@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>wearefeminism — Every voice deserves to be heard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=Figtree:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css?v=23" />
+</head>
+<body>
+  <script>document.body.classList.add("is-loading");</script>
+  <noscript><style>.preloader{display:none}</style></noscript>
+
+  <!-- Preloader: violet curtain with counter, lifts when the page is ready -->
+  <div class="preloader" id="preloader" aria-hidden="true">
+    <div class="preloader__inner">
+      <p class="preloader__mark">wearefeminism</p>
+      <div class="preloader__bar"><div class="preloader__bar-fill" id="preBar"></div></div>
+      <p class="preloader__count"><span id="preCount">0</span>%</p>
+    </div>
+  </div>
+
+  <!-- Custom cursor (fine pointers only) -->
+  <div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
+  <div class="cursor-ring" id="cursorRing" aria-hidden="true"></div>
+
+  <!-- Viewport edge glow — Apple Intelligence-style flowing border -->
+  <div class="edge-glow" id="edgeGlow" aria-hidden="true">
+    <div class="edge-glow__ring"></div>
+    <div class="edge-glow__bloom"></div>
+  </div>
+
+  <!-- GPU fluid simulation: lives behind everything, shows through the
+       transparent hero, reacts to the cursor across the whole page -->
+  <canvas class="fluid-bg" id="fluid" aria-hidden="true"></canvas>
+
+  <!-- page-wide scroll guide line -->
+  <div class="progress-line" aria-hidden="true">
+    <div class="progress-line__fill" id="plFill"></div>
+    <div class="progress-line__dot" id="plDot"></div>
+  </div>
+
+  <!-- ===== Nav ===== -->
+  <header class="nav" id="nav">
+    <a class="nav__logo" href="#top" data-magnetic>wearefeminism</a>
+    <nav class="nav__links">
+      <a href="#paths" data-magnetic>Start here</a>
+      <a href="#wall" data-magnetic>The Wall</a>
+      <a href="#pulse" data-magnetic>Pulse check</a>
+      <button class="quick-exit" id="quickExit" title="Instantly leave this site" data-magnetic>Quick exit</button>
+    </nav>
+  </header>
+
+  <!-- ===== Hero ===== -->
+  <section class="hero" id="top">
+    <p class="hero__eyebrow line-reveal"><span>A community for us, by us</span></p>
+    <h1 class="hero__title">
+      <span class="line-reveal"><span>Every voice</span></span>
+      <span class="line-reveal"><span>deserves to be</span></span>
+      <span class="line-reveal"><span><em>heard.</em></span></span>
+    </h1>
+    <p class="hero__sub line-reveal"><span>A space for students — especially girls and Black girls — to learn about feminism, share real experiences, and stand behind each other. Anonymous, always.</span></p>
+    <div class="hero__ctas line-reveal">
+      <span>
+        <a href="#wall" class="cta" data-magnetic>Share your story <span class="cta__arrow">→</span></a>
+        <a href="#paths" class="cta cta--quiet" data-magnetic>Find your way in <span class="cta__arrow">→</span></a>
+      </span>
+    </div>
+  </section>
+
+  <!-- ===== Marquee: student voices ===== -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee__inner" id="marquee">
+      <span>“I just want somewhere to be honest.” — student, 16&ensp;✦&ensp;“Nobody asks what we actually go through.” — student, 15&ensp;✦&ensp;“I didn’t know there was a word for what I felt.” — student, 17&ensp;✦&ensp;“Hearing other girls’ stories made me feel less alone.” — student, 14&ensp;✦&ensp;</span>
+      <span>“I just want somewhere to be honest.” — student, 16&ensp;✦&ensp;“Nobody asks what we actually go through.” — student, 15&ensp;✦&ensp;“I didn’t know there was a word for what I felt.” — student, 17&ensp;✦&ensp;“Hearing other girls’ stories made me feel less alone.” — student, 14&ensp;✦&ensp;</span>
+    </div>
+  </div>
+
+  <!-- ===== Pathways ===== -->
+  <section class="paths" id="paths">
+    <p class="eyebrow reveal">Start where you are</p>
+    <div class="paths__list">
+      <a href="#grounding" class="pathway reveal">
+        <span class="pathway__num">01</span>
+        <div class="pathway__body">
+          <h2>Learn</h2>
+          <p>Feminism, Black feminism, intersectionality — explained with respect for your intelligence.</p>
+        </div>
+        <span class="pathway__arrow">→</span>
+      </a>
+      <a href="#wall" class="pathway reveal">
+        <span class="pathway__num">02</span>
+        <div class="pathway__body">
+          <h2>Share <em>your</em> story</h2>
+          <p>What you’ve lived through matters. Put it on the wall — no name, no account, no pressure.</p>
+        </div>
+        <span class="pathway__arrow">→</span>
+      </a>
+      <a href="#wall" class="pathway reveal">
+        <span class="pathway__num">03</span>
+        <div class="pathway__body">
+          <h2>Join the conversation</h2>
+          <p>Read what others have shared and respond with support. Sometimes one reply changes a whole day.</p>
+        </div>
+        <span class="pathway__arrow">→</span>
+      </a>
+    </div>
+    <p class="paths__help reveal">Need real help right now? <strong>Kids Help Phone — text CONNECT to 686868.</strong> Free, confidential, 24/7.</p>
+  </section>
+
+  <!-- ===== Grounding: what students told us ===== -->
+  <section class="grounding" id="grounding">
+    <canvas class="gem-canvas" id="gemCanvas" aria-hidden="true"></canvas>
+    <p class="eyebrow reveal">Why this exists</p>
+    <blockquote class="pull reveal">
+      <p>Students told us the same two things, again and again: they want <em>somewhere to speak</em>, and <em>someone to answer.</em></p>
+    </blockquote>
+    <blockquote class="pull pull--indent reveal">
+      <p>Many said they’d only share if they could stay anonymous — so here, anonymity isn’t a setting. It’s the <em>default.</em></p>
+    </blockquote>
+    <blockquote class="pull reveal">
+      <p>And Black girls told us their experiences were treated as an afterthought. On this site, Black feminism isn’t a chapter — it’s the <em>foundation.</em></p>
+    </blockquote>
+  </section>
+
+  <!-- ===== Ask: pinned — question held center while the edge glow flares ===== -->
+  <section class="askpin" id="ask" aria-label="What is feminism">
+    <div class="askpin__stage">
+      <div class="askpin__veil" aria-hidden="true"></div>
+      <div class="askpin__fallback" aria-hidden="true"></div>
+      <canvas class="askpin__glow" id="siriGlow" aria-hidden="true"></canvas>
+      <h2 class="askpin__line">Hey — what <em>is</em> feminism?</h2>
+    </div>
+  </section>
+
+  <!-- ===== What is feminism — blank section for Carl's future content ===== -->
+  <section class="whatis" id="whatis" aria-label="What is feminism — content">
+    <!-- ============ CONTENT GOES HERE ============
+         Carl: fill this section in later. It's intentionally
+         blank (solid deep violet). Add your heading and copy
+         inside this section whenever you're ready. -->
+  </section>
+
+  <!-- ===== Pillars: scroll-pinned deck fans out, then flips ===== -->
+  <section class="ec-section" id="pillars" aria-label="What we're building">
+    <h2 class="ec-heading">What we're <em>building.</em></h2>
+    <div class="ec-cards">
+      <div class="ec-card" style="--accent:#2e2145">
+        <div class="ec-card-front" style="background-image:url('img/back-black.png')"><div class="ec-card-panel"><span class="ec-card-index">01</span><h3>Community</h3><ul><li>Peer support</li><li>Events</li><li>Workshops</li><li>Mentorship</li></ul></div></div>
+        <div class="ec-card-back" style="background-image:url('img/back-black.png')"></div>
+      </div>
+      <div class="ec-card" style="--accent:#a8459e">
+        <div class="ec-card-front" style="background-image:url('img/back-magenta.png')"><div class="ec-card-panel"><span class="ec-card-index">02</span><h3>Education</h3><ul><li>Readings</li><li>Toolkits</li><li>Guest speakers</li><li>Guides</li></ul></div></div>
+        <div class="ec-card-back" style="background-image:url('img/back-magenta.png')"></div>
+      </div>
+      <div class="ec-card" style="--accent:#a8459e">
+        <div class="ec-card-front" style="background-image:url('img/back-magenta.png')"><div class="ec-card-panel"><span class="ec-card-index">03</span><h3>Advocacy</h3><ul><li>Campaigns</li><li>Campus policy</li><li>Petitions</li><li>Outreach</li></ul></div></div>
+        <div class="ec-card-back" style="background-image:url('img/back-magenta.png')"></div>
+      </div>
+      <div class="ec-card" style="--accent:#9a5fa5">
+        <div class="ec-card-front" style="background-image:url('img/back-lavender.png')"><div class="ec-card-panel"><span class="ec-card-index">04</span><h3>Voices</h3><ul><li>The Wall</li><li>Interviews</li><li>Spotlights</li><li>Zines</li></ul></div></div>
+        <div class="ec-card-back" style="background-image:url('img/back-lavender.png')"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Flythrough: scroll flies the camera through 3D space ===== -->
+  <section class="fly" id="mission" aria-label="Our mission">
+    <div class="fly__sticky">
+      <canvas class="fly__canvas" id="flyCanvas" aria-hidden="true"></canvas>
+      <div class="fly__line" id="flyLine"></div>
+      <div class="fly__overlay" id="flyOverlay">
+        <p class="eyebrow eyebrow--light">Our promise</p>
+        <p class="fly__statement">This is where <em>silence</em> ends.</p>
+        <p class="fly__sub">Keep going — the wall is yours.</p>
+      </div>
+      <div class="fly__fallback">
+        <p class="eyebrow eyebrow--light">Our promise</p>
+        <p class="fly__statement">This is where <em>silence</em> ends.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== The Wall (dark immersive) ===== -->
+  <section class="wall-section" id="wall">
+    <canvas class="wall-canvas" id="wallCanvas" aria-hidden="true"></canvas>
+    <div class="wall-section__inner">
+      <p class="eyebrow eyebrow--light reveal">The wall</p>
+      <h2 class="wall-section__title reveal">Say what you <em>need</em> to say.</h2>
+      <p class="wall-section__sub reveal">Every story here is anonymous. Every reply is a hand on a shoulder.</p>
+
+      <form class="composer siri-glow reveal" id="wallForm" style="--r: 18px">
+        <span class="siri-glow__bloom" aria-hidden="true"></span>
+        <span class="siri-glow__border" aria-hidden="true"></span>
+        <textarea id="wallText" rows="3" placeholder="What do you want to share?" required></textarea>
+        <div class="composer__row">
+          <span class="composer__anon">Posted anonymously — no names, no accounts</span>
+          <button type="submit" class="btn" data-magnetic>Put it on the wall</button>
+        </div>
+      </form>
+
+      <div class="wall" id="wallList"></div>
+
+      <p class="wall-section__note reveal">Be gentle with each other. This wall lifts people up — it never tears them down.</p>
+    </div>
+  </section>
+
+  <!-- ===== Pulse Check ===== -->
+  <section class="pulse" id="pulse">
+    <p class="eyebrow reveal">Pulse check</p>
+    <h2 class="pulse__title reveal">How familiar are you with <em>intersectionality?</em></h2>
+
+    <div class="pulse__scale reveal" id="pulseScale">
+      <button class="pulse__option" data-val="1"><span class="pulse__n">1</span><span class="pulse__label">Never heard of it</span></button>
+      <button class="pulse__option" data-val="2"><span class="pulse__n">2</span><span class="pulse__label">Heard the word</span></button>
+      <button class="pulse__option" data-val="3"><span class="pulse__n">3</span><span class="pulse__label">Get the idea</span></button>
+      <button class="pulse__option" data-val="4"><span class="pulse__n">4</span><span class="pulse__label">Could explain it</span></button>
+      <button class="pulse__option" data-val="5"><span class="pulse__n">5</span><span class="pulse__label">Live and breathe it</span></button>
+    </div>
+
+    <div class="pulse__results" id="pulseResults" hidden>
+      <p class="pulse__thanks">Thank you — here’s where everyone stands so far.</p>
+      <div class="pulse__bars" id="pulseBars"></div>
+    </div>
+
+    <form class="pulse__open reveal" id="pulseForm">
+      <label class="pulse__open-label" for="pulseText">One more thing — what do you wish this space had?</label>
+      <div class="siri-glow siri-glow--field" style="--r: 14px">
+        <span class="siri-glow__bloom" aria-hidden="true"></span>
+        <span class="siri-glow__border" aria-hidden="true"></span>
+        <textarea id="pulseText" rows="2" placeholder="Anything. Big or small." required></textarea>
+      </div>
+      <button type="submit" class="btn btn--gold" data-magnetic>Send it</button>
+      <p class="pulse__sent" id="pulseSent" hidden>Received. Thank you for shaping this place.</p>
+    </form>
+  </section>
+
+  <!-- ===== Footer ===== -->
+  <footer class="footer">
+    <p class="footer__mark">wearefeminism</p>
+    <p class="footer__coming">Growing soon — workshops · mentorship · resource hub</p>
+    <a class="footer__ig" href="https://instagram.com/ourfeministspacee" target="_blank" rel="noopener" data-magnetic>@ourfeministspacee on Instagram →</a>
+    <p class="footer__fine">Made with care. Your words are anonymous, and you never have to share your name.</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/webgl-fluid@0.4.0/dist/webgl-fluid.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script src="js/scroll.js?v=23"></script>
+  <script src="js/edge.js?v=23"></script>
+  <script src="js/engulf.js?v=23"></script>
+  <script src="js/siri.js?v=23"></script>
+  <script src="js/polish.js?v=23"></script>
+  <script src="js/main.js?v=23"></script>
+  <script src="js/fluid.js?v=23"></script>
+  <script src="js/scene3d.js?v=23"></script>
+  <script src="js/wall3d.js?v=23"></script>
+  <script src="js/cards.js?v=23"></script>
+  <script src="js/thread.js?v=23"></script>
+</body>
+</html>
