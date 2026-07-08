@@ -31,7 +31,7 @@
      1. KINETIC TEXT — split headlines into masked, lifting words
      ============================================================ */
   const kineticTargets = document.querySelectorAll(
-    ".ec-heading, .fly__statement, .wall-section__title, .pulse__title"
+    ".ec-heading, .fly__statement, .wall-section__title, .bias__title, .pulse__title"
   );
 
   function splitWords(el) {

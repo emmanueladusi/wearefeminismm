@@ -1477,6 +1477,16 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
    element blurs then hard-clips to a thin crisp ring. Splitting them clips
    to the ring FIRST, then blurs it — giving the wide, deep, soft glow of
    the original. */
+/* dark inner well — a soft inset darkening hugging the rounded frame edge so
+   the rainbow border reads as emitted light on the light paper. Fades to
+   transparent before the centre, so the chat box still sits on cream. Lives
+   behind the bands; fades in with the stack (opacity = --ag-reveal). */
+.ag-backing {
+  position: absolute; inset: 0;
+  border-radius: var(--ag-radius);
+  pointer-events: none;
+  box-shadow: inset 0 0 120px 30px rgba(20, 10, 4, 0.55);
+}
 .ag-band { position: absolute; inset: 0; animation: ag-breathe 4.5s ease-in-out infinite; }
 .ag-ring {
   position: absolute; inset: 0;
@@ -1497,9 +1507,9 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
    ONCE and just sit there as a composited layer. Only the sharp rings
    (bands 3 & 4) and the comet keep reading the animated --ag-angle, so the
    visible rainbow flow is unchanged. */
-.ag-band1 { filter: blur(60px) saturate(2.6) brightness(1.05); --o: 0.6; --ag-angle: 130deg; }
+.ag-band1 { filter: blur(60px) saturate(3.0) brightness(1.14); --o: 0.74; --ag-angle: 130deg; }
 .ag-band1 .ag-ring { padding: 44px; }
-.ag-band2 { filter: blur(34px) saturate(2.6) brightness(1.05); --o: 0.85; --ag-angle: 290deg; }
+.ag-band2 { filter: blur(34px) saturate(3.0) brightness(1.14); --o: 0.98; --ag-angle: 290deg; }
 .ag-band2 .ag-ring { padding: 26px; }
 /* PERF (the big one): the crisp ring carries the SVG turbulence warp + the
    drop-shadow chromatic aberration — the whole heavy filter chain. It is now
@@ -1510,7 +1520,7 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
    repaint. So no SVG filter and no drop-shadow ever run per frame. */
 .ag-band3 {
   --ag-angle: 40deg;
-  filter: url(#ag-warp) blur(3px) saturate(2.5) brightness(1.08)
+  filter: url(#ag-warp) blur(3px) saturate(2.9) brightness(1.16)
           drop-shadow(2.2px 0 0.5px rgba(255, 30, 90, 0.7))
           drop-shadow(-2.2px 0 0.5px rgba(30, 140, 255, 0.7));
   --o: 1;
@@ -1518,7 +1528,7 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
 .ag-band3 .ag-ring { padding: 12px; }
 /* the mid glow rotates now — a single plain blurred ring is the only
    full-frame repaint per frame, giving the rainbow its living flow cheaply. */
-.ag-band4 { filter: blur(8px)  saturate(2.5) brightness(1.1); --o: 0.92; }
+.ag-band4 { filter: blur(8px)  saturate(2.9) brightness(1.18); --o: 1; }
 .ag-band4 .ag-ring { padding: 18px; }
 
 /* travelling yellow comet — same mask-inner / blur-outer structure */
@@ -1557,7 +1567,7 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
   right: -20vmax; top: -22vmax;
   width: 55vmax; height: 55vmax;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,190,150,0.35), rgba(255,120,180,0) 62%);
+  background: radial-gradient(circle, rgba(255,205,165,0.42), rgba(255,150,190,0) 62%);
   filter: blur(34px);
   mix-blend-mode: screen;
 }
@@ -1570,30 +1580,28 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
   position: absolute;
   top: -60%;
   left: 0;
-  width: 58vmax;            /* MUCH bigger band of light */
+  width: 50vmax;
   height: 240%;
-  transform: translateX(-110vmax) rotate(-12deg);
+  transform: translateX(-120vmax) rotate(-12deg);
   opacity: 0;
   will-change: transform, opacity;
-  /* rainbow leak — the SAME vivid colours as the border ring, as a bright
-     wavy band of light */
-  background: linear-gradient(108deg,
-    rgba(255,40,80,0)      0%,
-    rgba(255,40,80,0.040)  10%,
-    rgba(255,140,30,0.055) 23%,
-    rgba(255,225,40,0.060) 36%,
-    rgba(70,220,90,0.060)  49%,
-    rgba(30,210,235,0.060) 62%,
-    rgba(45,110,255,0.055) 75%,
-    rgba(150,55,255,0.045) 88%,
-    rgba(255,55,190,0)     100%);
-  /* heavy blur dissolves any defined edge — just a seamless haze of colour
-     drifting through, never a visible band */
-  filter: url(#ag-leakwave) blur(55px) saturate(2.2);
-  /* normal compositing (not screen) — over the LIGHT interior an additive
-     blend washes to white, so we paint the vivid rainbow directly to match the
-     saturated border glow. The transparent ends keep it reading as a band. */
-  mix-blend-mode: normal;
+  /* Oryzo-style leak: NOT a vivid rainbow band — a soft LUMINOUS pass. A hot
+     warm-white core with only a faint rose/cyan/violet chromatic fringe, so it
+     reads as real light sweeping across the frame (which desaturates + warps
+     the question as it crosses), rather than a coloured stripe. */
+  background: linear-gradient(102deg,
+    rgba(120,190,255,0)    0%,
+    rgba(120,190,255,0.05) 18%,   /* cool cyan fringe — leading edge */
+    rgba(255,150,200,0.12) 33%,   /* rose */
+    rgba(255,238,215,0.55) 50%,   /* hot warm-white core */
+    rgba(255,180,120,0.16) 66%,   /* amber — trailing */
+    rgba(150,120,255,0.05) 82%,   /* faint violet fringe */
+    rgba(150,120,255,0)    100%);
+  /* softened once + a wavy edge; screen-blended so it behaves like light —
+     glowing bright as it crosses the dark-welled border, gentle over the
+     light interior. Moved only by transform, so the blur stays cached. */
+  filter: url(#ag-leakwave) blur(48px) saturate(1.5) brightness(1.12);
+  mix-blend-mode: screen;
 }
 
 /* one slow, soft pass — the light drifts across like a breath of wind rather
@@ -1811,3 +1819,192 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
   font-variant-numeric: tabular-nums;
 }
 .sparkcard__counts b { color: var(--ink); }
+
+/* ===== Spot the Bias (timed feed game) ===== */
+.bias {
+  padding: clamp(90px, 12vw, 160px) clamp(20px, 7vw, 96px);
+  max-width: 760px;
+  margin: 0 auto;
+  text-align: center;
+}
+.bias__title {
+  font-size: clamp(1.9rem, 5vw, 3.4rem);
+  line-height: 1.12;
+  margin-bottom: 20px;
+}
+.bias__intro {
+  color: var(--ink-dim);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  max-width: 48ch;
+  margin: 0 auto 38px;
+}
+.bias__stage { position: relative; min-height: 380px; }
+
+/* start screen */
+.bias__start { display: flex; flex-direction: column; align-items: center; gap: 22px; }
+.bias__startrow { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; justify-content: center; }
+.bias__toggle {
+  font-family: var(--sans); font-weight: 600; font-size: 0.9rem;
+  display: inline-flex; align-items: center; gap: 8px;
+  background: transparent; color: var(--ink-dim);
+  border: 1px solid var(--line); border-radius: 999px; padding: 12px 18px; cursor: pointer;
+  transition: color 0.25s, border-color 0.25s, background 0.25s;
+}
+.bias__toggle.is-on { color: var(--violet); border-color: var(--violet); background: var(--gold-soft); }
+.bias__hint { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.08em; color: var(--ink-dim); }
+.bias__hint b { color: var(--violet); }
+
+/* feed */
+.bias__feed { display: flex; flex-direction: column; gap: 18px; }
+.bias__hud {
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.06em; color: var(--ink-dim);
+}
+.bias__count, .bias__score b { color: var(--ink); }
+.bias__pause {
+  font-family: var(--mono); font-size: 0.8rem; color: var(--ink-dim);
+  background: transparent; border: 1px solid var(--line); border-radius: 999px;
+  min-width: 40px; padding: 5px 11px; cursor: pointer; line-height: 1;
+  transition: color 0.2s, border-color 0.2s;
+}
+.bias__pause:hover { color: var(--violet); border-color: var(--violet); }
+
+/* card */
+.bias-card {
+  position: relative; isolation: isolate;
+  background: #fffdfa; border: 1px solid var(--line); border-radius: 20px;
+  padding: 26px 26px 22px; text-align: left; outline: none;
+  box-shadow: 0 22px 50px -20px rgba(44, 33, 64, 0.22), 0 2px 8px rgba(44, 33, 64, 0.05);
+  transition: box-shadow 0.4s var(--ease), border-color 0.4s var(--ease);
+}
+.bias-card__head { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.bias-card__avatar {
+  width: 26px; height: 26px; border-radius: 50%; opacity: 0.85;
+  background: conic-gradient(from 0deg, #30d5c8, #7b61ff, #ff3cac, #ffb86b, #6ee7b7, #30d5c8);
+}
+.bias-card__kind {
+  font-family: var(--mono); font-size: 0.68rem; text-transform: uppercase;
+  letter-spacing: 0.18em; color: var(--gold);
+}
+.bias-card__text {
+  font-family: var(--serif); font-size: clamp(1.25rem, 3.4vw, 1.6rem);
+  line-height: 1.32; color: var(--ink);
+}
+.bias-card__bar {
+  margin-top: 20px; height: 4px; border-radius: 999px;
+  background: rgba(44, 33, 64, 0.1); overflow: hidden;
+}
+.bias-card__fill {
+  display: block; height: 100%; width: 100%; border-radius: inherit;
+  background: linear-gradient(90deg, var(--violet), var(--gold));
+}
+.bias-card__feedback {
+  min-height: 1.2em; margin-top: 14px;
+  font-family: var(--sans); font-weight: 600; font-size: 0.95rem; color: var(--ink-dim);
+}
+
+/* feedback states — soft, never alarm-red */
+.bias-card.is-correct {
+  border-color: rgba(88, 179, 137, 0.6);
+  box-shadow: 0 0 0 1px rgba(88, 179, 137, 0.5), 0 18px 44px -18px rgba(88, 179, 137, 0.5);
+  animation: biasPulse 0.9s var(--ease);
+}
+.bias-card.is-correct .bias-card__feedback { color: #3f9d6e; }
+.bias-card.is-soft {
+  border-color: rgba(123, 97, 255, 0.35);
+  box-shadow: 0 18px 40px -20px rgba(74, 53, 104, 0.3);
+}
+.bias-card.is-soft .bias-card__feedback { color: var(--violet); }
+@keyframes biasPulse {
+  0% { box-shadow: 0 0 0 0 rgba(88, 179, 137, 0), 0 18px 44px -18px rgba(88, 179, 137, 0.3); }
+  40% { box-shadow: 0 0 0 6px rgba(88, 179, 137, 0.18), 0 18px 44px -18px rgba(88, 179, 137, 0.5); }
+  100% { box-shadow: 0 0 0 1px rgba(88, 179, 137, 0.5), 0 18px 44px -18px rgba(88, 179, 137, 0.4); }
+}
+
+/* actions */
+.bias__actions { display: flex; gap: 12px; }
+.bias__btn {
+  flex: 1; font-family: var(--sans); font-weight: 700; font-size: 0.98rem;
+  border-radius: 14px; padding: 15px 18px; cursor: pointer; border: 1px solid var(--line);
+  transition: transform 0.2s var(--ease), box-shadow 0.25s, background 0.25s, color 0.25s, border-color 0.25s;
+}
+.bias__btn:hover { transform: translateY(-2px); }
+.bias__btn--flag { background: var(--violet); color: var(--paper); border-color: var(--violet); }
+.bias__btn--flag:hover { box-shadow: 0 10px 26px rgba(74, 53, 104, 0.35); }
+.bias__btn--fair { background: transparent; color: var(--ink); }
+.bias__btn--fair:hover { border-color: var(--violet); color: var(--violet); }
+
+/* end screen */
+.bias__end { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.bias__score-big { font-family: var(--serif); }
+.bias__score-big b { font-size: clamp(3rem, 10vw, 4.4rem); color: var(--ink); }
+.bias__score-big span { font-size: 1.3rem; color: var(--ink-dim); margin-left: 8px; }
+.bias__end-line { color: var(--ink-dim); max-width: 44ch; line-height: 1.6; }
+.bias-reviews {
+  list-style: none; display: flex; flex-direction: column; gap: 12px;
+  width: 100%; text-align: left; margin: 14px 0 8px;
+}
+.bias-review {
+  background: #fffdfa; border: 1px solid var(--line); border-left-width: 3px;
+  border-radius: 14px; padding: 16px 18px;
+}
+.bias-review.is-good { border-left-color: #58b389; }
+.bias-review.is-miss { border-left-color: var(--gold); }
+.bias-review__top {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+  font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--ink-dim);
+}
+.bias-review__mark { font-weight: 700; }
+.bias-review.is-good .bias-review__mark { color: #3f9d6e; }
+.bias-review.is-miss .bias-review__mark { color: var(--gold); }
+.bias-review__text { font-family: var(--serif); font-size: 1.1rem; color: var(--ink); margin-bottom: 6px; }
+.bias-review__why { font-size: 0.92rem; line-height: 1.55; color: var(--ink-dim); }
+
+@media (max-width: 520px) {
+  .bias__actions { flex-direction: column; }
+}
+
+/* ===== Brandmark: oversized wordmark ===== */
+.brandmark {
+  min-height: 82vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(60px, 12vw, 150px) 5vw;
+  text-align: center;
+  overflow: hidden; /* the outer letters slide in from off-centre — no h-scroll */
+}
+/* Wordmark construction reveal (js/heroReveal.js + js/brandmarkData.js):
+   every letter is built live from its real vector anchor points — amber
+   square NODES on on-curve points, amber DOTS on bézier handles, dashed
+   construction CIRCLES on the round letters, over a faint blueprint GRID —
+   then the solid ink wordmark materialises as the rig dissolves. Themed for
+   light paper (ink + amber on cream). The SVG is injected into the host. */
+.brandmark__word {
+  position: relative;
+  display: block;
+  width: min(92vw, 1180px);
+  margin: 0;
+  line-height: 0; /* no extra box around the injected svg */
+}
+/* fallback when baked geometry is unavailable: plain readable wordmark */
+.brandmark__word--plain {
+  line-height: 1.1;
+  text-align: center;
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(2rem, 11vw, 10rem);
+  letter-spacing: -0.015em;
+  color: var(--ink);
+}
+.bmc-svg { display: block; width: 100%; height: auto; overflow: visible; }
+.bmc-grid line { stroke: rgba(44, 33, 64, 0.07); stroke-width: 1; stroke-dasharray: 6 10; }
+.bmc-fill { stroke: none; }
+.bmc-stroke { fill: none; stroke: rgba(44, 33, 64, 0.5); stroke-linecap: round; stroke-linejoin: round; }
+.bmc-box { fill: none; stroke: rgba(207, 140, 48, 0.6); stroke-dasharray: 7 7; }
+.bmc-circ { fill: none; stroke: rgba(44, 33, 64, 0.32); stroke-dasharray: 7 8; }
+.bmc-handle { stroke: rgba(207, 140, 48, 0.5); stroke-dasharray: 4 5; }
+.bmc-node { fill: #cf8c30; }
+.bmc-dot { fill: #cf8c30; }

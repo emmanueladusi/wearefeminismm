@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=Figtree:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=71" />
+  <link rel="stylesheet" href="css/styles.css?v=82" />
 </head>
 <body>
   <script>document.body.classList.add("is-loading");</script>
@@ -75,6 +75,14 @@
       <span>“I just want somewhere to be honest.” — student, 16&ensp;✦&ensp;“Nobody asks what we actually go through.” — student, 15&ensp;✦&ensp;“I didn’t know there was a word for what I felt.” — student, 17&ensp;✦&ensp;“Hearing other girls’ stories made me feel less alone.” — student, 14&ensp;✦&ensp;</span>
     </div>
   </div>
+
+  <!-- ===== Brandmark: oversized wordmark between the top and Learn.
+       js/heroReveal.js splits it into per-letter spans and runs the
+       outer-letters mask/slide/flip reveal, pinned while it plays. NOT
+       data-scene: it owns its own pin, so journey.js must not transform it. -->
+  <section class="brandmark" id="brandmark" data-bg="#f3ecdf">
+    <h2 class="brandmark__word" id="brandmarkWord" aria-label="wearefeminismm"></h2>
+  </section>
 
   <!-- ===== Pathways ===== -->
   <section class="paths" id="paths" data-bg="#faf6ef" data-scene>
@@ -173,6 +181,10 @@
     <div class="askpin__sticky">
       <div class="ag-panel">
         <div class="ag-stack" aria-hidden="true">
+          <!-- dark inner "well" so the rainbow reads as emitted light on the
+               light paper (the reference pops because it sits on near-black);
+               the panel centre + chat box stay cream. -->
+          <div class="ag-backing"></div>
           <div class="ag-band ag-band1"><div class="ag-ring"></div></div>
           <div class="ag-band ag-band2"><div class="ag-ring"></div></div>
           <div class="ag-band ag-band3"><div class="ag-ring"></div></div>
@@ -272,6 +284,15 @@
     </div>
   </section>
 
+  <!-- ===== Spot the Bias (timed feed game) ===== -->
+  <section class="bias" id="bias" data-bg="#f2ecf7" data-scene>
+    <p class="eyebrow reveal">Spot the bias</p>
+    <h2 class="bias__title reveal">Can you catch bias <em>as it scrolls by?</em></h2>
+    <p class="bias__intro reveal">A feed moves past you. Some posts carry quiet stereotypes; some are fair. Flag the biased ones before they slip away — trust your gut, then see what you caught.</p>
+    <!-- bias.js renders the start / feed / end screens inside here -->
+    <div class="bias__stage" id="biasStage"></div>
+  </section>
+
   <!-- ===== Pulse Check ===== -->
   <section class="pulse" id="pulse" data-bg="#efeaf5" data-scene>
     <p class="eyebrow reveal">Pulse check</p>
@@ -313,20 +334,24 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
-  <script src="js/scroll.js?v=71"></script>
-  <script src="js/morph.js?v=71"></script>
-  <script src="js/journey.js?v=71"></script>
-  <script src="js/pin.js?v=71"></script>
-  <script src="js/aiglow.js?v=71"></script>
-  <script src="js/engulf.js?v=71"></script>
-  <script src="js/polish.js?v=71"></script>
-  <script src="js/main.js?v=71"></script>
-  <script src="js/fluid.js?v=71"></script>
-  <script src="js/scene3d.js?v=71"></script>
-  <script src="js/wall3d.js?v=71"></script>
-  <script src="js/cards.js?v=71"></script>
-  <script src="js/thread.js?v=71"></script>
-  <script src="js/spark.js?v=71"></script>
+  <script src="js/scroll.js?v=78"></script>
+  <script src="js/morph.js?v=78"></script>
+  <script src="js/journey.js?v=78"></script>
+  <script src="js/pin.js?v=78"></script>
+  <script src="js/brandmarkData.js?v=80"></script>
+  <script src="js/heroReveal.js?v=80"></script>
+  <script src="js/aiglow.js?v=78"></script>
+  <script src="js/engulf.js?v=78"></script>
+  <script src="js/polish.js?v=78"></script>
+  <script src="js/main.js?v=78"></script>
+  <script src="js/fluid.js?v=78"></script>
+  <script src="js/scene3d.js?v=78"></script>
+  <script src="js/wall3d.js?v=78"></script>
+  <script src="js/cards.js?v=78"></script>
+  <script src="js/thread.js?v=78"></script>
+  <script src="js/spark.js?v=78"></script>
+  <script src="js/biasCards.js?v=78"></script>
+  <script src="js/bias.js?v=78"></script>
 </body>
 </html>
 
