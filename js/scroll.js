@@ -10,12 +10,20 @@
    Skipped entirely under prefers-reduced-motion (native scroll). */
 
 (function () {
+  // always begin at the top — browser scroll-restore lands mid-page after a
+  // reload, which desyncs the pinned scenes (they'd stick at opacity 0).
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+  window.scrollTo(0, 0);
+  window.addEventListener("load", () => window.scrollTo(0, 0));
+
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (reduceMotion || typeof Lenis === "undefined") return;
 
   const lenis = new Lenis({
-    duration: 1.1,
+    duration: 1.5,          // heavier glide — the page eases in like a journey, not clicks down
     smoothWheel: true,
+    wheelMultiplier: 0.9,   // a touch slower per notch so travel feels deliberate
+    touchMultiplier: 1.4,
   });
 
   if (typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined") {

@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=Figtree:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=23" />
+  <link rel="stylesheet" href="css/styles.css?v=71" />
 </head>
 <body>
   <script>document.body.classList.add("is-loading");</script>
@@ -26,11 +26,9 @@
   <div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
   <div class="cursor-ring" id="cursorRing" aria-hidden="true"></div>
 
-  <!-- Viewport edge glow — Apple Intelligence-style flowing border -->
-  <div class="edge-glow" id="edgeGlow" aria-hidden="true">
-    <div class="edge-glow__ring"></div>
-    <div class="edge-glow__bloom"></div>
-  </div>
+  <!-- Global colour-morph backdrop: one living field that shifts colour
+       across the whole scroll (js/morph.js). Sits behind the fluid sim. -->
+  <div class="morph-bg" id="morph" aria-hidden="true"></div>
 
   <!-- GPU fluid simulation: lives behind everything, shows through the
        transparent hero, reacts to the cursor across the whole page -->
@@ -54,7 +52,7 @@
   </header>
 
   <!-- ===== Hero ===== -->
-  <section class="hero" id="top">
+  <section class="hero" id="top" data-bg="#faf6ef" data-pin>
     <p class="hero__eyebrow line-reveal"><span>A community for us, by us</span></p>
     <h1 class="hero__title">
       <span class="line-reveal"><span>Every voice</span></span>
@@ -71,7 +69,7 @@
   </section>
 
   <!-- ===== Marquee: student voices ===== -->
-  <div class="marquee" aria-hidden="true">
+  <div class="marquee" aria-hidden="true" data-bg="#f3ecdf">
     <div class="marquee__inner" id="marquee">
       <span>“I just want somewhere to be honest.” — student, 16&ensp;✦&ensp;“Nobody asks what we actually go through.” — student, 15&ensp;✦&ensp;“I didn’t know there was a word for what I felt.” — student, 17&ensp;✦&ensp;“Hearing other girls’ stories made me feel less alone.” — student, 14&ensp;✦&ensp;</span>
       <span>“I just want somewhere to be honest.” — student, 16&ensp;✦&ensp;“Nobody asks what we actually go through.” — student, 15&ensp;✦&ensp;“I didn’t know there was a word for what I felt.” — student, 17&ensp;✦&ensp;“Hearing other girls’ stories made me feel less alone.” — student, 14&ensp;✦&ensp;</span>
@@ -79,7 +77,7 @@
   </div>
 
   <!-- ===== Pathways ===== -->
-  <section class="paths" id="paths">
+  <section class="paths" id="paths" data-bg="#faf6ef" data-scene>
     <p class="eyebrow reveal">Start where you are</p>
     <div class="paths__list">
       <a href="#grounding" class="pathway reveal">
@@ -111,7 +109,7 @@
   </section>
 
   <!-- ===== Grounding: what students told us ===== -->
-  <section class="grounding" id="grounding">
+  <section class="grounding" id="grounding" data-bg="#f2ecf7" data-scene>
     <canvas class="gem-canvas" id="gemCanvas" aria-hidden="true"></canvas>
     <p class="eyebrow reveal">Why this exists</p>
     <blockquote class="pull reveal">
@@ -125,18 +123,87 @@
     </blockquote>
   </section>
 
-  <!-- ===== Ask: pinned — question held center while the edge glow flares ===== -->
-  <section class="askpin" id="ask" aria-label="What is feminism">
-    <div class="askpin__stage">
-      <div class="askpin__veil" aria-hidden="true"></div>
-      <div class="askpin__fallback" aria-hidden="true"></div>
-      <canvas class="askpin__glow" id="siriGlow" aria-hidden="true"></canvas>
-      <h2 class="askpin__line">Hey — what <em>is</em> feminism?</h2>
+  <!-- ===== Pulse sparkline: live Yes/No tally from the pre-survey ===== -->
+  <section class="sparkpulse" id="boring-pulse" data-bg="#efeaf5" data-scene>
+    <div class="sparkcard reveal">
+      <p class="eyebrow">Pulse · live from the pre-survey</p>
+      <h2 class="sparkcard__q">Do students find learning about feminism <em>boring?</em></h2>
+      <div class="sparkcard__top">
+        <div class="sparkcard__big"><span id="sparkPct">—</span><small> said Yes</small></div>
+        <div class="sparkcard__verdict" id="sparkVerdict"></div>
+      </div>
+      <svg class="sparkcard__chart" id="sparkSvg" viewBox="0 0 500 120" preserveAspectRatio="none" aria-hidden="true">
+        <path id="sparkPath" class="sparkline-path"></path>
+        <circle id="sparkDot" class="spark-end-dot" r="6"></circle>
+      </svg>
+      <div class="sparkcard__foot">
+        <div class="sparkcard__counts" id="sparkCounts">Collecting responses…</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Ask: "what is feminism?" on a dark panel with the
+       flicker-proof Apple-Intelligence rainbow border (see css) ===== -->
+  <section class="askpin" id="ask" aria-label="What is feminism" data-bg="#f4eef8">
+    <!-- turbulence displacement: warps the sharp ring so the border ripples
+         like real emitted light instead of a perfect rounded rectangle -->
+    <svg class="ag-defs" width="0" height="0" aria-hidden="true" focusable="false">
+      <filter id="ag-warp" x="-25%" y="-25%" width="150%" height="150%" color-interpolation-filters="sRGB">
+        <!-- static noise field (computed once, not per frame) — the rippling
+             edge still reads because the rainbow colours rotate through it -->
+        <feTurbulence type="fractalNoise" baseFrequency="0.008 0.012" numOctaves="1" seed="7" result="n" />
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="13"
+                           xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+      <!-- refraction the light leak drags across the content: js/engulf.js
+           ramps the displacement scale up then down as the streak sweeps -->
+      <filter id="ag-distort" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.011 0.019" numOctaves="2" seed="3" result="dn" />
+        <feDisplacementMap id="ag-distort-map" in="SourceGraphic" in2="dn" scale="0"
+                           xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+      <!-- wavy edges for the rainbow light leak — warps its straight sides
+           into an organic, rippling band of light -->
+      <filter id="ag-leakwave" x="-45%" y="-45%" width="190%" height="190%" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.005 0.010" numOctaves="2" seed="9" result="lw" />
+        <feDisplacementMap in="SourceGraphic" in2="lw" scale="14"
+                           xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+    </svg>
+    <div class="askpin__sticky">
+      <div class="ag-panel">
+        <div class="ag-stack" aria-hidden="true">
+          <div class="ag-band ag-band1"><div class="ag-ring"></div></div>
+          <div class="ag-band ag-band2"><div class="ag-ring"></div></div>
+          <div class="ag-band ag-band3"><div class="ag-ring"></div></div>
+          <div class="ag-band ag-band4"><div class="ag-ring"></div></div>
+          <div class="ag-comet"><div class="ag-comet-ring"></div></div>
+          <!-- light leak: a single warm streak that whips across the frame with
+               a hot core + rose/cyan chromatic fringe, like a real film leak -->
+          <div class="ag-leak">
+            <span class="ag-leak__glow"></span>
+            <span class="ag-leak__streak"></span>
+          </div>
+        </div>
+      </div>
+      <div class="askpin__content">
+        <!-- AI-style chat prompt: js/engulf.js auto-types the question in, then
+             the send "fires" the Apple-Intelligence border. Purely animated. -->
+        <div class="aichat" id="aiChat" aria-hidden="true">
+          <span class="aichat__spark">✦</span>
+          <div class="aichat__field">
+            <span class="aichat__text" id="aiChatText" data-placeholder="Ask anything…"></span><span class="aichat__caret"></span>
+          </div>
+          <span class="aichat__send" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+          </span>
+        </div>
+      </div>
     </div>
   </section>
 
   <!-- ===== What is feminism — blank section for Carl's future content ===== -->
-  <section class="whatis" id="whatis" aria-label="What is feminism — content">
+  <section class="whatis" id="whatis" aria-label="What is feminism — content" data-bg="#2e2145" data-scene>
     <!-- ============ CONTENT GOES HERE ============
          Carl: fill this section in later. It's intentionally
          blank (solid deep violet). Add your heading and copy
@@ -144,7 +211,7 @@
   </section>
 
   <!-- ===== Pillars: scroll-pinned deck fans out, then flips ===== -->
-  <section class="ec-section" id="pillars" aria-label="What we're building">
+  <section class="ec-section" id="pillars" aria-label="What we're building" data-bg="#f3ecdf">
     <h2 class="ec-heading">What we're <em>building.</em></h2>
     <div class="ec-cards">
       <div class="ec-card" style="--accent:#2e2145">
@@ -167,7 +234,7 @@
   </section>
 
   <!-- ===== Flythrough: scroll flies the camera through 3D space ===== -->
-  <section class="fly" id="mission" aria-label="Our mission">
+  <section class="fly" id="mission" aria-label="Our mission" data-bg="#241a38">
     <div class="fly__sticky">
       <canvas class="fly__canvas" id="flyCanvas" aria-hidden="true"></canvas>
       <div class="fly__line" id="flyLine"></div>
@@ -184,16 +251,14 @@
   </section>
 
   <!-- ===== The Wall (dark immersive) ===== -->
-  <section class="wall-section" id="wall">
+  <section class="wall-section" id="wall" data-bg="#1a1330" data-scene>
     <canvas class="wall-canvas" id="wallCanvas" aria-hidden="true"></canvas>
     <div class="wall-section__inner">
       <p class="eyebrow eyebrow--light reveal">The wall</p>
       <h2 class="wall-section__title reveal">Say what you <em>need</em> to say.</h2>
       <p class="wall-section__sub reveal">Every story here is anonymous. Every reply is a hand on a shoulder.</p>
 
-      <form class="composer siri-glow reveal" id="wallForm" style="--r: 18px">
-        <span class="siri-glow__bloom" aria-hidden="true"></span>
-        <span class="siri-glow__border" aria-hidden="true"></span>
+      <form class="composer reveal" id="wallForm" style="--r: 18px" data-aig data-aig-radius="18" data-aig-duration="8">
         <textarea id="wallText" rows="3" placeholder="What do you want to share?" required></textarea>
         <div class="composer__row">
           <span class="composer__anon">Posted anonymously — no names, no accounts</span>
@@ -208,7 +273,7 @@
   </section>
 
   <!-- ===== Pulse Check ===== -->
-  <section class="pulse" id="pulse">
+  <section class="pulse" id="pulse" data-bg="#efeaf5" data-scene>
     <p class="eyebrow reveal">Pulse check</p>
     <h2 class="pulse__title reveal">How familiar are you with <em>intersectionality?</em></h2>
 
@@ -227,9 +292,7 @@
 
     <form class="pulse__open reveal" id="pulseForm">
       <label class="pulse__open-label" for="pulseText">One more thing — what do you wish this space had?</label>
-      <div class="siri-glow siri-glow--field" style="--r: 14px">
-        <span class="siri-glow__bloom" aria-hidden="true"></span>
-        <span class="siri-glow__border" aria-hidden="true"></span>
+      <div class="pulse__field" style="--r: 14px">
         <textarea id="pulseText" rows="2" placeholder="Anything. Big or small." required></textarea>
       </div>
       <button type="submit" class="btn btn--gold" data-magnetic>Send it</button>
@@ -238,7 +301,7 @@
   </section>
 
   <!-- ===== Footer ===== -->
-  <footer class="footer">
+  <footer class="footer" data-bg="#faf6ef" data-scene>
     <p class="footer__mark">wearefeminism</p>
     <p class="footer__coming">Growing soon — workshops · mentorship · resource hub</p>
     <a class="footer__ig" href="https://instagram.com/ourfeministspacee" target="_blank" rel="noopener" data-magnetic>@ourfeministspacee on Instagram →</a>
@@ -250,17 +313,20 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
-  <script src="js/scroll.js?v=23"></script>
-  <script src="js/edge.js?v=23"></script>
-  <script src="js/engulf.js?v=23"></script>
-  <script src="js/siri.js?v=23"></script>
-  <script src="js/polish.js?v=23"></script>
-  <script src="js/main.js?v=23"></script>
-  <script src="js/fluid.js?v=23"></script>
-  <script src="js/scene3d.js?v=23"></script>
-  <script src="js/wall3d.js?v=23"></script>
-  <script src="js/cards.js?v=23"></script>
-  <script src="js/thread.js?v=23"></script>
+  <script src="js/scroll.js?v=71"></script>
+  <script src="js/morph.js?v=71"></script>
+  <script src="js/journey.js?v=71"></script>
+  <script src="js/pin.js?v=71"></script>
+  <script src="js/aiglow.js?v=71"></script>
+  <script src="js/engulf.js?v=71"></script>
+  <script src="js/polish.js?v=71"></script>
+  <script src="js/main.js?v=71"></script>
+  <script src="js/fluid.js?v=71"></script>
+  <script src="js/scene3d.js?v=71"></script>
+  <script src="js/wall3d.js?v=71"></script>
+  <script src="js/cards.js?v=71"></script>
+  <script src="js/thread.js?v=71"></script>
+  <script src="js/spark.js?v=71"></script>
 </body>
 </html>
 

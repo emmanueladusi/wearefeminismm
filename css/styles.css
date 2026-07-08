@@ -153,6 +153,72 @@ em { font-style: italic; color: var(--violet); }
 
 .hero > * { position: relative; z-index: 1; }
 
+/* ===== Global colour-morph backdrop (js/morph.js) =====
+   One fixed field behind the fluid sim; its colour is interpolated across
+   the whole scroll so section seams dissolve. When the engine is live
+   (body.morph-on) every section drops its solid background and lets this
+   layer show through — except #ask, which keeps its light paper interior
+   for the rainbow border's pinned beat. */
+.morph-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -2;               /* behind the fluid sim (-1) */
+  background-color: var(--paper);
+  pointer-events: none;
+}
+body.morph-on .marquee,
+body.morph-on .paths,
+body.morph-on .grounding,
+body.morph-on .whatis,
+body.morph-on .ec-section,
+body.morph-on .fly,
+body.morph-on .fly__sticky,
+body.morph-on .wall-section,
+body.morph-on .pulse,
+body.morph-on .footer { background-color: transparent; }
+
+/* ===== Kinetic headline reveals (js/journey.js) =====
+   Each word sits in an overflow-clipped box and lifts into place on a
+   stagger when the heading enters view. The padding/negative-margin pair
+   gives descenders room so the clip never shaves a 'g' or 'y'. */
+.kin {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding: 0.14em 0.03em;
+  margin: -0.14em -0.03em;
+}
+.kin__i {
+  display: inline-block;
+  transform: translateY(118%);
+  opacity: 0;
+  transition: transform 0.9s var(--ease), opacity 0.9s var(--ease);
+  will-change: transform;
+  font-style: inherit; /* em words keep italics via existing `.section em` rules */
+}
+.kin-in .kin__i { transform: none; opacity: 1; }
+
+/* depth-scene planes composite on the GPU; origin a touch above centre so
+   they feel like they lift toward you as they arrive */
+[data-scene] { transform-origin: center 44%; backface-visibility: hidden; }
+
+/* pinned editorial slides (js/pin.js): sized to exactly one screen and
+   vertically centred, so their items can be revealed one at a time while the
+   frame holds still. overflow:hidden guards against any slight excess. */
+.pin-slide {
+  height: 100vh !important;
+  min-height: 100vh !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-top: clamp(84px, 12vh, 130px) !important;
+  padding-bottom: clamp(44px, 8vh, 88px) !important;
+  overflow: hidden;
+}
+.pin-slide .pathway { padding-top: clamp(14px, 2.2vh, 26px); padding-bottom: clamp(14px, 2.2vh, 26px); }
+.pin-slide .pull { margin-bottom: clamp(16px, 2.6vh, 32px); }
+.pin-slide .pull:last-of-type { margin-bottom: 0; }
+
 .hero__eyebrow {
   font-family: var(--mono);
   font-size: 0.72rem;
@@ -1310,9 +1376,13 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
 .edge-glow__bloom {
   position: absolute;
   inset: 0;
+  /* Richer, more vivid flow — violet → gold → rose → aqua → indigo, the
+     Apple-Intelligence palette warmed toward the site's feminist theme.
+     More stops = colors that melt into each other as the gradient spins. */
   background: conic-gradient(
     from var(--edge-angle, 0deg),
-    #8a63d2, #e8b45a, #c76a9e, #5b3f8f, #8a63d2
+    #8a63d2, #b98be0, #e8b45a, #f0c06a,
+    #c76a9e, #e07fb0, #5bc6d9, #5b3f8f, #8a63d2
   );
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
@@ -1320,15 +1390,19 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
   mask-composite: exclude;
 }
 
+/* thin bright ring — softened just slightly so it reads as emitted light,
+   not a hard stroke (the Apple Intelligence border is never razor-sharp) */
 .edge-glow__ring {
-  padding: 3px;
+  padding: 2.5px;
+  filter: blur(1.2px) saturate(1.5) brightness(1.1);
   opacity: calc(var(--edge-pulse, 0) * 0.95);
 }
 
+/* wide, dreamy inner bloom spilling from the edges toward the page */
 .edge-glow__bloom {
-  padding: 26px;
-  filter: blur(24px) saturate(1.4);
-  opacity: calc(var(--edge-pulse, 0) * 0.55);
+  padding: 42px;
+  filter: blur(36px) saturate(1.55);
+  opacity: calc(var(--edge-pulse, 0) * 0.6);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1336,103 +1410,279 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
 }
 
 /* =====================================================
-   Ask section — pinned via a tall scroll-track + sticky
-   stage (same technique as the #mission 3D section). Scroll
-   offset within the track drives an Apple-Intelligence / Siri
-   edge glow: glow in -> question out -> glow holds -> glow out
-   -> blank hold. Handled by js/engulf.js (WebGL shader).
+   Ask section — "Hey, what is feminism?" full-screen dark
+   moment wearing the Apple-Intelligence rainbow border.
+
+   Built the LIGHTWEIGHT way — the SAME technique as the site's
+   .edge-glow, which is already flicker-free in Chrome: a few
+   viewport-sized conic gradients whose ANGLE is animated via an
+   @property custom property (a cheap in-place repaint), masked
+   into a rounded-rect ring and blurred. No spinning 2400px
+   elements, no blend modes, no isolated group buffer — so Chrome
+   renders it as smoothly as Safari (the old approach spun six
+   huge blurred layers, which Chrome's tiler thrashed on under
+   the page's WebGL fluid sim, hence the Chrome-only flicker).
    ===================================================== */
 
-/* tall track: gives the scroll distance the sticky stage rides */
-.askpin { height: 420vh; position: relative; background: var(--paper); }
+@property --ag-angle   { syntax: "<angle>"; inherits: true; initial-value: 0deg; }
+@property --ag-comet-a { syntax: "<angle>"; inherits: true; initial-value: 0deg; }
 
-.askpin__stage {
+.askpin {
+  --ag-cream: #ffedd7;
+  --ag-radius: 44px;
+  position: relative;
+  height: 130svh;          /* pin covers the locked beat; releases soon after the border has faded */
+  background: var(--paper);
+}
+
+/* sticky stage — pins the question centred on screen (same technique as the
+   #mission fly-through). The rainbow border fades in across the scroll. */
+.askpin__sticky {
   position: sticky;
   top: 0;
   height: 100svh;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  overflow: hidden;        /* clips the border glow to the viewport */
   background: var(--paper);
-  /* driven by js/engulf.js from the scroll offset */
-  --reveal: 0;     /* glow intensity 0..1 */
-  --darken: 0;     /* dark veil opacity 0..1 */
-  --fallback: 1;   /* 0 once the WebGL glow takes over */
 }
 
-/* dark veil fades in so the glow reads as emitted light,
-   ending on the exact #whatis violet for a seamless handoff */
-.askpin__veil {
+/* the glow lives on a rounded frame INSET within the section (a margin all
+   around), so it fits the section rather than bleeding to the window edges.
+   No fill and no clip — the rainbow border frames a transparent interior and
+   its glow spills softly onto the page both sides. */
+.ag-panel {
   position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  opacity: var(--darken);
-  background: radial-gradient(130% 130% at 50% 42%,
-    #180e2e 0%, #241640 55%, #2e2145 100%);
+  inset: 0;                       /* full viewport — border hugs the window edges */
+  border-radius: var(--ag-radius);
 }
 
-/* WebGL Siri glow — screen-blends over the dark veil */
-.askpin__glow {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
+/* the stack drives the shared rotation angles; its OPACITY is driven by scroll
+   progress (--ag-reveal, set by js/engulf.js), so the border fades in as the
+   pinned question is scrolled through. .ag-live enables the rotation only
+   while the section is on screen. */
+.ag-stack {
+  position: absolute; inset: 0;
   pointer-events: none;
+  --ag-angle: 0deg;
+  --ag-comet-a: 0deg;
+  --ag-reveal: 0;
+  opacity: var(--ag-reveal);
+  transition: opacity 1s ease;   /* border blooms in when js sets --ag-reveal to 1 */
+}
+.ag-stack.ag-live {
+  animation: ag-spin 9s linear infinite, ag-comet-spin 2.3s linear infinite;
 }
 
-/* CSS fallback glow — only visible when WebGL is unavailable
-   (--fallback stays 1). A rounded aurora FRAME hugging an inset
-   border, matching the WebGL version: colours travel the frame. */
-.askpin__fallback {
-  position: absolute;
-  inset: 4.5%;
-  z-index: 1;
-  pointer-events: none;
-  border-radius: 26px;
-  opacity: calc(var(--reveal) * var(--fallback) * 0.85);
-  filter: blur(34px) saturate(1.25);
-  padding: 30px;
-  background: conic-gradient(from 0deg,
-    #ff6ec7, #7a84ff, #4d9dff, #ffbe6e, #965ce8, #ff6ec7);
+/* rainbow bands — CRITICAL: mask lives on the inner .ag-ring, blur on the
+   outer .ag-band. CSS applies filter BEFORE mask, so putting both on one
+   element blurs then hard-clips to a thin crisp ring. Splitting them clips
+   to the ring FIRST, then blurs it — giving the wide, deep, soft glow of
+   the original. */
+.ag-band { position: absolute; inset: 0; animation: ag-breathe 4.5s ease-in-out infinite; }
+.ag-ring {
+  position: absolute; inset: 0;
+  border-radius: var(--ag-radius);
+  box-sizing: border-box;
+  background: conic-gradient(from var(--ag-angle),
+    rgba(255,40,80,1), rgba(255,140,30,1), rgba(255,225,40,1), rgba(70,220,90,1),
+    rgba(30,210,235,1), rgba(45,110,255,1), rgba(150,55,255,1), rgba(255,55,190,1),
+    rgba(255,40,80,1));
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
-  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  mask-composite: exclude;
-  animation: siriSpin 14s linear infinite;
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask-composite: exclude;
+}
+/* PERF: bands 1 & 2 are wide diffuse halos — at blur(44px)/blur(22px) their
+   rotation is imperceptible, but re-blurring a full-viewport buffer every
+   frame is the single biggest cost. Pin them to a FIXED angle so they paint
+   ONCE and just sit there as a composited layer. Only the sharp rings
+   (bands 3 & 4) and the comet keep reading the animated --ag-angle, so the
+   visible rainbow flow is unchanged. */
+.ag-band1 { filter: blur(60px) saturate(2.6) brightness(1.05); --o: 0.6; --ag-angle: 130deg; }
+.ag-band1 .ag-ring { padding: 44px; }
+.ag-band2 { filter: blur(34px) saturate(2.6) brightness(1.05); --o: 0.85; --ag-angle: 290deg; }
+.ag-band2 .ag-ring { padding: 26px; }
+/* PERF (the big one): the crisp ring carries the SVG turbulence warp + the
+   drop-shadow chromatic aberration — the whole heavy filter chain. It is now
+   FROZEN at a fixed angle, so its filtered result is rasterised ONCE and
+   cached; it never re-runs while scrolling. It keeps the organic rippled,
+   lens-fringed edge — just static colours. The colour FLOW moves to band4
+   (a plain blurred ring, no SVG filter) + the comet, which are cheap to
+   repaint. So no SVG filter and no drop-shadow ever run per frame. */
+.ag-band3 {
+  --ag-angle: 40deg;
+  filter: url(#ag-warp) blur(3px) saturate(2.5) brightness(1.08)
+          drop-shadow(2.2px 0 0.5px rgba(255, 30, 90, 0.7))
+          drop-shadow(-2.2px 0 0.5px rgba(30, 140, 255, 0.7));
+  --o: 1;
+}
+.ag-band3 .ag-ring { padding: 12px; }
+/* the mid glow rotates now — a single plain blurred ring is the only
+   full-frame repaint per frame, giving the rainbow its living flow cheaply. */
+.ag-band4 { filter: blur(8px)  saturate(2.5) brightness(1.1); --o: 0.92; }
+.ag-band4 .ag-ring { padding: 18px; }
+
+/* travelling yellow comet — same mask-inner / blur-outer structure */
+.ag-comet { position: absolute; inset: 0; filter: blur(6px); }
+.ag-comet-ring {
+  position: absolute; inset: 0;
+  border-radius: var(--ag-radius);
+  box-sizing: border-box;
+  padding: 10px;
+  background: conic-gradient(from var(--ag-comet-a),
+    transparent 0deg, rgba(255,255,0,0.15) 6deg, rgba(255,255,0,0.6) 13deg,
+    rgba(255,255,0,1) 20deg, rgba(255,255,0,0.6) 27deg, rgba(255,255,0,0.15) 34deg,
+    transparent 42deg, transparent 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask-composite: exclude;
 }
 
-@keyframes siriSpin {
-  to { transform: rotate(360deg); }
+/* ---- light leak: a single luminous, soft-blurred diagonal band that WIPES
+   all the way across the frame — entering fast and decelerating to a stop near
+   the end (strong ease-out). A warm→rose→violet→cyan gradient at moderate
+   opacity, blurred ONCE and moved only by transform, so the blur is cached and
+   the whole sweep is GPU-cheap. Normal compositing so it reads over the light
+   interior as well as the border. Plus one faint static ambient glow so the
+   frame isn't empty between wipes. ---- */
+.ag-leak {
+  position: absolute; inset: 0;
+  border-radius: var(--ag-radius);
+  overflow: hidden;
+  pointer-events: none;
+}
+/* faint ambient warmth living in a corner */
+.ag-leak__glow {
+  position: absolute;
+  right: -20vmax; top: -22vmax;
+  width: 55vmax; height: 55vmax;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,190,150,0.35), rgba(255,120,180,0) 62%);
+  filter: blur(34px);
+  mix-blend-mode: screen;
+}
+/* the leak is now ONE tall, tilted streak of light: a warm gradient with a
+   hot amber core, softened once and thrown a rose edge on one side and a cyan
+   edge on the other (chromatic bleed). Screen-blended so it behaves like real
+   light — brightest as it crosses the vivid rainbow ring, gentle over the
+   light interior. Moved only by transform, so the blur is cached = GPU-cheap. */
+.ag-leak__streak {
+  position: absolute;
+  top: -60%;
+  left: 0;
+  width: 58vmax;            /* MUCH bigger band of light */
+  height: 240%;
+  transform: translateX(-110vmax) rotate(-12deg);
+  opacity: 0;
+  will-change: transform, opacity;
+  /* rainbow leak — the SAME vivid colours as the border ring, as a bright
+     wavy band of light */
+  background: linear-gradient(108deg,
+    rgba(255,40,80,0)      0%,
+    rgba(255,40,80,0.040)  10%,
+    rgba(255,140,30,0.055) 23%,
+    rgba(255,225,40,0.060) 36%,
+    rgba(70,220,90,0.060)  49%,
+    rgba(30,210,235,0.060) 62%,
+    rgba(45,110,255,0.055) 75%,
+    rgba(150,55,255,0.045) 88%,
+    rgba(255,55,190,0)     100%);
+  /* heavy blur dissolves any defined edge — just a seamless haze of colour
+     drifting through, never a visible band */
+  filter: url(#ag-leakwave) blur(55px) saturate(2.2);
+  /* normal compositing (not screen) — over the LIGHT interior an additive
+     blend washes to white, so we paint the vivid rainbow directly to match the
+     saturated border glow. The transparent ends keep it reading as a band. */
+  mix-blend-mode: normal;
 }
 
-.askpin__line {
-  position: relative;
-  z-index: 2;
-  font-family: var(--serif);
-  font-weight: 500;
-  font-size: clamp(2rem, 5vw, 4rem);
+/* one slow, soft pass — the light drifts across like a breath of wind rather
+   than whipping past. Gentle symmetric ease-in-out, long gradual fade in/out. */
+.ag-stack.ag-live .ag-leak__streak {
+  animation: ag-sweep 7.5s cubic-bezier(0.42, 0, 0.58, 1) 0.3s forwards;
+}
+
+@keyframes ag-sweep {
+  0%   { transform: translateX(-120vmax) rotate(-12deg); opacity: 0; }
+  36%  { opacity: 1; }
+  64%  { opacity: 1; }
+  100% { transform: translateX(180vmax) rotate(-12deg); opacity: 0; }
+}
+
+/* content — the question, crisp above the glow */
+.askpin__content {
+  position: absolute; inset: 0; z-index: 20;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 6vw; text-align: center;
+  opacity: 1;
+  transition: opacity 0.9s ease;  /* fades away 3s after the border is up */
+}
+.askpin__content.ask-faded { opacity: 0; }
+
+/* ===== AI-style chat prompt (js/engulf.js types into it) ===== */
+.aichat {
+  display: flex;
+  align-items: center;
+  gap: clamp(10px, 1.6vw, 16px);
+  width: min(560px, 88vw);
+  padding: 14px 14px 14px clamp(18px, 2.4vw, 24px);
+  background: #fffdfa;
+  border: 1px solid rgba(44, 33, 64, 0.12);
+  border-radius: 18px;
+  box-shadow: 0 18px 50px -16px rgba(44, 33, 64, 0.32), 0 2px 8px rgba(44, 33, 64, 0.06);
+  text-align: left;
+}
+.aichat__spark { color: var(--gold); font-size: 1.15rem; line-height: 1; flex: none; }
+.aichat__field {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  min-height: 1.7em;
+  font-family: var(--sans);
+  font-size: clamp(1.05rem, 2.5vw, 1.4rem);
   color: var(--ink);
-  text-align: center;
-  padding: 0 6vw;
-  will-change: opacity;
 }
+/* placeholder while the field is still empty (before typing starts) */
+.aichat__text:empty::before { content: attr(data-placeholder); color: var(--ink-dim); }
+.aichat__caret {
+  width: 2px;
+  height: 1.25em;
+  margin-left: 2px;
+  background: var(--violet);
+  opacity: 0;               /* only blinks while typing */
+  flex: none;
+}
+.aichat--typing .aichat__caret { animation: aichat-blink 1s steps(1) infinite; }
+.aichat__send {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: var(--violet);
+  color: var(--paper);
+  display: grid; place-items: center;
+  flex: none;
+  transition: background 0.35s var(--ease);
+}
+.aichat--sent .aichat__send { background: var(--gold); animation: aichat-send 0.55s var(--ease); }
 
-.askpin__line em { font-style: italic; color: var(--violet); }
-
-/* reduced motion / fallback: quiet static stage (no tall track) */
-.askpin.askpin--static { height: auto; padding: 120px 0; }
-.askpin.askpin--static .askpin__stage { position: static; height: auto; }
-.askpin.askpin--static .askpin__veil,
-.askpin.askpin--static .askpin__glow,
-.askpin.askpin--static .askpin__fallback { display: none; }
+@keyframes aichat-blink { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
+@keyframes aichat-send  { 0% { transform: scale(1); } 42% { transform: scale(0.82); } 100% { transform: scale(1); } }
 
 @media (prefers-reduced-motion: reduce) {
-  .askpin { height: auto; }
-  .askpin__stage { position: static; height: auto; padding: 120px 0; }
-  .askpin__veil, .askpin__glow, .askpin__fallback { display: none; }
+  .aichat__caret { display: none; }
+}
+
+/* hide the site-wide edge glow while this section fills the screen so the
+   two borders don't clash (js toggles .ask-glow-active on <body>) */
+.ask-glow-active .edge-glow { opacity: 0 !important; visibility: hidden !important; }
+
+@keyframes ag-spin       { to { --ag-angle: 360deg; } }
+@keyframes ag-comet-spin { to { --ag-comet-a: 360deg; } }
+@keyframes ag-breathe    { 0%,100% { opacity: calc(var(--o,1) * 0.72); } 50% { opacity: var(--o,1); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .ag-stack.ag-live, .ag-band, .ag-leak__streak { animation: none !important; }
+  .ag-stack { opacity: 1; }
 }
 
 /* =====================================================
@@ -1481,3 +1731,83 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
   opacity: 0;
   transition: opacity 0.3s;
 }
+
+/* ===== Pulse sparkline: live Yes/No from the pre-survey ===== */
+.sparkpulse {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12vh 24px;
+}
+.sparkcard {
+  width: 520px;
+  max-width: 94vw;
+  background: #fffdfa;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  padding: 34px 34px 28px;
+  box-shadow: 0 24px 55px -18px rgba(44, 33, 64, 0.22),
+              0 2px 8px rgba(44, 33, 64, 0.05);
+}
+.sparkcard .eyebrow { margin-bottom: 12px; }
+.sparkcard__q {
+  font-family: var(--serif);
+  font-size: clamp(1.4rem, 3.4vw, 1.75rem);
+  line-height: 1.18;
+  margin: 0 0 24px;
+}
+.sparkcard__top {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+.sparkcard__big {
+  font-family: var(--serif);
+  font-size: clamp(2.6rem, 8vw, 3.3rem);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--ink);
+}
+.sparkcard__big small {
+  font-family: var(--sans);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--ink-dim);
+}
+.sparkcard__verdict {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  font-size: 1rem;
+}
+.sparkcard__verdict svg { width: 15px; height: 15px; }
+.sparkcard__chart {
+  width: 100%;
+  height: 120px;
+  display: block;
+  overflow: visible;
+  margin-top: 22px;
+}
+.sparkline-path {
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.spark-end-dot { filter: drop-shadow(0 0 5px currentColor); }
+.sparkcard__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+.sparkcard__counts {
+  font-family: var(--sans);
+  font-size: 0.9rem;
+  color: var(--ink-dim);
+  font-variant-numeric: tabular-nums;
+}
+.sparkcard__counts b { color: var(--ink); }

@@ -20,6 +20,10 @@
   const el = document.getElementById("edgeGlow");
   if (!el || reduceMotion) return;
 
+  // Always-on baseline: the border never fully vanishes — it breathes
+  // gently around the viewport at all times, brightening on interaction.
+  const IDLE_BASE = 0.24;
+
   let pulse = 0;        // current eased intensity
   let target = 0;       // where pulse is heading
   let angle = 0;        // gradient rotation, degrees
@@ -34,10 +38,10 @@
   function setMode(m, durationMs) {
     mode = m;
     modeUntil = durationMs ? performance.now() + durationMs : Infinity;
-    if (m === "intro") { target = 0.85; speed = 120; }
+    if (m === "intro") { target = 0.9; speed = 120; }
     if (m === "typing") { target = 0.55; speed = 55; }
     if (m === "sweep") { target = 1; speed = 420; }
-    if (m === "idle") { target = 0; speed = 40; }
+    if (m === "idle") { target = IDLE_BASE; speed = 26; }
     wake();
   }
 
@@ -50,6 +54,15 @@
   }
 
   function loop(now) {
+    // While idle (the faint always-on breathing border), repaint at ~30fps
+    // instead of 60 — the drift is slow enough that it's imperceptible, and
+    // it halves the constant cost of recompositing this full-viewport blurred
+    // layer behind every scroll. Active moments keep the full frame rate.
+    if (mode === "idle" && boost < 0.01 && now - last < 32) {
+      requestAnimationFrame(loop);
+      return;
+    }
+
     const dt = Math.min(0.05, (now - last) / 1000);
     last = now;
 
@@ -58,9 +71,14 @@
       setModeAfterTimed();
     }
 
-    // breathing on top of the typing target (same 4s sine as the field glow)
+    // breathing — a slow sine on top of the target. Idle breathes softly
+    // (the always-on glow feels alive), typing breathes a touch harder and
+    // reacts to keystrokes.
     let t = target;
-    if (mode === "typing") {
+    if (mode === "idle") {
+      const breath = 0.86 + 0.14 * Math.sin(0.14 * (now / 1000) * Math.PI * 2);
+      t = target * breath + Math.min(0.3, boost * 0.3);
+    } else if (mode === "typing") {
       const breath = 0.5 + 0.25 * (Math.sin(0.25 * (now / 1000) * Math.PI * 2) + 1);
       t = target * breath + Math.min(0.35, boost * 0.35);
     }
@@ -73,13 +91,9 @@
     el.style.setProperty("--edge-pulse", pulse.toFixed(3));
     el.style.setProperty("--edge-angle", angle.toFixed(1) + "deg");
 
-    if (mode === "idle" && pulse < 0.004) {
-      pulse = 0;
-      el.style.setProperty("--edge-pulse", "0");
-      el.classList.remove("is-active");
-      running = false;
-      return;
-    }
+    // The border is always present now — the loop runs continuously to keep
+    // the colors flowing. (One lightweight rAF; no layout, just two custom
+    // properties per frame.)
     requestAnimationFrame(loop);
   }
 

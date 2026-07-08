@@ -24,8 +24,8 @@
       IMMEDIATE: true,        // a few splats on load so the hero isn't empty
       AUTO: true,             // ambient splats keep it alive when idle
       INTERVAL: 2600,
-      SIM_RESOLUTION: 128,
-      DYE_RESOLUTION: lean ? 512 : 1024,
+      SIM_RESOLUTION: lean ? 64 : 96,
+      DYE_RESOLUTION: lean ? 384 : 512,
       DENSITY_DISSIPATION: 1.4,   // ink lingers, then clears so paper stays clean
       VELOCITY_DISSIPATION: 0.35,
       PRESSURE: 0.8,
@@ -57,12 +57,18 @@
     );
   }
 
-  // only spend cycles reacting while the hero is actually on screen
+  // only spend cycles reacting while the hero is actually on screen — and
+  // once you've scrolled past it, drop the full-viewport GL layer out of the
+  // compositor so it stops being repainted behind every section as you scroll
+  // (the ink is only ever visible through the transparent hero anyway).
   let heroVisible = true;
   const hero = document.getElementById("top");
   if (hero) {
     new IntersectionObserver(
-      ([entry]) => (heroVisible = entry.isIntersecting),
+      ([entry]) => {
+        heroVisible = entry.isIntersecting;
+        canvas.style.visibility = heroVisible ? "" : "hidden";
+      },
       { threshold: 0 }
     ).observe(hero);
   }

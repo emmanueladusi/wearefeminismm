@@ -1,227 +1,226 @@
-/* Ask section — pinned via a tall scroll-track + sticky stage, the same
-   technique as the #mission 3D flythrough (CSS `position: sticky` on the
-   stage inside a tall `.askpin`; progress read from the section's scroll
-   offset each frame — no GSAP pin). Staged across the track:
+/* Ask section — "Hey, what is feminism?" pins centred on screen, then plays a
+   fixed beat:
+     1. the Apple-Intelligence rainbow border blooms in (~1s)
+     2. it holds fully lit for 3 seconds
+     3. the question text fades away (~0.9s)
+   The section stays PINNED for the whole beat — scrolling is locked (via
+   Lenis) the moment it pins and released only once the text has faded, so the
+   sequence always plays out in full before the page moves on.
 
-     0.00-0.08  static: question held, no glow (the resting state)
-     0.08-0.28  edge glow fades in around the section perimeter
-     0.20-0.42  "Hey — what is feminism?" fades out
-     0.28-0.62  glow holds alone — "answering" the question
-     0.62-0.80  glow fades out
-     0.80-1.00  blank hold: empty, back to paper, reserved for later
-
-   The glow is a WebGL fragment shader (Three.js): domain-warped fbm noise
-   in an Apple-Intelligence palette forming an edge/perimeter frame that
-   breathes on its own clock, while SCROLL controls its reveal. Screen-
-   blended over the veil so it reads as emitted light.
-
-   Fallbacks:
-     - no WebGL      -> animated CSS-gradient edge glow (.askpin__fallback)
-     - reduced motion -> static question, no effect. */
+   Reduced motion / no Lenis: the border is shown and the text kept, with no
+   scroll lock. */
 
 (function () {
   const section = document.getElementById("ask");
   if (!section) return;
 
+  const stack = section.querySelector(".ag-stack");
+  const content = section.querySelector(".askpin__content");
+  if (!stack || !content) return;
+
+  const chat = document.getElementById("aiChat");
+  const chatText = document.getElementById("aiChatText");
+  const QUESTION = "Hey, what is feminism?";
+
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (reduceMotion) {
-    section.classList.add("askpin--static");
+
+  if (reduceMotion || !("IntersectionObserver" in window)) {
+    if (chatText) chatText.textContent = QUESTION; // show the fully-typed prompt
+    stack.classList.add("ag-live");
+    stack.style.setProperty("--ag-reveal", "1");
+    document.body.classList.add("ask-glow-active");
     return;
   }
 
-  const stage = section.querySelector(".askpin__stage");
-  const line = section.querySelector(".askpin__line");
-  const canvas = document.getElementById("siriGlow");
-  const clamp01 = (v) => (v < 0 ? 0 : v > 1 ? 1 : v);
+  const TYPE_START = 480;  // pause after the box appears before typing begins
+  const CHAR_MS = 58;      // per-character typing speed
+  const SEND_PAUSE = 520;  // beat between finishing typing and firing the border
+  const FADE_IN = 1000;    // border blooms in
+  const HOLD = 5200;       // border fully lit (long enough for the slow leak to drift across)
+  const TEXT_FADE = 800;   // question fades out
+  const BORDER_OUT = 1000; // then the border itself fades away before the pin releases
 
-  /* ============================================================
-     WebGL Siri glow
-     ============================================================ */
-  function createGlow(cv) {
-    if (typeof THREE === "undefined") return null;
+  const lenis = () => window.__lenis;
 
-    let renderer;
-    try {
-      renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true });
-    } catch (e) {
-      return null;
-    }
-    if (!renderer.getContext()) return null;
-
-    renderer.setClearColor(0x000000, 0); // transparent — glow composites over the paper
-
-    const DPR = Math.min(window.devicePixelRatio || 1, 1.75);
-    renderer.setPixelRatio(DPR);
-
-    const scene = new THREE.Scene();
-    const camera = new THREE.Camera(); // full-screen quad in clip space, no transform
-    const uniforms = {
-      uTime: { value: 0 },
-      uRes: { value: new THREE.Vector2(1, 1) },
-      uReveal: { value: 0 },
-    };
-
-    const vertexShader = `
-      void main() { gl_Position = vec4(position.xy, 0.0, 1.0); }
-    `;
-
-    const fragmentShader = `
-      precision highp float;
-      uniform vec2  uRes;
-      uniform float uTime;
-      uniform float uReveal;
-
-      // --- value noise + fbm ---------------------------------
-      vec2 hash2(vec2 p){
-        p = vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)));
-        return fract(sin(p) * 43758.5453) * 2.0 - 1.0;
-      }
-      float noise(vec2 p){
-        vec2 i = floor(p);
-        vec2 f = fract(p);
-        vec2 u = f * f * (3.0 - 2.0 * f);
-        float a = dot(hash2(i + vec2(0.0, 0.0)), f - vec2(0.0, 0.0));
-        float b = dot(hash2(i + vec2(1.0, 0.0)), f - vec2(1.0, 0.0));
-        float c = dot(hash2(i + vec2(0.0, 1.0)), f - vec2(0.0, 1.0));
-        float d = dot(hash2(i + vec2(1.0, 1.0)), f - vec2(1.0, 1.0));
-        return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
-      }
-      float fbm(vec2 p){
-        float v = 0.0, a = 0.5;
-        mat2 m = mat2(1.6, 1.2, -1.2, 1.6);
-        for (int i = 0; i < 5; i++){ v += a * noise(p); p = m * p; a *= 0.5; }
-        return v;
-      }
-
-      // signed distance to a rounded rectangle (b = half-size, r = corner radius)
-      float sdRoundRect(vec2 p, vec2 b, float r){
-        vec2 q = abs(p) - b + r;
-        return min(max(q.x, q.y), 0.0) + length(max(q, 0.0)) - r;
-      }
-
-      void main(){
-        // aspect-correct, centered coordinates
-        vec2 uv = (gl_FragCoord.xy - 0.5 * uRes) / uRes.y;
-
-        // a very gentle drift — alive, not busy
-        uv += 0.02 * vec2(sin(uTime * 0.15), cos(uTime * 0.12));
-
-        // rounded-rectangle frame hugging the section edges
-        float aspect = uRes.x / uRes.y;
-        vec2 b = vec2(aspect * 0.5, 0.5) - 0.00;
-        float sd = sdRoundRect(uv, b, 0.05);
-
-        // SOFT, EVEN glow centred on the frame line — calm like the Oryzo
-        // reference. A gaussian band means the centre stays fully clear
-        // (paper shows through) with no muddy fill or conic spokes. Only a
-        // whisper of fbm so the thickness breathes gently around the border.
-        float wobble = 0.012 * fbm(uv * 1.3 + vec2(0.0, uTime * 0.05));
-        float w = 0.04 + wobble;
-        float mask = exp(-(sd * sd) / (w * w));
-        mask += 0.25 * smoothstep(0.0, -0.18, sd) * mask; // a touch of inward bloom
-        mask = clamp(mask, 0.0, 1.0);
-
-        // smooth rainbow around the border, slowly rotating (Oryzo-style),
-        // slightly desaturated + lifted toward white so it reads as calm,
-        // soft light rather than a harsh aurora.
-        float ang = atan(uv.y, uv.x) / 6.2831853;      // -0.5 .. 0.5
-        float hue = ang + 0.5 + uTime * 0.015;
-        vec3 col = 0.5 + 0.5 * cos(6.2831853 * (hue + vec3(0.0, 0.33, 0.67)));
-        col = mix(vec3(dot(col, vec3(0.333))), col, 0.90); // ease saturation a little
-        col = mix(col, vec3(1.0), 0.2);                   // soft & luminous
-
-        float breath = 0.92 + 0.05 * sin(uTime * 0.3);
-
-        // alpha = the soft band; transparent centre (paper shows through).
-        // Premultiplied; overall level kept low so the glow stays calm.
-        float a = clamp(mask * uReveal * breath * 0.7, 0.0, 1.0);
-        gl_FragColor = vec4(col * a, a);
-      }
-    `;
-
-    const material = new THREE.ShaderMaterial({
-      uniforms,
-      vertexShader,
-      fragmentShader,
-      transparent: true,
-      blending: THREE.NormalBlending,
-      depthTest: false,
-      depthWrite: false,
-    });
-    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
-    scene.add(mesh);
-
-    function resize() {
-      const w = cv.clientWidth || window.innerWidth;
-      const h = cv.clientHeight || window.innerHeight;
-      renderer.setSize(w, h, false);
-      uniforms.uRes.value.set(w * DPR, h * DPR);
-    }
-    resize();
-
-    return {
-      resize,
-      setReveal: (v) => { uniforms.uReveal.value = v; },
-      render: (elapsed) => {
-        uniforms.uTime.value = elapsed;
-        renderer.render(scene, camera);
-      },
-    };
-  }
-
-  const glow = createGlow(canvas);
-  if (glow) stage.style.setProperty("--fallback", "0"); // hide the CSS fallback
-
-  /* ---- progress: scroll offset within the tall track (0..1),
-     identical to the #mission 3D section's approach ---- */
-  function progress() {
-    const rect = section.getBoundingClientRect();
-    const total = rect.height - window.innerHeight;
-    return total > 0 ? clamp01(-rect.top / total) : 0;
-  }
-
-  /* ---- staged sequence driven by progress (see header) ---- */
-  function apply(p) {
-    let reveal;
-    if (p < 0.08) reveal = 0;
-    else if (p < 0.28) reveal = (p - 0.08) / 0.20;      // fade in
-    else if (p < 1) reveal = 1;                       // hold
-    else if (p < 0.80) reveal = 1 - (p - 0.1) / 0.18;   // fade out
-    else reveal = 0;                                     // blank hold
-
-    const textFade = clamp01((p - 0.20) / 0.22);         // gone by ~0.42
-
-    line.style.opacity = (1 - textFade).toFixed(3);
-    stage.style.setProperty("--reveal", reveal.toFixed(3));
-    stage.style.setProperty("--darken", "0"); // no dark veil — glow sits on the paper
-    if (glow) glow.setReveal(reveal);
-  }
-
-  /* ---- rAF loop: runs only while the section is on screen ---- */
-  let running = false;
-  const startTime = performance.now();
-
-  function frame(now) {
-    if (!running) return;
-    apply(progress());
-    if (glow) glow.render((now - startTime) / 1000);
-    requestAnimationFrame(frame);
-  }
-
-  new IntersectionObserver(
-    ([entry]) => {
-      if (entry.isIntersecting && !running) {
-        if (glow) glow.resize(); // ensure correct canvas size now it's on screen
-        running = true;
-        requestAnimationFrame(frame);
-      } else if (!entry.isIntersecting) {
-        running = false;   // stop rendering when off-screen
-        apply(progress()); // settle the vars at the boundary
-      }
+  // Track scroll direction so we only hold the beat when arriving from ABOVE
+  // (scrolling down into it). Scrolling UP into the section must never re-lock
+  // — that was the "stuck going back up" bug.
+  let dir = "down";
+  let lastY = window.scrollY;
+  window.addEventListener(
+    "scroll",
+    () => {
+      const y = window.scrollY;
+      if (y > lastY + 0.5) dir = "down";
+      else if (y < lastY - 0.5) dir = "up";
+      lastY = y;
     },
-    { threshold: 0 }
+    { passive: true }
+  );
+
+  // While the border is visible the scroll is HELD — we don't move on. The
+  // only thing that releases the hold is the user trying to scroll UP (leaving
+  // the way they came). Downward input is ignored, so the moment plays out and
+  // you can't get stuck (up always frees you); the beat then releases itself
+  // once the border has faded.
+  let locked = false;
+  let touchStartY = 0;
+  const onWheel = (e) => { if (locked && e.deltaY < 0) unlock(); };            // scrolling up
+  const onTouchStart = (e) => { touchStartY = e.touches ? e.touches[0].clientY : 0; };
+  const onTouchMove = (e) => {
+    if (locked && e.touches && e.touches[0].clientY > touchStartY + 6) unlock(); // dragging down = up
+  };
+  const onKey = (e) => {
+    if (locked && (e.key === "ArrowUp" || e.key === "PageUp" || e.key === "Home")) unlock();
+  };
+  function lock() {
+    const l = lenis();
+    if (!l) return;
+    l.stop();
+    locked = true;
+    window.addEventListener("wheel", onWheel, { passive: true });
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchmove", onTouchMove, { passive: true });
+    window.addEventListener("keydown", onKey);
+  }
+  function unlock() {
+    const l = lenis();
+    if (l) l.start();
+    locked = false;
+    window.removeEventListener("wheel", onWheel);
+    window.removeEventListener("touchstart", onTouchStart);
+    window.removeEventListener("touchmove", onTouchMove);
+    window.removeEventListener("keydown", onKey);
+  }
+
+  let played = false;
+  const timers = [];
+  const wait = (fn, ms) => timers.push(setTimeout(fn, ms));
+
+  /* ---- light-leak refraction: while the streak sweeps, drag an SVG
+     displacement across the question so the screen visibly warps, ramping
+     the distortion up as the leak enters and back down as it leaves. Runs
+     only during the ~4.6s sweep (section pinned, scroll locked), then the
+     filter is detached so there's zero cost afterwards. ---- */
+  const distortMap = document.getElementById("ag-distort-map");
+  const LEAK_DELAY = 300;      // matches the CSS streak animation-delay
+  const LEAK_DURATION = 7500;  // matches ag-sweep duration (7.5s)
+  const DISTORT_PEAK = 9;      // barely-there warp — the haze drifts, it doesn't shove
+  let distortRAF = 0;
+
+  function runDistortion() {
+    if (!distortMap || !content) return;
+    content.style.filter = "url(#ag-distort)";
+    content.style.willChange = "filter";
+    const start = performance.now();
+    (function step(now) {
+      const s = (now - start) / LEAK_DURATION;
+      if (s >= 1) {
+        distortMap.setAttribute("scale", "0");
+        content.style.filter = "";
+        content.style.willChange = "";
+        distortRAF = 0;
+        return;
+      }
+      // distortion is tied strictly to the leak's on-screen passage: the
+      // streak is only visible from ~12%→90% of the sweep, so the warp stays
+      // at 0 before it appears, ramps up as it crosses, and settles back to 0
+      // once it has left. The screen only distorts WHILE the leak is passing.
+      const w = Math.max(0, Math.min(1, (s - 0.22) / (0.78 - 0.22)));
+      const bump = Math.sin(Math.PI * w);
+      distortMap.setAttribute("scale", (DISTORT_PEAK * bump).toFixed(2));
+      distortRAF = requestAnimationFrame(step);
+    })(start);
+  }
+
+  function stopDistortion() {
+    if (distortRAF) cancelAnimationFrame(distortRAF);
+    distortRAF = 0;
+    if (distortMap) distortMap.setAttribute("scale", "0");
+    if (content) { content.style.filter = ""; content.style.willChange = ""; }
+  }
+
+  function play() {
+    if (played) return;
+    played = true;
+
+    document.body.classList.add("ask-glow-active");
+    if (dir !== "up") lock(); // only hold the beat when arriving from above
+
+    // 1. type the question into the chat box, character by character, THEN
+    //    "send" it — which fires the rainbow border.
+    if (chat && chatText) {
+      chatText.textContent = "";
+      chat.classList.remove("aichat--sent");
+      wait(() => {
+        chat.classList.add("aichat--typing");
+        typeChar(0);
+      }, TYPE_START);
+    } else {
+      fireBorder(); // no chat box present — just do the border
+    }
+  }
+
+  function typeChar(i) {
+    chatText.textContent = QUESTION.slice(0, i);
+    if (i < QUESTION.length) {
+      wait(() => typeChar(i + 1), CHAR_MS);
+    } else {
+      // done typing — hit send, pause, then fire the border
+      chat.classList.remove("aichat--typing");
+      chat.classList.add("aichat--sent");
+      wait(fireBorder, SEND_PAUSE);
+    }
+  }
+
+  function fireBorder() {
+    // bloom the rainbow border in
+    stack.classList.add("ag-live");
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => stack.style.setProperty("--ag-reveal", "1"))
+    );
+
+    // the light leak sweeps + warps the screen as it crosses
+    wait(runDistortion, LEAK_DELAY);
+
+    // after the hold, fade the chat prompt away
+    wait(() => content.classList.add("ask-faded"), FADE_IN + HOLD);
+
+    // then the rainbow border itself fades out — still pinned
+    wait(() => stack.style.setProperty("--ag-reveal", "0"), FADE_IN + HOLD + TEXT_FADE);
+
+    // once the border is gone, stop the animation work and release the pin
+    wait(() => {
+      stack.classList.remove("ag-live"); // no more rotation / warp / leak cost
+      unlock();
+    }, FADE_IN + HOLD + TEXT_FADE + BORDER_OUT);
+  }
+
+  function reset() {
+    timers.forEach(clearTimeout);
+    timers.length = 0;
+    stopDistortion();
+    unlock();
+    played = false;
+    stack.classList.remove("ag-live");
+    stack.style.setProperty("--ag-reveal", "0");
+    content.classList.remove("ask-faded");
+    if (chat) chat.classList.remove("aichat--typing", "aichat--sent");
+    if (chatText) chatText.textContent = "";
+    document.body.classList.remove("ask-glow-active");
+  }
+
+  // Fire the moment the section pins — i.e. its top reaches the top of the
+  // viewport (root shrunk to a line at the top via the -100% bottom margin).
+  new IntersectionObserver(
+    ([entry]) => { if (entry.isIntersecting) play(); },
+    { rootMargin: "0px 0px -100% 0px" }
   ).observe(section);
 
-  apply(progress()); // initial resting state before any scroll
-  window.addEventListener("resize", () => glow && glow.resize());
+  // Reset when the section has fully left the viewport, so scrolling back up
+  // replays the whole beat from the top.
+  new IntersectionObserver(
+    ([entry]) => { if (!entry.isIntersecting) reset(); },
+    { threshold: 0 }
+  ).observe(section);
 })();
