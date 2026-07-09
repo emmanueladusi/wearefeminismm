@@ -169,7 +169,7 @@ em { font-style: italic; color: var(--violet); }
 body.morph-on .marquee,
 body.morph-on .paths,
 body.morph-on .grounding,
-body.morph-on .whatis,
+body.morph-on .learn,
 body.morph-on .ec-section,
 body.morph-on .fly,
 body.morph-on .fly__sticky,
@@ -1221,6 +1221,15 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
 
 .ec-cards { position: absolute; inset: 0; }
 
+/* Deck reveal gate (js/cards.js): while the section is only APPROACHING (its
+   top hasn't reached the top of the screen yet) the cards are held invisible,
+   so the deck never shares the screen with the tail of the #ask beat one
+   viewport above. cards.js arms this (.ec-armed) and lights it (.ec-lit) the
+   moment the pin engages, so the deck fades in exactly as it starts to fan.
+   Only applies in the animated mode — the static fallback keeps cards shown. */
+.ec-armed .ec-cards { opacity: 0; transition: opacity 0.45s ease; }
+.ec-armed.ec-lit .ec-cards { opacity: 1; }
+
 .ec-card {
   position: absolute;
   top: 50%;
@@ -1571,50 +1580,77 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
   filter: blur(34px);
   mix-blend-mode: screen;
 }
-/* the leak is now ONE tall, tilted streak of light: a warm gradient with a
-   hot amber core, softened once and thrown a rose edge on one side and a cyan
-   edge on the other (chromatic bleed). Screen-blended so it behaves like real
-   light — brightest as it crosses the vivid rainbow ring, gentle over the
-   light interior. Moved only by transform, so the blur is cached = GPU-cheap. */
+/* the EMISSION: a warm-rainbow bloom fixed to the left arc of the ring. It
+   brightens where the border sits, so the light visibly LEAVES the rainbow —
+   the anchor point the inward streak peels away from. Screen-blended. */
+.ag-leak__emit {
+  position: absolute;
+  left: -10vmax; top: 50%;
+  width: 46vmax; height: 82vmax;
+  transform: translateY(-50%) scale(0.9);
+  border-radius: 50%;
+  background: radial-gradient(closest-side at 64% 50%,
+    rgba(255,246,228,0.95),
+    rgba(255,178,110,0.72) 30%,
+    rgba(255,95,165,0.42) 52%,
+    rgba(150,120,255,0.16) 72%,
+    rgba(150,120,255,0)    84%);
+  filter: blur(26px) brightness(1.5);
+  mix-blend-mode: screen;
+  opacity: 0;
+  will-change: opacity, transform;
+}
+
+/* the inward STREAK: a slice of the rainbow's own colours that peels off the
+   flaring arc and sweeps inward across the whole frame (warping the question as
+   it passes), then dissolves. Rooted at the ring (transform-origin left), so it
+   always reads as light radiating FROM the rainbow, not arriving from nowhere. */
 .ag-leak__streak {
   position: absolute;
-  top: -60%;
-  left: 0;
-  width: 50vmax;
-  height: 240%;
-  transform: translateX(-120vmax) rotate(-12deg);
+  top: -50%;
+  left: -12vmax;
+  width: 72vmax;
+  height: 220%;
+  transform-origin: left center;
+  transform: translateX(-16vmax) rotate(-10deg) scaleX(0.7);
   opacity: 0;
   will-change: transform, opacity;
-  /* Oryzo-style leak: NOT a vivid rainbow band — a soft LUMINOUS pass. A hot
-     warm-white core with only a faint rose/cyan/violet chromatic fringe, so it
-     reads as real light sweeping across the frame (which desaturates + warps
-     the question as it crosses), rather than a coloured stripe. */
-  background: linear-gradient(102deg,
-    rgba(120,190,255,0)    0%,
-    rgba(120,190,255,0.05) 18%,   /* cool cyan fringe — leading edge */
-    rgba(255,150,200,0.12) 33%,   /* rose */
-    rgba(255,238,215,0.55) 50%,   /* hot warm-white core */
-    rgba(255,180,120,0.16) 66%,   /* amber — trailing */
-    rgba(150,120,255,0.05) 82%,   /* faint violet fringe */
-    rgba(150,120,255,0)    100%);
-  /* softened once + a wavy edge; screen-blended so it behaves like light —
-     glowing bright as it crosses the dark-welled border, gentle over the
-     light interior. Moved only by transform, so the blur stays cached. */
-  filter: url(#ag-leakwave) blur(48px) saturate(1.5) brightness(1.12);
+  background: linear-gradient(100deg,
+    rgba(255,150,90,0)     0%,
+    rgba(255,165,100,0.42) 10%,   /* warm ring edge — where it leaves the arc */
+    rgba(255,228,150,0.66) 24%,   /* yellow */
+    rgba(255,252,242,0.92) 39%,   /* hot core */
+    rgba(150,240,185,0.62) 55%,   /* green */
+    rgba(120,205,255,0.50) 71%,   /* cyan */
+    rgba(170,130,255,0.30) 86%,   /* violet fringe */
+    rgba(170,130,255,0)    100%);
+  filter: url(#ag-leakwave) blur(40px) saturate(1.9) brightness(1.77);
   mix-blend-mode: screen;
 }
 
-/* one slow, soft pass — the light drifts across like a breath of wind rather
-   than whipping past. Gentle symmetric ease-in-out, long gradual fade in/out. */
+/* the flare pulses on at the ring, and the slice peels inward across the frame
+   and dissolves — one slow, soft breath, synced to the border's live beat. */
+.ag-stack.ag-live .ag-leak__emit {
+  animation: ag-emit 7.5s ease-in-out 0.3s forwards;
+}
 .ag-stack.ag-live .ag-leak__streak {
   animation: ag-sweep 7.5s cubic-bezier(0.42, 0, 0.58, 1) 0.3s forwards;
 }
 
+@keyframes ag-emit {
+  0%   { opacity: 0;   transform: translateY(-50%) scale(0.8); }
+  26%  { opacity: 1; }
+  66%  { opacity: 0.85; }
+  100% { opacity: 0;   transform: translateY(-50%) scale(1.12); }
+}
+/* peels off the left arc (rooted, narrow) and fans inward across the whole
+   frame, growing + dissolving — never a free-floating band from off-screen. */
 @keyframes ag-sweep {
-  0%   { transform: translateX(-120vmax) rotate(-12deg); opacity: 0; }
-  36%  { opacity: 1; }
-  64%  { opacity: 1; }
-  100% { transform: translateX(180vmax) rotate(-12deg); opacity: 0; }
+  0%   { transform: translateX(-16vmax) rotate(-10deg) scaleX(0.7);  opacity: 0; }
+  24%  { opacity: 1; }
+  50%  { transform: translateX(34vmax) rotate(-10deg) scaleX(1.08); }
+  74%  { opacity: 1; }
+  100% { transform: translateX(96vmax) rotate(-10deg) scaleX(1.28); opacity: 0; }
 }
 
 /* content — the question, crisp above the glow */
@@ -1689,17 +1725,17 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
 @keyframes ag-breathe    { 0%,100% { opacity: calc(var(--o,1) * 0.72); } 50% { opacity: var(--o,1); } }
 
 @media (prefers-reduced-motion: reduce) {
-  .ag-stack.ag-live, .ag-band, .ag-leak__streak { animation: none !important; }
+  .ag-stack.ag-live, .ag-band, .ag-leak__streak, .ag-leak__emit { animation: none !important; }
   .ag-stack { opacity: 1; }
 }
 
 /* =====================================================
-   What is feminism — blank section (Carl fills later).
-   Solid deep violet; the pinned question releases onto it.
+   Learn — "one word, three lenses". Deep-violet scene
+   (morph shows through). See the big Learn/Waves block
+   appended at the end of this file for the full styling.
    ===================================================== */
 
-.whatis {
-  background: #2e2145;
+.learn {
   min-height: 60vh;
 }
 
@@ -2008,3 +2044,583 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
 .bmc-handle { stroke: rgba(207, 140, 48, 0.5); stroke-dasharray: 4 5; }
 .bmc-node { fill: #cf8c30; }
 .bmc-dot { fill: #cf8c30; }
+
+/* =====================================================
+   LEARN — "one word, three lenses" + THE WAVES ocean.
+   (js/waves.js pins & scrubs the waves; everything here
+   also stands on its own under reduced-motion / no-JS.)
+   ===================================================== */
+
+.learn__inner {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 15vh 6vw 12vh;
+  color: var(--cream-on-dark);
+}
+.learn__title {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(2.1rem, 6vw, 4rem);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.5em;
+}
+.learn__title em { font-style: italic; color: var(--gold); }
+.learn__lead {
+  font-size: clamp(1.05rem, 2.2vw, 1.4rem);
+  line-height: 1.5;
+  max-width: 34ch;
+  color: var(--cream-on-dark);
+  margin: 0 0 9vh;
+}
+
+/* three concept cards */
+.lenses {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(20px, 3vw, 40px);
+}
+.lens {
+  position: relative;
+  padding: 30px 26px 34px;
+  border-radius: 20px;
+  background: rgba(250, 246, 239, 0.05);
+  border: 1px solid rgba(250, 246, 239, 0.12);
+  backdrop-filter: blur(2px);
+}
+.lens__name {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 1.4rem;
+  margin: 22px 0 10px;
+  color: #fff;
+}
+.lens__def {
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--cream-on-dark);
+  margin: 0;
+}
+.lens__def em { font-style: normal; color: var(--gold); font-weight: 600; }
+
+/* --- tiny living "data glyphs" inside each lens --- */
+.lens__viz {
+  height: 78px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.glyph-cap {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--dim-on-dark);
+}
+
+/* white feminism — one lonely axis, pulsing */
+.glyph-bar--solo {
+  width: 12px;
+  height: 46px;
+  border-radius: 6px;
+  background: linear-gradient(180deg, var(--gold), #b97e28);
+  transform-origin: bottom center;
+  animation: glyphPulse 2.6s var(--ease) infinite;
+}
+@keyframes glyphPulse {
+  0%, 100% { transform: scaleY(0.82); opacity: 0.7; }
+  50%      { transform: scaleY(1.08); opacity: 1; }
+}
+
+/* black feminism — four bars of unequal weight, breathing out of sync */
+.glyph-stack { display: flex; align-items: flex-end; gap: 7px; height: 52px; }
+.glyph-stack .glyph-bar {
+  width: 12px;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #d98cc9, #a8459e);
+  transform-origin: bottom center;
+  animation: glyphWeight 3.2s var(--ease) infinite;
+}
+.glyph-stack .glyph-bar:nth-child(1) { height: 24px; animation-delay: 0s;    }
+.glyph-stack .glyph-bar:nth-child(2) { height: 46px; animation-delay: 0.5s;  background: linear-gradient(180deg, var(--gold), #b97e28); }
+.glyph-stack .glyph-bar:nth-child(3) { height: 16px; animation-delay: 0.9s;  }
+.glyph-stack .glyph-bar:nth-child(4) { height: 36px; animation-delay: 1.3s;  }
+@keyframes glyphWeight {
+  0%, 100% { transform: scaleY(0.88); }
+  50%      { transform: scaleY(1.05); }
+}
+
+/* intersectionality — three axes crossing at a lit knot */
+.glyph-cross { position: relative; width: 60px; height: 60px; }
+.glyph-axis {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 58px; height: 2.5px;
+  border-radius: 2px;
+  background: rgba(250, 246, 239, 0.55);
+  transform-origin: center;
+}
+.glyph-axis--a { transform: translate(-50%, -50%) rotate(0deg);   animation: axisSpin 14s linear infinite; }
+.glyph-axis--b { transform: translate(-50%, -50%) rotate(60deg);  animation: axisSpin 14s linear infinite; animation-delay: -4.6s; }
+.glyph-axis--c { transform: translate(-50%, -50%) rotate(120deg); animation: axisSpin 14s linear infinite; animation-delay: -9.3s; }
+.glyph-knot {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--gold);
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 0 0 rgba(217, 161, 63, 0.55);
+  animation: knotPulse 2.4s var(--ease) infinite;
+}
+@keyframes axisSpin {
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+@keyframes knotPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(217, 161, 63, 0.5); }
+  50%      { box-shadow: 0 0 0 9px rgba(217, 161, 63, 0); }
+}
+
+/* =====================================================
+   THE WAVES — now living INSIDE the Apple-Intelligence
+   ring. After js/engulf.js types "Hey, what is feminism?"
+   and fades it out, it freezes the ring and reveals
+   .askwaves (a dark rounded "screen" framed by the still
+   rainbow); js/waves.js scrubs the four waves + rising
+   ocean as you keep scrolling through #ask.
+   ===================================================== */
+
+/* extra scroll length after the chat beat so the waves can scrub.
+   Added by js/engulf.js on the motion path only. */
+.askpin.aw-cine { height: 460svh; }
+
+/* the dark screen inside the ring — starts inset so the rainbow shows around
+   it (its glow spilling onto these rounded edges), then expands to FULL-BLEED
+   once the border fades (body.ask-fullscreen), so the waves fill the screen. */
+.askwaves {
+  position: absolute;
+  inset: clamp(16px, 2.2vmin, 34px);
+  z-index: 25;                    /* above the (faded) chat content */
+  border-radius: clamp(22px, 3vmin, 34px);
+  overflow: hidden;
+  /* deep-sea column: a shaft of surface light up top, deepening to a teal
+     seabed haze at the bottom (the seascape layers add the real depth). */
+  background:
+    radial-gradient(135% 92% at 50% -14%, rgba(78,198,212,0.22), rgba(78,198,212,0) 52%),
+    linear-gradient(180deg, #08233a 0%, #0b3a4e 50%, #115a6e 100%);
+  color: var(--cream-on-dark);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.9s ease, inset 1s var(--ease), border-radius 1s var(--ease);
+}
+body.ask-waves-on .askwaves { opacity: 1; }
+body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
+
+.askwaves__head {
+  position: absolute;
+  top: clamp(20px, 5vh, 56px);
+  left: clamp(22px, 5vw, 64px);
+  right: clamp(22px, 5vw, 64px);
+  z-index: 3;
+  max-width: 40ch;
+}
+.askwaves__lead {
+  font-family: var(--serif);
+  font-size: clamp(1.2rem, 3vw, 2rem);
+  line-height: 1.14;
+  margin: 8px 0 0;
+}
+.askwaves__lead em { font-style: italic; color: #86d9ec; }
+
+/* wave cards */
+.askwaves .waves__stage { position: relative; z-index: 3; }
+.wavecard { max-width: 640px; }
+.wavecard__num {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(3rem, 9vw, 6.5rem);
+  line-height: 0.8;
+  color: rgba(134, 217, 236, 0.28);
+  display: block;
+}
+.wavecard__years {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #86d9ec;
+  margin: 16px 0 6px;
+}
+.wavecard__title {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  line-height: 1.02;
+  margin: 0;
+  color: #fff;
+}
+.wavecard__tag {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(1.05rem, 2.4vw, 1.5rem);
+  color: var(--gold);
+  margin: 8px 0 18px;
+}
+.wavecard__points {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: grid;
+  gap: 11px;
+  max-width: 46ch;
+}
+.wavecard__points li {
+  position: relative;
+  padding-left: 26px;
+  font-size: 1.02rem;
+  line-height: 1.4;
+  color: var(--cream-on-dark);
+}
+.wavecard__points li::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0.6em;
+  width: 12px; height: 3px;
+  border-radius: 2px;
+  background: #86d9ec;
+}
+.wavecard__points strong { color: #fff; }
+
+.waves__dots { display: none; }
+
+/* --- the ocean --- */
+.ocean {
+  --level: 22%;
+  --mix: 0;
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: var(--level);
+  z-index: 2;
+  pointer-events: none;
+}
+/* the rising tide is now a TRANSLUCENT teal veil, so the seascape (dunes,
+   coral, wreck) reads through it — deepening as the water climbs. */
+.ocean__body {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(38,150,168,0.42) 0%, rgba(8,46,70,0.66) 100%);
+  box-shadow: 0 -14px 40px rgba(6, 26, 45, 0.4);
+}
+.ocean__body::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(150,63,137,0.55) 0%, rgba(52,26,68,0.72) 100%);
+  opacity: var(--mix);
+  transition: opacity 0.5s linear;
+}
+/* rolling + oscillating crest. Foam mask: +30% amplitude and a higher
+   frequency (four crests across the width), so the surface reads as a
+   busy, oscillating swell without ever climbing over the copy. */
+.ocean__crest {
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: 58px;
+  transform: translateY(-60%);
+  animation: crestBob 3s ease-in-out infinite;   /* vertical swell */
+}
+.owave {
+  position: absolute;
+  left: 0; bottom: 0;
+  width: 200%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.18);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 40' preserveAspectRatio='none'%3E%3Cpath d='M0 20 C10 4.4 20 4.4 30 20 C40 35.6 50 35.6 60 20 C70 4.4 80 4.4 90 20 C100 35.6 110 35.6 120 20 L120 40 L0 40 Z' fill='black'/%3E%3C/svg%3E") repeat-x;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 40' preserveAspectRatio='none'%3E%3Cpath d='M0 20 C10 4.4 20 4.4 30 20 C40 35.6 50 35.6 60 20 C70 4.4 80 4.4 90 20 C100 35.6 110 35.6 120 20 L120 40 L0 40 Z' fill='black'/%3E%3C/svg%3E") repeat-x;
+  -webkit-mask-size: 50% 100%;
+          mask-size: 50% 100%;
+  will-change: transform;
+}
+.owave--1 { background: rgba(255, 255, 255, 0.22); height: 66%;  animation: oceanRoll 7s linear infinite; }
+.owave--2 { background: rgba(255, 255, 255, 0.13); height: 100%; animation: oceanRoll 11s linear infinite reverse; }
+.owave--3 { background: rgba(255, 255, 255, 0.32); height: 44%;  animation: oceanRoll 5s linear infinite; }
+/* horizontal roll with a vertical bob folded in = an oscillating swell */
+@keyframes oceanRoll {
+  0%   { transform: translate(0, 0); }
+  50%  { transform: translate(-25%, -12%); }
+  100% { transform: translate(-50%, 0); }
+}
+@keyframes crestBob {
+  0%, 100% { transform: translateY(-54%); }
+  50%      { transform: translateY(-70%); }
+}
+
+/* ---------- CINEMATIC (scrubbed) MODE — set by js/waves.js ---------- */
+.askwaves.is-live .askwaves__lead { display: none; }   /* room for the card */
+.askwaves.is-live .waves__stage {
+  position: absolute;
+  left: clamp(22px, 5vw, 64px);
+  right: clamp(58px, 11vw, 130px);
+  top: 21vh;
+  z-index: 3;
+}
+.askwaves.is-live .wavecard {
+  position: absolute;
+  top: 0;
+  opacity: 0;
+  transform: translateY(38px);
+  text-shadow: 0 1px 16px rgba(6, 20, 40, 0.6);   /* legible if the tide laps up */
+  transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+  pointer-events: none;
+}
+.askwaves.is-live .wavecard.is-active {
+  opacity: 1;
+  transform: translateY(0);
+}
+.askwaves.is-live .ocean { transition: height 0.15s linear; }
+
+.askwaves.is-live .waves__dots {
+  position: absolute;
+  right: clamp(20px, 4vw, 48px); top: 50%;
+  transform: translateY(-50%);
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  list-style: none;
+  margin: 0; padding: 0;
+}
+.askwaves.is-live .waves__dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: rgba(250, 246, 239, 0.22);
+  transition: background 0.4s var(--ease), transform 0.4s var(--ease);
+}
+.askwaves.is-live .waves__dot.is-active {
+  background: var(--gold);
+  transform: scale(1.35);
+}
+
+/* ---------- STATIC fallback (reduced-motion): a readable stack ---------- */
+.askwaves:not(.is-live) .waves__stage {
+  display: flex; flex-direction: column; gap: 8vh; padding-top: 8vh;
+}
+.askwaves:not(.is-live) .wavecard {
+  opacity: 0; transform: translateY(30px);
+  transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+}
+.askwaves:not(.is-live) .wavecard.in { opacity: 1; transform: none; }
+
+@media (max-width: 720px) {
+  .lenses { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glyph-bar--solo, .glyph-stack .glyph-bar, .glyph-axis,
+  .glyph-knot, .owave, .ocean__crest { animation: none !important; }
+
+  /* drop the pinned ring choreography; show the question then a plain,
+     readable stack of the four waves. */
+  .askpin { height: auto; }
+  .askpin__sticky { position: static; height: auto; overflow: visible; }
+  .ag-panel, .ag-backing, .askpin__content { display: none; }
+  .askwaves {
+    position: static; inset: auto; opacity: 1; border-radius: 0;
+    padding: 12vh 6vw 12vh;
+  }
+  .askwaves__head { position: static; max-width: none; }
+  .askwaves__lead { display: block; }
+  .askwaves .waves__stage { position: static; }
+  .askwaves .wavecard { position: static; opacity: 1; transform: none; }
+  .askwaves .ocean { display: none; }
+}
+
+/* =====================================================
+   SEA LIFE — fish drift across, bubbles rise, and a
+   shark swims through a line eating the words while the
+   next ones surface behind it (js/sealife.js).
+   ===================================================== */
+
+/* fish + bubbles live inside .ocean, so they're clipped to the water and
+   rise/fall with the tide. */
+.sealife {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.fish {
+  position: absolute;
+  left: 0;
+  height: auto;
+  fill: rgba(206, 232, 248, 0.20);
+  will-change: transform;
+}
+.fish--1 { top: 26%; width: 40px; animation: fishR 23s linear infinite; }
+.fish--2 { top: 54%; width: 30px; fill: rgba(206,232,248,0.14); animation: fishL 31s linear infinite 4s; }
+.fish--3 { top: 72%; width: 52px; animation: fishR 27s linear infinite 9s; }
+.fish--4 { top: 40%; width: 24px; fill: rgba(206,232,248,0.12); animation: fishL 35s linear infinite 2s; }
+.fish--5 { top: 86%; width: 34px; animation: fishR 19s linear infinite 13s; }
+
+@keyframes fishR {   /* swims left → right, flipped to face the way it moves */
+  0%   { transform: translateX(-14vw) translateY(0)      scaleX(-1); }
+  50%  { transform: translateX(50vw)  translateY(-1.4vh) scaleX(-1); }
+  100% { transform: translateX(114vw) translateY(0)      scaleX(-1); }
+}
+@keyframes fishL {   /* swims right → left (fish faces left by default) */
+  0%   { transform: translateX(114vw) translateY(0); }
+  50%  { transform: translateX(50vw)  translateY(1.4vh); }
+  100% { transform: translateX(-14vw) translateY(0); }
+}
+
+.bubble {
+  position: absolute;
+  left: var(--x);
+  bottom: -3%;
+  width: var(--s); height: var(--s);
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 30%,
+    rgba(255,255,255,0.9), rgba(210,238,255,0.28) 58%, rgba(210,238,255,0.06));
+  box-shadow: 0 0 5px rgba(190,225,255,0.45);
+  opacity: 0;
+  animation: bubbleRise var(--d) ease-in var(--delay) infinite;
+  will-change: transform, opacity;
+}
+@keyframes bubbleRise {
+  0%   { transform: translate(0, 0)      scale(0.5);  opacity: 0; }
+  10%  { opacity: 0.7; }
+  55%  { transform: translate(7px, -38vh) scale(1); }
+  90%  { opacity: 0.55; }
+  100% { transform: translate(-3px, -72vh) scale(1.1); opacity: 0; }
+}
+
+/* --- the shark word-swap --- */
+.shark-swap {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(7vh, 10vh, 13vh);
+  transform: translateX(-50%);
+  z-index: 3;
+  width: min(74vw, 540px);
+  height: 2.2em;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(1.3rem, 3.6vw, 2.1rem);
+  line-height: 2.2em;
+  text-align: center;
+  pointer-events: none;
+}
+.shark-swap__old, .shark-swap__new {
+  position: absolute;
+  inset: 0;
+  white-space: nowrap;
+  color: #cfe9f5;
+  text-shadow: 0 2px 14px rgba(6, 20, 40, 0.6);
+}
+.shark-swap__new { color: var(--gold); }
+.shark-swap__new.pop { animation: sharkPop 0.5s var(--ease); }
+@keyframes sharkPop {
+  0%   { transform: scale(1.12); }
+  60%  { transform: scale(0.98); }
+  100% { transform: scale(1); }
+}
+.shark {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: clamp(96px, 22vw, 160px);
+  height: auto;
+  transform: translate(-160%, -50%);   /* parked off to the right until js drives it */
+  fill: rgba(158, 188, 212, 0.92);
+  z-index: 4;
+  will-change: transform;
+  filter: drop-shadow(0 4px 10px rgba(6, 20, 40, 0.45));
+}
+.shark__eye { fill: #0b1c3a; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fish, .bubble { animation: none !important; }
+  .bubble { display: none; }
+  .fish { opacity: 0.5; }
+  .shark { display: none; }               /* no swim → just show the words */
+  .shark-swap__old { clip-path: none !important; }
+  .shark-swap__new { display: none; }
+}
+
+/* =====================================================
+   SEASCAPE — layered depth behind the tide: light rays,
+   distant silhouettes, a hazy wreck, rolling dunes, coral.
+   ===================================================== */
+.seascape {
+  position: absolute;
+  inset: 0;
+  z-index: 1;                 /* behind the translucent ocean (2) + text (3) */
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* shafts of surface light slanting into the deep */
+.sea-ray {
+  position: absolute;
+  top: -12%;
+  width: 20vmax;
+  height: 130%;
+  background: linear-gradient(180deg, rgba(130,225,235,0.12), rgba(130,225,235,0) 68%);
+  transform: rotate(13deg);
+  transform-origin: top center;
+  mix-blend-mode: screen;
+  filter: blur(8px);
+}
+.sea-ray--1 { left: 16%; }
+.sea-ray--2 { left: 44%; width: 13vmax; opacity: 0.7; }
+.sea-ray--3 { left: 70%; width: 24vmax; opacity: 0.5; }
+
+/* distant creatures — a hair lighter than the deep so they just read */
+.sea-far { position: absolute; fill: rgba(150, 212, 226, 0.08); }
+.sea-far--shark { top: 12%; left: 9%;  width: clamp(160px, 22vw, 320px); animation: seaDrift 46s ease-in-out infinite; }
+.sea-far--fish  { top: 27%; left: 34%; width: clamp(64px, 8vw, 120px); transform: scaleX(-1); animation: seaDrift 38s ease-in-out infinite reverse; }
+@keyframes seaDrift {
+  0%, 100% { transform: translateX(0); }
+  50%      { transform: translateX(9vw); }
+}
+.sea-far--fish { animation-name: seaDriftFlip; }
+@keyframes seaDriftFlip {
+  0%, 100% { transform: translateX(0) scaleX(-1); }
+  50%      { transform: translateX(-9vw) scaleX(-1); }
+}
+
+/* the sunken wreck — a hazy mass resting in the mid-deep */
+.sea-wreck {
+  position: absolute;
+  right: 3%;
+  bottom: 26%;
+  width: clamp(240px, 33vw, 440px);
+  height: auto;
+  fill: rgba(116, 182, 198, 0.09);
+  transform: rotate(-3deg);
+}
+
+/* rolling seabed dunes, back (light/far) to front (dark/near) */
+.dune { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: auto; }
+.dune--3 { fill: #155a6d; height: 33%; }
+.dune--2 { fill: #0f4356; height: 29%; }
+.dune--1 { fill: #0a2f40; height: 25%; }
+
+/* coral: dark line-art silhouettes rooted on the dunes, reaching into the water */
+.coral {
+  position: absolute;
+  height: auto;
+  stroke: #06202e;
+  stroke-width: 2.6;
+  fill: none;
+  opacity: 0.92;
+}
+.coral--a { left: 6%;  width: clamp(48px, 6vw, 80px); bottom: 18%; }
+.coral--b { left: 22%; width: clamp(38px, 5vw, 64px); bottom: 13%; }
+.coral--c { left: 57%; width: clamp(54px, 7vw, 94px); bottom: 16%; }
+.coral--d { left: 79%; width: clamp(40px, 5vw, 66px); bottom: 17%; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sea-far { animation: none !important; }
+}

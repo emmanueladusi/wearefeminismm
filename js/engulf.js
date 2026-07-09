@@ -32,13 +32,22 @@
     return;
   }
 
+  // give #ask the extra scroll length the waves need to scrub through (the
+  // pinned sticky holds while you travel it). Then let the pins/morph re-measure
+  // the taller page.
+  section.classList.add("aw-cine");
+  if (window.ScrollTrigger && typeof window.ScrollTrigger.refresh === "function") {
+    requestAnimationFrame(() => window.ScrollTrigger.refresh());
+  }
+
   const TYPE_START = 480;  // pause after the box appears before typing begins
   const CHAR_MS = 58;      // per-character typing speed
   const SEND_PAUSE = 520;  // beat between finishing typing and firing the border
   const FADE_IN = 1000;    // border blooms in
   const HOLD = 5200;       // border fully lit (long enough for the slow leak to drift across)
   const TEXT_FADE = 800;   // question fades out
-  const BORDER_OUT = 1000; // then the border itself fades away before the pin releases
+  const WAVES_HOLD = 1500; // waves settle inside the lit ring before it fades
+  const BORDER_OUT = 1000; // the rainbow border then fades away (waves carry on)
 
   const lenis = () => window.__lenis;
 
@@ -186,14 +195,23 @@
     // after the hold, fade the chat prompt away
     wait(() => content.classList.add("ask-faded"), FADE_IN + HOLD);
 
-    // then the rainbow border itself fades out — still pinned
-    wait(() => stack.style.setProperty("--ag-reveal", "0"), FADE_IN + HOLD + TEXT_FADE);
-
-    // once the border is gone, stop the animation work and release the pin
+    // once the question is gone, reveal the waves inside the still-lit ring and
+    // release the scroll so you can scrub down through the four waves.
     wait(() => {
-      stack.classList.remove("ag-live"); // no more rotation / warp / leak cost
+      document.body.classList.add("ask-waves-on"); // fades the dark wave-screen in
+      if (window.__askWaves) window.__askWaves.start();
       unlock();
-    }, FADE_IN + HOLD + TEXT_FADE + BORDER_OUT);
+    }, FADE_IN + HOLD + TEXT_FADE);
+
+    // a beat after the waves have settled, fade the rainbow border away and
+    // let the wave-screen expand to full-bleed — it has handed off to the ocean,
+    // and dropping the border ends the rotation cost.
+    wait(() => {
+      stack.style.setProperty("--ag-reveal", "0");
+      document.body.classList.add("ask-fullscreen");
+    }, FADE_IN + HOLD + TEXT_FADE + WAVES_HOLD);
+    wait(() => stack.classList.remove("ag-live"),
+      FADE_IN + HOLD + TEXT_FADE + WAVES_HOLD + BORDER_OUT);
   }
 
   function reset() {
@@ -207,7 +225,8 @@
     content.classList.remove("ask-faded");
     if (chat) chat.classList.remove("aichat--typing", "aichat--sent");
     if (chatText) chatText.textContent = "";
-    document.body.classList.remove("ask-glow-active");
+    document.body.classList.remove("ask-glow-active", "ask-waves-on", "ask-fullscreen");
+    if (window.__askWaves) window.__askWaves.stop();
   }
 
   // Fire the moment the section pins — i.e. its top reaches the top of the

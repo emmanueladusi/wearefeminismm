@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=Figtree:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=82" />
+  <link rel="stylesheet" href="css/styles.css?v=88" />
 </head>
 <body>
   <script>document.body.classList.add("is-loading");</script>
@@ -150,6 +150,54 @@
     </div>
   </section>
 
+  <!-- ===== Learn: three lenses on feminism.
+       Solid deep-violet scene (morph shows through). Concept cards with
+       tiny looping CSS "data glyphs" so the ideas move, not just sit. ===== -->
+  <section class="learn" id="whatis" aria-label="What is feminism — three lenses" data-bg="#2e2145" data-scene>
+    <div class="learn__inner">
+      <p class="eyebrow eyebrow--light reveal">So… what is feminism?</p>
+      <h2 class="learn__title reveal">One word, <em>three lenses.</em></h2>
+      <p class="learn__lead reveal">It isn't one flat idea. Look through three lenses and the whole picture snaps into focus.</p>
+
+      <div class="lenses">
+        <article class="lens reveal" data-lens="white">
+          <div class="lens__viz" aria-hidden="true">
+            <span class="glyph-bar glyph-bar--solo"></span>
+            <span class="glyph-cap">gender</span>
+          </div>
+          <h3 class="lens__name">White feminism</h3>
+          <p class="lens__def">Sees <em>one</em> axis — gender. Fights for women, full stop.</p>
+        </article>
+
+        <article class="lens reveal" data-lens="black">
+          <div class="lens__viz" aria-hidden="true">
+            <span class="glyph-stack">
+              <span class="glyph-bar"></span><span class="glyph-bar"></span>
+              <span class="glyph-bar"></span><span class="glyph-bar"></span>
+            </span>
+            <span class="glyph-cap">not equal weight</span>
+          </div>
+          <h3 class="lens__name">Black feminism</h3>
+          <p class="lens__def">Names what the first lens misses: <em>not every woman carries the same weight.</em></p>
+        </article>
+
+        <article class="lens reveal" data-lens="inter">
+          <div class="lens__viz" aria-hidden="true">
+            <span class="glyph-cross">
+              <span class="glyph-axis glyph-axis--a"></span>
+              <span class="glyph-axis glyph-axis--b"></span>
+              <span class="glyph-axis glyph-axis--c"></span>
+              <span class="glyph-knot"></span>
+            </span>
+            <span class="glyph-cap">all at once</span>
+          </div>
+          <h3 class="lens__name">Intersectionality</h3>
+          <p class="lens__def">The knot that ties it back together — race, gender, class, all at once, under one movement.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
   <!-- ===== Ask: "what is feminism?" on a dark panel with the
        flicker-proof Apple-Intelligence rainbow border (see css) ===== -->
   <section class="askpin" id="ask" aria-label="What is feminism" data-bg="#f4eef8">
@@ -190,10 +238,14 @@
           <div class="ag-band ag-band3"><div class="ag-ring"></div></div>
           <div class="ag-band ag-band4"><div class="ag-ring"></div></div>
           <div class="ag-comet"><div class="ag-comet-ring"></div></div>
-          <!-- light leak: a single warm streak that whips across the frame with
-               a hot core + rose/cyan chromatic fringe, like a real film leak -->
+          <!-- light leak: the rainbow FLARES — an arc of the border blooms
+               (ag-leak__emit, glued to the ring edge) and throws a soft slice
+               of its own colour inward across the frame (ag-leak__streak),
+               warping the question as it passes. Reads as emitted rainbow
+               light, not a stray streak. -->
           <div class="ag-leak">
             <span class="ag-leak__glow"></span>
+            <span class="ag-leak__emit"></span>
             <span class="ag-leak__streak"></span>
           </div>
         </div>
@@ -211,15 +263,177 @@
           </span>
         </div>
       </div>
-    </div>
-  </section>
 
-  <!-- ===== What is feminism — blank section for Carl's future content ===== -->
-  <section class="whatis" id="whatis" aria-label="What is feminism — content" data-bg="#2e2145" data-scene>
-    <!-- ============ CONTENT GOES HERE ============
-         Carl: fill this section in later. It's intentionally
-         blank (solid deep violet). Add your heading and copy
-         inside this section whenever you're ready. -->
+      <!-- ===== The Waves, INSIDE the ring. After the chat types out and
+           fades, js/engulf.js freezes the rainbow ring and reveals this
+           dark "screen" within it; js/waves.js then scrubs the four waves
+           and the rising ocean as you keep scrolling through #ask. ===== -->
+      <div class="askwaves" id="askwaves" aria-label="The waves of feminism">
+
+        <!-- ===== Seascape: layered depth behind the tide — light rays, distant
+             silhouettes, a hazy wreck, rolling seabed dunes and coral. Static;
+             sits behind the (now translucent) rising water. ===== -->
+        <div class="seascape" aria-hidden="true">
+          <span class="sea-ray sea-ray--1"></span>
+          <span class="sea-ray sea-ray--2"></span>
+          <span class="sea-ray sea-ray--3"></span>
+
+          <!-- distant creatures drifting in the haze -->
+          <svg class="sea-far sea-far--shark" viewBox="0 0 140 60">
+            <path d="M14 32 C 34 19, 72 16, 104 27 C 108 28.5, 108 31.5, 104 33 C 74 43, 40 43, 22 37 C 16 35, 14 34, 14 32 Z"/>
+            <path d="M100 30 L 130 15 L 119 30 L 130 45 Z"/>
+            <path d="M50 21 L 64 6 L 74 23 Z"/>
+          </svg>
+          <svg class="sea-far sea-far--fish" viewBox="0 0 44 22">
+            <path d="M6 11 C 14 3, 30 3, 34 11 C 30 19, 14 19, 6 11 Z M33 11 L 42 5 L 39 11 L 42 17 Z"/>
+          </svg>
+
+          <!-- a sunken ship resting in the deep -->
+          <svg class="sea-wreck" viewBox="0 0 460 240" preserveAspectRatio="xMidYMax meet">
+            <path d="M24 150 L300 128 L360 120 L372 108 L372 92 L300 92 L300 78 L262 78 L262 96 L214 96 L214 108 L150 110 L150 122 L96 126 L96 140 L40 146 Z"/>
+            <path d="M300 128 L300 96 L392 92 L400 128 Z"/>
+            <path d="M330 96 L336 66 L392 64 L398 96 Z"/>
+            <path d="M110 120 Q 60 200, 150 214 L 348 206 Q 424 200, 404 132 L 372 138 Q 300 150, 200 152 Q 150 152, 110 120 Z"/>
+            <path d="M150 118 L150 78 L156 78 L156 116 Z"/>
+          </svg>
+
+          <!-- rolling seabed dunes, back (light/far) to front (dark/near) -->
+          <svg class="dune dune--3" viewBox="0 0 1440 300" preserveAspectRatio="none"><path d="M0 150 C 220 96, 430 176, 680 140 C 940 104, 1160 176, 1440 128 L1440 300 L0 300 Z"/></svg>
+          <svg class="dune dune--2" viewBox="0 0 1440 300" preserveAspectRatio="none"><path d="M0 196 C 260 132, 520 214, 800 180 C 1060 148, 1250 210, 1440 178 L1440 300 L0 300 Z"/></svg>
+          <svg class="dune dune--1" viewBox="0 0 1440 300" preserveAspectRatio="none"><path d="M0 236 C 300 190, 560 250, 860 224 C 1140 200, 1300 246, 1440 224 L1440 300 L0 300 Z"/></svg>
+
+          <!-- coral / sea plants rooted on the seabed -->
+          <svg class="coral coral--a" viewBox="0 0 90 140"><path fill="none" stroke-linecap="round" d="M45 140 L45 46 M45 104 C 33 94, 26 82, 25 64 M45 104 C 57 94, 64 82, 65 64 M45 78 C 35 70, 30 58, 32 44 M45 78 C 55 70, 60 58, 58 44 M45 60 C 39 52, 38 44, 41 34 M45 60 C 51 52, 52 44, 49 34 M25 64 C 21 58, 21 52, 24 48 M65 64 C 69 58, 69 52, 66 48"/></svg>
+          <svg class="coral coral--b" viewBox="0 0 70 120"><path fill="none" stroke-linecap="round" d="M35 120 C 30 92, 30 72, 33 50 C 35 38, 37 30, 38 20 M35 86 C 25 78, 20 66, 20 52 M35 86 C 46 78, 51 66, 52 52 M35 62 C 27 55, 24 46, 26 36"/></svg>
+          <svg class="coral coral--c" viewBox="0 0 100 150"><path fill="none" stroke-linecap="round" d="M50 150 L50 40 M50 112 C 36 100, 26 86, 24 66 M50 112 C 64 100, 74 86, 76 66 M50 84 C 38 74, 32 60, 34 44 M50 84 C 62 74, 68 60, 66 44 M50 60 C 43 50, 42 40, 46 30 M50 60 C 57 50, 58 40, 54 30 M24 66 C 20 58, 21 50, 25 46 M76 66 C 80 58, 79 50, 75 46"/></svg>
+          <svg class="coral coral--d" viewBox="0 0 70 110"><path fill="none" stroke-linecap="round" d="M35 110 C 31 86, 31 66, 34 46 C 36 34, 38 26, 39 16 M35 80 C 26 72, 22 60, 22 48 M35 80 C 45 72, 49 60, 49 48 M35 58 C 28 50, 26 42, 28 32"/></svg>
+        </div>
+
+        <div class="askwaves__head">
+          <p class="eyebrow eyebrow--light">The waves of feminism</p>
+          <p class="askwaves__lead">It didn't arrive all at once. It came in <em>waves.</em></p>
+        </div>
+
+        <div class="waves__stage">
+          <article class="wavecard" data-w="1">
+            <span class="wavecard__num">01</span>
+            <p class="wavecard__years">1800 — 1900</p>
+            <h3 class="wavecard__title">The first wave</h3>
+            <p class="wavecard__tag">The right to exist on paper.</p>
+            <ul class="wavecard__points">
+              <li>Won the right to <strong>vote</strong></li>
+              <li>Gained legal rights — like owning property</li>
+              <li>Mostly white, upper-class women</li>
+            </ul>
+          </article>
+
+          <article class="wavecard" data-w="2">
+            <span class="wavecard__num">02</span>
+            <p class="wavecard__years">1960 — 1980</p>
+            <h3 class="wavecard__title">The second wave</h3>
+            <p class="wavecard__tag">The personal becomes political.</p>
+            <ul class="wavecard__points">
+              <li>Workplace &amp; reproductive rights, education, sexuality</li>
+              <li>Challenged gender roles — like women as housewives</li>
+              <li>Still mainly white, upper-class women</li>
+            </ul>
+          </article>
+
+          <article class="wavecard" data-w="3">
+            <span class="wavecard__num">03</span>
+            <p class="wavecard__years">1990 — 2000</p>
+            <h3 class="wavecard__title">The third wave</h3>
+            <p class="wavecard__tag">Room for every kind of woman.</p>
+            <ul class="wavecard__points">
+              <li>Far more diverse — queer &amp; non-binary voices</li>
+              <li>Celebrated the differences between women</li>
+              <li>Intersectionality moved to the <strong>center</strong></li>
+              <li>No single goal — deliberately many</li>
+            </ul>
+          </article>
+
+          <article class="wavecard" data-w="4">
+            <span class="wavecard__num">04</span>
+            <p class="wavecard__years">2010 — now</p>
+            <h3 class="wavecard__title">The fourth wave</h3>
+            <p class="wavecard__tag">Loud, online, and for everyone.</p>
+            <ul class="wavecard__points">
+              <li>Fights harassment, assault &amp; online abuse</li>
+              <li>Trans rights, non-binary rights, global identities</li>
+              <li>Spread through social media</li>
+              <li><strong>Bold. Unapologetic. Inclusive.</strong></li>
+            </ul>
+          </article>
+        </div>
+
+        <ol class="waves__dots" aria-hidden="true">
+          <li class="waves__dot"></li>
+          <li class="waves__dot"></li>
+          <li class="waves__dot"></li>
+          <li class="waves__dot"></li>
+        </ol>
+
+        <!-- rising ocean: height (--level) + warmth (--mix) driven by scroll;
+             layers roll horizontally AND oscillate vertically for a live swell -->
+        <div class="ocean" id="ocean" aria-hidden="true">
+          <div class="ocean__body">
+            <div class="ocean__crest">
+              <span class="owave owave--1"></span>
+              <span class="owave owave--2"></span>
+              <span class="owave owave--3"></span>
+            </div>
+          </div>
+
+          <!-- sea life: fish drift across + bubbles rise to the surface. Lives
+               inside the ocean so it's clipped to (and rises with) the water. -->
+          <div class="sealife" aria-hidden="true">
+            <svg class="fish fish--1" viewBox="0 0 44 22"><use href="#ic-fish"/></svg>
+            <svg class="fish fish--2" viewBox="0 0 44 22"><use href="#ic-fish"/></svg>
+            <svg class="fish fish--3" viewBox="0 0 44 22"><use href="#ic-fish"/></svg>
+            <svg class="fish fish--4" viewBox="0 0 44 22"><use href="#ic-fish"/></svg>
+            <svg class="fish fish--5" viewBox="0 0 44 22"><use href="#ic-fish"/></svg>
+            <span class="bubble" style="--x:10%; --s:6px;  --d:7.5s; --delay:0s"></span>
+            <span class="bubble" style="--x:22%; --s:10px; --d:9.5s; --delay:1.6s"></span>
+            <span class="bubble" style="--x:37%; --s:5px;  --d:6.5s; --delay:3.1s"></span>
+            <span class="bubble" style="--x:51%; --s:8px;  --d:8.5s; --delay:0.8s"></span>
+            <span class="bubble" style="--x:63%; --s:12px; --d:10s;  --delay:2.4s"></span>
+            <span class="bubble" style="--x:74%; --s:6px;  --d:7s;   --delay:4s"></span>
+            <span class="bubble" style="--x:86%; --s:9px;  --d:9s;   --delay:1.1s"></span>
+            <span class="bubble" style="--x:94%; --s:5px;  --d:6s;   --delay:3.6s"></span>
+          </div>
+        </div>
+
+        <!-- shark word-swap: a shark swims across a line, eats the words, and
+             the new ones surface behind it (js/sealife.js). Purely playful. -->
+        <div class="shark-swap" aria-hidden="true">
+          <span class="shark-swap__old" id="sharkOld">make waves</span>
+          <span class="shark-swap__new" id="sharkNew"></span>
+          <svg class="shark" id="shark" viewBox="0 0 140 60">
+            <path d="M14 32 C 34 19, 72 16, 104 27 C 108 28.5, 108 31.5, 104 33 C 74 43, 40 43, 22 37 C 16 35, 14 34, 14 32 Z"/>
+            <path d="M100 30 L 130 15 L 119 30 L 130 45 Z"/>
+            <path d="M50 21 L 64 5 L 75 23 Z"/>
+            <path d="M48 36 L 43 51 L 63 38 Z"/>
+            <circle class="shark__eye" cx="26" cy="30" r="1.7"/>
+          </svg>
+        </div>
+
+        <!-- reusable silhouettes for the fish + shark -->
+        <svg width="0" height="0" aria-hidden="true" style="position:absolute">
+          <defs>
+            <symbol id="ic-fish" viewBox="0 0 44 22">
+              <path d="M6 11 C 14 3, 30 3, 34 11 C 30 19, 14 19, 6 11 Z M33 11 L 42 5 L 39 11 L 42 17 Z"/>
+            </symbol>
+            <symbol id="ic-shark" viewBox="0 0 140 60">
+              <path d="M14 32 C 34 19, 72 16, 104 27 C 108 28.5, 108 31.5, 104 33 C 74 43, 40 43, 22 37 C 16 35, 14 34, 14 32 Z"/>
+              <path d="M100 30 L 130 15 L 119 30 L 130 45 Z"/>
+              <path d="M50 21 L 64 5 L 75 23 Z"/>
+              <path d="M48 36 L 43 51 L 63 38 Z"/>
+              <circle class="shark__eye" cx="26" cy="30" r="1.7"/>
+            </symbol>
+          </defs>
+        </svg>
+      </div>
+    </div>
   </section>
 
   <!-- ===== Pillars: scroll-pinned deck fans out, then flips ===== -->
@@ -338,16 +552,18 @@
   <script src="js/morph.js?v=78"></script>
   <script src="js/journey.js?v=78"></script>
   <script src="js/pin.js?v=78"></script>
+  <script src="js/waves.js?v=85"></script>
+  <script src="js/sealife.js?v=87"></script>
   <script src="js/brandmarkData.js?v=80"></script>
   <script src="js/heroReveal.js?v=80"></script>
   <script src="js/aiglow.js?v=78"></script>
-  <script src="js/engulf.js?v=78"></script>
+  <script src="js/engulf.js?v=86"></script>
   <script src="js/polish.js?v=78"></script>
   <script src="js/main.js?v=78"></script>
   <script src="js/fluid.js?v=78"></script>
   <script src="js/scene3d.js?v=78"></script>
   <script src="js/wall3d.js?v=78"></script>
-  <script src="js/cards.js?v=78"></script>
+  <script src="js/cards.js?v=88"></script>
   <script src="js/thread.js?v=78"></script>
   <script src="js/spark.js?v=78"></script>
   <script src="js/biasCards.js?v=78"></script>
