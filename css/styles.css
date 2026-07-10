@@ -2320,15 +2320,14 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
   opacity: var(--mix);
   transition: opacity 0.5s linear;
 }
-/* rolling + oscillating crest. Foam mask: +30% amplitude and a higher
-   frequency (four crests across the width), so the surface reads as a
-   busy, oscillating swell without ever climbing over the copy. */
+/* the waterline crest (GIF-3 reference, made SMOOTH): gentle low-frequency
+   swells that roll slowly and evenly — no choppy bob, no high-frequency chop. */
 .ocean__crest {
   position: absolute;
   left: 0; right: 0; top: 0;
-  height: 58px;
-  transform: translateY(-60%);
-  animation: crestBob 3s ease-in-out infinite;   /* vertical swell */
+  height: 54px;
+  transform: translateY(-58%);
+  animation: crestBob 9s ease-in-out infinite;   /* barely-there breathing */
 }
 .owave {
   position: absolute;
@@ -2336,24 +2335,23 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
   width: 200%;
   height: 100%;
   background: rgba(255, 255, 255, 0.18);
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 40' preserveAspectRatio='none'%3E%3Cpath d='M0 20 C10 4.4 20 4.4 30 20 C40 35.6 50 35.6 60 20 C70 4.4 80 4.4 90 20 C100 35.6 110 35.6 120 20 L120 40 L0 40 Z' fill='black'/%3E%3C/svg%3E") repeat-x;
-          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 40' preserveAspectRatio='none'%3E%3Cpath d='M0 20 C10 4.4 20 4.4 30 20 C40 35.6 50 35.6 60 20 C70 4.4 80 4.4 90 20 C100 35.6 110 35.6 120 20 L120 40 L0 40 Z' fill='black'/%3E%3C/svg%3E") repeat-x;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 40' preserveAspectRatio='none'%3E%3Cpath d='M0 22 C 20 12 40 12 60 22 C 80 32 100 32 120 22 L120 40 L0 40 Z' fill='black'/%3E%3C/svg%3E") repeat-x;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 40' preserveAspectRatio='none'%3E%3Cpath d='M0 22 C 20 12 40 12 60 22 C 80 32 100 32 120 22 L120 40 L0 40 Z' fill='black'/%3E%3C/svg%3E") repeat-x;
   -webkit-mask-size: 50% 100%;
           mask-size: 50% 100%;
   will-change: transform;
 }
-.owave--1 { background: rgba(255, 255, 255, 0.22); height: 66%;  animation: oceanRoll 7s linear infinite; }
-.owave--2 { background: rgba(255, 255, 255, 0.13); height: 100%; animation: oceanRoll 11s linear infinite reverse; }
-.owave--3 { background: rgba(255, 255, 255, 0.32); height: 44%;  animation: oceanRoll 5s linear infinite; }
-/* horizontal roll with a vertical bob folded in = an oscillating swell */
+.owave--1 { background: rgba(255, 255, 255, 0.20); height: 70%;  animation: oceanRoll 16s linear infinite; }
+.owave--2 { background: rgba(255, 255, 255, 0.12); height: 100%; animation: oceanRoll 24s linear infinite reverse; }
+.owave--3 { background: rgba(255, 255, 255, 0.30); height: 48%;  animation: oceanRoll 12s linear infinite; }
+/* pure, even horizontal roll — smooth, never choppy */
 @keyframes oceanRoll {
-  0%   { transform: translate(0, 0); }
-  50%  { transform: translate(-25%, -12%); }
-  100% { transform: translate(-50%, 0); }
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
 }
 @keyframes crestBob {
-  0%, 100% { transform: translateY(-54%); }
-  50%      { transform: translateY(-70%); }
+  0%, 100% { transform: translateY(-56%); }
+  50%      { transform: translateY(-62%); }
 }
 
 /* ---------- CINEMATIC (scrubbed) MODE — set by js/waves.js ---------- */
@@ -2442,57 +2440,77 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
    next ones surface behind it (js/sealife.js).
    ===================================================== */
 
-/* fish + bubbles live inside .ocean, so they're clipped to the water and
-   rise/fall with the tide. */
-.sealife {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-.fish {
-  position: absolute;
-  left: 0;
-  height: auto;
-  fill: rgba(206, 232, 248, 0.20);
-  will-change: transform;
-}
-.fish--1 { top: 26%; width: 40px; animation: fishR 23s linear infinite; }
-.fish--2 { top: 54%; width: 30px; fill: rgba(206,232,248,0.14); animation: fishL 31s linear infinite 4s; }
-.fish--3 { top: 72%; width: 52px; animation: fishR 27s linear infinite 9s; }
-.fish--4 { top: 40%; width: 24px; fill: rgba(206,232,248,0.12); animation: fishL 35s linear infinite 2s; }
-.fish--5 { top: 86%; width: 34px; animation: fishR 19s linear infinite 13s; }
+/* Fish + bubbles now live in .seascape (full scene), matching the GIF-2
+   reference: one weaving red fish + glassy bubbles + small clusters. */
 
-@keyframes fishR {   /* swims left → right, flipped to face the way it moves */
-  0%   { transform: translateX(-14vw) translateY(0)      scaleX(-1); }
-  50%  { transform: translateX(50vw)  translateY(-1.4vh) scaleX(-1); }
-  100% { transform: translateX(114vw) translateY(0)      scaleX(-1); }
-}
-@keyframes fishL {   /* swims right → left (fish faces left by default) */
-  0%   { transform: translateX(114vw) translateY(0); }
-  50%  { transform: translateX(50vw)  translateY(1.4vh); }
-  100% { transform: translateX(-14vw) translateY(0); }
-}
-
+/* glassy translucent bubbles rising and gently swaying up to the surface */
 .bubble {
   position: absolute;
   left: var(--x);
-  bottom: -3%;
+  bottom: -4%;
   width: var(--s); height: var(--s);
   border-radius: 50%;
-  background: radial-gradient(circle at 32% 30%,
-    rgba(255,255,255,0.9), rgba(210,238,255,0.28) 58%, rgba(210,238,255,0.06));
-  box-shadow: 0 0 5px rgba(190,225,255,0.45);
+  background: radial-gradient(circle at 34% 28%,
+    rgba(255,255,255,0.95) 0 6%, rgba(255,255,255,0.12) 26%,
+    rgba(170,215,250,0.05) 60%, rgba(170,215,250,0.02) 100%);
+  box-shadow: inset -1px -1px 3px rgba(120,175,220,0.35),
+              inset 1px 1px 2px rgba(255,255,255,0.25),
+              0 0 6px rgba(190,225,255,0.32);
+  border: 1px solid rgba(220,240,255,0.20);
   opacity: 0;
-  animation: bubbleRise var(--d) ease-in var(--delay) infinite;
+  animation: bubbleRise var(--d) linear var(--delay) infinite;
   will-change: transform, opacity;
 }
 @keyframes bubbleRise {
-  0%   { transform: translate(0, 0)      scale(0.5);  opacity: 0; }
-  10%  { opacity: 0.7; }
-  55%  { transform: translate(7px, -38vh) scale(1); }
-  90%  { opacity: 0.55; }
-  100% { transform: translate(-3px, -72vh) scale(1.1); opacity: 0; }
+  0%   { transform: translate(0, 0)       scale(0.6);  opacity: 0; }
+  8%   { opacity: 0.8; }
+  50%  { transform: translate(10px, -46vh) scale(1); }
+  92%  { opacity: 0.62; }
+  100% { transform: translate(-6px, -90vh) scale(1.08); opacity: 0; }
+}
+
+/* small clusters of tiny bubbles rising together */
+.bubcluster {
+  position: absolute;
+  left: var(--x); bottom: -4%;
+  width: 26px; height: 30px;
+  opacity: 0;
+  animation: bubbleRise var(--d) linear var(--delay) infinite;
+  will-change: transform, opacity;
+}
+.bubcluster i {
+  position: absolute; border-radius: 50%;
+  background: radial-gradient(circle at 34% 28%, rgba(255,255,255,0.9), rgba(200,230,255,0.15) 60%, transparent);
+  box-shadow: 0 0 3px rgba(190,225,255,0.4);
+}
+.bubcluster i:nth-child(1){ width:5px;height:5px; left:4px;  top:20px; }
+.bubcluster i:nth-child(2){ width:7px;height:7px; left:12px; top:12px; }
+.bubcluster i:nth-child(3){ width:4px;height:4px; left:20px; top:18px; }
+.bubcluster i:nth-child(4){ width:6px;height:6px; left:7px;  top:4px;  }
+.bubcluster i:nth-child(5){ width:3px;height:3px; left:16px; top:2px;  }
+
+/* the one red fish, weaving through on a smooth sinuous path (GIF-2) */
+.rfish {
+  position: absolute;
+  left: 0; top: 0;
+  width: clamp(34px, 4.4vw, 60px);
+  height: auto;
+  will-change: transform;
+  animation: fishWeave 20s ease-in-out infinite;
+  filter: drop-shadow(0 3px 8px rgba(6,20,40,0.4));
+}
+.rfish__body { fill: #e8452f; }
+.rfish__tail, .rfish__fin { fill: #c8371f; }
+.rfish__eyew { fill: #fff; }
+.rfish__eyeb { fill: #171717; }
+@keyframes fishWeave {
+  0%   { transform: translate(-14vw, 58vh) rotate(-7deg); }
+  16%  { transform: translate(12vw,  40vh) rotate(6deg); }
+  32%  { transform: translate(31vw,  54vh) rotate(-6deg); }
+  50%  { transform: translate(50vw,  37vh) rotate(7deg); }
+  66%  { transform: translate(68vw,  52vh) rotate(-6deg); }
+  82%  { transform: translate(86vw,  39vh) rotate(6deg); }
+  100% { transform: translate(114vw, 50vh) rotate(-3deg); }
 }
 
 /* --- the shark word-swap --- */
@@ -2559,6 +2577,14 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
   overflow: hidden;
   pointer-events: none;
 }
+/* faint painterly grain over the whole scene (GIF-1 texture) */
+.seascape::after {
+  content: "";
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.06;
+  mix-blend-mode: overlay;
+}
 
 /* shafts of surface light slanting into the deep */
 .sea-ray {
@@ -2621,6 +2647,31 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
 .coral--c { left: 57%; width: clamp(54px, 7vw, 94px); bottom: 16%; }
 .coral--d { left: 79%; width: clamp(40px, 5vw, 66px); bottom: 17%; }
 
+/* big curling kelp fronds framing the scene (GIF-1 style), swaying from the
+   base like real kelp in a current. Sit at the edges so they don't cover copy. */
+.kelp {
+  position: absolute;
+  bottom: -2%;
+  height: auto;
+  fill: rgba(132, 168, 134, 0.32);
+  transform-origin: bottom center;
+  will-change: transform;
+}
+.kelp--1 { left: -4%;  width: clamp(120px, 20vw, 280px); animation: kelpSway 9s ease-in-out infinite; }
+.kelp--2 { left: 10%;  width: clamp(84px, 13vw, 200px); fill: rgba(132,168,134,0.20); animation: kelpSway 11s ease-in-out infinite reverse; }
+.kelp--3 { right: -5%; left: auto; width: clamp(128px, 21vw, 300px); animation: kelpSwayFlip 10s ease-in-out infinite; }
+.kelp--4 { right: 10%; left: auto; width: clamp(80px, 12vw, 188px); fill: rgba(132,168,134,0.18); animation: kelpSwayFlip 12.5s ease-in-out infinite reverse; }
+@keyframes kelpSway {
+  0%,100% { transform: rotate(-2.6deg); }
+  50%     { transform: rotate(2.6deg); }
+}
+@keyframes kelpSwayFlip {
+  0%,100% { transform: scaleX(-1) rotate(-2.6deg); }
+  50%     { transform: scaleX(-1) rotate(2.6deg); }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .sea-far { animation: none !important; }
+  .sea-far, .kelp, .rfish, .bubble, .bubcluster { animation: none !important; }
+  .bubble, .bubcluster { display: none; }
+  .rfish { display: none; }
 }

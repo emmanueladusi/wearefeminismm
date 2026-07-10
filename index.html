@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=Figtree:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=88" />
+  <link rel="stylesheet" href="css/styles.css?v=90" />
 </head>
 <body>
   <script>document.body.classList.add("is-loading");</script>
@@ -278,6 +278,12 @@
           <span class="sea-ray sea-ray--2"></span>
           <span class="sea-ray sea-ray--3"></span>
 
+          <!-- big curling kelp fronds framing the scene (GIF-1 style), swaying -->
+          <svg class="kelp kelp--1" viewBox="0 0 170 460" preserveAspectRatio="xMidYMax meet"><path d="M70 460 C 40 380, 34 320, 64 262 C 100 196, 138 150, 128 96 C 122 64, 100 48, 72 46 C 110 40, 152 64, 158 116 C 165 178, 124 226, 92 272 C 60 316, 72 384, 100 460 Z"/></svg>
+          <svg class="kelp kelp--2" viewBox="0 0 150 440" preserveAspectRatio="xMidYMax meet"><path d="M78 440 C 108 360, 116 300, 88 244 C 54 180, 20 138, 30 88 C 36 58, 56 44, 82 44 C 46 40, 8 66, 6 116 C 2 176, 44 220, 74 264 C 104 306, 96 372, 60 440 Z"/></svg>
+          <svg class="kelp kelp--3" viewBox="0 0 170 460" preserveAspectRatio="xMidYMax meet"><path d="M70 460 C 40 380, 34 320, 64 262 C 100 196, 138 150, 128 96 C 122 64, 100 48, 72 46 C 110 40, 152 64, 158 116 C 165 178, 124 226, 92 272 C 60 316, 72 384, 100 460 Z"/></svg>
+          <svg class="kelp kelp--4" viewBox="0 0 150 440" preserveAspectRatio="xMidYMax meet"><path d="M78 440 C 108 360, 116 300, 88 244 C 54 180, 20 138, 30 88 C 36 58, 56 44, 82 44 C 46 40, 8 66, 6 116 C 2 176, 44 220, 74 264 C 104 306, 96 372, 60 440 Z"/></svg>
+
           <!-- distant creatures drifting in the haze -->
           <svg class="sea-far sea-far--shark" viewBox="0 0 140 60">
             <path d="M14 32 C 34 19, 72 16, 104 27 C 108 28.5, 108 31.5, 104 33 C 74 43, 40 43, 22 37 C 16 35, 14 34, 14 32 Z"/>
@@ -307,6 +313,27 @@
           <svg class="coral coral--b" viewBox="0 0 70 120"><path fill="none" stroke-linecap="round" d="M35 120 C 30 92, 30 72, 33 50 C 35 38, 37 30, 38 20 M35 86 C 25 78, 20 66, 20 52 M35 86 C 46 78, 51 66, 52 52 M35 62 C 27 55, 24 46, 26 36"/></svg>
           <svg class="coral coral--c" viewBox="0 0 100 150"><path fill="none" stroke-linecap="round" d="M50 150 L50 40 M50 112 C 36 100, 26 86, 24 66 M50 112 C 64 100, 74 86, 76 66 M50 84 C 38 74, 32 60, 34 44 M50 84 C 62 74, 68 60, 66 44 M50 60 C 43 50, 42 40, 46 30 M50 60 C 57 50, 58 40, 54 30 M24 66 C 20 58, 21 50, 25 46 M76 66 C 80 58, 79 50, 75 46"/></svg>
           <svg class="coral coral--d" viewBox="0 0 70 110"><path fill="none" stroke-linecap="round" d="M35 110 C 31 86, 31 66, 34 46 C 36 34, 38 26, 39 16 M35 80 C 26 72, 22 60, 22 48 M35 80 C 45 72, 49 60, 49 48 M35 58 C 28 50, 26 42, 28 32"/></svg>
+
+          <!-- glassy bubbles + small clusters rising (GIF-2 reference) -->
+          <span class="bubble" style="--x:9%;  --s:9px;  --d:11s; --delay:0s"></span>
+          <span class="bubble" style="--x:19%; --s:14px; --d:14s; --delay:2.2s"></span>
+          <span class="bubble" style="--x:31%; --s:7px;  --d:9.5s;--delay:4.1s"></span>
+          <span class="bubble" style="--x:44%; --s:11px; --d:12.5s;--delay:1.1s"></span>
+          <span class="bubble" style="--x:57%; --s:18px; --d:16s; --delay:3.3s"></span>
+          <span class="bubble" style="--x:69%; --s:8px;  --d:10s; --delay:5.2s"></span>
+          <span class="bubble" style="--x:80%; --s:13px; --d:13s; --delay:0.7s"></span>
+          <span class="bubble" style="--x:91%; --s:7px;  --d:9s;  --delay:2.9s"></span>
+          <span class="bubcluster" style="--x:14%; --d:13s; --delay:1.5s"><i></i><i></i><i></i><i></i><i></i></span>
+          <span class="bubcluster" style="--x:63%; --d:15s; --delay:4.5s"><i></i><i></i><i></i><i></i><i></i></span>
+
+          <!-- the one red fish, weaving through on a smooth path (GIF-2) -->
+          <svg class="rfish" viewBox="0 0 64 44" aria-hidden="true">
+            <path class="rfish__tail" d="M16 22 L 2 11 L 7 22 L 2 33 Z"/>
+            <path class="rfish__fin"  d="M30 13 L 37 3 L 41 15 Z"/>
+            <path class="rfish__body" d="M52 22 C 52 11, 37 7, 23 12 C 12 16, 9 20, 12 25 C 19 34, 45 35, 52 22 Z"/>
+            <circle class="rfish__eyew" cx="44" cy="18.5" r="4.6"/>
+            <circle class="rfish__eyeb" cx="45.6" cy="18.5" r="2.2"/>
+          </svg>
         </div>
 
         <div class="askwaves__head">
@@ -382,24 +409,6 @@
               <span class="owave owave--2"></span>
               <span class="owave owave--3"></span>
             </div>
-          </div>
-
-          <!-- sea life: fish drift across + bubbles rise to the surface. Lives
-               inside the ocean so it's clipped to (and rises with) the water. -->
-          <div class="sealife" aria-hidden="true">
-            <svg class="fish fish--1" viewBox="0 0 44 22"><use href="#ic-fish"/></svg>
-            <svg class="fish fish--2" viewBox="0 0 44 22"><use href="#ic-fish"/></svg>
-            <svg class="fish fish--3" viewBox="0 0 44 22"><use href="#ic-fish"/></svg>
-            <svg class="fish fish--4" viewBox="0 0 44 22"><use href="#ic-fish"/></svg>
-            <svg class="fish fish--5" viewBox="0 0 44 22"><use href="#ic-fish"/></svg>
-            <span class="bubble" style="--x:10%; --s:6px;  --d:7.5s; --delay:0s"></span>
-            <span class="bubble" style="--x:22%; --s:10px; --d:9.5s; --delay:1.6s"></span>
-            <span class="bubble" style="--x:37%; --s:5px;  --d:6.5s; --delay:3.1s"></span>
-            <span class="bubble" style="--x:51%; --s:8px;  --d:8.5s; --delay:0.8s"></span>
-            <span class="bubble" style="--x:63%; --s:12px; --d:10s;  --delay:2.4s"></span>
-            <span class="bubble" style="--x:74%; --s:6px;  --d:7s;   --delay:4s"></span>
-            <span class="bubble" style="--x:86%; --s:9px;  --d:9s;   --delay:1.1s"></span>
-            <span class="bubble" style="--x:94%; --s:5px;  --d:6s;   --delay:3.6s"></span>
           </div>
         </div>
 
