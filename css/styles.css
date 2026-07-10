@@ -111,6 +111,9 @@ em { font-style: italic; color: var(--violet); }
 .nav__links a:hover { color: var(--ink); }
 .nav__links a:hover::after { transform: scaleX(1); transform-origin: left; }
 
+.nav__links a.is-current { color: var(--ink); }
+.nav__links a.is-current::after { transform: scaleX(1); transform-origin: left; }
+
 .quick-exit {
   font-family: var(--mono);
   font-size: 0.68rem;
@@ -2004,6 +2007,7 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
 
 /* ===== Brandmark: oversized wordmark ===== */
 .brandmark {
+  position: relative;               /* anchors the word-cycle overlay (.bwc) */
   min-height: 82vh;
   display: flex;
   align-items: center;
@@ -2041,6 +2045,69 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
 .bmc-stroke { fill: none; stroke: rgba(44, 33, 64, 0.5); stroke-linecap: round; stroke-linejoin: round; }
 .bmc-box { fill: none; stroke: rgba(207, 140, 48, 0.6); stroke-dasharray: 7 7; }
 .bmc-circ { fill: none; stroke: rgba(44, 33, 64, 0.32); stroke-dasharray: 7 8; }
+
+/* ===== Brandmark word-cycle + gold sweep (js/brandmarkCycle.js) =====
+   After the construction reveal, the baked-SVG wordmark hands off to this
+   live-text layer (Poppins SemiBold, the baked face). The prefix rolls
+   weare -> iam -> youare -> weare with a vertical motion blur, then a gold
+   light sweeps the settled "wearefeminismm".
+
+   Robustness notes (learned the hard way):
+   - The layer FILLS the section (inset:0) and centres its word with a
+     transform — the section already centres the SVG the same way, so the two
+     align WITHOUT any measured left/top (which broke while the section was
+     pinned/fixed).
+   - Text is a SOLID colour, not background-clip:text — the clip trick renders
+     transparent (invisible) if anything upstream disturbs it, which is exactly
+     what made the handoff "fade to nothing". The gold sweep is the only part
+     that uses clip, as a separate overlay that simply doesn't show if
+     unsupported — the solid word underneath stays visible regardless. */
+.bwc {
+  position: absolute; inset: 0;
+  display: none;
+  font-family: "Poppins", system-ui, sans-serif;
+  font-weight: 600; line-height: 1; letter-spacing: 0;
+  white-space: nowrap; pointer-events: none;
+}
+.bwc.on { display: block; }
+/* centred on the SVG word's measured centre (--wcx/--wcy set in JS; falls back
+   to the section centre). This lines the live word up with the baked glyphs. */
+.bwc-composed, .bwc-final, .bwc-shine {
+  position: absolute; left: var(--wcx, 50%); top: var(--wcy, 50%);
+  transform: translate(-50%, -50%);
+  display: flex; align-items: baseline;
+  color: #2b1f42;                       /* solid plum — always visible */
+}
+.bwc-suffix, .bwc-reel > span { color: #2b1f42; }
+.bwc-slot {
+  position: relative; height: 1em; overflow: hidden;
+  width: 0; transition: width 460ms cubic-bezier(.5,0,.2,1);
+}
+.bwc-reel {
+  display: flex; flex-direction: column;
+  transition: transform 460ms cubic-bezier(.5,0,.2,1);
+  filter: url(#bwc-ymblur); will-change: transform;
+}
+.bwc-reel > span { height: 1em; line-height: 1; display: block; text-align: right; }
+
+/* gold sweep: a SOLID-gold copy of the word revealed through a narrow band that
+   sweeps left -> right via clip-path — no background-clip:text (the thing that
+   was rendering invisible), so it actually shows. */
+.bwc-final { opacity: 0; }
+.bwc-final.show { opacity: 1; }
+.bwc-shine {
+  opacity: 0;
+  color: #ffd86a;
+  text-shadow: 0 0 22px rgba(255, 208, 100, 0.55);
+  clip-path: inset(0 100% 0 -30%);      /* band parked off the left = hidden */
+}
+.bwc-shine.show { opacity: 1; }
+.bwc-shine.sweep { animation: bwcGold 900ms ease-in-out; }
+@keyframes bwcGold {
+  0%   { clip-path: inset(0 100% 0 -30%); }   /* band off left */
+  100% { clip-path: inset(0 -30% 0 100%); }   /* band off right */
+}
+@media (prefers-reduced-motion: reduce) { .bwc { display: none !important; } }
 .bmc-handle { stroke: rgba(207, 140, 48, 0.5); stroke-dasharray: 4 5; }
 .bmc-node { fill: #cf8c30; }
 .bmc-dot { fill: #cf8c30; }
@@ -2306,11 +2373,37 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
 }
 /* the rising tide is now a TRANSLUCENT teal veil, so the seascape (dunes,
    coral, wreck) reads through it — deepening as the water climbs. */
+/* The water's own top edge IS a wave. Previously the body had a ruler-straight
+   top (plus a hard shadow band) and the foam crests merely floated above it —
+   that flat line read as a seam. Now a repeating wave tile masks the top of the
+   body and travels leftward, so the surface itself undulates; the .owave layers
+   above are foam riding on it. `mask` clips the element AND its ::after mix
+   layer, so both stay in register. */
 .ocean__body {
+  --wave-h: 78px;
+  --tile: 20vw;               /* 5 swells across the viewport */
   position: absolute;
   inset: 0;
+  top: calc(-0.55 * var(--wave-h));   /* keep the mean waterline where it was */
   background: linear-gradient(180deg, rgba(38,150,168,0.42) 0%, rgba(8,46,70,0.66) 100%);
-  box-shadow: 0 -14px 40px rgba(6, 26, 45, 0.4);
+  -webkit-mask:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 40' preserveAspectRatio='none'%3E%3Cpath d='M0 22 C 20 8 40 8 60 22 C 80 36 100 36 120 22 L120 40 L0 40 Z' fill='black'/%3E%3C/svg%3E") repeat-x 0 0 / var(--tile) var(--wave-h),
+    linear-gradient(#000, #000) no-repeat 0 100% / 100% calc(100% - var(--wave-h) + 2px);
+          mask:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 40' preserveAspectRatio='none'%3E%3Cpath d='M0 22 C 20 8 40 8 60 22 C 80 36 100 36 120 22 L120 40 L0 40 Z' fill='black'/%3E%3C/svg%3E") repeat-x 0 0 / var(--tile) var(--wave-h),
+    linear-gradient(#000, #000) no-repeat 0 100% / 100% calc(100% - var(--wave-h) + 2px);
+  /* the surface travels, and swells up and down as it goes — slowly */
+  animation: surfaceRoll 18s linear infinite, surfaceSwell 8.3s ease-in-out infinite alternate;
+}
+@keyframes surfaceRoll {
+  from { -webkit-mask-position: 0 0, 0 100%; mask-position: 0 0, 0 100%; }
+  to   { -webkit-mask-position: calc(-1 * var(--tile)) 0, 0 100%;
+                 mask-position: calc(-1 * var(--tile)) 0, 0 100%; }
+}
+/* the whole surface breathes — a long-period swell under the travelling waves */
+@keyframes surfaceSwell {
+  from { translate: 0 4px; }
+  to   { translate: 0 -7px; }
 }
 .ocean__body::after {
   content: "";
@@ -2320,38 +2413,131 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
   opacity: var(--mix);
   transition: opacity 0.5s linear;
 }
-/* the waterline crest (GIF-3 reference, made SMOOTH): gentle low-frequency
-   swells that roll slowly and evenly — no choppy bob, no high-frequency chop. */
+
+/* ---- the crest: five swell bands receding into the distance ----
+   Depth comes from four cues applied together, far -> near:
+     wavelength  3 swells across (long, distant) -> 7 (short, close)
+     parallax    22s per screen (slow, far)      -> 6.8s (fast, near)
+     amplitude   short, flat bands               -> tall, deep humps
+     atmosphere  hazy, low-contrast, blurred     -> bright white foam, sharp,
+                                                     casting a shadow on the water
+   Each band's mask tile is 50/n % wide, so the -50% roll is exactly n tiles
+   and every loop stays seamless. Bands are siblings of .ocean__body (NOT
+   children) — nested inside they were clipped by the body's own wave mask,
+   which fused them into one flat silhouette. */
 .ocean__crest {
   position: absolute;
   left: 0; right: 0; top: 0;
-  height: 54px;
-  transform: translateY(-58%);
-  animation: crestBob 9s ease-in-out infinite;   /* barely-there breathing */
+  height: 96px;
+  transform: translateY(-38%);
+  animation: crestBob 9s ease-in-out infinite;
 }
 .owave {
   position: absolute;
-  left: 0; bottom: 0;
+  left: 0;
   width: 200%;
-  height: 100%;
-  background: rgba(255, 255, 255, 0.18);
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 40' preserveAspectRatio='none'%3E%3Cpath d='M0 22 C 20 12 40 12 60 22 C 80 32 100 32 120 22 L120 40 L0 40 Z' fill='black'/%3E%3C/svg%3E") repeat-x;
-          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 40' preserveAspectRatio='none'%3E%3Cpath d='M0 22 C 20 12 40 12 60 22 C 80 32 100 32 120 22 L120 40 L0 40 Z' fill='black'/%3E%3C/svg%3E") repeat-x;
-  -webkit-mask-size: 50% 100%;
-          mask-size: 50% 100%;
+  --hv: 5px;                      /* per-band heave amplitude */
+  -webkit-mask-repeat: repeat-x;
+          mask-repeat: repeat-x;
+  -webkit-mask-size: var(--tile) 100%;
+          mask-size: var(--tile) 100%;
   will-change: transform;
 }
-.owave--1 { background: rgba(255, 255, 255, 0.20); height: 70%;  animation: oceanRoll 16s linear infinite; }
-.owave--2 { background: rgba(255, 255, 255, 0.12); height: 100%; animation: oceanRoll 24s linear infinite reverse; }
-.owave--3 { background: rgba(255, 255, 255, 0.30); height: 48%;  animation: oceanRoll 12s linear infinite; }
-/* pure, even horizontal roll — smooth, never choppy */
+/* shallow swells read as distant water; deep ones as near, breaking humps */
+.owave--1, .owave--2 {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 40' preserveAspectRatio='none'%3E%3Cpath d='M0 24 C 20 16 40 16 60 24 C 80 32 100 32 120 24 L120 40 L0 40 Z' fill='black'/%3E%3C/svg%3E");
+          mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 40' preserveAspectRatio='none'%3E%3Cpath d='M0 24 C 20 16 40 16 60 24 C 80 32 100 32 120 24 L120 40 L0 40 Z' fill='black'/%3E%3C/svg%3E");
+}
+.owave--3 {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 40' preserveAspectRatio='none'%3E%3Cpath d='M0 22 C 20 10 40 10 60 22 C 80 34 100 34 120 22 L120 40 L0 40 Z' fill='black'/%3E%3C/svg%3E");
+          mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 40' preserveAspectRatio='none'%3E%3Cpath d='M0 22 C 20 10 40 10 60 22 C 80 34 100 34 120 22 L120 40 L0 40 Z' fill='black'/%3E%3C/svg%3E");
+}
+.owave--4, .owave--5 {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 40' preserveAspectRatio='none'%3E%3Cpath d='M0 22 C 20 5 40 5 60 22 C 80 39 100 39 120 22 L120 40 L0 40 Z' fill='black'/%3E%3C/svg%3E");
+          mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 40' preserveAspectRatio='none'%3E%3Cpath d='M0 22 C 20 5 40 5 60 22 C 80 39 100 39 120 22 L120 40 L0 40 Z' fill='black'/%3E%3C/svg%3E");
+}
+
+/* Each band is a body of WATER, not a line: it is opaque at its crest and fades
+   to nothing at its foot, so it dissolves into the sea below instead of ending
+   on a hard edge (which is what made the earlier version read as a chart of
+   overlapping sine curves). Bands also hang below the waterline, and the near
+   ones darken — closer water is deeper in tone — while the far ones stay pale
+   and hazy. Only the nearest carries white foam. */
+
+/* Travel is slow — a long, unhurried swell. Only THREE bands move vertically,
+   and each on its own clock (9.4s / 12.6s / 17.3s) with unrelated offsets, so
+   they never rise together. Bands 1 and 4 hold their height, which gives the
+   moving ones something still to move against. */
+
+/* far: long, pale, hazy — drifts, never heaves */
+.owave--1 {
+  --tile: 16.6667%;              /* 3 swells */
+  bottom: 24px; height: 72px;
+  background: linear-gradient(180deg, rgba(158,196,214,0.22) 0%, rgba(158,196,214,0.10) 45%, rgba(158,196,214,0) 100%);
+  filter: blur(1.5px);
+  animation: oceanRoll 40s linear infinite;
+}
+/* heaves gently, slowest clock */
+.owave--2 {
+  --tile: 12.5%;                 /* 4 swells */
+  --hv: 4px;
+  bottom: 14px; height: 86px;
+  background: linear-gradient(180deg, rgba(146,190,214,0.26) 0%, rgba(146,190,214,0.11) 45%, rgba(146,190,214,0) 100%);
+  filter: blur(0.8px);
+  animation: oceanRoll 29s linear infinite,
+             waveHeave 9.4s ease-in-out -1.1s infinite alternate;
+}
+/* mid: sits on the true waterline; heaves deeper, on a different clock */
+.owave--3 {
+  --tile: 10%;                   /* 5 swells */
+  --hv: 7px;
+  bottom: 2px; height: 102px;
+  background: linear-gradient(180deg, rgba(124,176,204,0.32) 0%, rgba(124,176,204,0.13) 48%, rgba(124,176,204,0) 100%);
+  animation: oceanRoll 20s linear infinite,
+             waveHeave 12.6s ease-in-out -5.3s infinite alternate;
+}
+/* near: deeper in tone, casts a shadow into the trough — holds its height */
+.owave--4 {
+  --tile: 8.3333%;               /* 6 swells */
+  bottom: -14px; height: 120px;
+  background: linear-gradient(180deg, rgba(84,146,180,0.40) 0%, rgba(84,146,180,0.16) 50%, rgba(84,146,180,0) 100%);
+  filter: drop-shadow(0 3px 5px rgba(4, 20, 36, 0.28));
+  animation: oceanRoll 15.5s linear infinite;
+}
+/* nearest: the foam cap. Mostly it rides low — then it launches, cresting hard
+   and high, and sinks back down far more slowly than it rose. The 17.3s cycle
+   is coprime with every other clock here, so the surge never lands on the same
+   beat twice: it reads as random. */
+.owave--5 {
+  --tile: 7.1429%;               /* 7 swells */
+  bottom: 4px; height: 46px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.60) 0%, rgba(255,255,255,0.18) 40%, rgba(255,255,255,0) 88%);
+  filter: drop-shadow(0 4px 6px rgba(4, 20, 36, 0.36));
+  animation: oceanRoll 12.5s linear infinite,
+             waveSurge 17.3s linear -6.2s infinite;
+}
 @keyframes oceanRoll {
   from { transform: translateX(0); }
   to   { transform: translateX(-50%); }
 }
+/* the heave amplitude is read from each band's own --hv */
+@keyframes waveHeave {
+  from { translate: 0 var(--hv); }
+  to   { translate: 0 calc(-1 * var(--hv)); }
+}
+/* rise in ~0.7s, fall over ~4.3s — six times slower coming down than going up.
+   Per-keyframe timing functions govern the segment that FOLLOWS them. */
+@keyframes waveSurge {
+  0%   { translate: 0 4px;   animation-timing-function: ease-in-out; }
+  44%  { translate: 0 1px;   animation-timing-function: ease-in; }
+  48%  { translate: 0 5px;   animation-timing-function: cubic-bezier(.14,.85,.3,1); } /* coil, then launch */
+  52%  { translate: 0 -54px; animation-timing-function: cubic-bezier(.36,0,.5,1); }   /* apex — the long fall begins */
+  77%  { translate: 0 2px;   animation-timing-function: ease-in-out; }                /* settling */
+  100% { translate: 0 4px; }
+}
 @keyframes crestBob {
-  0%, 100% { transform: translateY(-56%); }
-  50%      { transform: translateY(-62%); }
+  0%, 100% { transform: translateY(-44%); }
+  50%      { transform: translateY(-52%); }
 }
 
 /* ---------- CINEMATIC (scrubbed) MODE — set by js/waves.js ---------- */
@@ -2416,7 +2602,8 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
 
 @media (prefers-reduced-motion: reduce) {
   .glyph-bar--solo, .glyph-stack .glyph-bar, .glyph-axis,
-  .glyph-knot, .owave, .ocean__crest { animation: none !important; }
+  .glyph-knot, .owave, .ocean__crest, .ocean__body { animation: none !important; }
+  .owave { translate: none !important; }
 
   /* drop the pinned ring choreography; show the question then a plain,
      readable stack of the four waves. */
@@ -2461,12 +2648,18 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
   animation: bubbleRise var(--d) linear var(--delay) infinite;
   will-change: transform, opacity;
 }
+/* Traced from the reference GIF: seven bubbles were tracked across the loop.
+   They rise essentially DEAD STRAIGHT — the largest deviation from a straight
+   line over a whole track was 2.1px on a 480px-wide frame (0.43% of width) —
+   and they hold their size, they don't swell as they climb. Rise rates spread
+   2.4%..12.6% of frame height per second, uncorrelated with radius (r=0.35).
+   So: no sway to speak of, no scale pulse; only the speeds vary (per --d). */
 @keyframes bubbleRise {
-  0%   { transform: translate(0, 0)       scale(0.6);  opacity: 0; }
-  8%   { opacity: 0.8; }
-  50%  { transform: translate(10px, -46vh) scale(1); }
-  92%  { opacity: 0.62; }
-  100% { transform: translate(-6px, -90vh) scale(1.08); opacity: 0; }
+  0%   { transform: translate(0, 0) scale(1); opacity: 0; }
+  6%   { opacity: 0.85; }
+  50%  { transform: translate(1.5px, -52vh) scale(1); }
+  92%  { opacity: 0.7; }
+  100% { transform: translate(-1px, -104vh) scale(1); opacity: 0; }
 }
 
 /* small clusters of tiny bubbles rising together */
@@ -2489,28 +2682,91 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
 .bubcluster i:nth-child(4){ width:6px;height:6px; left:7px;  top:4px;  }
 .bubcluster i:nth-child(5){ width:3px;height:3px; left:16px; top:2px;  }
 
-/* the one red fish, weaving through on a smooth sinuous path (GIF-2) */
-.rfish {
-  position: absolute;
-  left: 0; top: 0;
-  width: clamp(34px, 4.4vw, 60px);
-  height: auto;
-  will-change: transform;
-  animation: fishWeave 20s ease-in-out infinite;
+/* The fish is CONTAINED and SMOOTH.
+
+   Contained: it lives inside .ocean__life, which is clipped to the water box
+   (.ocean, whose height is the tide's --level). It physically cannot swim out
+   above the surface, and as the tide rises with scroll the fish just stays in
+   it. Positions are percentages of the water, so a rising tide gives it more
+   room rather than stranding it.
+
+   Smooth: the path is one closed analytic loop -- x = 50 + 40cos(t),
+   y = 52 + 24sin(t) + 7sin(2t) -- sampled at 24 keyframes. Because it closes on
+   itself (0% and 100% are the same point AND the same heading) the fish never
+   teleports back to a start position, so there is no pop and no opacity fade.
+   Between keyframes it moves at most ~10% of the water's width, and its heading
+   comes from the local velocity, tilted at most 20deg so it never stands on its
+   nose. It turns only at the two ends of the loop, where it is already
+   travelling vertically; there scaleX interpolates through zero, which reads as
+   the fish rolling over to face the other way.
+
+   Two elements, because CSS translate percentages resolve against the ELEMENT'S
+   own box: .fish-track is full-size (so its % are the water's), and the svg
+   inside carries only rotation and facing. */
+.ocean__life {
+  position: absolute; inset: 0;
+  overflow: hidden;          /* surface = ceiling, floor = where the spawn hides */
+  z-index: 1;
+  pointer-events: none;
+}
+/* each track is full-size, so its translate %s are the WATER's; the svg inside
+   carries size, and (for the fish) the gulp scale + fade. All three share one
+   11s cycle, phased so the shark's mouth meets the fish as it vanishes. */
+.o-shark-track, .o-fish-track { position: absolute; inset: 0; will-change: transform; }
+.o-shark-track { animation: sharkFeed 11s ease-in-out infinite; }
+.o-fish-track  { animation: fishSwim 11s ease-in-out infinite; }
+
+.o-shark {
+  position: absolute; left: 0; top: 0;
+  width: clamp(120px, 17vw, 240px); height: auto;
+  filter: drop-shadow(0 6px 14px rgba(4,16,32,0.45));
+}
+.o-shark path { fill: #16303e; }        /* deep silhouette (mouth faces left) */
+.o-shark__eye { fill: #dfeaf0; }
+
+.o-fish {
+  position: absolute; left: 0; top: 0;
+  width: clamp(30px, 4.2vw, 58px); height: auto;
+  transform-origin: 50% 50%;
+  will-change: transform, opacity;
+  animation: fishBite 11s ease-in-out infinite;
   filter: drop-shadow(0 3px 8px rgba(6,20,40,0.4));
 }
 .rfish__body { fill: #e8452f; }
 .rfish__tail, .rfish__fin { fill: #c8371f; }
 .rfish__eyew { fill: #fff; }
 .rfish__eyeb { fill: #171717; }
-@keyframes fishWeave {
-  0%   { transform: translate(-14vw, 58vh) rotate(-7deg); }
-  16%  { transform: translate(12vw,  40vh) rotate(6deg); }
-  32%  { transform: translate(31vw,  54vh) rotate(-6deg); }
-  50%  { transform: translate(50vw,  37vh) rotate(7deg); }
-  66%  { transform: translate(68vw,  52vh) rotate(-6deg); }
-  82%  { transform: translate(86vw,  39vh) rotate(6deg); }
-  100% { transform: translate(114vw, 50vh) rotate(-3deg); }
+
+/* shark: waits off the right, lunges left through the fish (~40% of the cycle),
+   then clears off the left. It faces left already (mouth leads), so no flip; it
+   is off-screen at both ends, so the loop's wrap is invisible. */
+@keyframes sharkFeed {
+  0%, 20% { transform: translate(120%, 42%); }
+  40%     { transform: translate(43%, 45%); }    /* body over the fish, mouth past it */
+  57%     { transform: translate(-46%, 45%); }   /* clears off the left */
+  100%    { transform: translate(-46%, 45%); }
+}
+/* fish: hovers near centre facing the incoming shark, is gone through the bite,
+   is repositioned below the floor, then rises from under; ends where it began
+   for a seamless loop. */
+@keyframes fishSwim {
+  0%   { transform: translate(50%, 50%); }
+  20%  { transform: translate(47%, 47%); }
+  38%  { transform: translate(49%, 50%); }       /* holds for the bite */
+  42%  { transform: translate(49%, 50%); }
+  43%  { transform: translate(50%, 128%); }      /* snap below the floor, hidden */
+  70%  { transform: translate(48%, 60%); }       /* rise up from under */
+  86%  { transform: translate(51%, 52%); }
+  100% { transform: translate(50%, 50%); }
+}
+/* fish state: normal, gulped (shrink + vanish) at the bite, hidden while it is
+   repositioned below, then fades back as it surfaces. */
+@keyframes fishBite {
+  0%, 40% { opacity: 1; transform: scale(1); }
+  43%     { opacity: 0; transform: scale(0.12); }  /* gulped */
+  47%     { opacity: 0; transform: scale(1); }      /* reset, still below */
+  60%     { opacity: 1; transform: scale(1); }      /* surfacing from under */
+  100%    { opacity: 1; transform: scale(1); }
 }
 
 /* --- the shark word-swap --- */
@@ -2671,7 +2927,35 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sea-far, .kelp, .rfish, .bubble, .bubcluster { animation: none !important; }
+  .sea-far, .kelp, .o-fish, .o-fish-track, .o-shark-track, .bubble, .bubcluster { animation: none !important; }
+  .o-shark-track { display: none; }
   .bubble, .bubcluster { display: none; }
-  .rfish { display: none; }
+  .o-fish { opacity: 1; }
 }
+
+/* Frame-scrubbed underwater artwork (js/uwscrub.js): a canvas at the very back
+   of .askwaves. Hidden by default — only once the real frames load does the
+   script add body.uwscrub-on, which shows the canvas and retires the
+   hand-drawn .seascape it replaces. */
+.uwscrub {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+  display: none;
+  pointer-events: none;
+  /* it's an opaque full-bleed backdrop: isolate its paints from the rest of
+     the section so repaints never invalidate the cards/ring above it */
+  contain: paint;
+}
+body.uwscrub-on .uwscrub { display: block; }
+/* The watercolour canvas replaces the hand-drawn SCENERY (kelp, dunes, coral,
+   wreck, rays, distant creatures) and its grain — but the fish and the bubbles
+   are life, not backdrop, so they keep swimming over the artwork. */
+body.uwscrub-on .seascape > .kelp,
+body.uwscrub-on .seascape > .sea-ray,
+body.uwscrub-on .seascape > .sea-far,
+body.uwscrub-on .seascape > .sea-wreck,
+body.uwscrub-on .seascape > .dune,
+body.uwscrub-on .seascape > .coral { display: none; }
+body.uwscrub-on .seascape::after { content: none; }
+

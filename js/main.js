@@ -100,11 +100,12 @@ if (!reduceMotion && marquee) {
 }
 
 /* =====================================================
-   The Wall
+   The Wall (only present on community.html)
    ===================================================== */
 const wallList = document.getElementById("wallList");
 const wallForm = document.getElementById("wallForm");
 
+if (wallList && wallForm) {
 const WALL_KEY = "wallPosts.v2";
 localStorage.removeItem("wallPosts"); // v1 held demo seed posts
 
@@ -211,14 +212,17 @@ wallForm.addEventListener("submit", (e) => {
 });
 
 renderPosts();
+}
 
 /* =====================================================
-   Pulse check
+   Pulse check (only present on voice.html)
    ===================================================== */
-const PULSE_KEY = "pulse.intersectionality";
 const pulseScale = document.getElementById("pulseScale");
 const pulseResults = document.getElementById("pulseResults");
 const pulseBars = document.getElementById("pulseBars");
+
+if (pulseScale && pulseResults && pulseBars) {
+const PULSE_KEY = "pulse.intersectionality";
 
 function loadPulse() {
   const saved = localStorage.getItem(PULSE_KEY);
@@ -279,12 +283,15 @@ renderPulse(false);
 const pulseForm = document.getElementById("pulseForm");
 const pulseSent = document.getElementById("pulseSent");
 
-pulseForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-  pulseForm.reset();
-  pulseSent.hidden = false;
-  setTimeout(() => (pulseSent.hidden = true), 5000);
-});
+if (pulseForm && pulseSent) {
+  pulseForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    pulseForm.reset();
+    pulseSent.hidden = false;
+    setTimeout(() => (pulseSent.hidden = true), 5000);
+  });
+}
+}
 
 /* =====================================================
    3D depth layer: hero parallax + tilt-on-hover cards

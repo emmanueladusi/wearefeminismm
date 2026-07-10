@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>wearefeminism — Your voice</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=Figtree:wght@400;500;600;700&family=Poppins:wght@600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css?v=112" />
+</head>
+<body>
+  <script>document.body.classList.add("is-loading");</script>
+  <noscript><style>.preloader{display:none}</style></noscript>
+
+  <!-- Preloader: violet curtain with counter, lifts when the page is ready -->
+  <div class="preloader" id="preloader" aria-hidden="true">
+    <div class="preloader__inner">
+      <p class="preloader__mark">wearefeminism</p>
+      <div class="preloader__bar"><div class="preloader__bar-fill" id="preBar"></div></div>
+      <p class="preloader__count"><span id="preCount">0</span>%</p>
+    </div>
+  </div>
+
+  <!-- Custom cursor (fine pointers only) -->
+  <div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
+  <div class="cursor-ring" id="cursorRing" aria-hidden="true"></div>
+
+  <!-- Global colour-morph backdrop: one living field that shifts colour
+       across the whole scroll (js/morph.js). Sits behind the fluid sim. -->
+  <div class="morph-bg" id="morph" aria-hidden="true"></div>
+
+  <!-- GPU fluid simulation: lives behind everything, reacts to the cursor
+       across the whole page -->
+  <canvas class="fluid-bg" id="fluid" aria-hidden="true"></canvas>
+
+  <!-- page-wide scroll guide line -->
+  <div class="progress-line" aria-hidden="true">
+    <div class="progress-line__fill" id="plFill"></div>
+    <div class="progress-line__dot" id="plDot"></div>
+  </div>
+
+  <!-- ===== Nav ===== -->
+  <header class="nav" id="nav">
+    <a class="nav__logo" href="index.html" data-magnetic>wearefeminism</a>
+    <nav class="nav__links">
+      <a href="index.html" data-magnetic>Home</a>
+      <a href="learn.html" data-magnetic>Learn</a>
+      <a href="community.html" data-magnetic>Community</a>
+      <a href="voice.html" class="is-current" data-magnetic>Your voice</a>
+      <button class="quick-exit" id="quickExit" title="Instantly leave this site" data-magnetic>Quick exit</button>
+    </nav>
+  </header>
+
+  <!-- ===== Page intro ===== -->
+  <section class="hero" id="top" data-bg="#f2ecf7" data-pin>
+    <p class="hero__eyebrow line-reveal"><span>Your voice</span></p>
+    <h1 class="hero__title">
+      <span class="line-reveal"><span>Test yourself,</span></span>
+      <span class="line-reveal"><span><em>tell us where you stand.</em></span></span>
+    </h1>
+    <p class="hero__sub line-reveal"><span>Play a quick round of Spot the Bias, then tell us how familiar you are with intersectionality — anonymously, in seconds.</span></p>
+  </section>
+
+  <!-- ===== Spot the Bias (timed feed game) ===== -->
+  <section class="bias" id="bias" data-bg="#f2ecf7" data-scene>
+    <p class="eyebrow reveal">Spot the bias</p>
+    <h2 class="bias__title reveal">Can you catch bias <em>as it scrolls by?</em></h2>
+    <p class="bias__intro reveal">A feed moves past you. Some posts carry quiet stereotypes; some are fair. Flag the biased ones before they slip away — trust your gut, then see what you caught.</p>
+    <!-- bias.js renders the start / feed / end screens inside here -->
+    <div class="bias__stage" id="biasStage"></div>
+  </section>
+
+  <!-- ===== Pulse Check ===== -->
+  <section class="pulse" id="pulse" data-bg="#efeaf5" data-scene>
+    <p class="eyebrow reveal">Pulse check</p>
+    <h2 class="pulse__title reveal">How familiar are you with <em>intersectionality?</em></h2>
+
+    <div class="pulse__scale reveal" id="pulseScale">
+      <button class="pulse__option" data-val="1"><span class="pulse__n">1</span><span class="pulse__label">Never heard of it</span></button>
+      <button class="pulse__option" data-val="2"><span class="pulse__n">2</span><span class="pulse__label">Heard the word</span></button>
+      <button class="pulse__option" data-val="3"><span class="pulse__n">3</span><span class="pulse__label">Get the idea</span></button>
+      <button class="pulse__option" data-val="4"><span class="pulse__n">4</span><span class="pulse__label">Could explain it</span></button>
+      <button class="pulse__option" data-val="5"><span class="pulse__n">5</span><span class="pulse__label">Live and breathe it</span></button>
+    </div>
+
+    <div class="pulse__results" id="pulseResults" hidden>
+      <p class="pulse__thanks">Thank you — here’s where everyone stands so far.</p>
+      <div class="pulse__bars" id="pulseBars"></div>
+    </div>
+
+    <form class="pulse__open reveal" id="pulseForm">
+      <label class="pulse__open-label" for="pulseText">One more thing — what do you wish this space had?</label>
+      <div class="pulse__field" style="--r: 14px">
+        <textarea id="pulseText" rows="2" placeholder="Anything. Big or small." required></textarea>
+      </div>
+      <button type="submit" class="btn btn--gold" data-magnetic>Send it</button>
+      <p class="pulse__sent" id="pulseSent" hidden>Received. Thank you for shaping this place.</p>
+    </form>
+  </section>
+
+  <!-- ===== Footer ===== -->
+  <footer class="footer" data-bg="#faf6ef" data-scene>
+    <p class="footer__mark">wearefeminism</p>
+    <p class="footer__coming">Growing soon — workshops · mentorship · resource hub</p>
+    <a class="footer__ig" href="https://instagram.com/ourfeministspacee" target="_blank" rel="noopener" data-magnetic>@ourfeministspacee on Instagram →</a>
+    <p class="footer__fine">Made with care. Your words are anonymous, and you never have to share your name.</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/webgl-fluid@0.4.0/dist/webgl-fluid.umd.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script src="js/scroll.js?v=79"></script>
+  <script src="js/morph.js?v=78"></script>
+  <script src="js/journey.js?v=78"></script>
+  <script src="js/pin.js?v=78"></script>
+  <script src="js/polish.js?v=78"></script>
+  <script src="js/main.js?v=79"></script>
+  <script src="js/fluid.js?v=78"></script>
+  <script src="js/thread.js?v=78"></script>
+  <script src="js/biasCards.js?v=78"></script>
+  <script src="js/bias.js?v=78"></script>
+</body>
+</html>

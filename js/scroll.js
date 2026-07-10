@@ -12,12 +12,28 @@
 (function () {
   // always begin at the top — browser scroll-restore lands mid-page after a
   // reload, which desyncs the pinned scenes (they'd stick at opacity 0).
+  // Exception: a page opened with a #hash (a cross-page deep link, e.g.
+  // community.html#wall) should land on that section instead of snapping
+  // back to the top.
   if ("scrollRestoration" in history) history.scrollRestoration = "manual";
-  window.scrollTo(0, 0);
-  window.addEventListener("load", () => window.scrollTo(0, 0));
+  const deepLinkHash = window.location.hash;
+  if (!deepLinkHash) window.scrollTo(0, 0);
+
+  function landOnDeepLink(scrollFn) {
+    if (!deepLinkHash) return false;
+    const target = document.querySelector(deepLinkHash);
+    if (!target) return false;
+    scrollFn(target);
+    return true;
+  }
 
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (reduceMotion || typeof Lenis === "undefined") return;
+  if (reduceMotion || typeof Lenis === "undefined") {
+    window.addEventListener("load", () => {
+      if (!landOnDeepLink((t) => t.scrollIntoView())) window.scrollTo(0, 0);
+    });
+    return;
+  }
 
   const lenis = new Lenis({
     duration: 1.5,          // heavier glide — the page eases in like a journey, not clicks down
@@ -41,6 +57,12 @@
     }
     requestAnimationFrame(raf);
   }
+
+  window.addEventListener("load", () => {
+    if (!landOnDeepLink((t) => lenis.scrollTo(t, { immediate: true, offset: 0 }))) {
+      window.scrollTo(0, 0);
+    }
+  });
 
   // glide to in-page anchors instead of jumping
   document.querySelectorAll('a[href^="#"]').forEach((a) => {

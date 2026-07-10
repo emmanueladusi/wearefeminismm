@@ -158,7 +158,10 @@
       fills.forEach(function (f) { f.style.opacity = 1; });
     }
 
-    if (reduce || !gsap || !ST) { renderStatic(); return; }
+    if (reduce || !gsap || !ST) {
+      try { console.log("[wordcycle] reveal path = STATIC (reduce=" + reduce + " gsap=" + !!gsap + " ST=" + !!ST + ") — NO reveal, NO cycle"); } catch (e) {}
+      renderStatic(); return;
+    }
     gsap.registerPlugin(ST);
 
     // prep the draw-on lengths now the paths are in the DOM
@@ -171,6 +174,7 @@
 
     /* ---- narrow: light fade of the finished wordmark, no pin, no rig ---- */
     if (narrow) {
+      try { console.log("[wordcycle] reveal path = NARROW (width<=860) — plain fade, NO word-cycle. Widen the window."); } catch (e) {}
       gridG.style.opacity = 0;
       strokes.forEach(function (s) { s.style.opacity = 0; });
       boxes.forEach(function (b) { b.style.opacity = 0; });
@@ -219,13 +223,74 @@
     tl.to(gridG, { opacity: 0, duration: 0.7 }, 2.7);
     tl.to(heroCircles, { opacity: 0, duration: 1.0, ease: "power2.inOut" }, 3.25); // linger, fade last
 
-    var play = function () { tl.restart(); };
-    var resetTl = function () { tl.pause(0); };
+    /* ---- hard scroll-lock while the reveal plays ----
+       Pinning alone only holds the section in place — a fast scroll still
+       blows through the pin range before the animation finishes. So when you
+       arrive from above we LOCK scrolling outright (Lenis stop + we swallow
+       wheel / touch / scroll-keys) and release the instant the timeline
+       completes. A safety cap unlocks no matter what, so no one is ever stuck.
+       We lock only on downward entry — scrolling back up past it must never
+       trap you. */
+    var lenis = function () { return window.__lenis; };
+    var SCROLL_KEYS = { " ": 1, "Spacebar": 1, "PageDown": 1, "PageUp": 1,
+                        "ArrowDown": 1, "ArrowUp": 1, "Home": 1, "End": 1 };
+    var swallow = function (e) { e.preventDefault(); };
+    var swallowKey = function (e) { if (SCROLL_KEYS[e.key]) e.preventDefault(); };
+    var locked = false, lockTimer = null;
+
+    function lockScroll() {
+      if (locked) return;
+      locked = true;
+      var l = lenis(); if (l) l.stop();
+      window.addEventListener("wheel", swallow, { passive: false });
+      window.addEventListener("touchmove", swallow, { passive: false });
+      window.addEventListener("keydown", swallowKey, { passive: false });
+    }
+    function unlockScroll() {
+      if (!locked) return;
+      locked = false;
+      clearTimeout(lockTimer);
+      var l = lenis(); if (l) l.start();
+      window.removeEventListener("wheel", swallow, { passive: false });
+      window.removeEventListener("touchmove", swallow, { passive: false });
+      window.removeEventListener("keydown", swallowKey, { passive: false });
+    }
+    // brandmarkCycle.js releases the lock when ITS gold sweep finishes, so the
+    // page stays locked through the whole title sequence (reveal + word-cycle +
+    // sweep), not just the reveal. Expose the unlock for it to call.
+    window.__brandmarkUnlock = unlockScroll;
+
+    // when the reveal finishes, hand off to the word-cycle (which unlocks when
+    // done); if the cycle module isn't present, unlock right away.
+    tl.eventCallback("onComplete", function () {
+      try { console.log("[wordcycle] reveal onComplete fired; cycle module present = " + !!window.__brandmarkCycle); } catch (e) {}
+      if (window.__brandmarkCycle) window.__brandmarkCycle.start();
+      else unlockScroll();
+    });
+
+    var playLocked = function () {
+      try { console.log("[wordcycle] reveal path = FULL — reveal playing now, cycle will follow on completion"); } catch (e) {}
+      if (window.__brandmarkCycle) window.__brandmarkCycle.reset();
+      tl.restart();
+      lockScroll();
+      clearTimeout(lockTimer);
+      // safety cap covers reveal + cycle + sweep (~9s) so no one is ever stuck
+      lockTimer = setTimeout(unlockScroll, tl.duration() * 1000 + 9000);
+    };
+    var play = function () {                            // replay without locking (coming back up)
+      if (window.__brandmarkCycle) window.__brandmarkCycle.reset();
+      tl.restart();
+    };
+    var resetTl = function () {
+      tl.pause(0);
+      if (window.__brandmarkCycle) window.__brandmarkCycle.reset();
+      unlockScroll();
+    };
 
     ST.create({
       trigger: section, start: "top top", end: "+=120%",
       pin: true, pinType: "fixed", pinSpacing: true, anticipatePin: 1, invalidateOnRefresh: true,
-      onEnter: play, onEnterBack: play, onLeave: resetTl, onLeaveBack: resetTl,
+      onEnter: playLocked, onEnterBack: play, onLeave: resetTl, onLeaveBack: resetTl,
     });
     ST.refresh();
   }
