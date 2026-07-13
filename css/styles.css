@@ -156,6 +156,55 @@ em { font-style: italic; color: var(--violet); }
 
 .hero > * { position: relative; z-index: 1; }
 
+/* ===== Learn hero: refraction =====
+   A beam of light splitting into three colour bands (violet · magenta ·
+   gold) behind the "one word, three lenses" title. Pure CSS — the drift
+   runs on the compositor, so it stays smooth and needs no JS. */
+.hero--refract .refract {
+  position: absolute; inset: 0; overflow: hidden; z-index: 0; pointer-events: none;
+}
+.refract__band {
+  position: absolute; left: 6%; top: 50%;
+  width: 82%; height: clamp(70px, 13vh, 150px);
+  border-radius: 50%;
+  transform-origin: 0% 50%;
+  filter: blur(34px);
+  mix-blend-mode: multiply;
+  will-change: transform, opacity;
+}
+.refract__band--v { background: radial-gradient(closest-side, var(--violet), transparent 78%); animation: refractV 13s var(--ease) infinite alternate; }
+.refract__band--m { background: radial-gradient(closest-side, #a8459e, transparent 78%); animation: refractM 15s var(--ease) infinite alternate; }
+.refract__band--g { background: radial-gradient(closest-side, var(--gold), transparent 78%); animation: refractG 11s var(--ease) infinite alternate; }
+@keyframes refractV { from { transform: translateY(-50%) rotate(-18deg); opacity: 0.42; } to { transform: translateY(-50%) rotate(-11deg); opacity: 0.6; } }
+@keyframes refractM { from { transform: translateY(-50%) rotate(-5deg); opacity: 0.5; } to { transform: translateY(-50%) rotate(1deg); opacity: 0.64; } }
+@keyframes refractG { from { transform: translateY(-50%) rotate(6deg); opacity: 0.4; } to { transform: translateY(-50%) rotate(13deg); opacity: 0.58; } }
+
+/* the white beam feeding the prism, and the bright split point */
+.refract__beam {
+  position: absolute; left: -14%; top: 16%;
+  width: 42%; height: clamp(28px, 6vh, 66px);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8));
+  transform-origin: 100% 50%; transform: rotate(27deg);
+  filter: blur(9px); opacity: 0.5;
+}
+.refract__prism {
+  position: absolute; left: 6%; top: 50%; width: 130px; height: 130px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(closest-side, rgba(255, 255, 255, 0.92), rgba(232, 224, 242, 0.45), transparent 70%);
+  filter: blur(5px);
+  animation: prismPulse 6.5s var(--ease) infinite alternate;
+}
+@keyframes prismPulse {
+  from { opacity: 0.6; transform: translate(-50%, -50%) scale(0.9); }
+  to { opacity: 0.92; transform: translate(-50%, -50%) scale(1.08); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .refract__band, .refract__prism { animation: none; }
+  .refract__band--v { transform: translateY(-50%) rotate(-15deg); opacity: 0.5; }
+  .refract__band--m { transform: translateY(-50%) rotate(-3deg); opacity: 0.55; }
+  .refract__band--g { transform: translateY(-50%) rotate(9deg); opacity: 0.5; }
+}
+
 /* ===== Global colour-morph backdrop (js/morph.js) =====
    One fixed field behind the fluid sim; its colour is interpolated across
    the whole scroll so section seams dissolve. When the engine is live
@@ -2003,6 +2052,287 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
 
 @media (max-width: 520px) {
   .bias__actions { flex-direction: column; }
+}
+
+/* ===== Know Your Feminism quiz =====
+   Shares the bias game's card language so the two challenges feel
+   like one family. Logic: js/quiz.js · content: js/quizQuestions.js */
+.quiz {
+  padding: clamp(90px, 12vw, 160px) clamp(20px, 7vw, 96px);
+  max-width: 760px;
+  margin: 0 auto;
+  text-align: center;
+}
+.quiz__title {
+  font-size: clamp(1.9rem, 5vw, 3.4rem);
+  line-height: 1.12;
+  margin-bottom: 20px;
+}
+.quiz__intro {
+  color: var(--ink-dim);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  max-width: 48ch;
+  margin: 0 auto 38px;
+}
+.quiz__stage { position: relative; min-height: 420px; }
+
+/* start screen */
+.quiz__start { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+.quiz__hint { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.06em; color: var(--ink-dim); }
+.quiz__hint b { color: var(--violet); }
+
+/* play */
+.quiz__play { display: flex; flex-direction: column; gap: 18px; }
+.quiz__hud {
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.06em; color: var(--ink-dim);
+}
+.quiz__count, .quiz__score b { color: var(--ink); }
+
+/* card */
+.quiz-card {
+  position: relative; isolation: isolate;
+  background: #fffdfa; border: 1px solid var(--line); border-radius: 20px;
+  padding: 28px 26px 24px; text-align: left; outline: none;
+  box-shadow: 0 22px 50px -20px rgba(44, 33, 64, 0.22), 0 2px 8px rgba(44, 33, 64, 0.05);
+}
+.quiz-card__topic {
+  font-family: var(--mono); font-size: 0.68rem; text-transform: uppercase;
+  letter-spacing: 0.18em; color: var(--gold);
+}
+.quiz-card__q {
+  font-family: var(--serif); font-size: clamp(1.3rem, 3.6vw, 1.7rem);
+  line-height: 1.3; color: var(--ink); margin: 12px 0 22px;
+}
+
+/* options */
+.quiz__opts { display: flex; flex-direction: column; gap: 10px; }
+.quiz__opt {
+  display: flex; align-items: center; gap: 14px; width: 100%; text-align: left;
+  font-family: var(--sans); font-size: 1rem; color: var(--ink);
+  background: transparent; border: 1px solid var(--line); border-radius: 14px;
+  padding: 14px 16px; cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, transform 0.2s var(--ease), box-shadow 0.25s;
+}
+.quiz__opt:hover:not(:disabled) { border-color: var(--violet); transform: translateY(-1px); }
+.quiz__opt:disabled { cursor: default; }
+.quiz__opt-key {
+  flex: none; width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center;
+  font-family: var(--mono); font-size: 0.8rem; font-weight: 700; color: var(--violet);
+  background: var(--lilac); transition: background 0.25s, color 0.25s;
+}
+.quiz__opt-text { line-height: 1.4; }
+.quiz__opt.is-correct {
+  border-color: rgba(88, 179, 137, 0.65); background: rgba(88, 179, 137, 0.1);
+  animation: biasPulse 0.9s var(--ease);
+}
+.quiz__opt.is-correct .quiz__opt-key { background: #58b389; color: #fff; }
+.quiz__opt.is-wrong { border-color: rgba(123, 97, 255, 0.4); background: rgba(123, 97, 255, 0.07); }
+.quiz__opt.is-wrong .quiz__opt-key { background: var(--violet); color: #fff; }
+
+.quiz-card__feedback {
+  min-height: 1.2em; margin-top: 18px;
+  font-family: var(--sans); font-weight: 500; font-size: 0.95rem; line-height: 1.55; color: var(--ink-dim);
+}
+.quiz-card__feedback.is-correct { color: #3f9d6e; }
+.quiz-card__feedback.is-soft { color: var(--violet); }
+.quiz__next { margin-top: 20px; align-self: flex-start; }
+
+/* end screen */
+.quiz__end { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.quiz__score-big { font-family: var(--serif); }
+.quiz__score-big b { font-size: clamp(3rem, 10vw, 4.4rem); color: var(--ink); }
+.quiz__score-big span { font-size: 1.3rem; color: var(--ink-dim); margin-left: 8px; }
+.quiz__end-line { color: var(--ink-dim); max-width: 46ch; line-height: 1.6; }
+.quiz-reviews {
+  list-style: none; display: flex; flex-direction: column; gap: 12px;
+  width: 100%; text-align: left; margin: 14px 0 8px;
+}
+.quiz-review {
+  background: #fffdfa; border: 1px solid var(--line); border-left-width: 3px;
+  border-radius: 14px; padding: 16px 18px;
+}
+.quiz-review.is-good { border-left-color: #58b389; }
+.quiz-review.is-miss { border-left-color: var(--gold); }
+.quiz-review__top {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+  font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--ink-dim);
+}
+.quiz-review__mark { font-weight: 700; }
+.quiz-review.is-good .quiz-review__mark { color: #3f9d6e; }
+.quiz-review.is-miss .quiz-review__mark { color: var(--gold); }
+.quiz-review__q { font-family: var(--serif); font-size: 1.05rem; color: var(--ink); margin-bottom: 6px; }
+.quiz-review__a { font-size: 0.9rem; color: var(--ink); margin-bottom: 4px; }
+.quiz-review__a b { color: #3f9d6e; }
+.quiz-review__why { font-size: 0.92rem; line-height: 1.55; color: var(--ink-dim); }
+
+/* game-feel: streak, momentum, pops */
+.quiz__meta { display: inline-flex; align-items: center; gap: 14px; }
+.quiz__streak {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: var(--mono); font-size: 0.78rem; color: var(--gold);
+  background: var(--gold-soft); border-radius: 999px; padding: 3px 10px;
+}
+.quiz__streak[hidden] { display: none; }
+.quiz__streak b { color: var(--gold); }
+.quiz__momentum {
+  height: 5px; border-radius: 999px; background: rgba(44, 33, 64, 0.1);
+  overflow: hidden; margin-top: -4px;
+}
+.quiz__momentum span {
+  display: block; height: 100%; width: 0; border-radius: inherit;
+  background: linear-gradient(90deg, var(--violet), var(--gold));
+  transition: width 0.55s var(--ease);
+}
+.quiz-fb__lead { font-weight: 700; }
+.quiz-card__feedback.is-correct .quiz-fb__lead { color: #3f9d6e; }
+.quiz-card__feedback.is-soft .quiz-fb__lead { color: var(--violet); }
+.is-bump { animation: quizBump 0.42s var(--ease); }
+@keyframes quizBump {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
+
+/* end screen: rank */
+.quiz__rank { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.quiz__rank-emoji { font-size: clamp(2.6rem, 8vw, 3.6rem); line-height: 1; }
+.quiz__rank-title {
+  font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--violet);
+}
+
+/* ===== Myth or Real? swipe game =====
+   Shares the quiz's HUD/rank language. Logic: js/myth.js · content:
+   js/mythCards.js · celebration: js/celebrate.js */
+.myth {
+  padding: clamp(90px, 12vw, 160px) clamp(20px, 7vw, 96px);
+  max-width: 620px; margin: 0 auto; text-align: center;
+}
+.myth__title { font-size: clamp(1.9rem, 5vw, 3.4rem); line-height: 1.12; margin-bottom: 20px; }
+.myth__intro { color: var(--ink-dim); font-size: 1.05rem; line-height: 1.6; max-width: 44ch; margin: 0 auto 38px; }
+.myth__stage { position: relative; min-height: 440px; }
+.myth__start { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+.myth__hint { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.06em; color: var(--ink-dim); }
+.myth__hint b { color: var(--violet); }
+
+.myth__play { display: flex; flex-direction: column; gap: 16px; }
+.myth__hud {
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.06em; color: var(--ink-dim);
+}
+.myth__count, .myth__score b { color: var(--ink); }
+.myth__meta { display: inline-flex; align-items: center; gap: 14px; }
+.myth__streak {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: var(--mono); font-size: 0.78rem; color: var(--gold);
+  background: var(--gold-soft); border-radius: 999px; padding: 3px 10px;
+}
+.myth__streak[hidden] { display: none; }
+.myth__momentum { height: 5px; border-radius: 999px; background: rgba(44, 33, 64, 0.1); overflow: hidden; }
+.myth__momentum span {
+  display: block; height: 100%; width: 0; border-radius: inherit;
+  background: linear-gradient(90deg, var(--violet), var(--gold)); transition: width 0.5s var(--ease);
+}
+
+/* the card stack */
+.myth__deck { position: relative; height: 290px; margin: 6px 0 4px; }
+.myth-card {
+  position: absolute; inset: 0; isolation: isolate;
+  display: flex; flex-direction: column; justify-content: center; gap: 16px;
+  background: #fffdfa; border: 1px solid var(--line); border-radius: 24px;
+  padding: 30px 30px; text-align: left; cursor: grab; touch-action: none;
+  box-shadow: 0 26px 60px -22px rgba(44, 33, 64, 0.28), 0 2px 8px rgba(44, 33, 64, 0.05);
+  transition: transform 0.35s var(--ease), box-shadow 0.4s var(--ease), border-color 0.4s var(--ease), opacity 0.5s var(--ease);
+  outline: none;
+}
+.myth-card:focus-visible { border-color: var(--violet); box-shadow: 0 0 0 3px var(--gold-soft), 0 26px 60px -22px rgba(44,33,64,0.28); }
+.myth-card.is-dragging { transition: box-shadow 0.4s var(--ease); cursor: grabbing; }
+.myth-card--peek {
+  transform: translateY(14px) scale(0.955); opacity: 0.6; cursor: default;
+  box-shadow: 0 18px 40px -24px rgba(44, 33, 64, 0.22);
+}
+.myth-card__kind {
+  font-family: var(--mono); font-size: 0.68rem; text-transform: uppercase;
+  letter-spacing: 0.18em; color: var(--gold);
+}
+.myth-card__text {
+  font-family: var(--serif); font-size: clamp(1.35rem, 4vw, 1.85rem);
+  line-height: 1.28; color: var(--ink);
+}
+/* drag stamps */
+.myth-card__stamp {
+  position: absolute; top: 20px; opacity: 0; pointer-events: none;
+  font-family: var(--mono); font-weight: 700; font-size: 1rem; letter-spacing: 0.12em;
+  text-transform: uppercase; padding: 6px 14px; border-radius: 10px; border: 2.5px solid;
+}
+.myth-card__stamp--myth { left: 20px; color: var(--violet); border-color: var(--violet); transform: rotate(-12deg); }
+.myth-card__stamp--real { right: 20px; color: #3f9d6e; border-color: #58b389; transform: rotate(12deg); }
+/* feedback + fling states */
+.myth-card.is-correct { border-color: rgba(88, 179, 137, 0.6); }
+.myth-card.is-soft { border-color: rgba(123, 97, 255, 0.4); }
+.myth-card.is-flung-real { transform: translate(135%, -8%) rotate(20deg) !important; opacity: 0; }
+.myth-card.is-flung-myth { transform: translate(-135%, -8%) rotate(-20deg) !important; opacity: 0; }
+
+.myth-card__truth {
+  min-height: 3.2em; margin: 4px 2px 0;
+  font-family: var(--sans); font-size: 0.95rem; line-height: 1.55; color: var(--ink-dim);
+  opacity: 0; transform: translateY(6px); transition: opacity 0.4s var(--ease), transform 0.4s var(--ease);
+}
+.myth-card__truth.is-shown { opacity: 1; transform: none; }
+.myth-fb__lead { font-weight: 700; }
+.myth-fb__lead.is-good { color: #3f9d6e; }
+.myth-fb__lead.is-soft { color: var(--violet); }
+
+/* action buttons */
+.myth__actions { display: flex; gap: 12px; }
+.myth__btn {
+  flex: 1; font-family: var(--sans); font-weight: 700; font-size: 1rem;
+  border-radius: 14px; padding: 15px 18px; cursor: pointer; border: 1px solid var(--line);
+  background: #fffdfa; color: var(--ink);
+  transition: transform 0.2s var(--ease), box-shadow 0.25s, background 0.25s, color 0.25s, border-color 0.25s;
+}
+.myth__btn:hover { transform: translateY(-2px); }
+.myth__btn--myth:hover { border-color: var(--violet); color: var(--violet); box-shadow: 0 10px 24px -12px rgba(74, 53, 104, 0.4); }
+.myth__btn--real:hover { border-color: #58b389; color: #3f9d6e; box-shadow: 0 10px 24px -12px rgba(88, 179, 137, 0.45); }
+
+/* end screen (mirrors the quiz) */
+.myth__end { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.myth__rank { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.myth__rank-emoji { font-size: clamp(2.6rem, 8vw, 3.6rem); line-height: 1; }
+.myth__rank-title {
+  font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--violet);
+}
+.myth__score-big { font-family: var(--serif); }
+.myth__score-big b { font-size: clamp(3rem, 10vw, 4.4rem); color: var(--ink); }
+.myth__score-big span { font-size: 1.3rem; color: var(--ink-dim); margin-left: 8px; }
+.myth__end-line { color: var(--ink-dim); max-width: 46ch; line-height: 1.6; }
+.myth-reviews {
+  list-style: none; display: flex; flex-direction: column; gap: 12px;
+  width: 100%; text-align: left; margin: 14px 0 8px;
+}
+.myth-review {
+  background: #fffdfa; border: 1px solid var(--line); border-left-width: 3px;
+  border-radius: 14px; padding: 16px 18px;
+}
+.myth-review.is-good { border-left-color: #58b389; }
+.myth-review.is-miss { border-left-color: var(--gold); }
+.myth-review__top {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+  font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--ink-dim);
+}
+.myth-review__mark { font-weight: 700; }
+.myth-review.is-good .myth-review__mark { color: #3f9d6e; }
+.myth-review.is-miss .myth-review__mark { color: var(--gold); }
+.myth-review__text { font-family: var(--serif); font-size: 1.05rem; color: var(--ink); margin-bottom: 6px; }
+.myth-review__why { font-size: 0.92rem; line-height: 1.55; color: var(--ink-dim); }
+
+@media (max-width: 520px) {
+  .myth__actions { position: sticky; bottom: 12px; }
 }
 
 /* ===== Brandmark: oversized wordmark ===== */

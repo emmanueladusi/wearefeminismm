@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=Figtree:wght@400;500;600;700&family=Poppins:wght@600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=112" />
+  <link rel="stylesheet" href="css/styles.css?v=115" />
 </head>
 <body>
   <script>document.body.classList.add("is-loading");</script>
@@ -30,9 +30,7 @@
        across the whole scroll (js/morph.js). Sits behind the fluid sim. -->
   <div class="morph-bg" id="morph" aria-hidden="true"></div>
 
-  <!-- GPU fluid simulation: lives behind everything, reacts to the cursor
-       across the whole page -->
-  <canvas class="fluid-bg" id="fluid" aria-hidden="true"></canvas>
+  <!-- (Cursor-reactive fluid banner lives on Home only.) -->
 
   <!-- page-wide scroll guide line -->
   <div class="progress-line" aria-hidden="true">
@@ -52,8 +50,18 @@
     </nav>
   </header>
 
-  <!-- ===== Page intro ===== -->
-  <section class="hero" id="top" data-bg="#f2ecf7" data-pin>
+  <!-- ===== Page intro =====
+       Custom hero for Learn: a beam of light refracting into three colour
+       bands — literally "one word, three lenses," and a nod to
+       intersectionality. Pure CSS (js-free, reduced-motion aware). -->
+  <section class="hero hero--refract" id="top" data-bg="#f2ecf7" data-pin>
+    <div class="refract" aria-hidden="true">
+      <span class="refract__beam"></span>
+      <span class="refract__prism"></span>
+      <span class="refract__band refract__band--v"></span>
+      <span class="refract__band refract__band--m"></span>
+      <span class="refract__band refract__band--g"></span>
+    </div>
     <p class="hero__eyebrow line-reveal"><span>Learn</span></p>
     <h1 class="hero__title">
       <span class="line-reveal"><span>One word,</span></span>
@@ -428,7 +436,6 @@
     <p class="footer__fine">Made with care. Your words are anonymous, and you never have to share your name.</p>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/webgl-fluid@0.4.0/dist/webgl-fluid.umd.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
@@ -439,13 +446,12 @@
   <script src="js/pin.js?v=78"></script>
   <script src="js/waves.js?v=85"></script>
   <script src="js/sealife.js?v=104"></script>
-  <script src="js/uwscrub.js?v=99"></script>
+  <script src="js/uwscrub.js?v=100"></script>
   <script src="js/aiglow.js?v=78"></script>
   <script src="js/aigspeed.js?v=93"></script>
   <script src="js/engulf.js?v=86"></script>
   <script src="js/polish.js?v=78"></script>
   <script src="js/main.js?v=79"></script>
-  <script src="js/fluid.js?v=78"></script>
   <script src="js/wall3d.js?v=78"></script>
   <script src="js/thread.js?v=78"></script>
   <script src="js/spark.js?v=78"></script>

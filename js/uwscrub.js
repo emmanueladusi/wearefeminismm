@@ -42,6 +42,7 @@
   const LRU = 20;    // decoded bitmaps held at once
   const AHEAD = 10;  // decode this far in the scroll direction
   const BEHIND = 3;
+  const IMG_WINDOW = 22; // HTMLImageElements kept around the playhead (bounds decoded-pixel memory)
 
   let files = [];
   let rev = "";
@@ -98,6 +99,22 @@
       im.src = BASE + files[i] + (rev ? "?v=" + rev : "");
     }
     return im;
+  }
+
+  // The LRU above bounds decoded ImageBitmaps — but every visited frame also
+  // left a loaded HTMLImageElement in imgs[] holding its OWN decoded pixels,
+  // and those were never released. Across a full 300+ frame scrub that grows
+  // into hundreds of MB and crashes the tab on the way back up. Release images
+  // far from the playhead; image() transparently recreates them from the HTTP
+  // cache if they're revisited.
+  function pruneImages() {
+    for (let k = 0; k < imgs.length; k++) {
+      const im = imgs[k];
+      if (im && !decoding.has(k) && Math.abs(k - lastIdx) > IMG_WINDOW) {
+        im.src = "";
+        imgs[k] = null;
+      }
+    }
   }
 
   function evict() {
@@ -182,6 +199,7 @@
     const i = Math.max(0, Math.min(N - 1, Math.round(p * (N - 1))));
     if (i !== lastIdx) { dir = i > lastIdx ? 1 : -1; lastIdx = i; }
     prefetch(i);
+    pruneImages();                      // bound decoded-image memory (see above)
     if (i === cur) return;              // scroll moved, frame didn't: nothing to do
     if (!paint(i)) paintNearest(i);     // never leave the canvas blank
   }
