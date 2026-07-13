@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=Figtree:wght@400;500;600;700&family=Poppins:wght@600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=112" />
+  <link rel="stylesheet" href="css/styles.css?v=118" />
 </head>
 <body>
   <script>document.body.classList.add("is-loading");</script>
@@ -70,37 +70,31 @@
     <h2 class="ec-heading">What we're <em>building.</em></h2>
     <div class="ec-cards">
       <div class="ec-card" style="--accent:#2e2145">
-        <div class="ec-card-front" style="background-image:url('img/card-faces.jpg'); background-position: left center"><div class="ec-card-panel"><span class="ec-card-index">01</span><h3>Community</h3><ul><li>Peer support</li><li>Events</li><li>Workshops</li><li>Mentorship</li></ul></div></div>
-        <div class="ec-card-back" style="background-image:url('img/card-faces.jpg'); background-position: left center"></div>
+        <div class="ec-card-front" style="background-image:url('img/card-faces-framed.png')"><div class="ec-card-panel"><span class="ec-card-index">01</span><h3>Community</h3><ul><li>Peer support</li><li>Events</li><li>Workshops</li><li>Mentorship</li></ul></div></div>
+        <div class="ec-card-back" style="background-image:url('img/card-faces-framed.png')"></div>
       </div>
       <div class="ec-card" style="--accent:#a8459e">
-        <div class="ec-card-front" style="background-image:url('img/card-tree.jpg')"><div class="ec-card-panel"><span class="ec-card-index">02</span><h3>Education</h3><ul><li>Readings</li><li>Toolkits</li><li>Guest speakers</li><li>Guides</li></ul></div></div>
-        <div class="ec-card-back" style="background-image:url('img/card-tree.jpg')"></div>
+        <div class="ec-card-front" style="background-image:url('img/card-tree-framed.png')"><div class="ec-card-panel"><span class="ec-card-index">02</span><h3>Education</h3><ul><li>Readings</li><li>Toolkits</li><li>Guest speakers</li><li>Guides</li></ul></div></div>
+        <div class="ec-card-back" style="background-image:url('img/card-tree-framed.png')"></div>
       </div>
       <div class="ec-card" style="--accent:#a8459e">
-        <div class="ec-card-front" style="background-image:url('img/card-fists.jpg')"><div class="ec-card-panel"><span class="ec-card-index">03</span><h3>Advocacy</h3><ul><li>Campaigns</li><li>Campus policy</li><li>Petitions</li><li>Outreach</li></ul></div></div>
-        <div class="ec-card-back" style="background-image:url('img/card-fists.jpg')"></div>
+        <div class="ec-card-front" style="background-image:url('img/card-fists-framed.png')"><div class="ec-card-panel"><span class="ec-card-index">03</span><h3>Advocacy</h3><ul><li>Campaigns</li><li>Campus policy</li><li>Petitions</li><li>Outreach</li></ul></div></div>
+        <div class="ec-card-back" style="background-image:url('img/card-fists-framed.png')"></div>
       </div>
       <div class="ec-card" style="--accent:#9a5fa5">
-        <div class="ec-card-front" style="background-image:url('img/card-faces.jpg'); background-position: right center"><div class="ec-card-panel"><span class="ec-card-index">04</span><h3>Voices</h3><ul><li>The Wall</li><li>Interviews</li><li>Spotlights</li><li>Zines</li></ul></div></div>
-        <div class="ec-card-back" style="background-image:url('img/card-faces.jpg'); background-position: right center"></div>
+        <div class="ec-card-front" style="background-image:url('img/card-faces-framed-flip.png')"><div class="ec-card-panel"><span class="ec-card-index">04</span><h3>Voices</h3><ul><li>The Wall</li><li>Interviews</li><li>Spotlights</li><li>Zines</li></ul></div></div>
+        <div class="ec-card-back" style="background-image:url('img/card-faces-framed-flip.png')"></div>
       </div>
     </div>
   </section>
 
-  <!-- ===== Flythrough: scroll flies the camera through 3D space ===== -->
-  <section class="fly" id="mission" aria-label="Our mission" data-bg="#241a38">
+  <!-- ===== Mission statement ===== -->
+  <section class="fly fly--static" id="mission" aria-label="Our mission" data-bg="#241a38">
     <div class="fly__sticky">
-      <canvas class="fly__canvas" id="flyCanvas" aria-hidden="true"></canvas>
-      <div class="fly__line" id="flyLine"></div>
-      <div class="fly__overlay" id="flyOverlay">
-        <p class="eyebrow eyebrow--light">Our promise</p>
-        <p class="fly__statement">This is where <em>silence</em> ends.</p>
-        <p class="fly__sub">Keep going — the wall is yours.</p>
-      </div>
       <div class="fly__fallback">
         <p class="eyebrow eyebrow--light">Our promise</p>
         <p class="fly__statement">This is where <em>silence</em> ends.</p>
+        <p class="fly__sub">Keep going — the wall is yours.</p>
       </div>
     </div>
   </section>
@@ -146,10 +140,9 @@
   <script src="js/aiglow.js?v=78"></script>
   <script src="js/aigspeed.js?v=93"></script>
   <script src="js/polish.js?v=78"></script>
-  <script src="js/main.js?v=79"></script>
-  <script src="js/scene3d.js?v=78"></script>
+  <script src="js/main.js?v=80"></script>
   <script src="js/wall3d.js?v=78"></script>
-  <script src="js/cards.js?v=88"></script>
+  <script src="js/cards.js?v=89"></script>
   <script src="js/thread.js?v=78"></script>
 </body>
 </html>

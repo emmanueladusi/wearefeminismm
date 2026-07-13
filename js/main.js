@@ -44,7 +44,6 @@ document.querySelectorAll(".reveal").forEach((el) => revealObserver.observe(el))
 
 /* =====================================================
    Page-wide scroll guide line
-   (the mission flythrough scene is handled in scene3d.js)
    ===================================================== */
 const clamp01 = (v) => Math.min(1, Math.max(0, v));
 

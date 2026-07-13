@@ -604,6 +604,14 @@ section { position: relative; }
   padding: 0 24px;
 }
 
+/* static: the 3D flythrough retired in favor of a plain statement */
+.fly--static { height: auto; }
+.fly--static .fly__sticky { position: static; height: auto; padding: 160px 24px; }
+.fly--static .fly__canvas,
+.fly--static .fly__line,
+.fly--static .fly__overlay { display: none; }
+.fly--static .fly__fallback { position: static; display: flex; }
+
 /* ===== The Wall (dark immersive) ===== */
 .wall-section {
   background: var(--violet-deep);
@@ -1403,8 +1411,8 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
   perspective: none;
 }
 
-.ec-static .ec-card-front { display: none; }
-.ec-static .ec-card-back { position: static; transform: none; }
+.ec-static .ec-card-front { position: static; transform: none; }
+.ec-static .ec-card-back { display: none; }
 
 @media (max-width: 720px) {
   .ec-heading { white-space: normal; text-align: center; width: 90vw; }
