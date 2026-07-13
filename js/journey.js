@@ -116,11 +116,11 @@
       const opa = 1 - 0.82 * e;                // and dissolve (1 → 0.18)
       const rx = clamp(-p * 10, -11, 11);      // tilt through space: planes lean as they pass
       const ty = -p * 52;                      // counter-parallax so it feels held, not scrolled
-      const blur = e > 0.14 ? (e * 7).toFixed(2) : 0; // depth-of-field: it softens as it leaves
+      // (depth-of-field blur removed — the constant soft-focus on every
+      //  section read as busy; the recede + fade carry the depth on their own.)
       el.style.transform =
         `perspective(1000px) translate3d(0, ${ty.toFixed(2)}px, 0) rotateX(${rx.toFixed(3)}deg) scale(${scale.toFixed(4)}) scaleY(${(1 + vScale).toFixed(4)}) skewY(${skew.toFixed(3)}deg)`;
       el.style.opacity = opa.toFixed(3);
-      el.style.filter = blur ? `blur(${blur}px)` : "";
     });
   }
 
