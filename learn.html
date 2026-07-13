@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=Figtree:wght@400;500;600;700&family=Poppins:wght@600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=118" />
+  <link rel="stylesheet" href="css/styles.css?v=122" />
 </head>
 <body>
   <script>document.body.classList.add("is-loading");</script>
@@ -70,7 +70,7 @@
        Custom hero for Learn: a beam of light refracting into three colour
        bands — literally "one word, three lenses," and a nod to
        intersectionality. Pure CSS (js-free, reduced-motion aware). -->
-  <section class="hero hero--refract" id="top" data-bg="#f2ecf7" data-pin>
+  <section class="hero hero--refract" id="top" data-bg="#f2ecf7">
     <div class="refract" aria-hidden="true">
       <span class="refract__beam"></span>
       <span class="refract__prism"></span>
@@ -101,8 +101,8 @@
   </section>
 
   <!-- ===== Pulse sparkline: live Yes/No tally from the pre-survey ===== -->
-  <section class="sparkpulse" id="boring-pulse" data-bg="#efeaf5" data-scene>
-    <div class="sparkcard reveal">
+  <section class="sparkpulse" id="boring-pulse" data-bg="#efeaf5">
+    <div class="sparkcard">
       <p class="eyebrow">Pulse · live from the pre-survey</p>
       <h2 class="sparkcard__q">Do students find learning about feminism <em>boring?</em></h2>
       <div class="sparkcard__top">
@@ -122,14 +122,19 @@
   <!-- ===== Learn: three lenses on feminism.
        Solid deep-violet scene (morph shows through). Concept cards with
        tiny looping CSS "data glyphs" so the ideas move, not just sit. ===== -->
-  <section class="learn" id="whatis" aria-label="What is feminism — three lenses" data-bg="#2e2145" data-scene>
+  <section class="learn" id="whatis" aria-label="What is feminism — three lenses" data-bg="#2e2145">
     <div class="learn__inner">
-      <p class="eyebrow eyebrow--light reveal">So… what is feminism?</p>
-      <h2 class="learn__title reveal">One word, <em>three lenses.</em></h2>
-      <p class="learn__lead reveal">It isn't one flat idea. Look through three lenses and the whole picture snaps into focus.</p>
+      <div class="learn__head">
+        <div class="learn__intro">
+          <p class="eyebrow eyebrow--light">So… what is feminism?</p>
+          <h2 class="learn__title">One word, <em>three lenses.</em></h2>
+          <p class="learn__lead">It isn't one flat idea. Look through three lenses and the whole picture snaps into focus.</p>
+        </div>
+        <img class="learn__glasses" src="img/three-lenses.svg" alt="A pair of glasses with three lenses" width="540" height="260" />
+      </div>
 
       <div class="lenses">
-        <article class="lens reveal" data-lens="white">
+        <article class="lens" data-lens="white">
           <div class="lens__viz" aria-hidden="true">
             <span class="glyph-bar glyph-bar--solo"></span>
             <span class="glyph-cap">gender</span>
@@ -138,7 +143,7 @@
           <p class="lens__def">Sees <em>one</em> axis — gender. Fights for women, full stop.</p>
         </article>
 
-        <article class="lens reveal" data-lens="black">
+        <article class="lens" data-lens="black">
           <div class="lens__viz" aria-hidden="true">
             <span class="glyph-stack">
               <span class="glyph-bar"></span><span class="glyph-bar"></span>
@@ -150,7 +155,7 @@
           <p class="lens__def">Names what the first lens misses: <em>not every woman carries the same weight.</em></p>
         </article>
 
-        <article class="lens reveal" data-lens="inter">
+        <article class="lens" data-lens="inter">
           <div class="lens__viz" aria-hidden="true">
             <span class="glyph-cross">
               <span class="glyph-axis glyph-axis--a"></span>
@@ -466,7 +471,7 @@
   <script src="js/engulf.js?v=86"></script>
   <script src="js/polish.js?v=78"></script>
   <script src="js/main.js?v=80"></script>
-  <script src="js/thread.js?v=78"></script>
-  <script src="js/spark.js?v=78"></script>
+  <script src="js/thread.js?v=86"></script>
+  <script src="js/spark.js?v=79"></script>
 </body>
 </html>

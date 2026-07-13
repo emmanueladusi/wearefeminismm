@@ -1852,6 +1852,21 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
   transition: opacity 0.3s;
 }
 
+/* the thread's sparkline hand-off: it traces the pulse chart itself, in the
+   poll's colour. Drawn/animated by js/thread.js. */
+.thread__spark {
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  /* opacity is driven by draw progress in js/thread.js (red fades in as the
+     line traces the graph) — no CSS transition, so it tracks the tip exactly */
+}
+.thread__spark-dot {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
 /* ===== Pulse sparkline: live Yes/No from the pre-survey ===== */
 .sparkpulse {
   min-height: 100vh;
@@ -1911,13 +1926,16 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
   overflow: visible;
   margin-top: 22px;
 }
+/* the card keeps #sparkPath as the shape/colour source, but the visible line
+   is now drawn by the thread (see .thread__spark) — so hide the card's own. */
 .sparkline-path {
   fill: none;
   stroke-width: 3;
   stroke-linecap: round;
   stroke-linejoin: round;
+  opacity: 0 !important;
 }
-.spark-end-dot { filter: drop-shadow(0 0 5px currentColor); }
+.spark-end-dot { display: none !important; }
 .sparkcard__foot {
   display: flex;
   align-items: center;
@@ -2514,7 +2532,26 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
   line-height: 1.5;
   max-width: 34ch;
   color: var(--cream-on-dark);
-  margin: 0 0 9vh;
+  margin: 0;
+}
+
+/* header row: intro text on the left, three-lens glasses on the right */
+.learn__head {
+  display: flex;
+  align-items: center;
+  gap: clamp(24px, 5vw, 72px);
+  margin-bottom: 9vh;
+}
+.learn__intro { flex: 1 1 auto; min-width: 0; }
+.learn__glasses {
+  flex: 0 0 auto;
+  width: clamp(190px, 26vw, 360px);
+  height: auto;
+  filter: drop-shadow(0 8px 22px rgba(0, 0, 0, 0.25));
+}
+@media (max-width: 820px) {
+  .learn__head { flex-direction: column; align-items: flex-start; gap: 34px; }
+  .learn__glasses { order: -1; width: min(300px, 64vw); }
 }
 
 /* three concept cards */

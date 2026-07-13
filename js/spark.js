@@ -67,19 +67,12 @@
     return NEUTRAL;
   }
 
-  function drawAnim() {
-    const len = path.getTotalLength();
-    path.style.transition = "none";
-    path.style.strokeDasharray = len;
-    path.style.strokeDashoffset = len;
-    path.getBoundingClientRect(); // force reflow
-    path.style.transition = "stroke-dashoffset 3.2s cubic-bezier(0.33,0,0.15,1)";
-    path.style.strokeDashoffset = "0";
-    dot.style.opacity = "0";
-    setTimeout(() => {
-      dot.style.transition = "opacity .4s ease";
-      dot.style.opacity = "1";
-    }, 3050);
+  // The visible line is now drawn by the thread (js/thread.js): the page-wide
+  // thread routes into this card and traces the chart itself, colouring the
+  // detour with our poll colour. This card keeps #sparkPath as the SHAPE/COLOUR
+  // source (hidden via CSS) and just hands the thread the latest curve.
+  function notifyThread() {
+    if (window.__thread && window.__thread.syncSpark) window.__thread.syncSpark();
   }
 
   // Neutral resting state — flat line, no numbers — used until real data lands.
@@ -95,7 +88,7 @@
     dot.style.fill = NEUTRAL;
     dot.style.color = NEUTRAL;
     $("sparkVerdict").innerHTML = "";
-    if (animate) drawAnim();
+    notifyThread();
   }
 
   function render(data, animate) {
@@ -129,7 +122,7 @@
     dot.style.fill = color;
     dot.style.color = color;
 
-    if (animate) drawAnim();
+    notifyThread();
   }
 
   let latest = null; // last data received
@@ -153,24 +146,13 @@
     }
   }
 
-  // Replay the draw EVERY time the card enters view — scroll away and back and
-  // the line re-draws itself from scratch. Fires only on the off→on transition
-  // (not continuously while it sits on screen).
+  // Track visibility so a response that lands WHILE the card is on screen
+  // redraws live (see loadLive). The actual replay-on-view is driven by the
+  // thread (js/thread.js), which owns the visible line now.
   new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          if (inView) return; // already counted as visible
-          inView = true;
-          if (DATA_URL) {
-            if (latest) render(latest, true);
-            // if data hasn't arrived yet, loadLive() will animate it in on arrival
-          } else {
-            renderWaiting(true);
-          }
-        } else {
-          inView = false; // left the screen → arm the replay for next time
-        }
+        inView = entry.isIntersecting;
       });
     },
     { threshold: 0.4 }
