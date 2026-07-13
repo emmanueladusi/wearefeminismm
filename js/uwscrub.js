@@ -37,9 +37,15 @@
   const clamp01 = (v) => (v < 0 ? 0 : v > 1 ? 1 : v);
 
   const BASE = "img/underwater/";
-  const MAX_BACKING_W = 1280;
-  const MAX_DPR = 1.5;
-  const LRU = 20;    // decoded bitmaps held at once
+  // Per-frame fill is the scrub's main scroll cost. The frames are only 768px
+  // wide, so a big retina backing store multiplies paint cost for no visible
+  // gain. Cap tighter, and go tighter still on low-end / school hardware.
+  const lean =
+    (navigator.deviceMemory && navigator.deviceMemory <= 4) ||
+    (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
+  const MAX_BACKING_W = lean ? 760 : 1024;
+  const MAX_DPR = lean ? 1 : 1.25;
+  const LRU = lean ? 14 : 20;    // decoded bitmaps held at once
   const AHEAD = 10;  // decode this far in the scroll direction
   const BEHIND = 3;
   const IMG_WINDOW = 22; // HTMLImageElements kept around the playhead (bounds decoded-pixel memory)

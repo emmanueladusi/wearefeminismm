@@ -125,3 +125,16 @@
     if (started) clearInterval(iv);
   }, 500);
 })();
+
+/* Perf: freeze the ocean's ambient CSS motion (bubbles, fish, kelp, rays,
+   waves — ~48 animated layers) while the #ask section is off-screen, so they
+   aren't burning compositor cycles when nobody's looking. Runs independently
+   of the shark above so it works even where that early-returns. */
+(function () {
+  const ask = document.getElementById("ask");
+  if (!ask || !("IntersectionObserver" in window)) return;
+  new IntersectionObserver(
+    ([e]) => ask.classList.toggle("is-idle", !e.isIntersecting),
+    { rootMargin: "250px 0px" }
+  ).observe(ask);
+})();

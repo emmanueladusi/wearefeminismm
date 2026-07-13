@@ -24,22 +24,21 @@
       IMMEDIATE: true,        // a few splats on load so the hero isn't empty
       AUTO: true,             // ambient splats keep it alive when idle
       INTERVAL: 2600,
-      SIM_RESOLUTION: lean ? 64 : 96,
-      DYE_RESOLUTION: lean ? 384 : 512,
+      SIM_RESOLUTION: lean ? 48 : 64,
+      DYE_RESOLUTION: lean ? 256 : 384,
       DENSITY_DISSIPATION: 1.4,   // ink lingers, then clears so paper stays clean
       VELOCITY_DISSIPATION: 0.35,
       PRESSURE: 0.8,
       CURL: 26,                   // swirl / turbulence
       SPLAT_RADIUS: 0.28,
       SPLAT_FORCE: 6200,
-      SHADING: true,
+      SHADING: !lean,             // cheap-ish; drop it on lean hardware
       COLORFUL: false,
       SPLAT_COLOR: { r: 0.42, g: 0.29, b: 0.69 }, // brand violet ink
-      BLOOM: true,
-      BLOOM_INTENSITY: 0.75,
-      BLOOM_THRESHOLD: 0.55,
-      SUNRAYS: !lean,             // god-ray glow; skipped on lean devices
-      SUNRAYS_WEIGHT: 0.9,
+      // BLOOM + SUNRAYS are extra full-screen passes EVERY frame — the biggest
+      // continuous GPU cost, and the sim keeps running even scrolled past. Off.
+      BLOOM: false,
+      SUNRAYS: false,
       TRANSPARENT: true,          // composite over the paper hero
     });
   } catch {
@@ -61,13 +60,27 @@
   // once you've scrolled past it, drop the full-viewport GL layer out of the
   // compositor so it stops being repainted behind every section as you scroll
   // (the ink is only ever visible through the transparent hero anyway).
+  // The webgl-fluid library checks `PAUSED` live in its render loop and skips
+  // the (expensive) simulation step when it's on — and it toggles that flag on
+  // a 'KeyP' keydown. So we drive its OWN pause: once the hero scrolls away, we
+  // hide the canvas AND pause the Navier–Stokes solve, freeing the GPU for the
+  // rest of the page. This is the fix for "smooth alone, laggy in the full site."
   let heroVisible = true;
+  let simPaused = false; // mirrors the library's PAUSED (starts false)
+  function setFluidPaused(paused) {
+    if (paused === simPaused) return;
+    // one keydown flips the library's flag; bubbles so it reaches a window- or
+    // document-level listener either way.
+    document.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyP", bubbles: true }));
+    simPaused = paused;
+  }
   const hero = document.getElementById("top");
   if (hero) {
     new IntersectionObserver(
       ([entry]) => {
         heroVisible = entry.isIntersecting;
         canvas.style.visibility = heroVisible ? "" : "hidden";
+        setFluidPaused(!heroVisible);
       },
       { threshold: 0 }
     ).observe(hero);

@@ -156,6 +156,11 @@ em { font-style: italic; color: var(--violet); }
 
 .hero > * { position: relative; z-index: 1; }
 
+/* perf: freeze the ocean's ambient CSS animations while #ask is off-screen
+   (toggled by js/sealife.js). Canvas scrub, the rising ocean, and the shark
+   are JS-driven, so this only quiets the ~48 ambient sea-life layers. */
+#ask.is-idle, #ask.is-idle * { animation-play-state: paused !important; }
+
 /* ===== Learn hero: refraction =====
    A beam of light splitting into three colour bands (violet · magenta ·
    gold) behind the "one word, three lenses" title. Pure CSS — the drift
