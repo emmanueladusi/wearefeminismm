@@ -41,6 +41,19 @@
       return;
     }
     host.__built = true;
+    var isHero = section.hasAttribute("data-hero"); // opening hero: full sequence plays on load
+    // Hero opens the page: don't start until the preloader curtain lifts (body
+    // loses .is-loading), or the reveal plays behind it and you catch only the
+    // tail. Safety-fires after the preloader's own max so it can't get stuck.
+    function whenReady(cb) {
+      if (!document.body.classList.contains("is-loading")) { cb(); return; }
+      var t;
+      var mo = new MutationObserver(function () {
+        if (!document.body.classList.contains("is-loading")) { mo.disconnect(); clearTimeout(t); cb(); }
+      });
+      mo.observe(document.body, { attributes: true, attributeFilter: ["class"] });
+      t = setTimeout(function () { mo.disconnect(); cb(); }, 6500);
+    }
 
     var gsap = window.gsap;
     var ST = window.ScrollTrigger;
@@ -184,10 +197,13 @@
       tlN.fromTo(fills, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.7, ease: "power2.out", stagger: { each: 0.03, from: "center" } });
       ST.create({
         trigger: section, start: "top 80%", end: "bottom 20%",
-        onEnter: function () { tlN.restart(); }, onEnterBack: function () { tlN.restart(); },
-        onLeave: function () { tlN.pause(0); }, onLeaveBack: function () { tlN.pause(0); },
+        onEnter: isHero ? function () {} : function () { tlN.restart(); },
+        onEnterBack: isHero ? function () {} : function () { tlN.restart(); },
+        onLeave: isHero ? function () {} : function () { tlN.pause(0); },
+        onLeaveBack: isHero ? function () {} : function () { tlN.pause(0); },
       });
       ST.refresh();
+      if (isHero) whenReady(function () { tlN.restart(); }); // opening fade plays on load
       return;
     }
 
@@ -264,6 +280,8 @@
     // done); if the cycle module isn't present, unlock right away.
     tl.eventCallback("onComplete", function () {
       try { console.log("[wordcycle] reveal onComplete fired; cycle module present = " + !!window.__brandmarkCycle); } catch (e) {}
+      // hand off to the word-cycle (weare → iam → youare + gold sweep); it
+      // unlocks when its sweep finishes. No cycle module → unlock now.
       if (window.__brandmarkCycle) window.__brandmarkCycle.start();
       else unlockScroll();
     });
@@ -287,12 +305,22 @@
       unlockScroll();
     };
 
+    // The hero plays its full sequence ONCE (on load, below) and then STAYS on
+    // the finished wordmark — no reset on leave, no rebuild on return — so it
+    // never blanks out while you scroll. (Mid-page use keeps the replay logic.)
+    var noop = function () {};
     ST.create({
       trigger: section, start: "top top", end: "+=120%",
       pin: true, pinType: "fixed", pinSpacing: true, anticipatePin: 1, invalidateOnRefresh: true,
-      onEnter: playLocked, onEnterBack: play, onLeave: resetTl, onLeaveBack: resetTl,
+      onEnter: isHero ? noop : playLocked,
+      onEnterBack: isHero ? noop : play,
+      onLeave: isHero ? noop : resetTl,
+      onLeaveBack: isHero ? noop : resetTl,
     });
     ST.refresh();
+    // The hero opens the page: once the preloader lifts, play the full locked
+    // sequence (reveal → word-cycle → gold sweep). It auto-unlocks when done.
+    if (isHero) whenReady(playLocked);
   }
 
   if (document.readyState === "loading") {

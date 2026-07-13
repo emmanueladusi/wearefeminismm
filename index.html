@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=Figtree:wght@400;500;600;700&family=Poppins:wght@600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=112" />
+  <link rel="stylesheet" href="css/styles.css?v=117" />
   <link rel="stylesheet" href="css/preso.css?v=4" />
 </head>
 <body>
@@ -31,9 +31,7 @@
        across the whole scroll (js/morph.js). Sits behind the fluid sim. -->
   <div class="morph-bg" id="morph" aria-hidden="true"></div>
 
-  <!-- GPU fluid simulation: lives behind everything, shows through the
-       transparent hero, reacts to the cursor across the whole page -->
-  <canvas class="fluid-bg" id="fluid" aria-hidden="true"></canvas>
+  <!-- (Reactive fluid hero removed — calmer, more resource-like, and faster.) -->
 
   <!-- page-wide scroll guide line -->
   <div class="progress-line" aria-hidden="true">
@@ -53,20 +51,20 @@
     </nav>
   </header>
 
-  <!-- ===== Hero ===== -->
-  <section class="hero" id="top" data-bg="#faf6ef" data-pin>
-    <p class="hero__eyebrow line-reveal"><span>A community for us, by us</span></p>
-    <h1 class="hero__title">
-      <span class="line-reveal"><span>Every voice</span></span>
-      <span class="line-reveal"><span>deserves to be</span></span>
-      <span class="line-reveal"><span><em>heard.</em></span></span>
-    </h1>
-    <p class="hero__sub line-reveal"><span>A space for students — especially girls and Black girls — to learn about feminism, share real experiences, and stand behind each other. Anonymous, always.</span></p>
-    <div class="hero__ctas line-reveal">
-      <span>
-        <a href="community.html#wall" class="cta" data-magnetic>Share your story <span class="cta__arrow">→</span></a>
-        <a href="#paths" class="cta cta--quiet" data-magnetic>Find your way in <span class="cta__arrow">→</span></a>
-      </span>
+  <!-- ===== Hero: the "wearefeminismm" wordmark builds itself in, then the
+       word-cycle runs (weare → iam → youare + gold sweep), then the caption
+       and the two ways in fade up. data-hero (js/heroReveal.js) starts the
+       full sequence once the preloader lifts and briefly holds scroll for it. -->
+  <section class="brandmark brandmark--hero" id="brandmark" data-hero data-bg="#faf6ef">
+    <h2 class="brandmark__word" id="brandmarkWord" aria-label="wearefeminismm"></h2>
+    <div class="brandmark__lede">
+      <p class="brandmark__cap line-reveal"><span>A space for students — especially girls and Black girls — to learn about feminism, share real experiences, and stand behind each other. Anonymous, always.</span></p>
+      <div class="brandmark__ctas line-reveal">
+        <span>
+          <a href="community.html#wall" class="cta" data-magnetic>Share your story <span class="cta__arrow">→</span></a>
+          <a href="#paths" class="cta cta--quiet" data-magnetic>Find your way in <span class="cta__arrow">→</span></a>
+        </span>
+      </div>
     </div>
   </section>
 
@@ -155,13 +153,7 @@
     </div>
   </section>
 
-  <!-- ===== Brandmark: oversized wordmark between the top and Learn.
-       js/heroReveal.js splits it into per-letter spans and runs the
-       outer-letters mask/slide/flip reveal, pinned while it plays. NOT
-       data-scene: it owns its own pin, so journey.js must not transform it. -->
-  <section class="brandmark" id="brandmark" data-bg="#f3ecdf">
-    <h2 class="brandmark__word" id="brandmarkWord" aria-label="wearefeminismm"></h2>
-  </section>
+  <!-- (The wordmark reveal now opens the page as the hero — see top.) -->
 
   <!-- ===== Pathways ===== -->
   <section class="paths" id="paths" data-bg="#faf6ef" data-scene>
@@ -203,7 +195,6 @@
     <p class="footer__fine">Made with care. Your words are anonymous, and you never have to share your name.</p>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/webgl-fluid@0.4.0/dist/webgl-fluid.umd.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
@@ -212,11 +203,10 @@
   <script src="js/journey.js?v=78"></script>
   <script src="js/pin.js?v=78"></script>
   <script src="js/brandmarkData.js?v=80"></script>
-  <script src="js/heroReveal.js?v=108"></script>
+  <script src="js/heroReveal.js?v=111"></script>
   <script src="js/brandmarkCycle.js?v=109"></script>
   <script src="js/polish.js?v=78"></script>
   <script src="js/main.js?v=79"></script>
-  <script src="js/fluid.js?v=81"></script>
   <script src="js/preso.js?v=3"></script>
 </body>
 </html>

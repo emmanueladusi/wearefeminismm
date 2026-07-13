@@ -2351,6 +2351,28 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
   text-align: center;
   overflow: hidden; /* the outer letters slide in from off-centre — no h-scroll */
 }
+
+/* Home hero: the wordmark reveal opens the page, with the mission caption
+   and the two ways-in below it (they fade up as the wordmark resolves). */
+.brandmark--hero {
+  flex-direction: column;
+  gap: clamp(24px, 5vh, 56px);
+  min-height: 100svh;
+}
+.brandmark__lede {
+  display: flex; flex-direction: column; align-items: center;
+  gap: clamp(20px, 3.4vh, 34px);
+  max-width: 600px;
+}
+.brandmark__cap {
+  color: var(--ink-dim);
+  font-size: clamp(1rem, 2.1vw, 1.15rem);
+  line-height: 1.6;
+}
+.brandmark__ctas > span { display: flex; gap: clamp(20px, 3vw, 40px); flex-wrap: wrap; justify-content: center; }
+/* the caption + ctas arrive as the wordmark's ink materialises */
+.brandmark--hero .brandmark__cap.line-reveal > span { animation-delay: 1.6s; }
+.brandmark--hero .brandmark__ctas.line-reveal > span { animation-delay: 1.85s; }
 /* Wordmark construction reveal (js/heroReveal.js + js/brandmarkData.js):
    every letter is built live from its real vector anchor points — amber
    square NODES on on-curve points, amber DOTS on bézier handles, dashed
