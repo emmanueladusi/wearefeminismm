@@ -309,18 +309,21 @@
     // the finished wordmark — no reset on leave, no rebuild on return — so it
     // never blanks out while you scroll. (Mid-page use keeps the replay logic.)
     var noop = function () {};
+    // Mid-page uses pin the section and lock scroll while it plays. The hero
+    // does NOT pin or lock — it plays once on load and lets you scroll freely
+    // through the intro (no held frame stuck to the screen).
     ST.create({
       trigger: section, start: "top top", end: "+=120%",
-      pin: true, pinType: "fixed", pinSpacing: true, anticipatePin: 1, invalidateOnRefresh: true,
+      pin: !isHero, pinType: "fixed", pinSpacing: !isHero, anticipatePin: 1, invalidateOnRefresh: true,
       onEnter: isHero ? noop : playLocked,
       onEnterBack: isHero ? noop : play,
       onLeave: isHero ? noop : resetTl,
       onLeaveBack: isHero ? noop : resetTl,
     });
     ST.refresh();
-    // The hero opens the page: once the preloader lifts, play the full locked
-    // sequence (reveal → word-cycle → gold sweep). It auto-unlocks when done.
-    if (isHero) whenReady(playLocked);
+    // The hero opens the page: once the preloader lifts, play the full
+    // sequence (reveal → word-cycle → gold sweep) WITHOUT locking scroll.
+    if (isHero) whenReady(play);
   }
 
   if (document.readyState === "loading") {
