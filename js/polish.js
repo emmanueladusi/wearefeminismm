@@ -14,6 +14,20 @@
     const pre = document.getElementById("preloader");
     if (!pre) return;
 
+    // Only run the intro curtain on the first page of a visit. On later
+    // navigations within the same session (switching Home/Learn/…), drop
+    // straight into the page instead of replaying the loader every time.
+    let visited = false;
+    try {
+      visited = !!sessionStorage.getItem("wf_visited");
+      sessionStorage.setItem("wf_visited", "1");
+    } catch (e) {}
+    if (visited) {
+      pre.remove();
+      document.body.classList.remove("is-loading");
+      return;
+    }
+
     if (reduceMotion) {
       pre.remove();
       document.body.classList.remove("is-loading");

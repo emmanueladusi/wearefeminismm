@@ -129,7 +129,7 @@
     return color;
   }
 
-  function build() {
+  function layout() {
     const W = document.documentElement.clientWidth;
     const H = docHeight();
     svg.setAttribute("width", W);
@@ -228,7 +228,25 @@
       sparkLen = 0;
       sparkStart = 0;
     }
+  }
+
+  function build() {
+    layout();
     update(true);
+  }
+
+  // rebuild the geometry from the chart's LIVE position, so the sparkline stays
+  // glued to the pulse card even while the card is held (sticky) in view
+  let lastChartKey = null;
+  function resyncSpark() {
+    const chart = document.getElementById(CHART_ID);
+    if (!chart || !sparkState.dLocal) return;
+    const r = chart.getBoundingClientRect();
+    if (r.bottom < -300 || r.top > window.innerHeight + 300) return; // off-screen
+    const key = Math.round((r.top + window.scrollY) * 4);
+    if (key === lastChartKey) return; // card hasn't moved — keep cached geometry
+    lastChartKey = key;
+    layout();
   }
 
   function progress() {
@@ -243,6 +261,7 @@
     queued = true;
     requestAnimationFrame(() => {
       queued = false;
+      resyncSpark(); // keep the sparkline locked to the (sticky) card
       const p = reduceMotion ? 1 : progress();
       const tip = L * p;
       path.style.strokeDashoffset = L - tip;

@@ -237,13 +237,14 @@ em { font-style: italic; color: var(--violet); }
 body.morph-on .marquee,
 body.morph-on .paths,
 body.morph-on .grounding,
-body.morph-on .learn,
 body.morph-on .ec-section,
 body.morph-on .fly,
 body.morph-on .fly__sticky,
 body.morph-on .wall-section,
 body.morph-on .pulse,
 body.morph-on .footer { background-color: transparent; }
+/* .learn keeps a solid background so the morph colour doesn't drift under the
+   "One word, three lenses" text (that colour shift read as the text fading) */
 
 /* ===== Kinetic headline reveals (js/journey.js) =====
    Each word sits in an overflow-clipped box and lifts into place on a
@@ -1813,6 +1814,7 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
 
 .learn {
   min-height: 60vh;
+  background-color: var(--violet-deep); /* stable bg — see morph-on note above */
 }
 
 /* =====================================================
@@ -1869,13 +1871,15 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
 
 /* ===== Pulse sparkline: live Yes/No from the pre-survey ===== */
 .sparkpulse {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 12vh 24px;
+  /* tall section + sticky card: the card holds in view while you scroll through
+     it, so the thread-drawn graph lingers instead of scrolling straight past */
+  min-height: 220vh;
+  padding: 44vh 24px 0;
 }
 .sparkcard {
+  position: sticky;
+  top: 22vh;
+  margin: 0 auto;
   width: 520px;
   max-width: 94vw;
   background: #fffdfa;
@@ -2564,9 +2568,11 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
   position: relative;
   padding: 30px 26px 34px;
   border-radius: var(--r-lg);
-  background: rgba(250, 246, 239, 0.05);
-  border: 1px solid rgba(250, 246, 239, 0.12);
-  backdrop-filter: blur(2px);
+  /* solid dark panel so the light text stays readable whatever colour the
+     morph backdrop is behind it (it was a 5%-white glass that washed out) */
+  background: rgba(22, 15, 38, 0.66);
+  border: 1px solid rgba(250, 246, 239, 0.16);
+  backdrop-filter: blur(6px);
 }
 .lens__name {
   font-family: var(--serif);
@@ -2578,7 +2584,7 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
 .lens__def {
   font-size: 1rem;
   line-height: 1.55;
-  color: var(--cream-on-dark);
+  color: #f3ede2;
   margin: 0;
 }
 .lens__def em { font-style: normal; color: var(--gold); font-weight: 600; }
