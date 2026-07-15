@@ -180,8 +180,8 @@
   function flair(correct, streak) {
     let t;
     if (!correct) t = "Not quite.";
-    else if (streak >= 5) t = "Unstoppable — " + streak + " straight! 🔥";
-    else if (streak >= 3) t = "On fire — " + streak + " in a row! 🔥";
+    else if (streak >= 5) t = "Unstoppable, " + streak + " straight! 🔥";
+    else if (streak >= 3) t = "On fire, " + streak + " in a row! 🔥";
     else if (streak === 2) t = "Two for two!";
     else t = "Correct!";
     return '<b class="quiz-fb__lead">' + t + "</b>";
@@ -262,9 +262,9 @@
   }
 
   function rankFor(pct) {
-    if (pct >= 100) return { emoji: "🏆", title: "Perfect run", note: "Every single one — you could teach this." };
+    if (pct >= 100) return { emoji: "🏆", title: "Perfect run", note: "Every single one, you could teach this." };
     if (pct >= 78) return { emoji: "🌟", title: "Feminism fluent", note: "You really know your stuff." };
-    if (pct >= 55) return { emoji: "🌱", title: "Getting there", note: "Solid core — the rest is one more round away." };
+    if (pct >= 55) return { emoji: "🌱", title: "Getting there", note: "Solid core, the rest is one more round away." };
     return { emoji: "✨", title: "Just warming up", note: "Now you’ve seen it once. Run it back and watch it climb." };
   }
 

@@ -2965,8 +2965,287 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
   position: absolute;
   left: clamp(22px, 5vw, 64px);
   right: clamp(58px, 11vw, 130px);
-  top: 21vh;
+  top: 31vh;                 /* pushed down to sit under the big wave counter */
   z-index: 3;
+}
+/* the headline wave counter — big number that flips to the next as you cross
+   into each wave (js/waves.js drives the flip). Replaces the faint per-card
+   number in the live view. */
+.askwaves.is-live .wavecard__num { display: none; }
+.askwaves.is-live .waves__count {
+  position: absolute;
+  top: 8vh;
+  left: clamp(22px, 5vw, 64px);
+  z-index: 4;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(4rem, 14vw, 9rem);
+  line-height: 0.82;
+  color: #9fe9ff;
+  text-shadow: 0 3px 34px rgba(90, 205, 255, 0.5);
+  pointer-events: none;
+  perspective: 800px;
+}
+.askwaves.is-live .waves__count span { display: inline-block; transform-origin: 50% 100%; will-change: transform, opacity; }
+.askwaves:not(.is-live) .waves__count { display: none; }
+
+/* ===== Resources: Black Canadian feminist scholars ===== */
+.resources {
+  background-color: #f2ecf7;   /* solid, so the morph backdrop can't wash the text */
+  padding: var(--section-y) var(--gutter);
+}
+.resources__inner { max-width: 1120px; margin: 0 auto; }
+.resources__title {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(2rem, 5.5vw, 3.5rem);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.35em;
+  color: var(--ink);
+}
+.resources__lead {
+  font-size: clamp(1.02rem, 2.1vw, 1.28rem);
+  line-height: 1.5;
+  color: var(--ink-dim);
+  max-width: 60ch;
+  margin: 0 0 clamp(40px, 6vw, 64px);
+}
+.resources__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(18px, 2.4vw, 30px);
+}
+/* whole card is a link: photo, name under it, role under that */
+.resource {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  text-decoration: none;
+  color: inherit;
+  background: #fffdfa;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 36px 24px 30px;
+  box-shadow: 0 18px 42px -24px rgba(44, 33, 64, 0.28);
+  transition: transform 0.32s var(--ease), box-shadow 0.32s var(--ease);
+}
+.resource:hover,
+.resource:focus-visible {
+  transform: translateY(-5px);
+  box-shadow: 0 26px 56px -22px rgba(44, 33, 64, 0.42);
+  outline: none;
+}
+/* avatar — works as a monogram placeholder OR a real <img class="resource__photo"> */
+.resource__photo {
+  flex: none;
+  width: clamp(96px, 12vw, 128px);
+  height: clamp(96px, 12vw, 128px);
+  border-radius: 50%;
+  object-fit: cover;
+  overflow: hidden;
+  margin-bottom: 20px;
+  background: linear-gradient(150deg, var(--violet), #c76a9e);
+  box-shadow: 0 12px 28px -12px rgba(74, 53, 104, 0.55);
+  animation: resource-float 12s ease-in-out infinite;
+  will-change: transform;
+}
+/* idle wander — each avatar drifts around a slow meandering path, out of phase */
+@keyframes resource-float {
+  0%   { transform: translate(0, 0) rotate(0deg); }
+  20%  { transform: translate(16px, -14px) rotate(2.2deg); }
+  40%  { transform: translate(-14px, -7px) rotate(-2.4deg); }
+  58%  { transform: translate(11px, 12px) rotate(1.6deg); }
+  78%  { transform: translate(-15px, 5px) rotate(-1.6deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+.resources__grid .resource:nth-child(2) .resource__photo { animation-duration: 14.5s; animation-delay: -5s; animation-direction: reverse; }
+.resources__grid .resource:nth-child(3) .resource__photo { animation-duration: 13s; animation-delay: -9s; }
+@media (prefers-reduced-motion: reduce) {
+  .resource__photo { animation: none; }
+}
+
+/* ===== Get involved (GTA orgs) — drifting aurora over dark ===== */
+.getinvolved {
+  position: relative;
+  overflow: hidden;
+  background-color: #160f2b;
+  padding: var(--section-y) var(--gutter);
+  color: var(--cream-on-dark);
+}
+.getinvolved__inner { position: relative; z-index: 2; max-width: 1120px; margin: 0 auto; }
+.getinvolved__title {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(2rem, 5.5vw, 3.5rem);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.35em;
+  color: #fff;
+}
+.getinvolved__title em { font-style: italic; color: var(--gold); }
+.getinvolved__lead {
+  font-size: clamp(1.02rem, 2.1vw, 1.28rem);
+  line-height: 1.5;
+  color: var(--dim-on-dark);
+  max-width: 62ch;
+  margin: 0 0 clamp(38px, 5vw, 56px);
+}
+
+/* dotted GTA map: dots fade in, pins pop with a starburst, then the gold arc
+   draws pin-to-pin. Staged off .is-visible (added by the .reveal observer). */
+.gtamap-wrap { position: relative; z-index: 2; margin: clamp(18px, 3vw, 34px) 0 clamp(40px, 6vw, 60px); }
+.gtamap { width: 100%; height: auto; display: block; overflow: visible; }
+.gtamap__dots circle { fill: rgba(150, 168, 220, 0.22); }
+.gtamap-wrap .gtamap__dots { opacity: 0; transition: opacity 1.3s ease; }
+.gtamap-wrap.is-visible .gtamap__dots { opacity: 1; }
+
+.gtamap__arc {
+  fill: none;
+  stroke: #d9a13f;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 5px rgba(217, 161, 63, 0.8));
+  stroke-dasharray: 1;      /* pathLength="1" on the element */
+  stroke-dashoffset: 1;     /* hidden until it draws */
+}
+.gtamap-wrap.is-visible .gtamap__arc { animation: gta-arc-draw 2.4s ease 0.9s forwards; }
+@keyframes gta-arc-draw { to { stroke-dashoffset: 0; } }
+
+.pin__mark { opacity: 0; transform: scale(0.3); transform-box: view-box; }
+.gtamap-wrap.is-visible .pin__mark {
+  animation: gta-pin-pop 0.55s cubic-bezier(0.2, 0.9, 0.3, 1.25) forwards;
+  animation-delay: calc(0.2s + var(--i) * 0.26s);
+}
+@keyframes gta-pin-pop { to { opacity: 1; transform: scale(1); } }
+
+.pin__burst { transform-box: view-box; }
+.pin__burst line { stroke: #f2c66a; stroke-width: 1.5; stroke-linecap: round; }
+.gtamap-wrap.is-visible .pin__burst {
+  animation: gta-twinkle 3.4s ease-in-out infinite;
+  animation-delay: calc(0.5s + var(--i) * 0.26s);
+}
+@keyframes gta-twinkle {
+  0%, 100% { opacity: 0.55; transform: scale(0.9) rotate(0deg); }
+  50%      { opacity: 1;    transform: scale(1.18) rotate(24deg); }
+}
+.pin__halo { fill: #d9a13f; opacity: 0.28; filter: blur(5px); }
+.gtamap-wrap.is-visible .pin__halo {
+  animation: gta-halo 3.4s ease-in-out infinite;
+  animation-delay: calc(0.5s + var(--i) * 0.26s);
+}
+@keyframes gta-halo { 0%, 100% { opacity: 0.2; } 50% { opacity: 0.5; } }
+.pin__dot { fill: #fff; filter: drop-shadow(0 0 4px #ffe6ad); }
+
+.pin__label { opacity: 0; }
+.gtamap-wrap.is-visible .pin__label {
+  animation: gta-label-in 0.5s ease forwards;
+  animation-delay: calc(0.45s + var(--i) * 0.26s);
+}
+@keyframes gta-label-in { to { opacity: 1; } }
+.pin__label rect { fill: rgba(12, 8, 24, 0.72); stroke: rgba(250, 246, 239, 0.14); }
+.pin__label text { fill: #f3ede2; font-family: var(--mono); font-size: 11px; letter-spacing: 0.02em; }
+@media (max-width: 620px) { .pin__label text { font-size: 15px; } }
+
+.involve-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: clamp(16px, 2vw, 24px);
+}
+.involve {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+  background: rgba(20, 14, 38, 0.5);
+  border: 1px solid rgba(250, 246, 239, 0.16);
+  border-radius: var(--r-lg);
+  padding: 24px 22px 22px;
+  backdrop-filter: blur(8px);
+  transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease), border-color 0.3s var(--ease);
+}
+.involve:hover,
+.involve:focus-visible {
+  transform: translateY(-5px);
+  border-color: rgba(250, 246, 239, 0.42);
+  box-shadow: 0 24px 50px -22px rgba(0, 0, 0, 0.6);
+  outline: none;
+}
+.involve__area {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 12px;
+}
+.involve__name {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 1.2rem;
+  line-height: 1.2;
+  color: #fff;
+  margin-bottom: 10px;
+}
+.involve__desc {
+  font-size: 0.94rem;
+  line-height: 1.5;
+  color: var(--cream-on-dark);
+  margin-bottom: 18px;
+}
+.involve__go {
+  margin-top: auto;
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--gold);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.involve__go span { transition: transform 0.25s var(--ease); }
+.involve:hover .involve__go span { transform: translateX(4px); }
+.getinvolved__note {
+  margin: clamp(32px, 5vw, 48px) 0 0;
+  font-size: 0.95rem;
+  color: var(--dim-on-dark);
+}
+.getinvolved__note a { color: var(--cream-on-dark); text-decoration: underline; text-underline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) {
+  .gtamap-wrap .gtamap__dots { opacity: 1; }
+  .pin__mark, .pin__label { opacity: 1; transform: none; animation: none; }
+  .gtamap__arc { stroke-dashoffset: 0; }
+  .pin__burst, .pin__halo { animation: none; }
+}
+img.resource__photo { display: block; }
+/* monogram-placeholder variant (a <span>) centres its initials */
+span.resource__photo {
+  display: grid;
+  place-items: center;
+  color: var(--cream-on-dark);
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(1.7rem, 3vw, 2.3rem);
+  letter-spacing: 0.02em;
+}
+.resource__name {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 1.32rem;
+  line-height: 1.15;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+.resource__role {
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.42;
+  color: var(--violet);
+}
+@media (max-width: 820px) {
+  .resources__grid { grid-template-columns: 1fr; max-width: 420px; margin: 0 auto; }
 }
 .askwaves.is-live .wavecard {
   position: absolute;

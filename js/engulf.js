@@ -74,13 +74,24 @@
   // once the border has faded.
   let locked = false;
   let touchStartY = 0;
-  const onWheel = (e) => { if (locked && e.deltaY < 0) unlock(); };            // scrolling up
+  // up = leave the way you came; DOWN = skip the beat and move straight on
+  const onWheel = (e) => {
+    if (!locked) return;
+    if (e.deltaY < 0) unlock();
+    else if (e.deltaY > 0) skip();
+  };
   const onTouchStart = (e) => { touchStartY = e.touches ? e.touches[0].clientY : 0; };
   const onTouchMove = (e) => {
-    if (locked && e.touches && e.touches[0].clientY > touchStartY + 6) unlock(); // dragging down = up
+    if (!locked || !e.touches) return;
+    const y = e.touches[0].clientY;
+    if (y > touchStartY + 6) unlock();      // dragging down = scrolling up = leave
+    else if (y < touchStartY - 6) skip();   // dragging up   = scrolling down = skip ahead
   };
   const onKey = (e) => {
-    if (locked && (e.key === "ArrowUp" || e.key === "PageUp" || e.key === "Home")) unlock();
+    if (!locked) return;
+    if (e.key === "ArrowUp" || e.key === "PageUp" || e.key === "Home") unlock();
+    else if (e.key === "ArrowDown" || e.key === "PageDown" || e.key === "End" ||
+             e.key === " " || e.key === "Spacebar" || e.key === "Escape" || e.key === "Enter") skip();
   };
   function lock() {
     const l = lenis();
@@ -103,8 +114,27 @@
   }
 
   let played = false;
+  let skipped = false;
   const timers = [];
   const wait = (fn, ms) => timers.push(setTimeout(fn, ms));
+
+  // Skip: jump straight to the resolved beat — the question sent, the border
+  // handed off, the waves revealed — and release the scroll. So the animation
+  // is never something you're forced to sit through; a scroll down skips it.
+  function skip() {
+    if (!played || skipped) return;
+    skipped = true;
+    timers.forEach(clearTimeout);
+    timers.length = 0;
+    stopDistortion();
+    if (chatText) chatText.textContent = QUESTION;
+    if (chat) { chat.classList.remove("aichat--typing"); chat.classList.add("aichat--sent"); }
+    if (content) content.classList.add("ask-faded");
+    document.body.classList.add("ask-glow-active", "ask-waves-on", "ask-fullscreen");
+    if (window.__askWaves) window.__askWaves.start();
+    if (stack) { stack.style.setProperty("--ag-reveal", "0"); stack.classList.remove("ag-live"); }
+    unlock();
+  }
 
   /* ---- light-leak refraction: while the streak sweeps, drag an SVG
      displacement across the question so the screen visibly warps, ramping
@@ -220,6 +250,7 @@
     stopDistortion();
     unlock();
     played = false;
+    skipped = false;
     stack.classList.remove("ag-live");
     stack.style.setProperty("--ag-reveal", "0");
     content.classList.remove("ask-faded");

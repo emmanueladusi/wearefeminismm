@@ -78,7 +78,7 @@
   // Neutral resting state — flat line, no numbers — used until real data lands.
   function renderWaiting(animate) {
     const { d, last } = buildPath(pollValues(50));
-    $("sparkPct").textContent = "—";
+    $("sparkPct").textContent = "…";
     path.setAttribute("d", d);
     path.style.stroke = NEUTRAL;
     path.style.opacity = "0.5";

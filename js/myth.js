@@ -84,7 +84,7 @@
         '<div class="myth__momentum" aria-hidden="true"><span id="mythMomentum" style="width:' + progress + '%"></span></div>' +
         '<div class="myth__deck">' +
           '<div class="myth-card myth-card--peek" aria-hidden="true"></div>' +
-          '<div class="myth-card" id="mythCard" tabindex="0" role="group" aria-label="Statement — decide myth or real">' +
+          '<div class="myth-card" id="mythCard" tabindex="0" role="group" aria-label="Statement: decide myth or real">' +
             '<span class="myth-card__stamp myth-card__stamp--myth" aria-hidden="true">Myth</span>' +
             '<span class="myth-card__stamp myth-card__stamp--real" aria-hidden="true">Real</span>' +
             '<span class="myth-card__kind">' + esc(card.kind || "Myth or real?") + "</span>" +
@@ -200,7 +200,7 @@
     const truth = document.getElementById("mythTruth");
     if (truth) {
       truth.innerHTML = '<b class="myth-fb__lead ' + (correct ? "is-good" : "is-soft") + '">' +
-        (correct ? "Nice call." : "Gotcha —") + "</b> " + esc(card.truth);
+        (correct ? "Nice call." : "Gotcha.") + "</b> " + esc(card.truth);
       truth.classList.add("is-shown");
     }
 
@@ -260,8 +260,8 @@
 
   function rankFor(pct) {
     if (pct >= 100) return { emoji: "🏆", title: "Myth-buster supreme", note: "You saw through every one." };
-    if (pct >= 78) return { emoji: "🌟", title: "Sharp eye", note: "Hard to fool — you know the difference." };
-    if (pct >= 55) return { emoji: "🌱", title: "Getting there", note: "Good instincts — the reviews below fill in the rest." };
+    if (pct >= 78) return { emoji: "🌟", title: "Sharp eye", note: "Hard to fool. You know the difference." };
+    if (pct >= 55) return { emoji: "🌱", title: "Getting there", note: "Good instincts, the reviews below fill in the rest." };
     return { emoji: "✨", title: "Just warming up", note: "Myths are sneaky. Read the truths below and run it back." };
   }
 

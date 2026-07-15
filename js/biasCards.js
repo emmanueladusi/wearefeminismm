@@ -18,7 +18,7 @@ window.BIAS_CARDS = [
   {
     /* PLACEHOLDER */
     kind: "Comment",
-    text: "She's surprisingly good at coding — for a girl.",
+    text: "She's surprisingly good at coding, for a girl.",
     isBiased: true,
     explanation:
       "The word “surprisingly” treats a girl being skilled at coding as unexpected. That's a stereotype: it quietly assumes technical talent isn't normal for girls.",
@@ -29,7 +29,7 @@ window.BIAS_CARDS = [
     text: "Student team ships new app update two weeks ahead of schedule.",
     isBiased: false,
     explanation:
-      "This just reports what a team did. There's no judgement based on anyone's gender, race, or identity — so it's fair.",
+      "This just reports what a team did. There's no judgement based on anyone's gender, race, or identity, so it's fair.",
   },
   {
     /* PLACEHOLDER */
@@ -37,7 +37,7 @@ window.BIAS_CARDS = [
     text: "Women leaders bring a softer, more emotional touch to the job.",
     isBiased: true,
     explanation:
-      "It sounds like a compliment, but it still boxes every woman into one emotional role. “Positive” stereotypes are bias too — they decide who someone is before you meet them.",
+      "It sounds like a compliment, but it still boxes every woman into one emotional role. “Positive” stereotypes are bias too: they decide who someone is before you meet them.",
   },
   {
     /* PLACEHOLDER */

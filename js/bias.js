@@ -214,9 +214,9 @@
   }
 
   function feedbackText(flagged, isBiased) {
-    if (flagged && isBiased) return "Good catch — that one carried bias.";
-    if (!flagged && !isBiased) return "Fair call — that one was okay.";
-    if (!flagged && isBiased) return "That one slipped by — it had bias in it.";
+    if (flagged && isBiased) return "Good catch, that one carried bias.";
+    if (!flagged && !isBiased) return "Fair call, that one was okay.";
+    if (!flagged && isBiased) return "That one slipped by. It had bias in it.";
     return "That one was actually fair.";
   }
 
@@ -258,7 +258,7 @@
 
   function endLine(pct) {
     if (pct >= 80) return "Sharp eye. You caught the quiet stuff most people scroll right past.";
-    if (pct >= 50) return "Good start — bias is slippery, and you spotted a lot of it.";
+    if (pct >= 50) return "Good start. Bias is slippery, and you spotted a lot of it.";
     return "Bias often hides in wording that sounds normal. Here's what to look for next time.";
   }
 

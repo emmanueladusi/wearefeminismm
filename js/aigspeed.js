@@ -11,8 +11,10 @@
    attacks quickly and decays slowly, so the ring surges with the scroll and
    winds back down to its resting spin a beat after you stop.
 
-   Only animations whose name contains "spin" are touched — the breathing
-   glow layers (ag-breathe / aig-breathe) keep their own calm rhythm.
+   Both the rotation ("spin") and the breathing/pulse ("breathe") layers rev
+   with the scroll: the spin whirls up to MAX, the breath revs a gentler amount
+   so the whole glow visibly energises as you scroll, then eases back to its
+   calm resting rhythm a beat after you stop.
 
    Cost: one rAF loop writing a number, plus a cheap animation re-scan on an
    interval (the ring's animations only exist once engulf.js goes .ag-live).
@@ -22,26 +24,32 @@
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   if (typeof document.getAnimations !== "function") return; // no WAAPI, leave CSS alone
 
-  const MAX = 6;          // fastest multiplier at a hard flick
-  const GAIN = 0.06;      // px-per-frame -> multiplier
-  const ATTACK = 0.25;    // how fast it surges
+  const MAX = 10;         // fastest spin multiplier at a hard flick
+  const GAIN = 0.09;      // px-per-frame -> multiplier (revs on a gentle scroll too)
+  const ATTACK = 0.28;    // how fast it surges
   const RELEASE = 0.045;  // how slowly it winds back down
+  const BREATHE_MAX = 3;  // the pulse revs too, but gentler than the spin
   const RESCAN_MS = 500;  // the ring appears mid-page; keep looking for it
 
   const isSpin = (a) => a.animationName && /spin/i.test(a.animationName);
+  const isBreathe = (a) => a.animationName && /breathe/i.test(a.animationName);
 
   let spins = [];
+  let breathes = [];
   let lastY = window.scrollY;
   let speed = 1;
   let running = false;
 
   function rescan() {
     try {
-      spins = document.getAnimations().filter(isSpin);
+      const all = document.getAnimations();
+      spins = all.filter(isSpin);
+      breathes = all.filter(isBreathe);
     } catch (e) {
       spins = [];
+      breathes = [];
     }
-    if (spins.length) wake();
+    if (spins.length || breathes.length) wake();
   }
   rescan();
   setInterval(rescan, RESCAN_MS);
@@ -64,6 +72,9 @@
 
     if (Math.abs(speed - 1) < 0.002) speed = 1; // settle exactly at rest
 
+    // the breath revs too, but on a gentler curve than the spin
+    const breatheRate = 1 + Math.min(BREATHE_MAX - 1, (speed - 1) * 0.3);
+
     for (let i = 0; i < spins.length; i++) {
       const a = spins[i];
       // a finished/cancelled animation is harmless to write to; guard anyway
@@ -71,14 +82,20 @@
         try { a.playbackRate = speed; } catch (e) { /* detached */ }
       }
     }
+    for (let i = 0; i < breathes.length; i++) {
+      const a = breathes[i];
+      if (a.playbackRate !== breatheRate) {
+        try { a.playbackRate = breatheRate; } catch (e) { /* detached */ }
+      }
+    }
 
     // park once everything is at rest and the page is still
-    if (!spins.length || (speed === 1 && v === 0)) { running = false; return; }
+    if ((!spins.length && !breathes.length) || (speed === 1 && v === 0)) { running = false; return; }
     requestAnimationFrame(frame);
   }
 
   window.addEventListener("scroll", wake, { passive: true });
 
   // expose for debugging / tuning
-  window.__aigSpeed = { rate: () => speed, count: () => spins.length };
+  window.__aigSpeed = { rate: () => speed, count: () => spins.length + breathes.length };
 })();

@@ -20,7 +20,10 @@
   const cards = Array.from(wavesEl.querySelectorAll(".wavecard"));
   const dots = Array.from(wavesEl.querySelectorAll(".waves__dot"));
   const ocean = wavesEl.querySelector("#ocean");
+  const countSpan = wavesEl.querySelector(".waves__count span");
   if (!cards.length || !ocean) return;
+
+  let lastSeg = -1; // so the counter flips (and never re-flips the same number)
 
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -58,6 +61,21 @@
     ocean.style.setProperty("--mix", mix.toFixed(3));
     cards.forEach((c, i) => c.classList.toggle("is-active", i === seg));
     dots.forEach((d, i) => d.classList.toggle("is-active", i <= seg));
+
+    // headline cue: flip the big wave number whenever the wave changes
+    if (seg !== lastSeg) {
+      lastSeg = seg;
+      if (countSpan) {
+        countSpan.textContent = String(seg + 1).padStart(2, "0");
+        if (countSpan.animate) {
+          countSpan.animate(
+            [{ transform: "rotateX(-90deg)", opacity: 0 },
+             { transform: "rotateX(0deg)", opacity: 1 }],
+            { duration: 520, easing: "cubic-bezier(.2,.9,.25,1)" }
+          );
+        }
+      }
+    }
   }
 
   function onScroll() {
