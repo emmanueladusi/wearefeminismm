@@ -3069,6 +3069,8 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
 /* ===== Get involved (GTA orgs) — drifting aurora over dark ===== */
 .getinvolved {
   position: relative;
+  z-index: 4;                    /* above the page thread (z-index 3): its solid
+                                    dark bg covers the line so it stops here */
   overflow: hidden;
   background-color: #160f2b;
   padding: var(--section-y) var(--gutter);
@@ -3095,11 +3097,20 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
 
 /* dotted GTA map: dots fade in, pins pop with a starburst, then the gold arc
    draws pin-to-pin. Staged off .is-visible (added by the .reveal observer). */
-.gtamap-wrap { position: relative; z-index: 2; margin: clamp(18px, 3vw, 34px) 0 clamp(40px, 6vw, 60px); }
-.gtamap { width: 100%; height: auto; display: block; overflow: visible; }
-.gtamap__dots circle { fill: rgba(150, 168, 220, 0.22); }
-.gtamap-wrap .gtamap__dots { opacity: 0; transition: opacity 1.3s ease; }
-.gtamap-wrap.is-visible .gtamap__dots { opacity: 1; }
+.gtamap-wrap {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 840px;
+  margin: clamp(18px, 3vw, 34px) auto clamp(40px, 6vw, 60px);
+  aspect-ratio: 1000 / 680;         /* the canvas + SVG overlay share this box */
+}
+/* fade in only — no slide/zoom, so opening the map has no "warp" */
+.gtamap-wrap.reveal,
+.gtamap-wrap.reveal.is-visible { transform: none; }
+.gtamap-canvas,
+.gtamap-pins { position: absolute; inset: 0; width: 100%; height: 100%; }
+.gtamap-pins { overflow: visible; }
 
 .gtamap__arc {
   fill: none;
@@ -3110,41 +3121,47 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
   stroke-dasharray: 1;      /* pathLength="1" on the element */
   stroke-dashoffset: 1;     /* hidden until it draws */
 }
-.gtamap-wrap.is-visible .gtamap__arc { animation: gta-arc-draw 2.4s ease 0.9s forwards; }
-@keyframes gta-arc-draw { to { stroke-dashoffset: 0; } }
+/* seamless loop: draws forward, then reverses (un-draws), forever */
+.gtamap-wrap.is-open .gtamap__arc {
+  animation: gta-arc-loop 5.5s ease-in-out infinite alternate;
+}
+@keyframes gta-arc-loop { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
 
-.pin__mark { opacity: 0; transform: scale(0.3); transform-box: view-box; }
-.gtamap-wrap.is-visible .pin__mark {
-  animation: gta-pin-pop 0.55s cubic-bezier(0.2, 0.9, 0.3, 1.25) forwards;
-  animation-delay: calc(0.2s + var(--i) * 0.26s);
+/* fades in on the way in, fades back out on the way out (the reverse) */
+.pin__mark { opacity: 0; transform-box: view-box; transition: opacity 0.6s ease; }
+.gtamap-wrap.is-open .pin__mark {
+  opacity: 1;
+  transition-delay: calc(var(--i) * 0.14s);
 }
-@keyframes gta-pin-pop { to { opacity: 1; transform: scale(1); } }
 
-.pin__burst { transform-box: view-box; }
-.pin__burst line { stroke: #f2c66a; stroke-width: 1.5; stroke-linecap: round; }
-.gtamap-wrap.is-visible .pin__burst {
-  animation: gta-twinkle 3.4s ease-in-out infinite;
-  animation-delay: calc(0.5s + var(--i) * 0.26s);
+/* each place is a little glowing building (house / tower / low block) on the map */
+.pin__mark { filter: drop-shadow(0 0 7px rgba(255, 214, 140, 0.9)); }
+.pin__house-body { fill: #fff3dd; }
+.pin__house-roof { fill: #e3ad46; }
+.pin__house-door { fill: #b06f26; }
+.pin__win { fill: #ecc063; }
+/* expanding "ping" so each house clearly reads as a location marker */
+.pin__ping { fill: none; stroke: #f2c66a; stroke-width: 1.6; opacity: 0; transform-box: view-box; }
+.gtamap-wrap.is-open .pin__ping {
+  animation: pin-ping 2.8s ease-out infinite;
+  animation-delay: calc(0.6s + var(--i) * 0.45s);
 }
-@keyframes gta-twinkle {
-  0%, 100% { opacity: 0.55; transform: scale(0.9) rotate(0deg); }
-  50%      { opacity: 1;    transform: scale(1.18) rotate(24deg); }
+@keyframes pin-ping {
+  0%   { transform: scale(0.5); opacity: 0.75; }
+  70%  { opacity: 0; }
+  100% { transform: scale(4.2); opacity: 0; }
 }
-.pin__halo { fill: #d9a13f; opacity: 0.28; filter: blur(5px); }
-.gtamap-wrap.is-visible .pin__halo {
-  animation: gta-halo 3.4s ease-in-out infinite;
-  animation-delay: calc(0.5s + var(--i) * 0.26s);
-}
-@keyframes gta-halo { 0%, 100% { opacity: 0.2; } 50% { opacity: 0.5; } }
-.pin__dot { fill: #fff; filter: drop-shadow(0 0 4px #ffe6ad); }
 
-.pin__label { opacity: 0; }
-.gtamap-wrap.is-visible .pin__label {
-  animation: gta-label-in 0.5s ease forwards;
-  animation-delay: calc(0.45s + var(--i) * 0.26s);
-}
-@keyframes gta-label-in { to { opacity: 1; } }
-.pin__label rect { fill: rgba(12, 8, 24, 0.72); stroke: rgba(250, 246, 239, 0.14); }
+/* pins are links: hover/focus reveals the name; the whole pin is clickable */
+.pin { cursor: pointer; }
+.pin__hit { fill: transparent; pointer-events: all; }
+.pin__label { opacity: 0; transition: opacity 0.22s ease; pointer-events: none; }
+.pin:hover .pin__label,
+.pin:focus .pin__label,
+.pin:focus-visible .pin__label { opacity: 1; }
+.pin:hover .pin__mark,
+.pin:focus .pin__mark { filter: drop-shadow(0 0 9px rgba(255, 224, 150, 0.95)); }
+.pin__label rect { fill: rgba(12, 8, 24, 0.88); stroke: rgba(250, 246, 239, 0.18); }
 .pin__label text { fill: #f3ede2; font-family: var(--mono); font-size: 11px; letter-spacing: 0.02em; }
 @media (max-width: 620px) { .pin__label text { font-size: 15px; } }
 
@@ -3213,10 +3230,10 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
 }
 .getinvolved__note a { color: var(--cream-on-dark); text-decoration: underline; text-underline-offset: 3px; }
 @media (prefers-reduced-motion: reduce) {
-  .gtamap-wrap .gtamap__dots { opacity: 1; }
-  .pin__mark, .pin__label { opacity: 1; transform: none; animation: none; }
-  .gtamap__arc { stroke-dashoffset: 0; }
-  .pin__burst, .pin__halo { animation: none; }
+  .pin__mark { opacity: 1; transform: none; animation: none; }
+  .gtamap-wrap.is-open .gtamap__arc,
+  .gtamap__arc { stroke-dashoffset: 0; animation: none; }
+  .pin__burst, .pin__halo, .pin__ping { animation: none; }
 }
 img.resource__photo { display: block; }
 /* monogram-placeholder variant (a <span>) centres its initials */
