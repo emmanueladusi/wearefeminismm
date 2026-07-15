@@ -255,45 +255,67 @@
     return Math.max(0, Math.min(1, window.scrollY / max));
   }
 
-  let queued = false;
+  // draw the thread up to progress p (0..1) and place the head/overlay there
+  function render(p) {
+    const tip = L * p;
+    path.style.strokeDashoffset = L - tip;
+    glow.style.strokeDashoffset = L - tip;
+
+    const fade = p > 0.88 ? Math.max(0, 1 - (p - 0.88) / 0.12) : 1;
+    svg.style.opacity = fade.toFixed(3);
+
+    // reveal the poll colour in lock-step with the tip: the graph turns
+    // colour exactly under the moving head as it traces the sparkline
+    if (sparkLen) {
+      const raw = tip - sparkStart;
+      const lag = sparkLen * 0.12;             // length of the purple leading zone
+      const redReveal = Math.max(0, Math.min(sparkLen, raw - lag));
+      spark.style.strokeDashoffset = (sparkLen - redReveal).toFixed(1);
+      spark.style.opacity = redReveal > 0.5 ? "1" : "0";
+      sparkDot.style.opacity = redReveal >= sparkLen - 0.5 ? 1 : 0;
+    }
+
+    // the bead rides the tip — including along the sparkline it's drawing
+    if (p > 0.001 && p < 0.999) {
+      const pt = path.getPointAtLength(tip);
+      bead.setAttribute("cx", pt.x);
+      bead.setAttribute("cy", pt.y);
+      bead.style.opacity = 1;
+    } else {
+      bead.style.opacity = 0;
+    }
+  }
+
+  // The head EASES toward the scroll position instead of snapping to it. Each
+  // frame the drawn progress moves a fraction of the remaining distance to the
+  // scroll target — an exponential ease-out — so the line glides and trails
+  // gently rather than tracking the scrollbar 1:1. The loop idles once settled.
+  const EASE = 0.085;
+  let pCurrent = reduceMotion ? 1 : 0;
+  let rafId = null;
+
+  function tick() {
+    resyncSpark(); // keep the sparkline locked to the (sticky) card
+    const target = reduceMotion ? 1 : progress();
+    const gap = target - pCurrent;
+    if (Math.abs(gap) < 0.0002) {   // arrived — settle exactly and stop
+      pCurrent = target;
+      render(pCurrent);
+      rafId = null;
+      return;
+    }
+    pCurrent += gap * EASE;
+    render(pCurrent);
+    rafId = requestAnimationFrame(tick);
+  }
+
   function update(force) {
-    if (queued && !force) return;
-    queued = true;
-    requestAnimationFrame(() => {
-      queued = false;
-      resyncSpark(); // keep the sparkline locked to the (sticky) card
-      const p = reduceMotion ? 1 : progress();
-      const tip = L * p;
-      path.style.strokeDashoffset = L - tip;
-      glow.style.strokeDashoffset = L - tip;
-
-      const fade = p > 0.88 ? Math.max(0, 1 - (p - 0.88) / 0.12) : 1;
-      svg.style.opacity = fade.toFixed(3);
-
-      // reveal the poll colour in lock-step with the tip: the graph turns
-      // colour exactly under the moving head as it traces the sparkline
-      if (sparkLen) {
-        // full-strength red glows in just BEHIND the tip: the leading stretch
-        // stays the thread's own (purple) colour as it draws, and each part
-        // snaps to full red a moment after the line passes it
-        const raw = tip - sparkStart;
-        const lag = sparkLen * 0.12;             // length of the purple leading zone
-        const redReveal = Math.max(0, Math.min(sparkLen, raw - lag));
-        spark.style.strokeDashoffset = (sparkLen - redReveal).toFixed(1);
-        spark.style.opacity = redReveal > 0.5 ? "1" : "0";
-        sparkDot.style.opacity = redReveal >= sparkLen - 0.5 ? 1 : 0;
-      }
-
-      // the bead rides the tip — including along the sparkline it's drawing
-      if (p > 0.001 && p < 0.999) {
-        const pt = path.getPointAtLength(tip);
-        bead.setAttribute("cx", pt.x);
-        bead.setAttribute("cy", pt.y);
-        bead.style.opacity = 1;
-      } else {
-        bead.style.opacity = 0;
-      }
-    });
+    if (force) {                    // build/resize: snap into place, no glide
+      pCurrent = reduceMotion ? 1 : progress();
+      render(pCurrent);
+      return;
+    }
+    if (rafId == null) rafId = requestAnimationFrame(tick);
   }
 
   // spark.js calls this after it computes a new shape/colour
