@@ -20,14 +20,14 @@
   --dim-on-dark: rgba(250, 246, 239, 0.55);
   --line: rgba(44, 33, 64, 0.14);
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
-  --serif: "Fraunces", Georgia, serif;
-  --sans: "Figtree", -apple-system, sans-serif;
-  --mono: "Space Mono", monospace;
+  --serif: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Monaco, "Cascadia Code", monospace;
 
   /* Layout rhythm — one vertical cadence and one page gutter,
      so every section breathes on the same scale. */
-  --section-y: clamp(104px, 13vw, 184px);
-  --gutter: clamp(20px, 7vw, 96px);
+  --section-y: clamp(140px, 16vw, 244px);   /* more vertical breathing room = premium */
+  --gutter: clamp(24px, 7.5vw, 116px);
 
   /* Corner-radius scale — replaces the ad-hoc 2–24px spread. */
   --r-sm: 8px;
@@ -50,7 +50,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3 { font-family: var(--serif); font-weight: 400; letter-spacing: -0.01em; }
+h1, h2, h3 { font-family: var(--serif); font-weight: 700; letter-spacing: -0.02em; }
 
 em { font-style: italic; color: var(--violet); }
 
@@ -2524,7 +2524,7 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
 }
 .learn__title {
   font-family: var(--serif);
-  font-weight: 400;
+  font-weight: 700;
   font-size: clamp(2.1rem, 6vw, 4rem);
   line-height: 1.04;
   letter-spacing: -0.02em;
@@ -2741,7 +2741,7 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
 }
 .wavecard__title {
   font-family: var(--serif);
-  font-weight: 400;
+  font-weight: 700;
   font-size: clamp(1.8rem, 5vw, 3rem);
   line-height: 1.02;
   margin: 0;
@@ -2989,6 +2989,81 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
 .askwaves.is-live .waves__count span { display: inline-block; transform-origin: 50% 100%; will-change: transform, opacity; }
 .askwaves:not(.is-live) .waves__count { display: none; }
 
+/* ===== Pop culture · feminism's soundtrack (Learn) ===== */
+.popculture {
+  background-color: #1e1533;   /* solid, so the morph backdrop can't wash the text */
+  padding: var(--section-y) 0;
+  position: relative;
+  overflow: hidden;
+}
+.popculture__inner { max-width: 940px; margin: 0 auto; padding: 0 var(--gutter); }
+.popculture__title {
+  font-family: var(--serif);
+  font-weight: 700;
+  color: var(--cream-on-dark);
+  font-size: clamp(2rem, 5.5vw, 3.4rem);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  margin: 0.5rem 0 0;
+}
+.popculture__title em { font-style: italic; color: var(--gold); }
+.popculture__lead {
+  color: var(--dim-on-dark);
+  max-width: 56ch;
+  margin: 1.1rem 0 0;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+/* the artists who carry the message — free-licensed photos, name + a note */
+.artists {
+  list-style: none; margin: clamp(30px, 4vw, 48px) 0 0; padding: 0;
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: clamp(20px, 2.6vw, 36px);
+}
+.artist__photo {
+  aspect-ratio: 4 / 5;
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.4);
+}
+.artist__photo img {
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: 50% 22%;   /* favour faces */
+  display: block;
+  transition: transform 0.55s var(--ease);
+}
+.artist:hover .artist__photo img { transform: scale(1.05); }
+.artist__name {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: var(--cream-on-dark);
+  margin: 0.8rem 0 0.25rem;
+}
+.artist__note {
+  color: var(--dim-on-dark);
+  font-size: 0.92rem;
+  line-height: 1.5;
+  margin: 0;
+}
+.popculture__foot {
+  color: var(--cream-on-dark);
+  font-style: italic;
+  font-family: var(--serif);
+  margin: clamp(30px, 4vw, 44px) 0 0;
+  font-size: 1.1rem;
+}
+.artist__credits {
+  color: rgba(250, 246, 239, 0.4);
+  font-size: 0.72rem;
+  line-height: 1.55;
+  margin: clamp(16px, 2vw, 22px) 0 0;
+  max-width: 78ch;
+}
+@media (max-width: 760px) { .artists { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 440px) { .artists { grid-template-columns: 1fr; } }
+
 /* ===== Resources: Black Canadian feminist scholars ===== */
 .resources {
   background-color: #f2ecf7;   /* solid, so the morph backdrop can't wash the text */
@@ -2997,7 +3072,7 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
 .resources__inner { max-width: 1120px; margin: 0 auto; }
 .resources__title {
   font-family: var(--serif);
-  font-weight: 400;
+  font-weight: 700;
   font-size: clamp(2rem, 5.5vw, 3.5rem);
   line-height: 1.04;
   letter-spacing: -0.02em;
@@ -3079,7 +3154,7 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
 .getinvolved__inner { position: relative; z-index: 2; max-width: 1120px; margin: 0 auto; }
 .getinvolved__title {
   font-family: var(--serif);
-  font-weight: 400;
+  font-weight: 700;
   font-size: clamp(2rem, 5.5vw, 3.5rem);
   line-height: 1.04;
   letter-spacing: -0.02em;
@@ -3436,8 +3511,21 @@ span.resource__photo {
   width: clamp(120px, 17vw, 240px); height: auto;
   filter: drop-shadow(0 6px 14px rgba(4,16,32,0.45));
 }
-.o-shark path { fill: #16303e; }        /* deep silhouette (mouth faces left) */
+.o-shark__upper, .o-shark__fin, .o-shark__jaw { fill: #16303e; }   /* deep silhouette (mouth faces left) */
+.o-shark__mouth { fill: #6e2a2f; }       /* dark maw, seen only while the jaw is open */
 .o-shark__eye { fill: #dfeaf0; }
+.o-shark__jaw {
+  transform-box: view-box;
+  transform-origin: 47px 33px;           /* hinge at the back corner of the mouth */
+  animation: sharkJaw 11s ease-in-out infinite;
+}
+/* the jaw is shut most of the loop, gapes as the shark reaches the fish, snaps shut */
+@keyframes sharkJaw {
+  0%, 36%   { transform: rotate(0deg); }
+  43%       { transform: rotate(-26deg); }
+  50%       { transform: rotate(-26deg); }
+  57%, 100% { transform: rotate(0deg); }
+}
 
 .o-fish {
   position: absolute; left: 0; top: 0;
@@ -3456,31 +3544,30 @@ span.resource__photo {
    then clears off the left. It faces left already (mouth leads), so no flip; it
    is off-screen at both ends, so the loop's wrap is invisible. */
 @keyframes sharkFeed {
-  0%, 20% { transform: translate(120%, 42%); }
-  40%     { transform: translate(43%, 45%); }    /* body over the fish, mouth past it */
-  57%     { transform: translate(-46%, 45%); }   /* clears off the left */
-  100%    { transform: translate(-46%, 45%); }
+  0%, 10%  { transform: translate(122%, 22%); }   /* waits off the right, upper water lane */
+  43%      { transform: translate(42%, 22%); }     /* open mouth reaches the fish — never stops */
+  80%      { transform: translate(-60%, 22%); }    /* glides on out to the left */
+  100%     { transform: translate(-60%, 22%); }    /* rest off-frame, then the loop wraps */
 }
 /* fish: hovers near centre facing the incoming shark, is gone through the bite,
    is repositioned below the floor, then rises from under; ends where it began
    for a seamless loop. */
 @keyframes fishSwim {
-  0%   { transform: translate(50%, 50%); }
-  20%  { transform: translate(47%, 47%); }
-  38%  { transform: translate(49%, 50%); }       /* holds for the bite */
-  42%  { transform: translate(49%, 50%); }
-  43%  { transform: translate(50%, 128%); }      /* snap below the floor, hidden */
-  70%  { transform: translate(48%, 60%); }       /* rise up from under */
-  86%  { transform: translate(51%, 52%); }
-  100% { transform: translate(50%, 50%); }
+  0%   { transform: translate(46%, 34%); }
+  38%  { transform: translate(46%, 34%); }       /* hovers in the shark's lane, waiting */
+  43%  { transform: translate(43%, 33%); }       /* tugged into the maw */
+  45%  { transform: translate(46%, 130%); }      /* eaten: drops below the floor, hidden */
+  72%  { transform: translate(45%, 46%); }       /* a fresh fish rises from under */
+  90%  { transform: translate(47%, 36%); }
+  100% { transform: translate(46%, 34%); }
 }
 /* fish state: normal, gulped (shrink + vanish) at the bite, hidden while it is
    repositioned below, then fades back as it surfaces. */
 @keyframes fishBite {
-  0%, 40% { opacity: 1; transform: scale(1); }
-  43%     { opacity: 0; transform: scale(0.12); }  /* gulped */
-  47%     { opacity: 0; transform: scale(1); }      /* reset, still below */
-  60%     { opacity: 1; transform: scale(1); }      /* surfacing from under */
+  0%, 41% { opacity: 1; transform: scale(1); }
+  44%     { opacity: 0; transform: scale(0.1); }   /* gulped into the open mouth */
+  47%     { opacity: 0; transform: scale(1); }      /* reset, still below the floor */
+  66%     { opacity: 1; transform: scale(1); }      /* the new fish fades in as it surfaces */
   100%    { opacity: 1; transform: scale(1); }
 }
 

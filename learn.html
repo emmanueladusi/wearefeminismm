@@ -22,8 +22,8 @@
   <meta name="twitter:image" content="https://emmanueladusi.github.io/wearefeminismm/img/og-image.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=Figtree:wght@400;500;600;700&family=Poppins:wght@600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=141" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css?v=148" />
 </head>
 <body>
   <script>document.body.classList.add("is-loading");</script>
@@ -84,20 +84,6 @@
       <span class="line-reveal"><span><em>three lenses.</em></span></span>
     </h1>
     <p class="hero__sub line-reveal"><span>Why this space exists, where feminism came from, and what it actually means, explained with respect for your intelligence.</span></p>
-  </section>
-
-  <!-- ===== Grounding: what students told us ===== -->
-  <section class="grounding" id="grounding" data-bg="#f2ecf7" data-scene>
-    <p class="eyebrow reveal">Why this exists</p>
-    <blockquote class="pull reveal">
-      <p>Students told us the same two things, again and again: they want <em>somewhere to speak</em>, and <em>someone to answer.</em></p>
-    </blockquote>
-    <blockquote class="pull pull--indent reveal">
-      <p>Many said they’d only share if they could stay anonymous. So here, anonymity isn’t a setting. It’s the <em>default.</em></p>
-    </blockquote>
-    <blockquote class="pull reveal">
-      <p>And Black girls told us their experiences were treated as an afterthought. On this site, Black feminism isn’t a chapter. It’s the <em>foundation.</em></p>
-    </blockquote>
   </section>
 
   <!-- ===== Pulse sparkline: live Yes/No tally from the pre-survey ===== -->
@@ -389,11 +375,16 @@
           <div class="ocean__life">
             <div class="o-shark-track">
               <svg class="o-shark" viewBox="0 0 140 60" aria-hidden="true">
-                <path d="M14 32 C 34 19, 72 16, 104 27 C 108 28.5, 108 31.5, 104 33 C 74 43, 40 43, 22 37 C 16 35, 14 34, 14 32 Z"/>
-                <path d="M100 30 L 130 15 L 119 30 L 130 45 Z"/>
-                <path d="M50 21 L 64 5 L 75 23 Z"/>
-                <path d="M48 36 L 43 51 L 63 38 Z"/>
-                <circle class="o-shark__eye" cx="26" cy="30" r="1.7"/>
+                <!-- dark maw, revealed as the hinged lower jaw drops open -->
+                <path class="o-shark__mouth" d="M47 33 L 12 30 L 17 47 Z"/>
+                <!-- upper body + head + upper jaw (fixed) -->
+                <path class="o-shark__upper" d="M14 31 C 34 19, 72 16, 104 27 C 108 28.5, 108 31.5, 104 33 C 82 40, 62 40, 48 37 L 47 33 Z"/>
+                <path class="o-shark__fin" d="M100 30 L 130 15 L 119 30 L 130 45 Z"/>
+                <path class="o-shark__fin" d="M52 21 L 66 5 L 77 23 Z"/>
+                <path class="o-shark__fin" d="M50 37 L 45 51 L 65 39 Z"/>
+                <!-- lower jaw: hinged at the mouth corner, swings down to bite -->
+                <path class="o-shark__jaw" d="M47 33 L 14 32 L 16 37 L 47 37 Z"/>
+                <circle class="o-shark__eye" cx="28" cy="28" r="1.7"/>
               </svg>
             </div>
             <div class="o-fish-track">
@@ -452,6 +443,51 @@
     </div>
   </section>
 
+  <!-- ===== Pop culture: feminism's soundtrack ===== -->
+  <section class="popculture" id="popculture" data-bg="#1e1533">
+    <div class="popculture__inner">
+      <p class="eyebrow eyebrow--light reveal">In the culture</p>
+      <h2 class="popculture__title reveal">Feminism has a <em>soundtrack.</em></h2>
+      <p class="popculture__lead reveal">It doesn't only live in essays and history books. It lives in the artists who turn it all the way up. A few who carry the message.</p>
+
+      <ul class="artists">
+        <li class="artist reveal">
+          <div class="artist__photo"><img src="img/artists/aretha.jpg" alt="Aretha Franklin" loading="lazy" /></div>
+          <p class="artist__name">Aretha Franklin</p>
+          <p class="artist__note">The Queen of Soul, whose demand for respect became an anthem for women and the civil rights movement alike.</p>
+        </li>
+        <li class="artist reveal">
+          <div class="artist__photo"><img src="img/artists/beyonce.jpg" alt="Beyoncé" loading="lazy" /></div>
+          <p class="artist__name">Beyoncé</p>
+          <p class="artist__note">Puts a plain definition of feminism on the world's biggest stages, and centers Black women while she does it.</p>
+        </li>
+        <li class="artist reveal">
+          <div class="artist__photo"><img src="img/artists/lizzo.jpg" alt="Lizzo" loading="lazy" /></div>
+          <p class="artist__name">Lizzo</p>
+          <p class="artist__note">Turns self-love and taking up space, unapologetically, into pop you can't sit still to.</p>
+        </li>
+        <li class="artist reveal">
+          <div class="artist__photo"><img src="img/artists/alicia.jpg" alt="Alicia Keys" loading="lazy" /></div>
+          <p class="artist__name">Alicia Keys</p>
+          <p class="artist__note">A fifteen-time Grammy winner who writes about the quiet, everyday strength of women.</p>
+        </li>
+        <li class="artist reveal">
+          <div class="artist__photo"><img src="img/artists/janelle.jpg" alt="Janelle Monáe" loading="lazy" /></div>
+          <p class="artist__name">Janelle Monáe</p>
+          <p class="artist__note">Claims Black womanhood and queerness out loud, in her music and on screen, without apology.</p>
+        </li>
+        <li class="artist reveal">
+          <div class="artist__photo"><img src="img/artists/taylor.jpg" alt="Taylor Swift" loading="lazy" /></div>
+          <p class="artist__name">Taylor Swift</p>
+          <p class="artist__note">Reshaped the music business on her own terms and names the double standards women face.</p>
+        </li>
+      </ul>
+
+      <p class="popculture__foot reveal">Starting points, not a canon. Who's on your feminist playlist?</p>
+      <p class="artist__credits reveal">Photos via Wikimedia Commons. Aretha Franklin: public domain. Beyoncé: Raph_PH (CC BY 2.0). Lizzo: Million Dollaz Worth of Game (CC BY 3.0). Alicia Keys: PhilipRomanoPhoto (CC BY 4.0). Janelle Monáe: Myles Kalus Anak Jihem (CC BY-SA 4.0). Taylor Swift: iHeartRadioCA (CC BY 3.0).</p>
+    </div>
+  </section>
+
   <!-- ===== Resources: Black Canadian feminist scholars ===== -->
   <section class="resources" id="resources" data-bg="#f2ecf7">
     <div class="resources__inner">
@@ -506,7 +542,7 @@
   <script src="js/engulf.js?v=87"></script>
   <script src="js/polish.js?v=79"></script>
   <script src="js/main.js?v=80"></script>
-  <script src="js/thread.js?v=88"></script>
+  <script src="js/thread.js?v=89"></script>
   <script src="js/spark.js?v=80"></script>
 </body>
 </html>

@@ -20,7 +20,7 @@
 (function () {
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  const SECTIONS = ["paths", "grounding", "ask", "whatis", "pillars", "mission", "wall", "pulse"];
+  const SECTIONS = ["paths", "ask", "whatis", "pillars", "wall", "pulse"];
   const CHART_ID = "sparkSvg"; // the pulse chart the thread traces (Learn only)
   const NS = "http://www.w3.org/2000/svg";
 
@@ -268,7 +268,7 @@
     // colour exactly under the moving head as it traces the sparkline
     if (sparkLen) {
       const raw = tip - sparkStart;
-      const lag = sparkLen * 0.12;             // length of the purple leading zone
+      const lag = sparkLen * 0.02;             // red follows right behind the tip (barely any purple)
       const redReveal = Math.max(0, Math.min(sparkLen, raw - lag));
       spark.style.strokeDashoffset = (sparkLen - redReveal).toFixed(1);
       spark.style.opacity = redReveal > 0.5 ? "1" : "0";

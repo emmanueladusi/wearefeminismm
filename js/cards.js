@@ -76,16 +76,22 @@
     const backEl = card.querySelector(".ec-card-back");
     const staggerOffset = i * 0.05;
     const startOffset = 1 / 3 + staggerOffset;
-    const endOffset = 2 / 3 + staggerOffset;
 
-    ScrollTrigger.create({
+    // the card's flip angle for a given overall scroll progress (0..1)
+    const flipFor = (progress) =>
+      Math.max(0, Math.min(1, (progress - startOffset) / (1 / 3)));
+
+    const st = ScrollTrigger.create({
       trigger: section,
       start: "top top",
       end: () => `+=${totalScrollHeight()}`,
       scrub: 1,
       onUpdate: (self) => {
+        // while a card is being hovered, the peek owns it — don't let a stray
+        // scroll tick (Lenis momentum) snap it back mid-hover
+        if (card._peek) return;
         // clamp so fast scrolls can't strand a card mid-flip
-        const p = Math.max(0, Math.min(1, (self.progress - startOffset) / (1 / 3)));
+        const p = flipFor(self.progress);
         frontEl.style.transform = `rotateY(${-180 * p}deg)`;
         backEl.style.transform = `rotateY(${180 - 180 * p}deg)`;
         // phase 1's fan tween owns the card transform until the flip window opens
@@ -94,5 +100,18 @@
         }
       },
     });
+
+    // CLICK to flip: one click turns the card to its info face, another click
+    // turns it back. While flipped, _peek freezes the card so stray scroll ticks
+    // (Lenis momentum) can't fight it.
+    card.style.cursor = "pointer";
+    const FLIP = { duration: 0.9, ease: "power2.inOut", overwrite: true };  // slower, card-like turn
+    function reflect() {
+      card._peek = card._flipped;
+      const front = card._flipped ? 0 : -180 * flipFor(st.progress);
+      gsap.to(frontEl, Object.assign({ rotateY: front }, FLIP));
+      gsap.to(backEl, Object.assign({ rotateY: front + 180 }, FLIP));
+    }
+    card.addEventListener("click", () => { card._flipped = !card._flipped; reflect(); });
   });
 })();
