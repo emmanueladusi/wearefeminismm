@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=149" />
+  <link rel="stylesheet" href="css/styles.css?v=150" />
 </head>
 <body>
   <script>document.body.classList.add("is-loading");</script>
@@ -76,7 +76,7 @@
     <p class="hero__sub line-reveal"><span>Peer support, education, advocacy, and the wall, where every story is anonymous and every reply is a hand on a shoulder.</span></p>
     <div class="hero__ctas line-reveal">
       <span>
-        <a href="#wall" class="cta" data-magnetic>Go straight to the wall <span class="cta__arrow">→</span></a>
+        <a href="voice.html#wall" class="cta" data-magnetic>Go straight to the wall <span class="cta__arrow">→</span></a>
       </span>
     </div>
   </section>
@@ -159,27 +159,6 @@
     </div>
   </section>
 
-  <!-- ===== The Wall (dark immersive) ===== -->
-  <section class="wall-section" id="wall" data-bg="#1a1330" data-scene>
-    <canvas class="wall-canvas" id="wallCanvas" aria-hidden="true"></canvas>
-    <div class="wall-section__inner">
-      <p class="eyebrow eyebrow--light reveal">The wall</p>
-      <h2 class="wall-section__title reveal">Say what you <em>need</em> to say.</h2>
-      <p class="wall-section__sub reveal">Every story here is anonymous. Every reply is a hand on a shoulder.</p>
-
-      <form class="composer reveal" id="wallForm" style="--r: 18px" data-aig data-aig-radius="18" data-aig-duration="8">
-        <textarea id="wallText" rows="3" placeholder="What do you want to share?" required></textarea>
-        <div class="composer__row">
-          <span class="composer__anon">Posted anonymously, no names, no accounts</span>
-          <button type="submit" class="btn" data-magnetic>Put it on the wall</button>
-        </div>
-      </form>
-
-      <div class="wall" id="wallList"></div>
-
-      <p class="wall-section__note reveal">Be gentle with each other. This wall lifts people up. It never tears them down.</p>
-    </div>
-  </section>
 
   <!-- ===== Footer ===== -->
   <footer class="footer" data-bg="#faf6ef" data-scene>
@@ -189,7 +168,6 @@
     <p class="footer__fine">Made with care. Your words are anonymous, and you never have to share your name.</p>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
@@ -197,13 +175,12 @@
   <script src="js/morph.js?v=78"></script>
   <script src="js/journey.js?v=79"></script>
   <script src="js/pin.js?v=78"></script>
-  <script src="js/aiglow.js?v=78"></script>
   <script src="js/aigspeed.js?v=94"></script>
   <script src="js/polish.js?v=79"></script>
   <script src="js/main.js?v=80"></script>
-  <script src="js/wall3d.js?v=78"></script>
   <script src="js/cards.js?v=93"></script>
+  <script src="js/echeading.js?v=1"></script>
   <script src="js/gtamap.js?v=6"></script>
-  <script src="js/thread.js?v=89"></script>
+  <script src="js/thread.js?v=90"></script>
 </body>
 </html>

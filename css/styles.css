@@ -3138,22 +3138,6 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
   margin-bottom: 20px;
   background: linear-gradient(150deg, var(--violet), #c76a9e);
   box-shadow: 0 12px 28px -12px rgba(74, 53, 104, 0.55);
-  animation: resource-float 12s ease-in-out infinite;
-  will-change: transform;
-}
-/* idle wander — each avatar drifts around a slow meandering path, out of phase */
-@keyframes resource-float {
-  0%   { transform: translate(0, 0) rotate(0deg); }
-  20%  { transform: translate(16px, -14px) rotate(2.2deg); }
-  40%  { transform: translate(-14px, -7px) rotate(-2.4deg); }
-  58%  { transform: translate(11px, 12px) rotate(1.6deg); }
-  78%  { transform: translate(-15px, 5px) rotate(-1.6deg); }
-  100% { transform: translate(0, 0) rotate(0deg); }
-}
-.resources__grid .resource:nth-child(2) .resource__photo { animation-duration: 14.5s; animation-delay: -5s; animation-direction: reverse; }
-.resources__grid .resource:nth-child(3) .resource__photo { animation-duration: 13s; animation-delay: -9s; }
-@media (prefers-reduced-motion: reduce) {
-  .resource__photo { animation: none; }
 }
 
 /* ===== Get involved (GTA orgs) — drifting aurora over dark ===== */

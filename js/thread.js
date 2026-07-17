@@ -112,8 +112,10 @@
   }
 
   function cubicTo(a, b) {
-    const cy = (b.y - a.y) * 0.55;
-    return ` C ${a.x.toFixed(1)} ${(a.y + cy).toFixed(1)}, ${b.x.toFixed(1)} ${(b.y - cy).toFixed(1)}, ${b.x.toFixed(1)} ${b.y.toFixed(1)}`;
+    // control ys kept in order (0.42 then 0.58) so the descent is always smooth
+    // and monotonic — no vertical wobble, no sharp bounce at the waypoints
+    const dy = b.y - a.y;
+    return ` C ${a.x.toFixed(1)} ${(a.y + dy * 0.42).toFixed(1)}, ${b.x.toFixed(1)} ${(a.y + dy * 0.58).toFixed(1)}, ${b.x.toFixed(1)} ${b.y.toFixed(1)}`;
   }
 
   // build a valid rgba() from either "rgb(r, g, b)" or "#hex" (appending a hex
@@ -137,14 +139,18 @@
     svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
 
     const pts = [{ x: W * 0.5, y: 0 }];
-    let side = 0; // alternate 12% / 88%
+    // collect each section's y, then sort top-to-bottom so the line only ever
+    // flows DOWN — never jumping back up the page (that was the sharp bounce)
+    const stops = [];
     SECTIONS.forEach((id) => {
       const el = document.getElementById(id);
       if (!el) return;
-      const y = el.offsetTop + Math.min(140, el.offsetHeight * 0.2);
-      const x = W * (side % 2 === 0 ? 0.12 : 0.88);
-      side++;
-      pts.push({ x, y });
+      stops.push(el.offsetTop + Math.min(140, el.offsetHeight * 0.2));
+    });
+    stops.sort((a, b) => a - b);
+    // a gentle weave (30% / 70%) rather than a wide 12% / 88% swing — softer turns
+    stops.forEach((y, i) => {
+      pts.push({ x: W * (i % 2 === 0 ? 0.30 : 0.70), y });
     });
     pts.push({ x: W * 0.5, y: H - 140 }); // settle center at the footer
 
