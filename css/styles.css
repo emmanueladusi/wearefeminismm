@@ -67,6 +67,21 @@ em { font-style: italic; color: var(--violet); }
 
 .eyebrow--light { color: var(--gold); }
 
+/* the signature m — the doubled m in "wearefeminismm" is Emmanuel (js/signature.js) */
+.bmc-glyph--sig .bmc-fill { fill: var(--gold) !important; }
+.bmc-glyph--sig .bmc-stroke { stroke: var(--gold) !important; }
+.sig-tip {
+  position: fixed; z-index: 9999;
+  transform: translate(-50%, -100%);
+  background: var(--ink); color: #faf6ef;
+  font-family: var(--sans); font-size: 0.8rem; letter-spacing: 0.01em;
+  padding: 7px 13px; border-radius: 999px; white-space: nowrap;
+  box-shadow: 0 8px 24px rgba(44, 33, 64, 0.28);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.sig-tip.is-on { opacity: 1; transform: translate(-50%, -125%); }
+
 /* ===== Nav ===== */
 .nav {
   position: fixed;
