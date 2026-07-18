@@ -337,7 +337,9 @@
     }
   }
 
-  window.__thread = { syncSpark: syncSpark };
+  window.__thread = {
+    syncSpark: syncSpark,
+  };
 
   window.addEventListener("scroll", () => update(false), { passive: true });
 

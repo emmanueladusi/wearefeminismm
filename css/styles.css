@@ -140,23 +140,6 @@ em { font-style: italic; color: var(--violet); }
 .nav__links a.is-current { color: var(--ink); }
 .nav__links a.is-current::after { transform: scaleX(1); transform-origin: left; }
 
-.quick-exit {
-  font-family: var(--mono);
-  font-size: 0.68rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  background: var(--ink);
-  color: var(--paper);
-  border: none;
-  border-radius: var(--r-pill);
-  padding: 9px 16px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.quick-exit:hover { background: var(--violet); }
-
 /* ===== Hero ===== */
 .hero {
   position: relative;
@@ -1952,7 +1935,7 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
   stroke-width: 3;
   stroke-linecap: round;
   stroke-linejoin: round;
-  opacity: 0 !important;
+  opacity: 0 !important;   /* the page-wide thread draws the visible line instead */
 }
 .spark-end-dot { display: none !important; }
 .sparkcard__foot {
@@ -1967,6 +1950,23 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
   color: var(--ink-dim);
   font-variant-numeric: tabular-nums;
 }
+/* scan-to-vote QR next to the graph */
+.sparkcard__qr { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.sparkcard__qr-label {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 0.92rem;
+  line-height: 1.15;
+  color: var(--ink);
+  text-align: right;
+  max-width: 7.5ch;
+}
+.sparkcard__qr img {
+  width: 58px; height: auto; display: block;
+  background: #fff;               /* white quiet zone so it scans on a dark card too */
+  padding: 4px; border-radius: 6px;
+}
+@media (max-width: 460px) { .sparkcard__qr-label { display: none; } }
 .sparkcard__counts b { color: var(--ink); }
 
 /* ===== Spot the Bias (timed feed game) ===== */
@@ -3760,3 +3760,97 @@ body.uwscrub-on .seascape > .dune,
 body.uwscrub-on .seascape > .coral { display: none; }
 body.uwscrub-on .seascape::after { content: none; }
 
+
+/* =====================================================================
+   Nav toggles + Dark mode + Accessible mode
+   ===================================================================== */
+.nav__toggle {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; padding: 0; margin: 0 2px;
+  border: none; background: transparent; cursor: pointer;
+  color: var(--ink); border-radius: var(--r-pill);
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.nav__toggle:hover { background: var(--gold-soft); color: var(--violet); }
+.nav__toggle:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.nav__toggle[aria-pressed="true"] { background: var(--gold-soft); color: var(--gold); }
+
+/* ---------- Dark mode ---------- */
+html[data-theme="dark"] {
+  --paper: #14101f;
+  --paper-soft: #1c1630;
+  --ink: rgba(250, 246, 239, 0.92);
+  --ink-dim: rgba(250, 246, 239, 0.56);
+  --violet: #b9a3e6;
+  --lilac: #241c3a;
+  --line: rgba(250, 246, 239, 0.15);
+  --gold-soft: rgba(217, 161, 63, 0.22);
+}
+html[data-theme="dark"] body { background: #14101f; }
+/* the colour-morph backdrop becomes a calm deep-violet field, overriding the
+   light colour morph.js writes inline each frame */
+html[data-theme="dark"] #morph {
+  background:
+    radial-gradient(120% 80% at 50% -12%, rgba(96, 62, 150, 0.34), transparent 60%),
+    #110d1b !important;
+}
+/* every section rides that dark backdrop (drop solid light panels) */
+html[data-theme="dark"] section,
+html[data-theme="dark"] .footer { background-color: transparent !important; }
+html[data-theme="dark"] .nav { background: rgba(18, 14, 28, 0.72); border-bottom-color: var(--line); }
+/* light glass panels -> dark glass so dark text doesn't land on light */
+html[data-theme="dark"] .sparkcard,
+html[data-theme="dark"] .pulse__card,
+html[data-theme="dark"] .quiz__stage, html[data-theme="dark"] .bias__stage, html[data-theme="dark"] .myth__stage,
+html[data-theme="dark"] .resources__card, html[data-theme="dark"] .resource,
+html[data-theme="dark"] .involve, html[data-theme="dark"] .composer,
+html[data-theme="dark"] .pathway, html[data-theme="dark"] .lens, html[data-theme="dark"] .ec-card-panel {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: var(--line) !important;
+}
+/* any element still carrying a near-white inline/hardcoded panel goes dark-glass */
+html[data-theme="dark"] .post, html[data-theme="dark"] .quiz-card, html[data-theme="dark"] .bias-post,
+html[data-theme="dark"] .myth-card { background: rgba(255, 255, 255, 0.06) !important; color: var(--ink) !important; }
+/* the light hero refract/prism art dims a touch on dark */
+html[data-theme="dark"] .refract { opacity: 0.5; }
+
+/* ---------- Accessible mode ---------- */
+html[data-a11y] {
+  font-size: 115%;                                   /* larger text (scales rem) */
+  --sans: Verdana, "Segoe UI", Tahoma, Arial, sans-serif;   /* plain, high-legibility */
+  --serif: Verdana, "Segoe UI", Tahoma, Arial, sans-serif;
+  --ink: #17102a;                                    /* higher contrast on light */
+  --ink-dim: #392f52;
+}
+html[data-theme="dark"][data-a11y] { --ink: #ffffff; --ink-dim: #ded7ec; }
+/* stop all motion */
+html[data-a11y] *, html[data-a11y] *::before, html[data-a11y] *::after {
+  animation-duration: 0.001ms !important;
+  animation-delay: 0s !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  transition-delay: 0s !important;
+  scroll-behavior: auto !important;
+}
+/* hide the decorative animated layers + restore the native cursor */
+html[data-a11y] .cursor-dot, html[data-a11y] .cursor-ring,
+html[data-a11y] .progress-line,
+html[data-a11y] .ocean__life, html[data-a11y] .seascape,
+html[data-a11y] .gtamap-canvas, html[data-a11y] .wall-canvas,
+html[data-a11y] .refract, html[data-a11y] .brandmark__word .bmc-grid { display: none !important; }
+/* the thread stays visible in accessible mode, just fully drawn + static
+   (no scroll-driven drawing, no moving bead) instead of vanishing */
+html[data-a11y] .thread__path, html[data-a11y] .thread__glow { stroke-dashoffset: 0 !important; }
+html[data-a11y] .thread { opacity: 1 !important; }
+html[data-a11y] .thread__bead, html[data-a11y] .thread__spark, html[data-a11y] .thread__spark-dot { display: none !important; }
+html[data-a11y], html[data-a11y] * { cursor: auto !important; }
+/* freeze the colour-morph background */
+html[data-a11y] #morph { background: var(--paper) !important; }
+/* clear, strong focus outlines everywhere */
+html[data-a11y] a:focus-visible, html[data-a11y] button:focus-visible,
+html[data-a11y] [tabindex]:focus-visible, html[data-a11y] textarea:focus-visible {
+  outline: 3px solid var(--gold) !important; outline-offset: 3px !important;
+}
+/* the wordmark uses a dark gradient fill — lighten it on dark (keep gold sig m) */
+html[data-theme="dark"] .bmc-glyph:not(.bmc-glyph--sig) .bmc-fill { fill: rgba(250, 246, 239, 0.9) !important; }
+html[data-theme="dark"] .bmc-glyph:not(.bmc-glyph--sig) .bmc-stroke { stroke: rgba(250, 246, 239, 0.45) !important; }

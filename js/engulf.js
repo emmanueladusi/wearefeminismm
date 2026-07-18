@@ -3,9 +3,11 @@
      1. the Apple-Intelligence rainbow border blooms in (~1s)
      2. it holds fully lit for 3 seconds
      3. the question text fades away (~0.9s)
-   The section stays PINNED for the whole beat — scrolling is locked (via
-   Lenis) the moment it pins and released only once the text has faded, so the
-   sequence always plays out in full before the page moves on.
+   The section stays PINNED and scroll is locked (via Lenis) the moment it pins.
+   If left alone the beat plays out in full and releases itself once the waves
+   are revealed. But a deliberate scroll DOWN ("move on") jumps straight to the
+   revealed waves, and a scroll UP leaves the way you came — so you're never
+   forced to sit through it and trying to scroll past always brings the waves up.
 
    Reduced motion / no Lenis: the border is shown and the text kept, with no
    scroll lock. */
@@ -22,13 +24,19 @@
   const chatText = document.getElementById("aiChatText");
   const QUESTION = "Hey, what is feminism?";
 
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // Accessible mode counts as reduced motion here — otherwise the CSS-driven
+  // border bloom is killed mid-animation and the beat looks broken.
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    || document.documentElement.hasAttribute("data-a11y");
 
   if (reduceMotion || !("IntersectionObserver" in window)) {
-    if (chatText) chatText.textContent = QUESTION; // show the fully-typed prompt
+    // show the whole scene already resolved: question sent, border lit, waves in
+    if (chatText) chatText.textContent = QUESTION; // fully-typed prompt
+    if (chat) chat.classList.add("aichat--sent");
     stack.classList.add("ag-live");
     stack.style.setProperty("--ag-reveal", "1");
-    document.body.classList.add("ask-glow-active");
+    document.body.classList.add("ask-glow-active", "ask-waves-on");
+    if (window.__askWaves && window.__askWaves.start) { try { window.__askWaves.start(); } catch (e) {} }
     return;
   }
 
@@ -74,30 +82,37 @@
   // once the border has faded.
   let locked = false;
   let touchStartY = 0;
-  // up = leave the way you came; DOWN = skip the beat and move straight on
+  let downAcc = 0;             // accumulated downward scroll while held
+  const SKIP_AT = 120;        // px of deliberate downward scroll → jump to the waves
+  // Scrolling UP leaves the way you came (resets the beat). Scrolling DOWN means
+  // "move on" — so once you've pushed down a little we jump STRAIGHT to the
+  // revealed waves (skip) rather than ignoring you until the timed beat ends.
+  // The small threshold keeps a stray flick from skipping, but a real scroll
+  // past always brings the waves up right after.
   const onWheel = (e) => {
     if (!locked) return;
-    if (e.deltaY < 0) unlock();
-    else if (e.deltaY > 0) skip();
+    if (e.deltaY < 0) { unlock(); return; }        // up = leave the way you came
+    downAcc += e.deltaY;                            // down = move on → reveal the waves
+    if (downAcc >= SKIP_AT) skip();
   };
   const onTouchStart = (e) => { touchStartY = e.touches ? e.touches[0].clientY : 0; };
   const onTouchMove = (e) => {
     if (!locked || !e.touches) return;
     const y = e.touches[0].clientY;
-    if (y > touchStartY + 6) unlock();      // dragging down = scrolling up = leave
-    else if (y < touchStartY - 6) skip();   // dragging up   = scrolling down = skip ahead
+    if (y > touchStartY + 6) { unlock(); return; } // dragging down = scrolling up = leave
+    if (touchStartY - y >= SKIP_AT) skip();        // dragging up = scrolling down → waves
   };
   const onKey = (e) => {
     if (!locked) return;
-    if (e.key === "ArrowUp" || e.key === "PageUp" || e.key === "Home") unlock();
-    else if (e.key === "ArrowDown" || e.key === "PageDown" || e.key === "End" ||
-             e.key === " " || e.key === "Spacebar" || e.key === "Escape" || e.key === "Enter") skip();
+    if (e.key === "ArrowUp" || e.key === "PageUp" || e.key === "Home") { unlock(); return; }
+    if (e.key === "ArrowDown" || e.key === "PageDown" || e.key === " " || e.key === "Spacebar") skip();
   };
   function lock() {
     const l = lenis();
     if (!l) return;
     l.stop();
     locked = true;
+    downAcc = 0;
     window.addEventListener("wheel", onWheel, { passive: true });
     window.addEventListener("touchstart", onTouchStart, { passive: true });
     window.addEventListener("touchmove", onTouchMove, { passive: true });

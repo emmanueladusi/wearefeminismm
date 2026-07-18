@@ -67,10 +67,11 @@
     return NEUTRAL;
   }
 
-  // The visible line is now drawn by the thread (js/thread.js): the page-wide
-  // thread routes into this card and traces the chart itself, colouring the
-  // detour with our poll colour. This card keeps #sparkPath as the SHAPE/COLOUR
-  // source (hidden via CSS) and just hands the thread the latest curve.
+  // Hand the latest curve/colour to the page-thread (js/thread.js), which routes
+  // its one continuous line into the pulse card and TRACES the chart itself — so
+  // the gold thread line flows straight into the graph and draws it. The pulse
+  // hold (js/pulsepin.js) then waits until that trace is finished before it holds
+  // the screen on the completed graph.
   function notifyThread() {
     if (window.__thread && window.__thread.syncSpark) window.__thread.syncSpark();
   }

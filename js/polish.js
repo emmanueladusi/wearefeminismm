@@ -130,7 +130,7 @@
     if (reduceMotion || !finePointer) return;
 
     document.querySelectorAll("[data-magnetic]").forEach((el) => {
-      const strength = el.classList.contains("btn") || el.classList.contains("quick-exit") ? 0.38 : 0.28;
+      const strength = el.classList.contains("btn") ? 0.38 : 0.28;
 
       el.addEventListener("mousemove", (e) => {
         const r = el.getBoundingClientRect();

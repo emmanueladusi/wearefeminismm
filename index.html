@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>(function(){try{var t=localStorage.getItem("wf-theme");var d=t?t==="dark":matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.setAttribute("data-theme",d?"dark":"light");if(localStorage.getItem("wf-a11y"))document.documentElement.setAttribute("data-a11y","");}catch(e){}})();</script>
   <title>wearefeminism · Every voice deserves to be heard</title>
   <meta name="description" content="A space for students, especially girls and Black girls, to learn about feminism, share real experiences anonymously, and stand behind each other. Student-led, always anonymous." />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
@@ -23,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=150" />
+  <link rel="stylesheet" href="css/styles.css?v=163" />
 </head>
 <body>
   <script>document.body.classList.add("is-loading");</script>
@@ -62,7 +63,8 @@
       <a href="learn.html" data-magnetic>Learn</a>
       <a href="community.html" data-magnetic>Community</a>
       <a href="voice.html" data-magnetic>Your voice</a>
-      <button class="quick-exit" id="quickExit" title="Instantly leave this site" data-magnetic>Quick exit</button>
+      <button class="nav__toggle" id="darkToggle" type="button" title="Dark mode" aria-label="Dark mode" aria-pressed="false" data-magnetic><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.5 6.5 0 0 0 9.8 9.8z"/></svg></button>
+      <button class="nav__toggle" id="a11yToggle" type="button" title="Accessible mode" aria-label="Accessible mode" aria-pressed="false" data-magnetic><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="7.3" r="1.4" fill="currentColor"/><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M7.6 10.2h8.8M12 10.6v4.2m0 0-1.9 3.2m1.9-3.2 1.9 3.2"/></svg></button>
     </nav>
   </header>
 
@@ -121,6 +123,51 @@
     <p class="paths__help reveal">Need real help right now? <strong>Kids Help Phone: text CONNECT to 686868.</strong> Free, confidential, 24/7.</p>
   </section>
 
+  <!-- ===== Pop culture: feminism's soundtrack (moved from Learn) ===== -->
+<section class="popculture" id="popculture" data-bg="#1e1533">
+    <div class="popculture__inner">
+      <p class="eyebrow eyebrow--light reveal">In the culture</p>
+      <h2 class="popculture__title reveal">Feminism has a <em>soundtrack.</em></h2>
+      <p class="popculture__lead reveal">It doesn't only live in essays and history books. It lives in the artists who turn it all the way up. A few who carry the message.</p>
+
+      <ul class="artists">
+        <li class="artist reveal">
+          <div class="artist__photo"><img src="img/artists/aretha.jpg" alt="Aretha Franklin" loading="lazy" /></div>
+          <p class="artist__name">Aretha Franklin</p>
+          <p class="artist__note">The Queen of Soul, whose demand for respect became an anthem for women and the civil rights movement alike.</p>
+        </li>
+        <li class="artist reveal">
+          <div class="artist__photo"><img src="img/artists/beyonce.jpg" alt="Beyoncé" loading="lazy" /></div>
+          <p class="artist__name">Beyoncé</p>
+          <p class="artist__note">Puts a plain definition of feminism on the world's biggest stages, and centers Black women while she does it.</p>
+        </li>
+        <li class="artist reveal">
+          <div class="artist__photo"><img src="img/artists/lizzo.jpg" alt="Lizzo" loading="lazy" /></div>
+          <p class="artist__name">Lizzo</p>
+          <p class="artist__note">Turns self-love and taking up space, unapologetically, into pop you can't sit still to.</p>
+        </li>
+        <li class="artist reveal">
+          <div class="artist__photo"><img src="img/artists/alicia.jpg" alt="Alicia Keys" loading="lazy" /></div>
+          <p class="artist__name">Alicia Keys</p>
+          <p class="artist__note">A fifteen-time Grammy winner who writes about the quiet, everyday strength of women.</p>
+        </li>
+        <li class="artist reveal">
+          <div class="artist__photo"><img src="img/artists/janelle.jpg" alt="Janelle Monáe" loading="lazy" /></div>
+          <p class="artist__name">Janelle Monáe</p>
+          <p class="artist__note">Claims Black womanhood and queerness out loud, in her music and on screen, without apology.</p>
+        </li>
+        <li class="artist reveal">
+          <div class="artist__photo"><img src="img/artists/taylor.jpg" alt="Taylor Swift" loading="lazy" /></div>
+          <p class="artist__name">Taylor Swift</p>
+          <p class="artist__note">Reshaped the music business on her own terms and names the double standards women face.</p>
+        </li>
+      </ul>
+
+      <p class="popculture__foot reveal">Starting points, not a canon. Who's on your feminist playlist?</p>
+      <p class="artist__credits reveal">Photos via Wikimedia Commons. Aretha Franklin: public domain. Beyoncé: Raph_PH (CC BY 2.0). Lizzo: Million Dollaz Worth of Game (CC BY 3.0). Alicia Keys: PhilipRomanoPhoto (CC BY 4.0). Janelle Monáe: Myles Kalus Anak Jihem (CC BY-SA 4.0). Taylor Swift: iHeartRadioCA (CC BY 3.0).</p>
+    </div>
+  </section>
+
   <!-- ===== Footer ===== -->
   <footer class="footer" data-bg="#faf6ef" data-scene>
     <p class="footer__mark">wearefeminism</p>
@@ -140,8 +187,9 @@
   <script src="js/heroReveal.js?v=112"></script>
   <script src="js/brandmarkCycle.js?v=109"></script>
   <script src="js/signature.js?v=1"></script>
-  <script src="js/polish.js?v=79"></script>
-  <script src="js/main.js?v=80"></script>
+  <script src="js/polish.js?v=81"></script>
+  <script src="js/main.js?v=82"></script>
+  <script src="js/theme.js?v=1"></script>
 </body>
 </html>
 

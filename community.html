@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>(function(){try{var t=localStorage.getItem("wf-theme");var d=t?t==="dark":matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.setAttribute("data-theme",d?"dark":"light");if(localStorage.getItem("wf-a11y"))document.documentElement.setAttribute("data-a11y","");}catch(e){}})();</script>
   <title>wearefeminism · Community</title>
   <meta name="description" content="Read what other students have lived through, and add your own: no name, no account. A supportive, anonymous community space for students." />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
@@ -23,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=150" />
+  <link rel="stylesheet" href="css/styles.css?v=163" />
 </head>
 <body>
   <script>document.body.classList.add("is-loading");</script>
@@ -62,7 +63,8 @@
       <a href="learn.html" data-magnetic>Learn</a>
       <a href="community.html" class="is-current" data-magnetic>Community</a>
       <a href="voice.html" data-magnetic>Your voice</a>
-      <button class="quick-exit" id="quickExit" title="Instantly leave this site" data-magnetic>Quick exit</button>
+      <button class="nav__toggle" id="darkToggle" type="button" title="Dark mode" aria-label="Dark mode" aria-pressed="false" data-magnetic><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.5 6.5 0 0 0 9.8 9.8z"/></svg></button>
+      <button class="nav__toggle" id="a11yToggle" type="button" title="Accessible mode" aria-label="Accessible mode" aria-pressed="false" data-magnetic><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="7.3" r="1.4" fill="currentColor"/><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M7.6 10.2h8.8M12 10.6v4.2m0 0-1.9 3.2m1.9-3.2 1.9 3.2"/></svg></button>
     </nav>
   </header>
 
@@ -176,11 +178,12 @@
   <script src="js/journey.js?v=79"></script>
   <script src="js/pin.js?v=78"></script>
   <script src="js/aigspeed.js?v=94"></script>
-  <script src="js/polish.js?v=79"></script>
-  <script src="js/main.js?v=80"></script>
+  <script src="js/polish.js?v=81"></script>
+  <script src="js/main.js?v=82"></script>
   <script src="js/cards.js?v=93"></script>
   <script src="js/echeading.js?v=1"></script>
   <script src="js/gtamap.js?v=6"></script>
-  <script src="js/thread.js?v=90"></script>
+  <script src="js/thread.js?v=95"></script>
+  <script src="js/theme.js?v=1"></script>
 </body>
 </html>

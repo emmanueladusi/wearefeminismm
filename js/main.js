@@ -6,11 +6,6 @@
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const lerp = (a, b, t) => a + (b - a) * t;
 
-/* ===== Quick exit: instantly leave, replacing this page in history ===== */
-document.getElementById("quickExit").addEventListener("click", () => {
-  window.location.replace("https://www.google.com/search?q=weather");
-});
-
 /* ===== Nav border on scroll ===== */
 const nav = document.getElementById("nav");
 window.addEventListener(

@@ -104,7 +104,7 @@
     if (reduceMotion || !finePointer) return;
 
     const targets = document.querySelectorAll(
-      ".btn, .cta, .nav__links a, .quick-exit, .footer__ig"
+      ".btn, .cta, .nav__links a, .footer__ig"
     );
 
     targets.forEach((el) => {
