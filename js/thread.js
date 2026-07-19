@@ -71,6 +71,40 @@
   let sparkEndPt = null;
   const sparkState = { dLocal: null, color: "#ef4444" };
 
+  // Stable (0..1) scroll-progress bounds for the graph reveal, frozen after
+  // their first computation (see layout()). The chart sits inside a sticky
+  // card, so resyncSpark() re-splices its LIVE position into the main path
+  // every frame just to keep the drawn segment glued to the card on screen —
+  // that constant re-splicing shifts the main path's total length (L) and,
+  // with it, the length-based sparkStart, by a similar amount each frame. If
+  // reveal progress were measured as (tip - sparkStart) in those length
+  // units, the target would drift forward at nearly the same rate as the
+  // tip approaches it — the graph would "run away" from itself and never
+  // fill. Measuring reveal against these frozen fractions of overall scroll
+  // progress instead keeps it monotonic regardless of how often the visual
+  // segment gets repositioned.
+  let sparkStartFrac = null;
+  let sparkEndFrac = null;
+  // Raw scroll-progress fraction at which the thread's own head should have
+  // already arrived at the chart (see remapProgress()) — the head races
+  // ahead through the approach so it's sitting there, settled, before the
+  // graph starts tracing, rather than still gliding toward it.
+  let leadTargetFrac = null;
+
+  // Speeds the head through [0, leadTargetFrac] so it reaches the chart
+  // (sparkStartFrac) by then, instead of at its naturally-later arrival
+  // point — then resumes covering the rest of the page over what's left.
+  function remapProgress(raw) {
+    if (leadTargetFrac == null || sparkStartFrac == null) return raw;
+    if (raw <= leadTargetFrac) {
+      return leadTargetFrac > 0 ? (sparkStartFrac * raw) / leadTargetFrac : sparkStartFrac;
+    }
+    const remaining = 1 - leadTargetFrac;
+    return remaining > 0
+      ? sparkStartFrac + ((raw - leadTargetFrac) / remaining) * (1 - sparkStartFrac)
+      : raw;
+  }
+
   function docHeight() {
     return Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
   }
@@ -131,7 +165,7 @@
     return color;
   }
 
-  function layout() {
+  function layout(fullRebuild) {
     const W = document.documentElement.clientWidth;
     const H = docHeight();
     svg.setAttribute("width", W);
@@ -191,9 +225,15 @@
         prev = b.end;
         exitHoriz = true;
       } else if (exitHoriz) {
-        const c2y = (b.y - (b.y - prev.y) * 0.55).toFixed(1);
-        // leave the chart moving horizontally, then ease back down to the waypoint
-        d += ` C ${(prev.x + hh).toFixed(1)} ${prev.y.toFixed(1)}, ${b.x.toFixed(1)} ${c2y}, ${b.x.toFixed(1)} ${b.y.toFixed(1)}`;
+        // leave the chart as a wide bowl out the card's right side: still
+        // horizontal off the endpoint (the sparkline's own tangent), swing
+        // out past the card edge to a far-right point where the tangent is
+        // vertical, then sweep back down-left into the waypoint — which the
+        // generic chain below expects to be approached vertically.
+        const bowlX = Math.max(prev.x + 32, Math.min(W - 48, prev.x + W * 0.14));
+        const bowlY = prev.y + (b.y - prev.y) * 0.45;
+        d += ` C ${(prev.x + (bowlX - prev.x) * 0.8).toFixed(1)} ${prev.y.toFixed(1)}, ${bowlX.toFixed(1)} ${(prev.y + (bowlY - prev.y) * 0.5).toFixed(1)}, ${bowlX.toFixed(1)} ${bowlY.toFixed(1)}`;
+        d += ` C ${bowlX.toFixed(1)} ${(bowlY + (b.y - bowlY) * 0.45).toFixed(1)}, ${b.x.toFixed(1)} ${(b.y - (b.y - bowlY) * 0.55).toFixed(1)}, ${b.x.toFixed(1)} ${b.y.toFixed(1)}`;
         prev = b;
         exitHoriz = false;
       } else {
@@ -228,16 +268,32 @@
       sparkDot.style.display = "";
       measure.setAttribute("d", prefixD);
       sparkStart = measure.getTotalLength(); // tip length at which the chart begins
+      // freeze the reveal-timing bounds on first computation (or on a real
+      // rebuild); resync-only calls reposition the segment but must NOT
+      // perturb these, or the reveal target drifts with them (see above).
+      if (fullRebuild || sparkStartFrac == null) {
+        const arrivalFrac = sparkStart / L;      // where the head reaches the chart, once sped up
+        const naturalSpan = sparkLen / L;         // the chart's own natural "duration"
+        sparkStartFrac = arrivalFrac;             // reveal begins exactly as the (sped-up) head arrives
+        sparkEndFrac = arrivalFrac + naturalSpan * 0.35; // ...then traces quickly, well inside the card's held view
+        // the head itself should have already reached the chart, settled,
+        // by well before this point — not still gliding toward it — so the
+        // graph only starts tracing once it's actually there.
+        leadTargetFrac = Math.max(0, arrivalFrac - naturalSpan * 1.5);
+      }
     } else {
       spark.style.display = "none";
       sparkDot.style.display = "none";
       sparkLen = 0;
       sparkStart = 0;
+      sparkStartFrac = null;
+      sparkEndFrac = null;
+      leadTargetFrac = null;
     }
   }
 
   function build() {
-    layout();
+    layout(true);
     update(true);
   }
 
@@ -263,22 +319,27 @@
 
   // draw the thread up to progress p (0..1) and place the head/overlay there
   function render(p) {
-    const tip = L * p;
+    const pEff = remapProgress(p); // races the head to the chart early (see remapProgress)
+    const tip = L * pEff;
     path.style.strokeDashoffset = L - tip;
     glow.style.strokeDashoffset = L - tip;
 
     const fade = p > 0.88 ? Math.max(0, 1 - (p - 0.88) / 0.12) : 1;
     svg.style.opacity = fade.toFixed(3);
 
-    // reveal the poll colour in lock-step with the tip: the graph turns
-    // colour exactly under the moving head as it traces the sparkline
-    if (sparkLen) {
-      const raw = tip - sparkStart;
-      const lag = sparkLen * 0.02;             // red follows right behind the tip (barely any purple)
-      const redReveal = Math.max(0, Math.min(sparkLen, raw - lag));
+    // reveal the poll colour in lock-step with the (sped-up) head: measured
+    // in frozen (0..1) fractions rather than tip/sparkStart length units, so
+    // resyncSpark()'s constant re-splicing (to keep the segment glued to the
+    // sticky card) can't drag the reveal target forward along with the tip.
+    if (sparkLen && sparkStartFrac != null) {
+      const span = sparkEndFrac - sparkStartFrac;
+      const lag = span * 0.02;                 // red follows right behind the tip (barely any purple)
+      const revealFrac = span > 0 ? Math.max(0, Math.min(1, (pEff - sparkStartFrac - lag) / span)) : 0;
+      const redReveal = revealFrac * sparkLen;
+      const eps = sparkLen > 0 ? 0.5 / sparkLen : 0; // sub-pixel threshold, mirrors the old length-unit check
       spark.style.strokeDashoffset = (sparkLen - redReveal).toFixed(1);
-      spark.style.opacity = redReveal > 0.5 ? "1" : "0";
-      sparkDot.style.opacity = redReveal >= sparkLen - 0.5 ? 1 : 0;
+      spark.style.opacity = revealFrac > eps ? "1" : "0";
+      sparkDot.style.opacity = revealFrac >= 1 - eps ? 1 : 0;
     }
 
     // the bead rides the tip — including along the sparkline it's drawing

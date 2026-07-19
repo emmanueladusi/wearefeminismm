@@ -69,9 +69,7 @@
 
   // Hand the latest curve/colour to the page-thread (js/thread.js), which routes
   // its one continuous line into the pulse card and TRACES the chart itself — so
-  // the gold thread line flows straight into the graph and draws it. The pulse
-  // hold (js/pulsepin.js) then waits until that trace is finished before it holds
-  // the screen on the completed graph.
+  // the gold thread line flows straight into the graph and draws it.
   function notifyThread() {
     if (window.__thread && window.__thread.syncSpark) window.__thread.syncSpark();
   }
