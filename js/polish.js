@@ -130,6 +130,10 @@
     if (reduceMotion || !finePointer) return;
 
     document.querySelectorAll("[data-magnetic]").forEach((el) => {
+      // Top-nav items stay perfectly aligned — the magnetic pull would nudge
+      // each one toward the cursor by a different amount and make the evenly
+      // spaced links look unevenly spaced.
+      if (el.closest(".nav")) return;
       const strength = el.classList.contains("btn") ? 0.38 : 0.28;
 
       el.addEventListener("mousemove", (e) => {
