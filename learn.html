@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=168" />
+  <link rel="stylesheet" href="css/styles.css?v=169" />
 </head>
 <body>
   <script>document.body.classList.add("is-loading");</script>
@@ -685,6 +685,12 @@
     </div>
 
     <div class="tlcount" id="tlCount" aria-hidden="true">WAVE <b>01</b> / 04</div>
+
+    <!-- escape hatch: appears (with the wave counter) while you're inside the
+         timeline; one tap skips the rest and lands on the scholars section -->
+    <button class="tlskip" id="tlSkip" aria-label="Skip the timeline and continue to the resources section">
+      I know enough <span aria-hidden="true">↓</span>
+    </button>
   </section>
 
 
@@ -761,7 +767,7 @@
   <script src="js/engulf.js?v=92"></script>
   <script src="js/polish.js?v=82"></script>
   <script src="js/main.js?v=82"></script>
-  <script src="js/timeline.js?v=1"></script>
+  <script src="js/timeline.js?v=2"></script>
   <script src="js/thread.js?v=116"></script>
   <script src="js/spark.js?v=90"></script>
   <script src="js/theme.js?v=1"></script>

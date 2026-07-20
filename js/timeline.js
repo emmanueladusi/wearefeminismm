@@ -141,13 +141,26 @@
       ).observe(c)
     );
   }
+  /* ---- "I know enough": skip the rest of the timeline ---- */
+  const skip = document.getElementById("tlSkip");
+  if (skip) {
+    skip.addEventListener("click", () => {
+      const target = document.getElementById("resources");
+      if (!target) return;
+      const l = window.__lenis;
+      if (l && !reduce) l.scrollTo(target, { offset: 0 });
+      else target.scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
+      skip.blur();
+    });
+  }
+
   function counterVis() {
-    if (!counter) return;
     const anyVisible = chapters.some((c) => {
       const r = c.getBoundingClientRect();
       return r.top < window.innerHeight * 0.6 && r.bottom > window.innerHeight * 0.4;
     });
-    counter.classList.toggle("show", anyVisible);
+    if (counter) counter.classList.toggle("show", anyVisible);
+    if (skip) skip.classList.toggle("show", anyVisible);
   }
 
   /* ---- main loop ---- */

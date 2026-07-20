@@ -4318,6 +4318,30 @@ html[data-theme="dark"] .bwc-reel > span { color: #eab84f; }
 .tlcount.show { opacity: 1; }
 .tlcount b { color: var(--gold); font-size: 1.5rem; letter-spacing: 0; vertical-align: -2px; }
 
+/* ---------- "I know enough" escape hatch ----------
+   fixed opposite the wave counter; visible only while the timeline is on
+   screen (js/timeline.js toggles .show with the counter). One tap jumps
+   past the rest of the timeline to #resources. */
+.tlskip {
+  position: fixed; left: clamp(14px, 3vw, 40px); bottom: clamp(16px, 4vh, 42px);
+  z-index: 40;
+  font-family: var(--mono); font-weight: 700; font-size: 0.66rem;
+  text-transform: uppercase; letter-spacing: 0.18em;
+  color: var(--ink-dim);
+  background: rgba(250, 246, 239, 0.82);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--line); border-radius: var(--r-pill);
+  padding: 10px 16px;
+  cursor: pointer;
+  opacity: 0; pointer-events: none; transform: translateY(8px);
+  transition: opacity 0.5s var(--ease), transform 0.5s var(--ease),
+              color 0.3s, border-color 0.3s;
+}
+.tlskip.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
+.tlskip:hover, .tlskip:focus-visible { color: var(--gold); border-color: var(--gold); }
+.tlskip span { letter-spacing: 0; }
+html[data-theme="dark"] .tlskip { background: rgba(20, 16, 31, 0.82); }
+
 /* ---------- dark theme ---------- */
 html[data-theme="dark"] .tline { --tl-card: #1f1834; --tl-check: rgba(31, 24, 52, 0.6); }
 html[data-theme="dark"] .tline .node__card { box-shadow: 0 10px 34px rgba(0, 0, 0, 0.35); }
