@@ -1870,9 +1870,12 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
 /* ===== Pulse sparkline: live Yes/No from the pre-survey ===== */
 .sparkpulse {
   /* tall section + sticky card: the card holds in view while you scroll through
-     it, so the thread-drawn graph lingers instead of scrolling straight past */
-  min-height: 220vh;
-  padding: 44vh 24px 0;
+     it, so the thread-drawn graph lingers instead of scrolling straight past.
+     The 40vh bottom padding ends the sticky range early, leaving a long empty
+     breather between the card and the next section; min-height grows by the
+     same amount so the card's held time stays unchanged. */
+  min-height: 260vh;
+  padding: 44vh 24px 40vh;
 }
 .sparkcard {
   position: sticky;
