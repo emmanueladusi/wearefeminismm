@@ -4028,11 +4028,22 @@ html[data-theme="dark"] .bwc-reel > span { color: #eab84f; }
 .tline .roll__item { border-bottom: 1px solid var(--line); position: relative; }
 .tline .roll__item:first-child { border-top: 1px solid var(--line); }
 .tline .roll__btn {
-  display: flex; align-items: baseline; justify-content: space-between; gap: 20px;
+  display: flex; align-items: baseline; gap: 20px;
   width: 100%; padding: clamp(18px, 3vw, 30px) 4px;
   background: none; border: 0; cursor: pointer; text-align: left;
   font: inherit; color: inherit;
 }
+/* small "(wave N)" tag beside the chapter name; the years stay pinned right */
+.tline .roll__wave {
+  font-family: var(--mono); font-weight: 700;
+  font-size: clamp(0.7rem, 1.1vw, 0.85rem);
+  letter-spacing: 0.14em; white-space: nowrap;
+  color: var(--ink-dim);
+  transition: color 0.4s var(--ease);
+}
+.tline .roll__btn:hover .roll__wave,
+.tline .roll__btn:focus-visible .roll__wave { color: var(--gold); }
+.tline .roll__meta { margin-left: auto; }
 .tline .roll__word {
   position: relative; overflow: hidden; display: block;
   font-family: var(--serif); font-weight: 800;
