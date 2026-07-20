@@ -175,25 +175,38 @@
     svg.setAttribute("height", H);
     svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
 
-    const pts = [{ x: W * 0.5, y: 0 }];
-    // collect each section's y, then sort top-to-bottom so the line only ever
-    // flows DOWN — never jumping back up the page (that was the sharp bounce)
-    const stops = [];
-    SECTIONS.forEach((id) => {
-      const el = document.getElementById(id);
-      if (!el) return;
-      stops.push(el.offsetTop + Math.min(140, el.offsetHeight * 0.2));
-    });
-    stops.sort((a, b) => a - b);
-    // a gentle weave (30% / 70%) rather than a wide 12% / 88% swing — softer turns
-    stops.forEach((y, i) => {
-      pts.push({ x: W * (i % 2 === 0 ? 0.30 : 0.70), y });
-    });
-    pts.push({ x: W * 0.5, y: H - 140 }); // settle center at the footer
+    // ---- route the thread down the empty RIGHT margin, never over content ----
+    // Every real text/card block sits to the left of ~1280px (the scholar
+    // cards are the right-most), so a calm ribbon held ~100px in from the right
+    // edge clears all of it, in a wide margin with nothing else in it (the
+    // scroll line lives on the LEFT). This is deliberately content-shape
+    // agnostic: tracing around each box is fragile here because the page is
+    // full of pinned/animated/full-bleed decorative elements whose measured
+    // positions shift under scroll. A faint sine keeps the line alive.
+    const ribbonX = (y) => W - 100 + Math.sin(y / 340) * 8; // ~x1340, sways 1332..1348
 
-    // ---- weave the sparkline INTO the single continuous stroke ----
+    // the pulse chart, mapped into page space (traced as one stroke)
     const m = chartMap();
     const fl = m ? firstLast(sparkState.dLocal, m) : null;
+    // the chart's SECTION bottom is fixed (unlike the sticky chart itself), so
+    // the bowl lands at a stable page position instead of drifting with scroll
+    const chartSection = m ? document.getElementById(CHART_ID).closest("section") : null;
+
+    const pts = [{ x: W * 0.5, y: 0 }];
+    const STEP = 82;
+    // After tracing the chart the thread sweeps a bowl out to the right and
+    // settles straight into the right-margin ribbon (no crossing back left).
+    let startY = STEP;
+    if (fl) {
+      const secBot = chartSection ? chartSection.offsetTop + chartSection.offsetHeight : Math.max(fl.start.y, fl.end.y) + 900;
+      const bowlY = secBot - 120; // land in the section's empty breather, above the next section
+      pts.push({ x: ribbonX(bowlY), y: bowlY });
+      startY = bowlY + STEP;
+    }
+    for (let y = startY; y < H - 150; y += STEP) pts.push({ x: ribbonX(y), y });
+    pts.push({ x: ribbonX(H - 120), y: H - 120 }); // settle in the margin, clear of the footer text
+
+    // ---- weave the sparkline INTO the single continuous stroke ----
     let sparkMappedD = null;
     if (m && fl) {
       sparkMappedD = mapD(sparkState.dLocal, m); // "M sx sy C ... C ..."
