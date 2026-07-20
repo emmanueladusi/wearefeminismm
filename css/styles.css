@@ -4112,6 +4112,21 @@ html[data-theme="dark"] .bwc-reel > span { color: #eab84f; }
   mix-blend-mode: overlay;
   opacity: 0.34;
 }
+/* archival photo, melted into the era sky: grayscaled then luminosity-blended
+   (it borrows the sky's own hue), soft radial mask so there is no hard edge,
+   and it sits UNDER the weave/grain/waves so the textures wash over it —
+   part of the background, never the main attraction */
+.tline .art__photo {
+  position: absolute; z-index: 0;
+  top: 7%; left: 50%; transform: translateX(-50%);
+  width: min(56%, 600px);
+  filter: grayscale(1) contrast(1.05) brightness(1.12);
+  mix-blend-mode: luminosity;
+  opacity: 0.45;
+  -webkit-mask-image: radial-gradient(ellipse 62% 58% at 50% 50%, #000 32%, transparent 75%);
+  mask-image: radial-gradient(ellipse 62% 58% at 50% 50%, #000 32%, transparent 75%);
+  pointer-events: none;
+}
 .tline .art svg { position: absolute; left: -25%; width: 150%; height: 46%; bottom: 0; z-index: 2; }
 .tline .art svg path { fill: var(--w-fill); }
 .tline .art .w1 { bottom: 12%; opacity: 0.35; animation: tlDrift 13s linear infinite; }
