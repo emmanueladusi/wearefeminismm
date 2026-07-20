@@ -4118,14 +4118,39 @@ html[data-theme="dark"] .bwc-reel > span { color: #eab84f; }
    part of the background, never the main attraction */
 .tline .art__photo {
   position: absolute; z-index: 0;
-  top: 7%; left: 50%; transform: translateX(-50%);
-  width: min(56%, 600px);
+  left: 50%; transform: translateX(-50%);
   filter: grayscale(1) contrast(1.05) brightness(1.12);
   mix-blend-mode: luminosity;
-  opacity: 0.45;
-  -webkit-mask-image: radial-gradient(ellipse 62% 58% at 50% 50%, #000 32%, transparent 75%);
-  mask-image: radial-gradient(ellipse 62% 58% at 50% 50%, #000 32%, transparent 75%);
   pointer-events: none;
+}
+/* Each chapter's photo takes a different size and position, so moving
+   through the chapters feels like moving through different waves. Every
+   mask fades out gradually and reaches DOWN into the wave band, so the
+   semi-transparent wave layers (w1/w2) wash over the photo and the two
+   blend into one image instead of a floating cut-out. */
+#ch1 .art__photo {   /* the picket line: a wide banner across the whole sky */
+  width: 96%; top: 5%;
+  opacity: 0.52;
+  -webkit-mask-image: radial-gradient(ellipse 76% 74% at 50% 40%, #000 34%, transparent 88%);
+  mask-image: radial-gradient(ellipse 76% 74% at 50% 40%, #000 34%, transparent 88%);
+}
+#ch2 .art__photo {   /* the march: bigger crowd, weighted to the left */
+  width: 80%; top: 9%; left: 40%;
+  opacity: 0.55;
+  -webkit-mask-image: radial-gradient(ellipse 72% 78% at 48% 44%, #000 32%, transparent 87%);
+  mask-image: radial-gradient(ellipse 72% 78% at 48% 44%, #000 32%, transparent 87%);
+}
+#ch3 .art__photo {   /* the many: the biggest swell, over-bleeding the frame */
+  width: 110%; top: 0;
+  opacity: 0.5;
+  -webkit-mask-image: radial-gradient(ellipse 88% 94% at 50% 46%, #000 34%, transparent 95%);
+  mask-image: radial-gradient(ellipse 88% 94% at 50% 46%, #000 34%, transparent 95%);
+}
+#ch4 .art__photo {   /* the feed: a tighter portrait, held to the right */
+  width: 90%; top: 5%; left: 60%;
+  opacity: 0.55;
+  -webkit-mask-image: radial-gradient(ellipse 72% 78% at 44% 42%, #000 30%, transparent 90%);
+  mask-image: radial-gradient(ellipse 72% 78% at 44% 42%, #000 30%, transparent 90%);
 }
 .tline .art svg { position: absolute; left: -25%; width: 150%; height: 46%; bottom: 0; z-index: 2; }
 .tline .art svg path { fill: var(--w-fill); }
