@@ -85,6 +85,9 @@
   // segment gets repositioned.
   let sparkStartFrac = null;
   let sparkEndFrac = null;
+  // Frozen fraction at which the tip itself finishes the graph (the reveal's
+  // sparkEndFrac is earlier — red races ahead of the head on purpose).
+  let tipEndFrac = null;
   // Raw scroll-progress fraction at which the thread's own head should have
   // already arrived at the chart (see remapProgress()) — the head races
   // ahead through the approach so it's sitting there, settled, before the
@@ -276,6 +279,8 @@
         const naturalSpan = sparkLen / L;         // the chart's own natural "duration"
         sparkStartFrac = arrivalFrac;             // reveal begins exactly as the (sped-up) head arrives
         sparkEndFrac = arrivalFrac + naturalSpan * 0.35; // ...then traces quickly, well inside the card's held view
+        tipEndFrac = Math.min(0.99, arrivalFrac + naturalSpan); // head crosses the graph at its natural pace
+        bowlArcMax = 0;
         // the head itself should have already reached the chart, settled,
         // by well before this point — not still gliding toward it — so the
         // graph only starts tracing once it's actually there.
@@ -288,6 +293,7 @@
       sparkStart = 0;
       sparkStartFrac = null;
       sparkEndFrac = null;
+      tipEndFrac = null;
       leadTargetFrac = null;
     }
   }
@@ -322,10 +328,32 @@
   // point reached, so scrolling back up leaves the line (and the revealed
   // graph) exactly as drawn instead of un-drawing it in reverse.
   let pEffMax = 0;
+  // Forward-only arc through the exit zone (see tipLength) — reset whenever
+  // the geometry is rebuilt from scratch (layout(true)).
+  let bowlArcMax = 0;
+  // Where the head sits, in path-length units. NOT simply L * pEff: while the
+  // pulse card is sticky, resyncSpark() re-splices the chart every scrolled
+  // frame, which stretches the path BEHIND the head (L and sparkStart churn).
+  // A tip measured against that churning total slides backward whenever the
+  // path grows faster than the eased head advances — the bead visibly
+  // pendulums around the graph on each scroll burst. So the tip is anchored
+  // zone-by-zone against the frozen scroll fractions instead: a fraction of
+  // the CURRENT approach, then of the graph itself, then of the exit — and
+  // the exit arc is ratcheted, because that's the one stretch whose geometry
+  // shrinks while the card is held.
+  function tipLength(pEff) {
+    if (!sparkLen || sparkStartFrac == null || tipEndFrac == null) return L * pEff;
+    const f0 = sparkStartFrac, f1 = tipEndFrac;
+    if (pEff <= f0) return f0 > 0 ? (pEff / f0) * sparkStart : sparkStart;
+    if (pEff <= f1) return sparkStart + ((pEff - f0) / (f1 - f0)) * sparkLen;
+    const suffix = Math.max(0, L - sparkStart - sparkLen);
+    bowlArcMax = Math.min(suffix, Math.max(bowlArcMax, ((pEff - f1) / (1 - f1)) * suffix));
+    return sparkStart + sparkLen + bowlArcMax;
+  }
   function render(p) {
     pEffMax = Math.max(pEffMax, remapProgress(p)); // races the head to the chart early (see remapProgress)
     const pEff = pEffMax;
-    const tip = L * pEff;
+    const tip = tipLength(pEff);
     path.style.strokeDashoffset = L - tip;
     glow.style.strokeDashoffset = L - tip;
 
