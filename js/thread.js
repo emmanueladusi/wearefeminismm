@@ -317,9 +317,14 @@
     return Math.max(0, Math.min(1, window.scrollY / max));
   }
 
-  // draw the thread up to progress p (0..1) and place the head/overlay there
+  // draw the thread up to progress p (0..1) and place the head/overlay there.
+  // The drawn length only ever moves FORWARD: pEffMax holds the furthest
+  // point reached, so scrolling back up leaves the line (and the revealed
+  // graph) exactly as drawn instead of un-drawing it in reverse.
+  let pEffMax = 0;
   function render(p) {
-    const pEff = remapProgress(p); // races the head to the chart early (see remapProgress)
+    pEffMax = Math.max(pEffMax, remapProgress(p)); // races the head to the chart early (see remapProgress)
+    const pEff = pEffMax;
     const tip = L * pEff;
     path.style.strokeDashoffset = L - tip;
     glow.style.strokeDashoffset = L - tip;
@@ -342,8 +347,10 @@
       sparkDot.style.opacity = revealFrac >= 1 - eps ? 1 : 0;
     }
 
-    // the bead rides the tip — including along the sparkline it's drawing
-    if (p > 0.001 && p < 0.999) {
+    // the bead rides the tip — including along the sparkline it's drawing.
+    // Gated on the ratcheted pEff, not live p, so it stays parked at the
+    // furthest point drawn when the user scrolls back up.
+    if (pEff > 0.001 && pEff < 0.999) {
       const pt = path.getPointAtLength(tip);
       bead.setAttribute("cx", pt.x);
       bead.setAttribute("cy", pt.y);
@@ -357,7 +364,7 @@
   // frame the drawn progress moves a fraction of the remaining distance to the
   // scroll target — an exponential ease-out — so the line glides and trails
   // gently rather than tracking the scrollbar 1:1. The loop idles once settled.
-  const EASE = 0.085;
+  const EASE = 0.042; // halved from 0.085 — the line finishes at half speed, less rushed
   let pCurrent = reduceMotion ? 1 : 0;
   let rafId = null;
 
