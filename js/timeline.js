@@ -155,12 +155,19 @@
   }
 
   function counterVis() {
-    const anyVisible = chapters.some((c) => {
+    // wave counter: only while an actual chapter is centred on screen
+    const anyChapter = chapters.some((c) => {
       const r = c.getBoundingClientRect();
       return r.top < window.innerHeight * 0.6 && r.bottom > window.innerHeight * 0.4;
     });
-    if (counter) counter.classList.toggle("show", anyVisible);
-    if (skip) skip.classList.toggle("show", anyVisible);
+    if (counter) counter.classList.toggle("show", anyChapter);
+    // skip button: the WHOLE timeline (head + index included) — the top of
+    // the section is exactly where "I know enough" gets decided
+    if (skip) {
+      const r = root.getBoundingClientRect();
+      const inSection = r.top < window.innerHeight * 0.7 && r.bottom > window.innerHeight * 0.6;
+      skip.classList.toggle("show", inSection);
+    }
   }
 
   /* ---- main loop ---- */
