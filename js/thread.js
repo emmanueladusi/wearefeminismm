@@ -291,7 +291,7 @@
         const arrivalFrac = sparkStart / L;      // where the head reaches the chart, once sped up
         const naturalSpan = sparkLen / L;         // the chart's own natural "duration"
         sparkStartFrac = arrivalFrac;             // reveal begins exactly as the (sped-up) head arrives
-        sparkEndFrac = arrivalFrac + naturalSpan * 0.35; // ...then traces quickly, well inside the card's held view
+        sparkEndFrac = arrivalFrac + naturalSpan * 0.6; // ...then traces at a calmer pace (was 0.35 — felt rushed), still inside the card's held view and ahead of the head
         tipEndFrac = Math.min(0.99, arrivalFrac + naturalSpan); // head crosses the graph at its natural pace
         // the head itself should have already reached the chart, settled,
         // by well before this point — not still gliding toward it — so the
@@ -392,7 +392,7 @@
   // frame the drawn progress moves a fraction of the remaining distance to the
   // scroll target — an exponential ease-out — so the line glides and trails
   // gently rather than tracking the scrollbar 1:1. The loop idles once settled.
-  const EASE = 0.042; // halved from 0.085 — the line finishes at half speed, less rushed
+  const EASE = 0.028; // slowed again from 0.042 (still felt too fast) — gentler, less rushed glide
   let pCurrent = reduceMotion ? 1 : 0;
   let rafId = null;
 
