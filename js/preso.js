@@ -25,7 +25,7 @@
     ypar: "img/preso/ypar-stage.jpg?v=1",         // on stage at YPAR — the "Findings" slide
     team: "img/preso/team.jpg?v=1",               // the team at the "ready · unconventional · fearless" wall
     room: "img/preso/room.jpg?v=1",               // spoken-word under the spotlight
-    stage: null,                                  // still awaiting the "Background Information" export
+    stage: "img/preso/stage.jpg?v=1",             // Emmanuel presenting at the podium (falls back to placeholder until the file is added)
 
   };
   function placeholder(label) {
@@ -43,7 +43,15 @@
   }
   root.querySelectorAll("[data-photo]").forEach((el) => {
     const key = el.dataset.photo;
-    el.style.backgroundImage = "url('" + (PHOTOS[key] || placeholder(key)) + "')";
+    const src = PHOTOS[key];
+    const fallback = placeholder(key);
+    if (!src) { el.style.backgroundImage = "url('" + fallback + "')"; return; }
+    // use the real photo, but drop back to the placeholder if it 404s or fails
+    // to load — so a not-yet-added shot never shows as a broken card.
+    el.style.backgroundImage = "url('" + src + "')";
+    const probe = new Image();
+    probe.onerror = function () { el.style.backgroundImage = "url('" + fallback + "')"; };
+    probe.src = src;
   });
 
   /* ---------- scene selection by scroll ---------- */

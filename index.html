@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=164" />
+  <link rel="stylesheet" href="css/styles.css?v=165" />
 </head>
 <body>
   <script>document.body.classList.add("is-loading");</script>
@@ -63,8 +63,8 @@
       <a href="learn.html" data-magnetic>Learn</a>
       <a href="community.html" data-magnetic>Community</a>
       <a href="voice.html" data-magnetic>Your voice</a>
-      <button class="nav__toggle" id="darkToggle" type="button" title="Dark mode" aria-label="Dark mode" aria-pressed="false" data-magnetic><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.5 6.5 0 0 0 9.8 9.8z"/></svg></button>
-      <button class="nav__toggle" id="a11yToggle" type="button" title="Accessible mode" aria-label="Accessible mode" aria-pressed="false" data-magnetic><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="7.3" r="1.4" fill="currentColor"/><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M7.6 10.2h8.8M12 10.6v4.2m0 0-1.9 3.2m1.9-3.2 1.9 3.2"/></svg></button>
+      <span class="nav__tools"><button class="nav__toggle" id="darkToggle" type="button" title="Dark mode" aria-label="Dark mode" aria-pressed="false" data-magnetic><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.5 6.5 0 0 0 9.8 9.8z"/></svg></button>
+      <button class="nav__toggle" id="a11yToggle" type="button" title="Accessible mode" aria-label="Accessible mode" aria-pressed="false" data-magnetic><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="7.3" r="1.4" fill="currentColor"/><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M7.6 10.2h8.8M12 10.6v4.2m0 0-1.9 3.2m1.9-3.2 1.9 3.2"/></svg></button></span>
     </nav>
   </header>
 
@@ -91,36 +91,29 @@
 
   <!-- (The wordmark reveal now opens the page as the hero — see top.) -->
 
-  <!-- ===== Pathways ===== -->
-  <section class="paths" id="paths" data-bg="#faf6ef" data-scene>
-    <p class="eyebrow reveal">Start where you are</p>
-    <div class="paths__list">
-      <a href="learn.html#whatis" class="pathway reveal">
-        <span class="pathway__num">01</span>
-        <div class="pathway__body">
-          <h2>Learn</h2>
-          <p>Feminism, Black feminism, intersectionality, explained with respect for your intelligence.</p>
+  <!-- ===== About: the student behind the site ===== -->
+  <section class="about" id="about" data-bg="#faf6ef" data-scene>
+    <div class="about__inner">
+      <p class="eyebrow reveal">Who made this</p>
+      <h2 class="about__title reveal">Hi, I'm <em>Emmanuel Adusi.</em></h2>
+      <div class="about__grid">
+        <div class="about__body">
+          <p class="reveal">There's a double m in my name, E<strong>mm</strong>anuel, and the title carries the same signature: wearefeminis<span class="about__mm">mm</span>. That's not a coincidence. It's my mark, tucked into the name of the whole thing.</p>
+          <p class="reveal">I started this because I wanted to teach these ideas in a way nobody would find boring. Every time I've learned about topics like this, I noticed the same thing: it's easy to get overwhelmed, easy to start tuning out, and honestly, a lot of it can just feel boring. So <em>wearefeminismm</em> was born: the same ideas, told in a way that actually holds your attention.</p>
+          <p class="reveal">When students were asked, <a href="learn.html#boring-pulse" class="about__stat" data-magnetic>over 44% said they find learning about feminism boring&nbsp;→</a> That number is the whole point. If it comes out lower for the people who spend time here, the site is working, and we're doing great.</p>
+          <p class="reveal">This fall I'm heading to the University of Waterloo for Honours Mathematics, and I want to become a quantitative analyst.</p>
         </div>
-        <span class="pathway__arrow">→</span>
-      </a>
-      <a href="voice.html#wall" class="pathway reveal">
-        <span class="pathway__num">02</span>
-        <div class="pathway__body">
-          <h2>Share <em>your</em> story</h2>
-          <p>What you’ve lived through matters. Put it on the wall. No name, no account, no pressure.</p>
-        </div>
-        <span class="pathway__arrow">→</span>
-      </a>
-      <a href="voice.html#wall" class="pathway reveal">
-        <span class="pathway__num">03</span>
-        <div class="pathway__body">
-          <h2>Join the conversation</h2>
-          <p>Read what others have shared and respond with support. Sometimes one reply changes a whole day.</p>
-        </div>
-        <span class="pathway__arrow">→</span>
-      </a>
+        <aside class="about__connect reveal">
+          <p class="about__connect-label">Come say hi</p>
+          <a class="cta" href="https://www.linkedin.com/in/emmanuel-adusi-/" target="_blank" rel="noopener" data-magnetic>Connect on LinkedIn <span class="cta__arrow">→</span></a>
+          <a class="about__email" href="mailto:wearefeminismm@gmail.com" data-magnetic>wearefeminismm@gmail.com</a>
+          <figure class="about__qr">
+            <img src="img/linkedin-qr.png" alt="QR code that links to Emmanuel Adusi's LinkedIn profile" width="740" height="740" loading="lazy" />
+            <figcaption>Or scan this, if you want to be a little weird about it.</figcaption>
+          </figure>
+        </aside>
+      </div>
     </div>
-    <p class="paths__help reveal">Need real help right now? <strong>Kids Help Phone: text CONNECT to 686868.</strong> Free, confidential, 24/7.</p>
   </section>
 
   <!-- ===== Pop culture: feminism's soundtrack (moved from Learn) ===== -->
@@ -166,6 +159,38 @@
       <p class="popculture__foot reveal">Starting points, not a canon. Who's on your feminist playlist?</p>
       <p class="artist__credits reveal">Photos via Wikimedia Commons. Aretha Franklin: public domain. Beyoncé: Raph_PH (CC BY 2.0). Lizzo: Million Dollaz Worth of Game (CC BY 3.0). Alicia Keys: PhilipRomanoPhoto (CC BY 4.0). Janelle Monáe: Myles Kalus Anak Jihem (CC BY-SA 4.0). Taylor Swift: iHeartRadioCA (CC BY 3.0).</p>
     </div>
+  </section>
+
+  <!-- ===== Pathways ===== -->
+  <section class="paths" id="paths" data-bg="#faf6ef" data-scene>
+    <p class="eyebrow reveal">Start where you are</p>
+    <div class="paths__list">
+      <a href="learn.html#whatis" class="pathway reveal">
+        <span class="pathway__num">01</span>
+        <div class="pathway__body">
+          <h2>Learn</h2>
+          <p>Feminism, Black feminism, intersectionality, explained with respect for your intelligence.</p>
+        </div>
+        <span class="pathway__arrow">→</span>
+      </a>
+      <a href="voice.html#wall" class="pathway reveal">
+        <span class="pathway__num">02</span>
+        <div class="pathway__body">
+          <h2>Share <em>your</em> story</h2>
+          <p>What you’ve lived through matters. Put it on the wall. No name, no account, no pressure.</p>
+        </div>
+        <span class="pathway__arrow">→</span>
+      </a>
+      <a href="voice.html#wall" class="pathway reveal">
+        <span class="pathway__num">03</span>
+        <div class="pathway__body">
+          <h2>Join the conversation</h2>
+          <p>Read what others have shared and respond with support. Sometimes one reply changes a whole day.</p>
+        </div>
+        <span class="pathway__arrow">→</span>
+      </a>
+    </div>
+    <p class="paths__help reveal">Need real help right now? <strong>Kids Help Phone: text CONNECT to 686868.</strong> Free, confidential, 24/7.</p>
   </section>
 
   <!-- ===== Footer ===== -->

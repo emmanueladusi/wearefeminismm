@@ -1760,15 +1760,18 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
   min-height: 1.7em;
   font-family: var(--sans);
   font-size: clamp(1.05rem, 2.5vw, 1.4rem);
-  color: var(--ink);
+  /* the chat box is always cream (#fffdfa) in BOTH themes, so the typed text is
+     hardcoded near-black — using var(--ink) turned it cream-on-cream (invisible)
+     in dark mode. */
+  color: #14101f;
 }
 /* placeholder while the field is still empty (before typing starts) */
-.aichat__text:empty::before { content: attr(data-placeholder); color: var(--ink-dim); }
+.aichat__text:empty::before { content: attr(data-placeholder); color: rgba(20, 16, 31, 0.45); }
 .aichat__caret {
   width: 2px;
   height: 1.25em;
   margin-left: 2px;
-  background: var(--violet);
+  background: #4a3568;
   opacity: 0;               /* only blinks while typing */
   flex: none;
 }
@@ -3008,6 +3011,98 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
 .askwaves:not(.is-live) .waves__count { display: none; }
 
 /* ===== Pop culture · feminism's soundtrack (Learn) ===== */
+/* =====================================================
+   About — the student behind the site
+   ===================================================== */
+.about {
+  background-color: var(--paper);   /* solid so the morph can't wash the text */
+  padding: var(--section-y) var(--gutter);
+}
+.about__inner { max-width: 1120px; margin: 0 auto; }
+.about__title {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: clamp(2rem, 5.5vw, 3.5rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin: 0 0 clamp(32px, 5vw, 56px);
+}
+.about__grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: clamp(32px, 6vw, 80px);
+  align-items: start;
+}
+.about__body > p {
+  font-size: clamp(1.05rem, 1.7vw, 1.26rem);
+  line-height: 1.66;
+  color: var(--ink-dim);
+  margin: 0 0 1.1em;
+  max-width: 62ch;
+}
+.about__body > p:last-child { margin-bottom: 0; }
+.about__body strong { color: var(--ink); font-weight: 700; }
+/* the extra m — Emmanuel's signature — glows gold like the wordmark's */
+.about__mm { color: var(--gold); font-weight: 700; }
+.about__stat {
+  color: var(--violet);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1.5px solid var(--gold-soft);
+  transition: border-color 0.25s;
+  white-space: normal;
+}
+.about__stat:hover { border-bottom-color: var(--gold); }
+
+/* connect card: LinkedIn + email + the QR */
+.about__connect {
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: clamp(22px, 3vw, 32px);
+  background: var(--paper-soft);      /* flips warm/dark with the theme */
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: sticky;
+  top: 100px;
+}
+.about__connect-label {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--gold);
+}
+.about__email {
+  font-size: 0.95rem;
+  color: var(--ink-dim);
+  text-decoration: none;
+  word-break: break-word;
+  transition: color 0.2s;
+}
+.about__email:hover { color: var(--violet); }
+.about__qr { margin: 6px 0 0; }
+.about__qr img {
+  width: clamp(150px, 20vw, 190px);
+  height: auto;
+  display: block;
+  border-radius: var(--r);
+  border: 1px solid var(--line);
+}
+.about__qr figcaption {
+  margin-top: 10px;
+  font-size: 0.86rem;
+  line-height: 1.4;
+  color: var(--ink-dim);
+  max-width: 26ch;
+}
+@media (max-width: 760px) {
+  .about__grid { grid-template-columns: 1fr; }
+  .about__connect { position: static; }
+}
+
 .popculture {
   background-color: #1e1533;   /* solid, so the morph backdrop can't wash the text */
   padding: var(--section-y) 0;
@@ -3085,7 +3180,9 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
 /* ===== Resources: Black Canadian feminist scholars ===== */
 .resources {
   background-color: #f2ecf7;   /* solid, so the morph backdrop can't wash the text */
-  padding: var(--section-y) var(--gutter);
+  /* extra top breather so the scholars header doesn't crowd the end of the
+     "what is feminism" ocean animation directly above it */
+  padding: clamp(220px, 30vw, 400px) var(--gutter) var(--section-y);
 }
 .resources__inner { max-width: 1120px; margin: 0 auto; }
 .resources__title {
@@ -3767,9 +3864,18 @@ body.uwscrub-on .seascape::after { content: none; }
 /* =====================================================================
    Nav toggles + Dark mode + Accessible mode
    ===================================================================== */
+/* the two theme toggles ride together as one tight control cluster at the far
+   right, set just off the menu (the negative margin cancels the wide inter-link
+   gap so they hug the edge instead of floating a menu-slot away). */
+.nav__tools {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: calc(12px - clamp(16px, 3vw, 34px));
+}
 .nav__toggle {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 36px; height: 36px; padding: 0; margin: 0 2px;
+  width: 36px; height: 36px; padding: 0; margin: 0;
   border: none; background: transparent; cursor: pointer;
   color: var(--ink); border-radius: var(--r-pill);
   transition: background 0.2s ease, color 0.2s ease;
@@ -3816,6 +3922,13 @@ html[data-theme="dark"] .post, html[data-theme="dark"] .quiz-card, html[data-the
 html[data-theme="dark"] .myth-card { background: rgba(255, 255, 255, 0.06) !important; color: var(--ink) !important; }
 /* the light hero refract/prism art dims a touch on dark */
 html[data-theme="dark"] .refract { opacity: 0.5; }
+/* The Apple-Intelligence rainbow border ("light leak") was tuned to read as
+   emitted light on light paper. On the near-black dark backdrop the same fully
+   saturated, screen-blended rainbow blooms far too hot — so pull its overall
+   saturation and brightness down and ease the screen-blend so it glows softly
+   instead of glaring. */
+html[data-theme="dark"] .ag-stack { filter: saturate(0.62) brightness(0.66); }
+html[data-theme="dark"] .ag-backing { box-shadow: inset 0 0 120px 30px rgba(8, 5, 14, 0.7); }
 
 /* ---------- Accessible mode ---------- */
 html[data-a11y] {
@@ -3854,6 +3967,17 @@ html[data-a11y] a:focus-visible, html[data-a11y] button:focus-visible,
 html[data-a11y] [tabindex]:focus-visible, html[data-a11y] textarea:focus-visible {
   outline: 3px solid var(--gold) !important; outline-offset: 3px !important;
 }
-/* the wordmark uses a dark gradient fill — lighten it on dark (keep gold sig m) */
-html[data-theme="dark"] .bmc-glyph:not(.bmc-glyph--sig) .bmc-fill { fill: rgba(250, 246, 239, 0.9) !important; }
-html[data-theme="dark"] .bmc-glyph:not(.bmc-glyph--sig) .bmc-stroke { stroke: rgba(250, 246, 239, 0.45) !important; }
+/* On the deep-violet dark backdrop the wordmark reads GOLD end to end so it
+   contrasts hard and never disappears — the built SVG glyphs, the live
+   word-cycle handoff layer, and the gold sweep all sit in the same amber
+   family. The signature doubled-m keeps the slightly deeper brand gold so
+   Emmanuel's mark still reads against the brighter body. */
+html[data-theme="dark"] .bmc-glyph:not(.bmc-glyph--sig) .bmc-fill { fill: #eab84f !important; }
+html[data-theme="dark"] .bmc-glyph:not(.bmc-glyph--sig) .bmc-stroke { stroke: rgba(234, 184, 79, 0.5) !important; }
+/* the live word-cycle layer (Poppins) is plum by default (tuned for light
+   paper); on dark that plum vanishes, so paint the whole handoff gold too —
+   this is the phase the eye catches mid-animation. */
+html[data-theme="dark"] .bwc-composed,
+html[data-theme="dark"] .bwc-final,
+html[data-theme="dark"] .bwc-suffix,
+html[data-theme="dark"] .bwc-reel > span { color: #eab84f; }
