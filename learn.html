@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=165" />
+  <link rel="stylesheet" href="css/styles.css?v=166" />
 </head>
 <body>
   <script>document.body.classList.add("is-loading");</script>
@@ -230,223 +230,457 @@
         </div>
       </div>
 
-      <!-- ===== The Waves, INSIDE the ring. After the chat types out and
-           fades, js/engulf.js freezes the rainbow ring and reveals this
-           dark "screen" within it; js/waves.js then scrubs the four waves
-           and the rising ocean as you keep scrolling through #ask. ===== -->
-      <div class="askwaves" id="askwaves" aria-label="The waves of feminism">
+    </div>
+  </section>
 
-        <!-- ===== Frame-scrubbed underwater scene: the real artwork drawn to a
-             canvas, frame index driven by scroll (js/uwscrub.js). Stays hidden
-             (and the seascape stays visible) until img/underwater/ exists. ===== -->
-        <canvas class="uwscrub" id="uwscrub" aria-hidden="true"></canvas>
+  <!-- ===== The timeline: one thread, four waves, 178 years.
+       Replaces the old wave-scrub screen. The four waves are now the
+       CHAPTERS of an interactive timeline; the gold thread (js/thread.js)
+       leaves its right-margin ribbon and weaves through every .th-anchor
+       here, lighting the event nodes as it passes. Driven by
+       js/timeline.js; styles under ".tline" in css/styles.css. ===== -->
+  <section class="tline" id="timeline" aria-label="The waves of feminism, as a timeline" data-bg="#faf6ef">
 
-        <!-- ===== Seascape: layered depth behind the tide — light rays, distant
-             silhouettes, a hazy wreck, rolling seabed dunes and coral. Static;
-             sits behind the (now translucent) rising water. ===== -->
-        <div class="seascape" aria-hidden="true">
-          <span class="sea-ray sea-ray--1"></span>
-          <span class="sea-ray sea-ray--2"></span>
-          <span class="sea-ray sea-ray--3"></span>
+    <div class="tline__head">
+      <p class="eyebrow">One thread · four waves · 178 years</p>
+      <h2>It didn't arrive all at once.</h2>
+      <p class="tline__lead">Feminism moved like a current. It rose in waves, and it never stopped
+         between them. Follow the thread, and tap anything that glows gold.</p>
+      <div class="tline__start th-anchor"></div>
+    </div>
 
-          <!-- big curling kelp fronds framing the scene (GIF-1 style), swaying -->
-          <svg class="kelp kelp--1" viewBox="0 0 170 460" preserveAspectRatio="xMidYMax meet"><path d="M70 460 C 40 380, 34 320, 64 262 C 100 196, 138 150, 128 96 C 122 64, 100 48, 72 46 C 110 40, 152 64, 158 116 C 165 178, 124 226, 92 272 C 60 316, 72 384, 100 460 Z"/></svg>
-          <svg class="kelp kelp--2" viewBox="0 0 150 440" preserveAspectRatio="xMidYMax meet"><path d="M78 440 C 108 360, 116 300, 88 244 C 54 180, 20 138, 30 88 C 36 58, 56 44, 82 44 C 46 40, 8 66, 6 116 C 2 176, 44 220, 74 264 C 104 306, 96 372, 60 440 Z"/></svg>
-          <svg class="kelp kelp--3" viewBox="0 0 170 460" preserveAspectRatio="xMidYMax meet"><path d="M70 460 C 40 380, 34 320, 64 262 C 100 196, 138 150, 128 96 C 122 64, 100 48, 72 46 C 110 40, 152 64, 158 116 C 165 178, 124 226, 92 272 C 60 316, 72 384, 100 460 Z"/></svg>
-          <svg class="kelp kelp--4" viewBox="0 0 150 440" preserveAspectRatio="xMidYMax meet"><path d="M78 440 C 108 360, 116 300, 88 244 C 54 180, 20 138, 30 88 C 36 58, 56 44, 82 44 C 46 40, 8 66, 6 116 C 2 176, 44 220, 74 264 C 104 306, 96 372, 60 440 Z"/></svg>
+    <nav class="index" aria-label="Timeline chapters">
+      <p class="eyebrow">The chapters</p>
+      <ul class="roll">
+        <li class="roll__item">
+          <button class="roll__btn" data-goto="ch1">
+            <span class="roll__word"><span class="face">THE BALLOT</span><span class="alt">THE BALLOT</span></span>
+            <span class="roll__meta">1848–1929</span>
+          </button>
+          <span class="roll__art" style="--art-sky: linear-gradient(160deg, #4a3568, #2e2145); --w-fill: #d9a13f;" aria-hidden="true">
+            <span class="art"><svg viewBox="0 0 900 140" preserveAspectRatio="none" class="w3"><path d="M0 70 Q 112 20 225 70 T 450 70 T 675 70 T 900 70 V 140 H 0 Z"/></svg><span class="num">01</span><span class="grain"></span></span>
+          </span>
+        </li>
+        <li class="roll__item">
+          <button class="roll__btn" data-goto="ch2">
+            <span class="roll__word"><span class="face">THE MARCH</span><span class="alt">THE MARCH</span></span>
+            <span class="roll__meta">1960–1980</span>
+          </button>
+          <span class="roll__art" style="--art-sky: linear-gradient(160deg, #6d2f4e, #3b1c33); --w-fill: #e0797f;" aria-hidden="true">
+            <span class="art"><svg viewBox="0 0 900 140" preserveAspectRatio="none" class="w3"><path d="M0 70 Q 112 20 225 70 T 450 70 T 675 70 T 900 70 V 140 H 0 Z"/></svg><span class="num">02</span><span class="grain"></span></span>
+          </span>
+        </li>
+        <li class="roll__item">
+          <button class="roll__btn" data-goto="ch3">
+            <span class="roll__word"><span class="face">THE MANY</span><span class="alt">THE MANY</span></span>
+            <span class="roll__meta">1990–2000</span>
+          </button>
+          <span class="roll__art" style="--art-sky: linear-gradient(160deg, #2f5a63, #1d2c45); --w-fill: #8fd0c4;" aria-hidden="true">
+            <span class="art"><svg viewBox="0 0 900 140" preserveAspectRatio="none" class="w3"><path d="M0 70 Q 112 20 225 70 T 450 70 T 675 70 T 900 70 V 140 H 0 Z"/></svg><span class="num">03</span><span class="grain"></span></span>
+          </span>
+        </li>
+        <li class="roll__item">
+          <button class="roll__btn" data-goto="ch4">
+            <span class="roll__word"><span class="face">THE FEED</span><span class="alt">THE FEED</span></span>
+            <span class="roll__meta">2010–NOW</span>
+          </button>
+          <span class="roll__art" style="--art-sky: linear-gradient(160deg, #5b3b8f, #241a3e); --w-fill: #e8c15f;" aria-hidden="true">
+            <span class="art"><svg viewBox="0 0 900 140" preserveAspectRatio="none" class="w3"><path d="M0 70 Q 112 20 225 70 T 450 70 T 675 70 T 900 70 V 140 H 0 Z"/></svg><span class="num">04</span><span class="grain"></span></span>
+          </span>
+        </li>
+      </ul>
+    </nav>
 
-          <!-- distant creatures drifting in the haze -->
-          <svg class="sea-far sea-far--shark" viewBox="0 0 140 60">
-            <path d="M14 32 C 34 19, 72 16, 104 27 C 108 28.5, 108 31.5, 104 33 C 74 43, 40 43, 22 37 C 16 35, 14 34, 14 32 Z"/>
-            <path d="M100 30 L 130 15 L 119 30 L 130 45 Z"/>
-            <path d="M50 21 L 64 6 L 74 23 Z"/>
-          </svg>
-          <svg class="sea-far sea-far--fish" viewBox="0 0 44 22">
-            <path d="M6 11 C 14 3, 30 3, 34 11 C 30 19, 14 19, 6 11 Z M33 11 L 42 5 L 39 11 L 42 17 Z"/>
-          </svg>
-
-          <!-- a sunken ship resting in the deep -->
-          <svg class="sea-wreck" viewBox="0 0 460 240" preserveAspectRatio="xMidYMax meet">
-            <path d="M24 150 L300 128 L360 120 L372 108 L372 92 L300 92 L300 78 L262 78 L262 96 L214 96 L214 108 L150 110 L150 122 L96 126 L96 140 L40 146 Z"/>
-            <path d="M300 128 L300 96 L392 92 L400 128 Z"/>
-            <path d="M330 96 L336 66 L392 64 L398 96 Z"/>
-            <path d="M110 120 Q 60 200, 150 214 L 348 206 Q 424 200, 404 132 L 372 138 Q 300 150, 200 152 Q 150 152, 110 120 Z"/>
-            <path d="M150 118 L150 78 L156 78 L156 116 Z"/>
-          </svg>
-
-          <!-- rolling seabed dunes, back (light/far) to front (dark/near) -->
-          <svg class="dune dune--3" viewBox="0 0 1440 300" preserveAspectRatio="none"><path d="M0 150 C 220 96, 430 176, 680 140 C 940 104, 1160 176, 1440 128 L1440 300 L0 300 Z"/></svg>
-          <svg class="dune dune--2" viewBox="0 0 1440 300" preserveAspectRatio="none"><path d="M0 196 C 260 132, 520 214, 800 180 C 1060 148, 1250 210, 1440 178 L1440 300 L0 300 Z"/></svg>
-          <svg class="dune dune--1" viewBox="0 0 1440 300" preserveAspectRatio="none"><path d="M0 236 C 300 190, 560 250, 860 224 C 1140 200, 1300 246, 1440 224 L1440 300 L0 300 Z"/></svg>
-
-          <!-- coral / sea plants rooted on the seabed -->
-          <svg class="coral coral--a" viewBox="0 0 90 140"><path fill="none" stroke-linecap="round" d="M45 140 L45 46 M45 104 C 33 94, 26 82, 25 64 M45 104 C 57 94, 64 82, 65 64 M45 78 C 35 70, 30 58, 32 44 M45 78 C 55 70, 60 58, 58 44 M45 60 C 39 52, 38 44, 41 34 M45 60 C 51 52, 52 44, 49 34 M25 64 C 21 58, 21 52, 24 48 M65 64 C 69 58, 69 52, 66 48"/></svg>
-          <svg class="coral coral--b" viewBox="0 0 70 120"><path fill="none" stroke-linecap="round" d="M35 120 C 30 92, 30 72, 33 50 C 35 38, 37 30, 38 20 M35 86 C 25 78, 20 66, 20 52 M35 86 C 46 78, 51 66, 52 52 M35 62 C 27 55, 24 46, 26 36"/></svg>
-          <svg class="coral coral--c" viewBox="0 0 100 150"><path fill="none" stroke-linecap="round" d="M50 150 L50 40 M50 112 C 36 100, 26 86, 24 66 M50 112 C 64 100, 74 86, 76 66 M50 84 C 38 74, 32 60, 34 44 M50 84 C 62 74, 68 60, 66 44 M50 60 C 43 50, 42 40, 46 30 M50 60 C 57 50, 58 40, 54 30 M24 66 C 20 58, 21 50, 25 46 M76 66 C 80 58, 79 50, 75 46"/></svg>
-          <svg class="coral coral--d" viewBox="0 0 70 110"><path fill="none" stroke-linecap="round" d="M35 110 C 31 86, 31 66, 34 46 C 36 34, 38 26, 39 16 M35 80 C 26 72, 22 60, 22 48 M35 80 C 45 72, 49 60, 49 48 M35 58 C 28 50, 26 42, 28 32"/></svg>
-
-          <!-- glassy bubbles + small clusters rising (GIF-2 reference) -->
-          <span class="bubble" style="--x:9%; --s:1.4vw; --d:11s; --delay:0s"></span>
-          <span class="bubble" style="--x:19%; --s:2.9vw; --d:9s; --delay:2.2s"></span>
-          <span class="bubble" style="--x:31%; --s:1.3vw; --d:16s; --delay:4.1s"></span>
-          <span class="bubble" style="--x:44%; --s:2.2vw; --d:12.5s; --delay:1.1s"></span>
-          <span class="bubble" style="--x:57%; --s:3.4vw; --d:8.5s; --delay:3.3s"></span>
-          <span class="bubble" style="--x:69%; --s:1.6vw; --d:22s; --delay:5.2s"></span>
-          <span class="bubble" style="--x:80%; --s:2.6vw; --d:13s; --delay:0.7s"></span>
-          <span class="bubble" style="--x:91%; --s:1.35vw; --d:28s; --delay:2.9s"></span>
-          <span class="bubcluster" style="--x:14%; --d:14s; --delay:1.5s"><i></i><i></i><i></i><i></i><i></i></span>
-          <span class="bubcluster" style="--x:63%; --d:24s; --delay:4.5s"><i></i><i></i><i></i><i></i><i></i></span>
-
-        </div>
-
-        <div class="askwaves__head">
-          <p class="eyebrow eyebrow--light">The waves of feminism</p>
-          <p class="askwaves__lead">It didn't arrive all at once. It came in <em>waves.</em></p>
-        </div>
-
-        <!-- big wave counter: flips to the next number as you cross each wave
-             (driven by js/waves.js) — the headline cue that a wave changed -->
-        <div class="waves__count" id="wavesCount" aria-hidden="true"><span>01</span></div>
-
-        <div class="waves__stage">
-          <article class="wavecard" data-w="1">
-            <span class="wavecard__num">01</span>
-            <p class="wavecard__years">1800–1900</p>
-            <h3 class="wavecard__title">The first wave</h3>
-            <p class="wavecard__tag">The right to exist on paper.</p>
-            <ul class="wavecard__points">
-              <li>Won the right to <strong>vote</strong></li>
-              <li>Gained legal rights, like owning property</li>
-              <li>Mostly white, upper-class women</li>
-            </ul>
-          </article>
-
-          <article class="wavecard" data-w="2">
-            <span class="wavecard__num">02</span>
-            <p class="wavecard__years">1960–1980</p>
-            <h3 class="wavecard__title">The second wave</h3>
-            <p class="wavecard__tag">The personal becomes political.</p>
-            <ul class="wavecard__points">
-              <li>Workplace &amp; reproductive rights, education, sexuality</li>
-              <li>Challenged gender roles, like women as housewives</li>
-              <li>Still mainly white, upper-class women</li>
-            </ul>
-          </article>
-
-          <article class="wavecard" data-w="3">
-            <span class="wavecard__num">03</span>
-            <p class="wavecard__years">1990–2000</p>
-            <h3 class="wavecard__title">The third wave</h3>
-            <p class="wavecard__tag">Room for every kind of woman.</p>
-            <ul class="wavecard__points">
-              <li>Far more diverse: queer &amp; non-binary voices</li>
-              <li>Celebrated the differences between women</li>
-              <li>Intersectionality moved to the <strong>center</strong></li>
-              <li>No single goal: deliberately many</li>
-            </ul>
-          </article>
-
-          <article class="wavecard" data-w="4">
-            <span class="wavecard__num">04</span>
-            <p class="wavecard__years">2010–now</p>
-            <h3 class="wavecard__title">The fourth wave</h3>
-            <p class="wavecard__tag">Loud, online, and for everyone.</p>
-            <ul class="wavecard__points">
-              <li>Fights harassment, assault &amp; online abuse</li>
-              <li>Trans rights, non-binary rights, global identities</li>
-              <li>Spread through social media</li>
-              <li><strong>Bold. Unapologetic. Inclusive.</strong></li>
-            </ul>
-          </article>
-        </div>
-
-        <ol class="waves__dots" aria-hidden="true">
-          <li class="waves__dot"></li>
-          <li class="waves__dot"></li>
-          <li class="waves__dot"></li>
-          <li class="waves__dot"></li>
-        </ol>
-
-        <!-- rising ocean: height (--level) + warmth (--mix) driven by scroll;
-             layers roll horizontally AND oscillate vertically for a live swell -->
-        <div class="ocean" id="ocean" aria-hidden="true">
-          <div class="ocean__body"></div>
-
-          <!-- The water's life: a shark sweeps in from the right and EATS the
-               fish; a fresh fish then rises from under the floor to take its
-               place, and the loop repeats. Everything is clipped to the water
-               box (.ocean__life), so nothing crosses above the surface and the
-               new fish genuinely emerges from below. Each *-track is full-size
-               so its translate %s resolve against the water. -->
-          <div class="ocean__life">
-            <div class="o-shark-track">
-              <svg class="o-shark" viewBox="0 0 140 60" aria-hidden="true">
-                <!-- dark maw, revealed as the hinged lower jaw drops open -->
-                <path class="o-shark__mouth" d="M47 33 L 12 30 L 17 47 Z"/>
-                <!-- upper body + head + upper jaw (fixed) -->
-                <path class="o-shark__upper" d="M14 31 C 34 19, 72 16, 104 27 C 108 28.5, 108 31.5, 104 33 C 82 40, 62 40, 48 37 L 47 33 Z"/>
-                <path class="o-shark__fin" d="M100 30 L 130 15 L 119 30 L 130 45 Z"/>
-                <path class="o-shark__fin" d="M52 21 L 66 5 L 77 23 Z"/>
-                <path class="o-shark__fin" d="M50 37 L 45 51 L 65 39 Z"/>
-                <!-- lower jaw: hinged at the mouth corner, swings down to bite -->
-                <path class="o-shark__jaw" d="M47 33 L 14 32 L 16 37 L 47 37 Z"/>
-                <circle class="o-shark__eye" cx="28" cy="28" r="1.7"/>
-              </svg>
-            </div>
-            <div class="o-fish-track">
-              <svg class="o-fish" viewBox="0 0 64 44" aria-hidden="true">
-                <path class="rfish__tail" d="M16 22 L 2 11 L 7 22 L 2 33 Z"/>
-                <path class="rfish__fin"  d="M30 13 L 37 3 L 41 15 Z"/>
-                <path class="rfish__body" d="M52 22 C 52 11, 37 7, 23 12 C 12 16, 9 20, 12 25 C 19 34, 45 35, 52 22 Z"/>
-                <circle class="rfish__eyew" cx="44" cy="18.5" r="4.6"/>
-                <circle class="rfish__eyeb" cx="45.6" cy="18.5" r="2.2"/>
-              </svg>
+    <!-- ===== Chapter 01: THE BALLOT ===== -->
+    <div class="chapter" id="ch1" data-wave="01">
+      <div class="hero-wrap th-anchor">
+        <div class="hero-pin">
+          <span class="hero-side hero-side--l">WAVE 01</span>
+          <span class="hero-side hero-side--r">1848–1929</span>
+          <div class="hero-art" style="--art-sky: linear-gradient(160deg, #4a3568, #2e2145); --w-fill: #d9a13f;">
+            <div class="art">
+              <svg viewBox="0 0 900 140" preserveAspectRatio="none" class="w1"><path d="M0 70 Q 112 30 225 70 T 450 70 T 675 70 T 900 70 V 140 H 0 Z"/></svg>
+              <svg viewBox="0 0 900 140" preserveAspectRatio="none" class="w2"><path d="M0 70 Q 112 24 225 70 T 450 70 T 675 70 T 900 70 V 140 H 0 Z"/></svg>
+              <svg viewBox="0 0 900 140" preserveAspectRatio="none" class="w3"><path d="M0 70 Q 112 18 225 70 T 450 70 T 675 70 T 900 70 V 140 H 0 Z"/></svg>
+              <span class="num">01</span><span class="grain"></span>
             </div>
           </div>
-          <!-- the crest is a SIBLING of the body, not a child: nested inside it
-               the bands were clipped by the body's own wave mask, which welded
-               them into a single silhouette. Five bands, far -> near, each with
-               its own wavelength, speed, height and haze. -->
-          <div class="ocean__crest">
-            <span class="owave owave--1"></span>
-            <span class="owave owave--2"></span>
-            <span class="owave owave--3"></span>
-            <span class="owave owave--4"></span>
-            <span class="owave owave--5"></span>
+          <div class="hero-title">
+            <span class="eyebrow">The first wave</span>
+            <h3>The Ballot</h3>
+            <p class="tag">The right to exist on paper.</p>
           </div>
         </div>
+      </div>
 
-        <!-- shark word-swap: a shark swims across a line, eats the words, and
-             the new ones surface behind it (js/sealife.js). Purely playful. -->
-        <div class="shark-swap" aria-hidden="true">
-          <span class="shark-swap__old" id="sharkOld">make waves</span>
-          <span class="shark-swap__new" id="sharkNew"></span>
-          <svg class="shark" id="shark" viewBox="0 0 140 60">
-            <path d="M14 32 C 34 19, 72 16, 104 27 C 108 28.5, 108 31.5, 104 33 C 74 43, 40 43, 22 37 C 16 35, 14 34, 14 32 Z"/>
-            <path d="M100 30 L 130 15 L 119 30 L 130 45 Z"/>
-            <path d="M50 21 L 64 5 L 75 23 Z"/>
-            <path d="M48 36 L 43 51 L 63 38 Z"/>
-            <circle class="shark__eye" cx="26" cy="30" r="1.7"/>
-          </svg>
+      <div class="events">
+        <article class="node">
+          <span class="node__dot th-anchor"></span>
+          <div class="node__card" role="button" tabindex="0" aria-expanded="false">
+            <span class="node__year">1851</span>
+            <h4 class="node__title">Sojourner Truth asks: “Ain’t I a woman?”</h4>
+            <p class="node__blurb">A formerly enslaved abolitionist stands up at a women’s convention in Ohio and points at the gap in the room: this fight wasn’t including Black women.</p>
+            <div class="node__more"><div>
+              <p class="node__why"><b>Why it matters</b>She named the blind spot 138 years before anyone had the word “intersectionality” for it. The thread starts here.</p>
+            </div></div>
+            <p class="node__hint">tap for why it matters</p>
+          </div>
+        </article>
+
+        <article class="node">
+          <span class="node__dot th-anchor"></span>
+          <div class="node__card" role="button" tabindex="0" aria-expanded="false">
+            <span class="node__year">1916</span>
+            <h4 class="node__title">Manitoba goes first</h4>
+            <p class="node__blurb">After years of petitions and a satirical “Mock Parliament,” Manitoba becomes the first Canadian province where women win the vote.</p>
+            <div class="node__more"><div>
+              <p class="node__why"><b>Why it matters</b>Change didn’t start in Ottawa. It started close to home, province by province. Local pressure works.</p>
+            </div></div>
+            <p class="node__hint">tap for why it matters</p>
+          </div>
+        </article>
+
+        <article class="node">
+          <span class="node__dot th-anchor"></span>
+          <div class="node__card" role="button" tabindex="0" aria-expanded="false">
+            <span class="node__year">1918</span>
+            <h4 class="node__title">Canada’s federal vote, for <em>some</em> women</h4>
+            <p class="node__blurb">Women win the federal vote… unless they were of Asian descent, or First Nations, or Inuit. Many waited until 1948, or even 1960.</p>
+            <div class="node__more"><div>
+              <p class="node__why"><b>Why it matters</b>A win on paper isn’t a win for everyone. Every wave after this one exists because someone noticed who got left out.</p>
+            </div></div>
+            <p class="node__hint">tap for why it matters</p>
+          </div>
+        </article>
+
+        <article class="node">
+          <span class="node__dot th-anchor"></span>
+          <div class="node__card" role="button" tabindex="0" aria-expanded="false">
+            <span class="node__year">1929</span>
+            <h4 class="node__title">The Persons Case</h4>
+            <p class="node__blurb">The Famous Five take “are women persons?” all the way up, and win. Women are legally “persons” in Canada at last.</p>
+            <div class="node__more"><div>
+              <p class="node__why"><b>Why it matters</b>You can’t sit in the Senate if the law says you’re not a person. Sometimes the fight is over one word.</p>
+            </div></div>
+            <p class="node__hint">tap for why it matters</p>
+          </div>
+        </article>
+      </div>
+
+      <div class="check">
+        <div class="check__card th-anchor">
+          <p class="eyebrow">Quick check · wave 01</p>
+          <p class="check__q">The first wave won the vote for…</p>
+          <div class="check__opts" data-answer="1">
+            <button class="check__opt">Every woman in Canada, all at once</button>
+            <button class="check__opt">Mostly white, upper-class women; others waited decades</button>
+            <button class="check__opt">No one; the vote came later</button>
+          </div>
+          <p class="check__verdict" data-right="Exactly. <b>Who gets left out</b> is the question that powers every wave after this one." data-wrong="Not quite. Look one node up: who was still waiting after 1918?"></p>
         </div>
+      </div>
 
-        <!-- reusable silhouettes for the fish + shark -->
-        <svg width="0" height="0" aria-hidden="true" style="position:absolute">
-          <defs>
-            <symbol id="ic-fish" viewBox="0 0 44 22">
-              <path d="M6 11 C 14 3, 30 3, 34 11 C 30 19, 14 19, 6 11 Z M33 11 L 42 5 L 39 11 L 42 17 Z"/>
-            </symbol>
-            <symbol id="ic-shark" viewBox="0 0 140 60">
-              <path d="M14 32 C 34 19, 72 16, 104 27 C 108 28.5, 108 31.5, 104 33 C 74 43, 40 43, 22 37 C 16 35, 14 34, 14 32 Z"/>
-              <path d="M100 30 L 130 15 L 119 30 L 130 45 Z"/>
-              <path d="M50 21 L 64 5 L 75 23 Z"/>
-              <path d="M48 36 L 43 51 L 63 38 Z"/>
-              <circle class="shark__eye" cx="26" cy="30" r="1.7"/>
-            </symbol>
-          </defs>
-        </svg>
+      <div class="events">
+        <article class="node node--bridge">
+          <span class="node__dot th-anchor"></span>
+          <div class="node__card" role="button" tabindex="0" aria-expanded="false">
+            <span class="bridge-label">Between the waves · the current kept moving</span>
+            <span class="node__year">1946</span>
+            <h4 class="node__title">Viola Desmond sits down</h4>
+            <p class="node__blurb">In a New Glasgow movie theatre, she refuses to leave the whites-only floor, and is arrested over one cent of tax.</p>
+            <div class="node__more"><div>
+              <p class="node__why"><b>Why it matters</b>The history books say the waves “paused” here. Black women didn’t. She’s on the $10 bill now.</p>
+            </div></div>
+            <p class="node__hint">tap for why it matters</p>
+          </div>
+        </article>
       </div>
     </div>
+
+    <!-- ===== Chapter 02: THE MARCH ===== -->
+    <div class="chapter" id="ch2" data-wave="02">
+      <div class="hero-wrap th-anchor">
+        <div class="hero-pin">
+          <span class="hero-side hero-side--l">WAVE 02</span>
+          <span class="hero-side hero-side--r">1960–1980</span>
+          <div class="hero-art" style="--art-sky: linear-gradient(160deg, #6d2f4e, #3b1c33); --w-fill: #e0797f;">
+            <div class="art">
+              <svg viewBox="0 0 900 140" preserveAspectRatio="none" class="w1"><path d="M0 70 Q 112 30 225 70 T 450 70 T 675 70 T 900 70 V 140 H 0 Z"/></svg>
+              <svg viewBox="0 0 900 140" preserveAspectRatio="none" class="w2"><path d="M0 70 Q 112 24 225 70 T 450 70 T 675 70 T 900 70 V 140 H 0 Z"/></svg>
+              <svg viewBox="0 0 900 140" preserveAspectRatio="none" class="w3"><path d="M0 70 Q 112 18 225 70 T 450 70 T 675 70 T 900 70 V 140 H 0 Z"/></svg>
+              <span class="num">02</span><span class="grain"></span>
+            </div>
+          </div>
+          <div class="hero-title">
+            <span class="eyebrow">The second wave</span>
+            <h3>The March</h3>
+            <p class="tag">The personal becomes political.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="events">
+        <article class="node">
+          <span class="node__dot th-anchor"></span>
+          <div class="node__card" role="button" tabindex="0" aria-expanded="false">
+            <span class="node__year">1960</span>
+            <h4 class="node__title">The pill arrives</h4>
+            <p class="node__blurb">In Canada it could only be prescribed “for cycle regulation” until 1969. Everyone knew what it was really for.</p>
+            <div class="node__more"><div>
+              <p class="node__why"><b>Why it matters</b>Deciding if and when to have kids meant deciding everything else too: school, work, whose life this is.</p>
+            </div></div>
+            <p class="node__hint">tap for why it matters</p>
+          </div>
+        </article>
+
+        <article class="node">
+          <span class="node__dot th-anchor"></span>
+          <div class="node__card" role="button" tabindex="0" aria-expanded="false">
+            <span class="node__year">1967</span>
+            <h4 class="node__title">Canada asks: “how unequal is this, exactly?”</h4>
+            <p class="node__blurb">The Royal Commission on the Status of Women is launched. It comes back with 167 recommendations.</p>
+            <div class="node__more"><div>
+              <p class="node__why"><b>Why it matters</b>What gets measured gets fixed, slowly. This report is why “equal pay for equal work” is written down at all.</p>
+            </div></div>
+            <p class="node__hint">tap for why it matters</p>
+          </div>
+        </article>
+
+        <article class="node">
+          <span class="node__dot th-anchor"></span>
+          <div class="node__card" role="button" tabindex="0" aria-expanded="false">
+            <span class="node__year">1977</span>
+            <h4 class="node__title">The Combahee River Collective</h4>
+            <p class="node__blurb">Black feminists in Boston write the statement that reframes everything: if Black women were free, <em>everybody</em> would have to be free.</p>
+            <div class="node__more"><div>
+              <p class="node__why"><b>Why it matters</b>This is the blueprint for the feminism this whole site teaches: freedom measured from the most excluded person up.</p>
+            </div></div>
+            <p class="node__hint">tap for why it matters</p>
+          </div>
+        </article>
+
+        <article class="node">
+          <span class="node__dot th-anchor"></span>
+          <div class="node__card" role="button" tabindex="0" aria-expanded="false">
+            <span class="node__year">1981</span>
+            <h4 class="node__title">bell hooks: <em>Ain’t I a Woman</em></h4>
+            <p class="node__blurb">She borrows her title from Sojourner Truth, 130 years later, and puts Black women back at the centre of the story.</p>
+            <div class="node__more"><div>
+              <p class="node__why"><b>Why it matters</b>The thread loops back on itself: the question from 1851 was still waiting for an answer.</p>
+            </div></div>
+            <p class="node__hint">tap for why it matters</p>
+          </div>
+        </article>
+      </div>
+
+      <div class="check">
+        <div class="check__card th-anchor">
+          <p class="eyebrow">Quick check · wave 02</p>
+          <p class="check__q">“The personal is political” meant…</p>
+          <div class="check__opts" data-answer="1">
+            <button class="check__opt">Keep politics out of the home</button>
+            <button class="check__opt">“Private” struggles like housework, health, and safety are public issues</button>
+            <button class="check__opt">Only politicians can change things</button>
+          </div>
+          <p class="check__verdict" data-right="Yes. <b>If it happens to half the population, it isn’t private.</b>" data-wrong="Flip it around: the slogan says private struggles belong in public."></p>
+        </div>
+      </div>
+
+      <div class="events">
+        <article class="node node--bridge">
+          <span class="node__dot th-anchor"></span>
+          <div class="node__card" role="button" tabindex="0" aria-expanded="false">
+            <span class="bridge-label">Between the waves · the current kept moving</span>
+            <span class="node__year">1989</span>
+            <h4 class="node__title">Kimberlé Crenshaw names the overlap</h4>
+            <p class="node__blurb">A law professor coins one word, <em>intersectionality</em>, for what Sojourner, Viola, and Combahee had been living all along.</p>
+            <div class="node__more"><div>
+              <p class="node__why"><b>Why it matters</b>Once the overlap had a name, nobody could pretend it wasn’t there. The third wave builds its whole house on it.</p>
+            </div></div>
+            <p class="node__hint">tap for why it matters</p>
+          </div>
+        </article>
+      </div>
+    </div>
+
+    <!-- ===== Chapter 03: THE MANY ===== -->
+    <div class="chapter" id="ch3" data-wave="03">
+      <div class="hero-wrap th-anchor">
+        <div class="hero-pin">
+          <span class="hero-side hero-side--l">WAVE 03</span>
+          <span class="hero-side hero-side--r">1990–2000</span>
+          <div class="hero-art" style="--art-sky: linear-gradient(160deg, #2f5a63, #1d2c45); --w-fill: #8fd0c4;">
+            <div class="art">
+              <svg viewBox="0 0 900 140" preserveAspectRatio="none" class="w1"><path d="M0 70 Q 112 30 225 70 T 450 70 T 675 70 T 900 70 V 140 H 0 Z"/></svg>
+              <svg viewBox="0 0 900 140" preserveAspectRatio="none" class="w2"><path d="M0 70 Q 112 24 225 70 T 450 70 T 675 70 T 900 70 V 140 H 0 Z"/></svg>
+              <svg viewBox="0 0 900 140" preserveAspectRatio="none" class="w3"><path d="M0 70 Q 112 18 225 70 T 450 70 T 675 70 T 900 70 V 140 H 0 Z"/></svg>
+              <span class="num">03</span><span class="grain"></span>
+            </div>
+          </div>
+          <div class="hero-title">
+            <span class="eyebrow">The third wave</span>
+            <h3>The Many</h3>
+            <p class="tag">Room for every kind of woman.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="events">
+        <article class="node">
+          <span class="node__dot th-anchor"></span>
+          <div class="node__card" role="button" tabindex="0" aria-expanded="false">
+            <span class="node__year">1991</span>
+            <h4 class="node__title">Riot grrrl zines</h4>
+            <p class="node__blurb">Photocopied, stapled, passed hand to hand: girls making their own media instead of waiting to be covered fairly.</p>
+            <div class="node__more"><div>
+              <p class="node__why"><b>Why it matters</b>It’s the fourth wave’s group chat, on paper. When the media won’t tell your story, you become the media.</p>
+            </div></div>
+            <p class="node__hint">tap for why it matters</p>
+          </div>
+        </article>
+
+        <article class="node">
+          <span class="node__dot th-anchor"></span>
+          <div class="node__card" role="button" tabindex="0" aria-expanded="false">
+            <span class="node__year">1995</span>
+            <h4 class="node__title">Beijing: “women’s rights are human rights”</h4>
+            <p class="node__blurb">189 countries sign the biggest agreement on gender equality the world has ever made.</p>
+            <div class="node__more"><div>
+              <p class="node__why"><b>Why it matters</b>The sentence sounds obvious now. That’s the point: it wasn’t, until 30,000 people flew to Beijing to say it.</p>
+            </div></div>
+            <p class="node__hint">tap for why it matters</p>
+          </div>
+        </article>
+
+        <article class="node">
+          <span class="node__dot th-anchor"></span>
+          <div class="node__card" role="button" tabindex="0" aria-expanded="false">
+            <span class="node__year">1990s</span>
+            <h4 class="node__title">No single goal, deliberately many</h4>
+            <p class="node__blurb">Queer voices, non-binary voices, every culture and body type: the third wave stops looking for one “right way” to be a woman.</p>
+            <div class="node__more"><div>
+              <p class="node__why"><b>Why it matters</b>Earlier waves asked “what do women want?” The third wave answered: <em>which women? Ask them all.</em></p>
+            </div></div>
+            <p class="node__hint">tap for why it matters</p>
+          </div>
+        </article>
+      </div>
+
+      <div class="check">
+        <div class="check__card th-anchor">
+          <p class="eyebrow">Quick check · wave 03</p>
+          <p class="check__q">The third wave’s big upgrade was…</p>
+          <div class="check__opts" data-answer="1">
+            <button class="check__opt">Finally agreeing on one single goal</button>
+            <button class="check__opt">Deliberately many goals: every kind of woman counts</button>
+            <button class="check__opt">Handing the movement to governments</button>
+          </div>
+          <p class="check__verdict" data-right="Right. <b>Difference stopped being a problem and became the point.</b>" data-wrong="Almost backwards: the third wave gave up on “one size fits all” on purpose."></p>
+        </div>
+      </div>
+
+      <div class="events">
+        <article class="node node--bridge">
+          <span class="node__dot th-anchor"></span>
+          <div class="node__card" role="button" tabindex="0" aria-expanded="false">
+            <span class="bridge-label">Between the waves · the current kept moving</span>
+            <span class="node__year">2006</span>
+            <h4 class="node__title">Tarana Burke starts “me too”</h4>
+            <p class="node__blurb">A phrase for survivors to find each other, eleven years before the hashtag made it global.</p>
+            <div class="node__more"><div>
+              <p class="node__why"><b>Why it matters</b>The fourth wave’s loudest moment began quietly, offline, with a Black woman helping girls in her community.</p>
+            </div></div>
+            <p class="node__hint">tap for why it matters</p>
+          </div>
+        </article>
+      </div>
+    </div>
+
+    <!-- ===== Chapter 04: THE FEED ===== -->
+    <div class="chapter" id="ch4" data-wave="04">
+      <div class="hero-wrap th-anchor">
+        <div class="hero-pin">
+          <span class="hero-side hero-side--l">WAVE 04</span>
+          <span class="hero-side hero-side--r">2010–NOW</span>
+          <div class="hero-art" style="--art-sky: linear-gradient(160deg, #5b3b8f, #241a3e); --w-fill: #e8c15f;">
+            <div class="art">
+              <svg viewBox="0 0 900 140" preserveAspectRatio="none" class="w1"><path d="M0 70 Q 112 30 225 70 T 450 70 T 675 70 T 900 70 V 140 H 0 Z"/></svg>
+              <svg viewBox="0 0 900 140" preserveAspectRatio="none" class="w2"><path d="M0 70 Q 112 24 225 70 T 450 70 T 675 70 T 900 70 V 140 H 0 Z"/></svg>
+              <svg viewBox="0 0 900 140" preserveAspectRatio="none" class="w3"><path d="M0 70 Q 112 18 225 70 T 450 70 T 675 70 T 900 70 V 140 H 0 Z"/></svg>
+              <span class="num">04</span><span class="grain"></span>
+            </div>
+          </div>
+          <div class="hero-title">
+            <span class="eyebrow">The fourth wave</span>
+            <h3>The Feed</h3>
+            <p class="tag">Loud, online, and for everyone.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="events">
+        <article class="node">
+          <span class="node__dot th-anchor"></span>
+          <div class="node__card" role="button" tabindex="0" aria-expanded="false">
+            <span class="node__year">2012</span>
+            <h4 class="node__title">Idle No More</h4>
+            <p class="node__blurb">Four women in Saskatchewan, three First Nations and one settler ally, spark an Indigenous rights movement that circles the world.</p>
+            <div class="node__more"><div>
+              <p class="node__why"><b>Why it matters</b>Feminism and land, together, led from Canada. Movements don’t need permission anymore. They need a spark.</p>
+            </div></div>
+            <p class="node__hint">tap for why it matters</p>
+          </div>
+        </article>
+
+        <article class="node">
+          <span class="node__dot th-anchor"></span>
+          <div class="node__card" role="button" tabindex="0" aria-expanded="false">
+            <span class="node__year">2013</span>
+            <h4 class="node__title">#BlackLivesMatter</h4>
+            <p class="node__blurb">Founded by three Black women: Alicia Garza, Patrisse Cullors, and Opal Tometi. A hashtag becomes a global civil-rights movement.</p>
+            <div class="node__more"><div>
+              <p class="node__why"><b>Why it matters</b>The fourth wave’s DNA in one story: Black women build it, the internet carries it, the whole world moves.</p>
+            </div></div>
+            <p class="node__hint">tap for why it matters</p>
+          </div>
+        </article>
+
+        <article class="node">
+          <span class="node__dot th-anchor"></span>
+          <div class="node__card" role="button" tabindex="0" aria-expanded="false">
+            <span class="node__year">2017</span>
+            <h4 class="node__title">#MeToo goes viral</h4>
+            <p class="node__blurb">Tarana Burke’s eleven-year-old phrase reaches 85+ countries in days. The cost of silence finally flips sides.</p>
+            <div class="node__more"><div>
+              <p class="node__why"><b>Why it matters</b>For a century, speaking up cost the survivor everything. This is the moment staying silent started costing the powerful instead.</p>
+            </div></div>
+            <p class="node__hint">tap for why it matters</p>
+          </div>
+        </article>
+      </div>
+
+      <div class="check">
+        <div class="check__card th-anchor">
+          <p class="eyebrow">Quick check · wave 04</p>
+          <p class="check__q">The fourth wave spreads mainly through…</p>
+          <div class="check__opts" data-answer="2">
+            <button class="check__opt">Royal commissions</button>
+            <button class="check__opt">Printed zines</button>
+            <button class="check__opt">Your feed</button>
+          </div>
+          <p class="check__verdict" data-right="Yes, which means <b>you’re already standing in it.</b>" data-wrong="Think about where you heard of #MeToo. Exactly."></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="finale">
+      <div class="end-dot th-anchor"></div>
+      <h3>2026: the thread reaches <em>you.</em></h3>
+      <p>44% of students told us learning about feminism is boring.
+         This timeline is the counter-argument. The next node is yours to write.</p>
+    </div>
+
+    <div class="tlcount" id="tlCount" aria-hidden="true">WAVE <b>01</b> / 04</div>
   </section>
 
 
@@ -514,18 +748,17 @@
   <script src="js/morph.js?v=78"></script>
   <script src="js/journey.js?v=79"></script>
   <script src="js/pin.js?v=78"></script>
-  <script src="js/waves.js?v=86"></script>
-  <script src="js/sealife.js?v=105"></script>
   <!-- Frame-scrubbed underwater reef backdrop disabled — reverted to the plain
        hand-drawn .seascape (kelp, dunes, coral, wreck, rays). Re-enable by
        restoring this script: <script src="js/uwscrub.js?v=101"></script> -->
   <!-- <script src="js/uwscrub.js?v=101"></script> -->
   <script src="js/aiglow.js?v=78"></script>
   <script src="js/aigspeed.js?v=94"></script>
-  <script src="js/engulf.js?v=91"></script>
+  <script src="js/engulf.js?v=92"></script>
   <script src="js/polish.js?v=82"></script>
   <script src="js/main.js?v=82"></script>
-  <script src="js/thread.js?v=115"></script>
+  <script src="js/timeline.js?v=1"></script>
+  <script src="js/thread.js?v=116"></script>
   <script src="js/spark.js?v=90"></script>
   <script src="js/theme.js?v=1"></script>
 </body>

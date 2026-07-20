@@ -1,13 +1,16 @@
 /* Ask section — "Hey, what is feminism?" pins centred on screen, then plays a
    fixed beat:
      1. the Apple-Intelligence rainbow border blooms in (~1s)
-     2. it holds fully lit for 3 seconds
-     3. the question text fades away (~0.9s)
+     2. it holds fully lit while the light leak sweeps
+     3. the question text fades away, then the border fades out
    The section stays PINNED and scroll is locked (via Lenis) the moment it pins.
-   If left alone the beat plays out in full and releases itself once the waves
-   are revealed. But a deliberate scroll DOWN ("move on") jumps straight to the
-   revealed waves, and a scroll UP leaves the way you came — so you're never
-   forced to sit through it and trying to scroll past always brings the waves up.
+   If left alone the beat plays out in full and releases itself once the border
+   has faded. A deliberate scroll DOWN ("move on") skips straight to the end of
+   the beat, and a scroll UP leaves the way you came — so you're never forced
+   to sit through it. The timeline section below answers the question.
+
+   (The waves screen that used to be revealed here is gone — the four waves
+   now live in the interactive timeline, #timeline, right after this section.)
 
    Reduced motion / no Lenis: the border is shown and the text kept, with no
    scroll lock. */
@@ -30,22 +33,13 @@
     || document.documentElement.hasAttribute("data-a11y");
 
   if (reduceMotion || !("IntersectionObserver" in window)) {
-    // show the whole scene already resolved: question sent, border lit, waves in
+    // show the scene already resolved: question sent, border lit
     if (chatText) chatText.textContent = QUESTION; // fully-typed prompt
     if (chat) chat.classList.add("aichat--sent");
     stack.classList.add("ag-live");
     stack.style.setProperty("--ag-reveal", "1");
-    document.body.classList.add("ask-glow-active", "ask-waves-on");
-    if (window.__askWaves && window.__askWaves.start) { try { window.__askWaves.start(); } catch (e) {} }
+    document.body.classList.add("ask-glow-active");
     return;
-  }
-
-  // give #ask the extra scroll length the waves need to scrub through (the
-  // pinned sticky holds while you travel it). Then let the pins/morph re-measure
-  // the taller page.
-  section.classList.add("aw-cine");
-  if (window.ScrollTrigger && typeof window.ScrollTrigger.refresh === "function") {
-    requestAnimationFrame(() => window.ScrollTrigger.refresh());
   }
 
   const TYPE_START = 480;  // pause after the box appears before typing begins
@@ -54,8 +48,7 @@
   const FADE_IN = 1000;    // border blooms in
   const HOLD = 5200;       // border fully lit (long enough for the slow leak to drift across)
   const TEXT_FADE = 800;   // question fades out
-  const WAVES_HOLD = 1500; // waves settle inside the lit ring before it fades
-  const BORDER_OUT = 1000; // the rainbow border then fades away (waves carry on)
+  const BORDER_OUT = 1000; // the rainbow border then fades away
 
   const lenis = () => window.__lenis;
 
@@ -134,8 +127,8 @@
   const wait = (fn, ms) => timers.push(setTimeout(fn, ms));
 
   // Skip: jump straight to the resolved beat — the question sent, the border
-  // handed off, the waves revealed — and release the scroll. So the animation
-  // is never something you're forced to sit through; a scroll down skips it.
+  // faded — and release the scroll. So the animation is never something
+  // you're forced to sit through; a scroll down skips it.
   function skip() {
     if (!played || skipped) return;
     skipped = true;
@@ -145,8 +138,7 @@
     if (chatText) chatText.textContent = QUESTION;
     if (chat) { chat.classList.remove("aichat--typing"); chat.classList.add("aichat--sent"); }
     if (content) content.classList.add("ask-faded");
-    document.body.classList.add("ask-glow-active", "ask-waves-on", "ask-fullscreen");
-    if (window.__askWaves) window.__askWaves.start();
+    document.body.classList.add("ask-glow-active");
     if (stack) { stack.style.setProperty("--ag-reveal", "0"); stack.classList.remove("ag-live"); }
     unlock();
   }
@@ -240,23 +232,14 @@
     // after the hold, fade the chat prompt away
     wait(() => content.classList.add("ask-faded"), FADE_IN + HOLD);
 
-    // once the question is gone, reveal the waves inside the still-lit ring and
-    // release the scroll so you can scrub down through the four waves.
-    wait(() => {
-      document.body.classList.add("ask-waves-on"); // fades the dark wave-screen in
-      if (window.__askWaves) window.__askWaves.start();
-      unlock();
-    }, FADE_IN + HOLD + TEXT_FADE);
-
-    // a beat after the waves have settled, fade the rainbow border away and
-    // let the wave-screen expand to full-bleed — it has handed off to the ocean,
-    // and dropping the border ends the rotation cost.
+    // once the question is gone, fade the border out and release the scroll —
+    // the answer is the timeline waiting right below.
     wait(() => {
       stack.style.setProperty("--ag-reveal", "0");
-      document.body.classList.add("ask-fullscreen");
-    }, FADE_IN + HOLD + TEXT_FADE + WAVES_HOLD);
+      unlock();
+    }, FADE_IN + HOLD + TEXT_FADE);
     wait(() => stack.classList.remove("ag-live"),
-      FADE_IN + HOLD + TEXT_FADE + WAVES_HOLD + BORDER_OUT);
+      FADE_IN + HOLD + TEXT_FADE + BORDER_OUT);
   }
 
   function reset() {
@@ -271,8 +254,7 @@
     content.classList.remove("ask-faded");
     if (chat) chat.classList.remove("aichat--typing", "aichat--sent");
     if (chatText) chatText.textContent = "";
-    document.body.classList.remove("ask-glow-active", "ask-waves-on", "ask-fullscreen");
-    if (window.__askWaves) window.__askWaves.stop();
+    document.body.classList.remove("ask-glow-active");
   }
 
   // Fire the moment the section pins — i.e. its top reaches the top of the

@@ -203,7 +203,32 @@
       pts.push({ x: ribbonX(bowlY), y: bowlY });
       startY = bowlY + STEP;
     }
-    for (let y = startY; y < H - 150; y += STEP) pts.push({ x: ribbonX(y), y });
+
+    // ---- the timeline splice (Learn page): where the interactive timeline
+    // sits, the thread leaves the margin ribbon and weaves straight through
+    // the section's anchors — the start dot, each chapter hero, every event
+    // node, the quick-checks and the end dot — then rejoins the ribbon below.
+    // The anchors are static (no sticky drift), so plain doc coords hold.
+    const tlSection = document.getElementById("timeline");
+    let tlPts = [], tlTop = Infinity, tlBot = -Infinity;
+    if (tlSection) {
+      tlSection.querySelectorAll(".th-anchor").forEach((el) => {
+        const r = el.getBoundingClientRect();
+        if (!r.width && !r.height) return;
+        tlPts.push({ x: r.left + r.width / 2 + window.scrollX, y: r.top + r.height / 2 + window.scrollY });
+      });
+      tlPts.sort((a, b) => a.y - b.y); // DOM order ≈ vertical order, but be safe
+      if (tlPts.length) { tlTop = tlPts[0].y; tlBot = tlPts[tlPts.length - 1].y; }
+    }
+
+    let tlSpliced = false;
+    for (let y = startY; y < H - 150; y += STEP) {
+      if (tlPts.length && y >= tlTop - 40 && y <= tlBot + 40) {
+        if (!tlSpliced) { pts.push(...tlPts); tlSpliced = true; }
+        continue;
+      }
+      pts.push({ x: ribbonX(y), y });
+    }
     pts.push({ x: ribbonX(H - 120), y: H - 120 }); // settle in the margin, clear of the footer text
 
     // ---- weave the sparkline INTO the single continuous stroke ----
