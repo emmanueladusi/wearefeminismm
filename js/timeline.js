@@ -55,21 +55,24 @@
 
     if (reduce) return; // heroes stay as cards; CSS shows the titles
 
+    // card scale: what makes a 100vw-wide art read as a min(46vw, 520px)
+    // card (never narrower than 280px). The art's layout never changes —
+    // only this uniform scale — so the whole grow is compositor-only.
+    const s0 = Math.max(280, Math.min(window.innerWidth * 0.46, 520)) / window.innerWidth;
+
     for (const h of heroes) {
       const r = h.wrap.getBoundingClientRect();
       const span = r.height - window.innerHeight;
       if (span <= 0) continue;
       const p = Math.min(1, Math.max(0, -r.top / span));
 
-      // base card size (matches the CSS: min(46vw, 520px), min 280, 4:3)
-      const w0 = Math.max(280, Math.min(window.innerWidth * 0.46, 520));
-      const h0 = w0 * 0.75;
-
-      // grow the box over p ∈ [0.08, 0.68]
+      // grow over p ∈ [0.08, 0.68]
       const g = easeOut(Math.min(1, Math.max(0, (p - 0.08) / 0.6)));
-      h.art.style.width = `${(w0 + (window.innerWidth - w0) * g).toFixed(1)}px`;
-      h.art.style.height = `${(h0 + (window.innerHeight - h0) * g).toFixed(1)}px`;
-      h.art.style.borderRadius = `${((1 - g) * 20).toFixed(1)}px`;
+      const s = s0 + (1 - s0) * g;
+      // the radius is divided by the scale so it LOOKS like a constant
+      // 20px card corner shrinking to 0 as the art fills the screen
+      h.art.style.transform = `scale(${s.toFixed(4)})`;
+      h.art.style.borderRadius = `${(((1 - g) * 20) / s).toFixed(1)}px`;
 
       // title slides up over p ∈ [0.68, 0.9]
       const t = Math.min(1, Math.max(0, (p - 0.68) / 0.22));

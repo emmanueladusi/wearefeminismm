@@ -4094,17 +4094,23 @@ html[data-theme="dark"] .bwc-reel > span { color: #eab84f; }
 }
 .tline .hero-side--l { left: clamp(18px, 6vw, 90px); }
 .tline .hero-side--r { right: clamp(18px, 6vw, 90px); }
-/* the box is animated (width/height), NOT transform:scale — scaling would
-   zoom INTO the artwork; resizing re-composes the waves + number so the
-   art stays framed while it swallows the screen */
+/* PERFORMANCE: the art is laid out at FULL viewport size exactly once and
+   the "card" state is just transform: scale() of it — a mini viewport.
+   Growing by animating width/height re-laid-out and repainted every heavy
+   layer (noise tile, weave gradients, masked photo, filtered waves) each
+   scroll frame, which stuttered; a uniform scale is compositor-only, so
+   the expansion runs entirely on the GPU. js/timeline.js writes only
+   transform + border-radius. */
 .tline .hero-art {
   position: relative; z-index: 2;
-  width: min(46vw, 520px); aspect-ratio: 4 / 3;
-  min-width: 280px;
+  width: 100vw; height: 100svh;
   border-radius: var(--r-lg); overflow: hidden;
   box-shadow: 0 30px 80px rgba(44, 33, 64, 0.35);
-  will-change: width, height, border-radius;
+  transform: scale(0.4);          /* pre-JS approximation of the card state */
+  transform-origin: center;
+  will-change: transform;
 }
+.tline .art svg { will-change: transform; } /* drifting waves: own layers */
 
 /* the chapter art: era-tinted sky, textured, with the waves drifting inside */
 .tline .art { position: absolute; inset: 0; background: var(--art-sky); }
@@ -4373,6 +4379,7 @@ html[data-theme="dark"] .tline .node__card { box-shadow: 0 10px 34px rgba(0, 0, 
   .tline .node__card { opacity: 1; transform: none; transition: none; }
   .tline .hero-wrap { height: auto; }
   .tline .hero-pin { position: static; height: auto; padding: 10vh 0; }
+  .tline .hero-art { width: min(88vw, 720px); height: auto; aspect-ratio: 4 / 3; transform: none !important; }
   .tline .hero-title { position: static; opacity: 1 !important; transform: none !important; color: var(--ink); text-shadow: none; max-width: none; text-align: center; margin-top: 20px; }
   .tline .hero-title .tag { color: var(--ink-dim); }
 }
@@ -4381,5 +4388,6 @@ html[data-a11y] .tline .finale .end-dot { animation: none !important; }
 html[data-a11y] .tline .node__card { opacity: 1 !important; transform: none !important; }
 html[data-a11y] .tline .hero-wrap { height: auto; }
 html[data-a11y] .tline .hero-pin { position: static; height: auto; padding: 10vh 0; }
+html[data-a11y] .tline .hero-art { width: min(88vw, 720px); height: auto; aspect-ratio: 4 / 3; transform: none !important; }
 html[data-a11y] .tline .hero-title { position: static; opacity: 1 !important; transform: none !important; color: var(--ink); text-shadow: none; max-width: none; text-align: center; margin-top: 20px; }
 html[data-a11y] .tline .hero-title .tag { color: var(--ink-dim); }
