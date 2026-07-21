@@ -96,5 +96,21 @@
   // this is just a belt-and-suspenders hook if a Lenis instance is exposed.
   if (window.lenis && typeof window.lenis.on === "function") window.lenis.on("scroll", schedule);
 
+  // "Skip last year's recap" — the HUD button jumps straight past the
+  // pinned slideshow to the wall, for anyone who doesn't want the recap.
+  const skip = document.getElementById("presoSkip");
+  const wall = document.getElementById("wall");
+  if (skip && wall) {
+    skip.addEventListener("click", () => {
+      const reduce =
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+        document.documentElement.hasAttribute("data-a11y");
+      const l = window.__lenis;
+      if (l && !reduce) l.scrollTo(wall, { offset: 0 });
+      else wall.scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
+      skip.blur();
+    });
+  }
+
   measure(); // set the opening state
 })();

@@ -192,7 +192,17 @@
 .preso .hud__bar { flex: 1; height: 2px; margin: 0 clamp(10px, 2vw, 24px); background: var(--line); border-radius: 999px; overflow: hidden; }
 .preso .hud__fill { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--violet), var(--gold)); transition: width 0.25s var(--ease); }
 .preso .hud__hint { opacity: 0.7; }
-@media (max-width: 560px) { .preso .hud__hint { display: none; } }
+/* skip control: a subtle pill in the HUD (pinned bottom throughout the
+   slideshow) that jumps past the recap to the wall. js/preso.js wires it. */
+.preso .hud__skip {
+  font: inherit; color: var(--ink-dim);
+  background: none; border: 1px solid var(--line);
+  border-radius: 999px; cursor: pointer;
+  padding: 6px 14px; white-space: nowrap;
+  transition: color 0.3s var(--ease), border-color 0.3s var(--ease);
+}
+.preso .hud__skip:hover, .preso .hud__skip:focus-visible { color: var(--gold); border-color: var(--gold); }
+@media (max-width: 560px) { .preso .hud__skip { padding: 5px 11px; font-size: 0.66rem; } }
 
 /* reduced motion: every scene shows its finished state, no movement.
    Scroll still selects the scene; only the entrance animations stop. */

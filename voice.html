@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css?v=172" />
-  <link rel="stylesheet" href="css/preso.css?v=4" />
+  <link rel="stylesheet" href="css/preso.css?v=5" />
 </head>
 <body>
   <script>document.body.classList.add("is-loading");</script>
@@ -144,11 +144,11 @@
         <p class="closer">…and we're just getting <em>started →</em></p>
       </section>
 
-      <!-- scene counter + scroll progress -->
+      <!-- scene counter + scroll progress + skip -->
       <div class="hud">
         <span id="presoIdx">01 / 06</span>
         <span class="hud__bar"><span class="hud__fill" id="presoFill"></span></span>
-        <span class="hud__hint">↓ scroll through</span>
+        <button class="hud__skip" id="presoSkip" type="button" aria-label="Skip last year's recap and jump to the wall">Skip last year's recap ↓</button>
       </div>
     </div>
   </section>
@@ -194,7 +194,7 @@
   <script src="js/polish.js?v=82"></script>
   <script src="js/aiglow.js?v=78"></script>
   <script src="js/main.js?v=82"></script>
-  <script src="js/preso.js?v=4"></script>
+  <script src="js/preso.js?v=5"></script>
   <script src="js/wall3d.js?v=78"></script>
   <script src="js/thread.js?v=116"></script>
   <script src="js/theme.js?v=1"></script>
