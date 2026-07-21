@@ -5,21 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script>(function(){try{var t=localStorage.getItem("wf-theme");var d=t?t==="dark":matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.setAttribute("data-theme",d?"dark":"light");if(localStorage.getItem("wf-a11y"))document.documentElement.setAttribute("data-a11y","");}catch(e){}})();</script>
   <title>wearefeminism · Your voice</title>
-  <meta name="description" content="Test what you know and bust the myths: quizzes and games about feminism, in a student-led, anonymous space." />
+  <meta name="description" content="See where our research has travelled, then add your voice to the anonymous wall. A student-led space where every voice matters." />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <meta name="theme-color" content="#4a3568" />
   <!-- Open Graph / social share -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="wearefeminism" />
   <meta property="og:title" content="wearefeminism · Your voice" />
-  <meta property="og:description" content="Test what you know and bust the myths: quizzes and games about feminism, in a student-led, anonymous space." />
+  <meta property="og:description" content="See where our research has travelled, then add your voice to the anonymous wall. A student-led space where every voice matters." />
   <meta property="og:url" content="https://emmanueladusi.github.io/wearefeminismm/voice.html" />
   <meta property="og:image" content="https://emmanueladusi.github.io/wearefeminismm/img/og-image.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="wearefeminism · Your voice" />
-  <meta name="twitter:description" content="Test what you know and bust the myths: quizzes and games about feminism." />
+  <meta name="twitter:description" content="See where our research has travelled, then add your voice to the anonymous wall." />
   <meta name="twitter:image" content="https://emmanueladusi.github.io/wearefeminismm/img/og-image.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -73,10 +73,10 @@
   <section class="hero" id="top" data-bg="#f2ecf7">
     <p class="hero__eyebrow line-reveal"><span>Your voice</span></p>
     <h1 class="hero__title">
-      <span class="line-reveal"><span>Test yourself,</span></span>
-      <span class="line-reveal"><span><em>tell us where you stand.</em></span></span>
+      <span class="line-reveal"><span>See the work,</span></span>
+      <span class="line-reveal"><span><em>then add your voice.</em></span></span>
     </h1>
-    <p class="hero__sub line-reveal"><span>Three quick games: catch bias as it scrolls by, test what you know, and swipe to bust the myths. No accounts, no pressure.</span></p>
+    <p class="hero__sub line-reveal"><span>Where our research has travelled, and a wall to say what you need to say. Anonymous, always. No accounts, no pressure.</span></p>
   </section>
 
   <!-- ===== Last year's research: kinetic-typography slideshow (moved from Home).
@@ -153,33 +153,6 @@
     </div>
   </section>
 
-  <!-- ===== Spot the Bias (timed feed game) ===== -->
-  <section class="bias" id="bias" data-bg="#f2ecf7" data-scene>
-    <p class="eyebrow reveal">Spot the bias</p>
-    <h2 class="bias__title reveal">Can you catch bias <em>as it scrolls by?</em></h2>
-    <p class="bias__intro reveal">A feed moves past you. Some posts carry quiet stereotypes; some are fair. Flag the biased ones before they slip away. Trust your gut, then see what you caught.</p>
-    <!-- bias.js renders the start / feed / end screens inside here -->
-    <div class="bias__stage" id="biasStage"></div>
-  </section>
-
-  <!-- ===== Know Your Feminism (multiple-choice quiz) ===== -->
-  <section class="quiz" id="quiz" data-bg="#ece5f3" data-scene>
-    <p class="eyebrow reveal">Know your feminism</p>
-    <h2 class="quiz__title reveal">How much do you <em>actually</em> know?</h2>
-    <p class="quiz__intro reveal">No grades, no pressure: a few questions to test what's stuck and fill in what hasn't. Every answer comes with the why.</p>
-    <!-- quiz.js renders the start / question / end screens inside here -->
-    <div class="quiz__stage" id="quizStage"></div>
-  </section>
-
-  <!-- ===== Myth or Real? (swipe game) ===== -->
-  <section class="myth" id="myth" data-bg="#efe7f4" data-scene>
-    <p class="eyebrow reveal">Myth or real?</p>
-    <h2 class="myth__title reveal">Bust the <em>myths.</em></h2>
-    <p class="myth__intro reveal">Swipe each card: left if it's a myth, right if it's real. Trust your gut, then learn the truth behind it.</p>
-    <!-- myth.js renders the start / cards / end screens inside here -->
-    <div class="myth__stage" id="mythStage"></div>
-  </section>
-
   <!-- ===== The wall: anonymous story wall (shared with Community) ===== -->
   <section class="wall-section" id="wall" data-bg="#1a1330" data-scene>
     <canvas class="wall-canvas" id="wallCanvas" aria-hidden="true"></canvas>
@@ -224,13 +197,6 @@
   <script src="js/preso.js?v=4"></script>
   <script src="js/wall3d.js?v=78"></script>
   <script src="js/thread.js?v=116"></script>
-  <script src="js/biasCards.js?v=79"></script>
-  <script src="js/bias.js?v=79"></script>
-  <script src="js/celebrate.js?v=1"></script>
-  <script src="js/quizQuestions.js?v=2"></script>
-  <script src="js/quiz.js?v=5"></script>
-  <script src="js/mythCards.js?v=2"></script>
-  <script src="js/myth.js?v=2"></script>
   <script src="js/theme.js?v=1"></script>
 </body>
 </html>
