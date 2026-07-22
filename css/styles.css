@@ -83,6 +83,12 @@ em { font-style: italic; color: var(--violet); }
 .sig-tip.is-on { opacity: 1; transform: translate(-50%, -125%); }
 
 /* ===== Nav ===== */
+html {
+  /* stop iOS/Android from inflating text in landscape — layout stays as designed */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 .nav {
   position: fixed;
   top: 0; left: 0; right: 0;
