@@ -2671,6 +2671,7 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
   background: rgba(22, 15, 38, 0.66);
   border: 1px solid rgba(250, 246, 239, 0.16);
   backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 .lens__name {
   font-family: var(--serif);
@@ -3485,6 +3486,7 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
   border-radius: var(--r-lg);
   padding: 24px 22px 22px;
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease), border-color 0.3s var(--ease);
 }
 .involve:hover,
@@ -4417,6 +4419,18 @@ html[data-theme="dark"] .bwc-reel > span { color: #eab84f; }
   .glyph-cap { font-size: 0.7rem; }
 }
 
+/* Safari/WebKit paints large-radius blurs slowly, and phones don't need
+   desktop radii anyway — the elements are roughly half the size, so halving
+   the blur keeps the same visual softness at a fraction of the paint cost. */
+@media (max-width: 760px) {
+  .refract__band { filter: blur(16px); }
+  .edge-glow__bloom { filter: blur(18px) saturate(1.55); }
+  .ag-band1 { filter: blur(28px) saturate(3.0) brightness(1.14); }
+  .ag-band2 { filter: blur(18px) saturate(3.0) brightness(1.14); }
+  .ag-leak__glow { filter: blur(16px); }
+  .ag-leak__emit { filter: blur(14px) brightness(1.5); }
+}
+
 /* ---------- quick check ---------- */
 .tline .check {
   position: relative; z-index: 4;
@@ -4484,6 +4498,7 @@ html[data-theme="dark"] .bwc-reel > span { color: #eab84f; }
   color: var(--ink-dim);
   background: rgba(250, 246, 239, 0.82);
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1px solid var(--line); border-radius: var(--r-pill);
   padding: 10px 16px;
   cursor: pointer;
