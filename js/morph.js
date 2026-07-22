@@ -43,7 +43,12 @@
   // (and after every ScrollTrigger refresh) so GSAP pin spacers are included.
   function measure() {
     const y = window.scrollY;
-    tops = nodes.map((n) => n.getBoundingClientRect().top + y);
+    // anchors sit half a viewport BELOW each section top: a section shows its
+    // pure colour while its top is at the viewport top (so the page-load hero
+    // is clean cream, not half-blended toward the next section), and the
+    // crossfade completes exactly when the next section fills the screen.
+    const lead = window.innerHeight * 0.5;
+    tops = nodes.map((n) => n.getBoundingClientRect().top + y + lead);
   }
 
   const clamp01 = (v) => (v < 0 ? 0 : v > 1 ? 1 : v);
