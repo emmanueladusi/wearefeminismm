@@ -203,6 +203,12 @@
 }
 .preso .hud__skip:hover, .preso .hud__skip:focus-visible { color: var(--gold); border-color: var(--gold); }
 @media (max-width: 560px) { .preso .hud__skip { padding: 5px 11px; font-size: 0.66rem; } }
+/* three collage cards at 120px min each overflow a 375px phone — let them
+   shrink with the viewport instead */
+@media (max-width: 640px) {
+  .preso .s4 .cards { justify-content: center; }
+  .preso .s4 .card { width: clamp(92px, 26vw, 300px); }
+}
 
 /* reduced motion: every scene shows its finished state, no movement.
    Scroll still selects the scene; only the entrance animations stop. */
