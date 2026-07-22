@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=172" />
+  <link rel="stylesheet" href="css/styles.css?v=173" />
 </head>
 <body>
   <script>document.body.classList.add("is-loading");</script>
@@ -91,33 +91,34 @@
 
   <!-- (The wordmark reveal now opens the page as the hero — see top.) -->
 
-  <!-- ===== Pop culture: feminism's soundtrack (moved from Learn) ===== -->
+  <!-- ===== Pop culture: the piece of the week (one featured work, swapped weekly) ===== -->
 <section class="popculture" id="popculture" data-bg="#1e1533">
     <div class="popculture__inner">
       <p class="eyebrow eyebrow--light reveal">In the culture</p>
-      <h2 class="popculture__title reveal">Feminism has a <em>soundtrack.</em></h2>
-      <p class="popculture__lead reveal">It doesn't only live in essays and history books. It lives in the artists who turn it all the way up. A few who carry the message.</p>
+      <h2 class="popculture__title reveal">This week's <em>piece.</em></h2>
+      <p class="popculture__lead reveal">Feminism doesn't only live in essays and history books. Every week, one piece earns this spot: a poem, a song, a speech, a scene. Sit with it for a minute and see what it stirs.</p>
 
-      <ul class="artists">
-        <li class="artist reveal">
-          <div class="artist__photo"><img src="img/artists/aretha.jpg" alt="Aretha Franklin" loading="lazy" /></div>
-          <p class="artist__name">Aretha Franklin</p>
-          <p class="artist__note">The Queen of Soul, whose demand for respect became an anthem for women and the civil rights movement alike.</p>
-        </li>
-        <li class="artist reveal">
-          <div class="artist__photo"><img src="img/artists/beyonce.jpg" alt="Beyoncé" loading="lazy" /></div>
-          <p class="artist__name">Beyoncé</p>
-          <p class="artist__note">Puts a plain definition of feminism on the world's biggest stages, and centers Black women while she does it.</p>
-        </li>
-        <li class="artist reveal">
-          <div class="artist__photo"><img src="img/artists/lizzo.jpg" alt="Lizzo" loading="lazy" /></div>
-          <p class="artist__name">Lizzo</p>
-          <p class="artist__note">Turns self-love and taking up space, unapologetically, into pop you can't sit still to.</p>
-        </li>
-      </ul>
+      <article class="piece reveal">
+        <div class="piece__photo">
+          <img src="img/pieces/maya-angelou.jpg" alt="Maya Angelou reciting a poem at a podium during the 1993 presidential inauguration" loading="lazy" />
+        </div>
+        <div class="piece__body">
+          <p class="piece__meta">Piece 001 · Poem, 1978</p>
+          <h3 class="piece__name">Still I Rise</h3>
+          <p class="piece__author">Maya Angelou</p>
+          <blockquote class="piece__quote">
+            <p>"But still, like dust, I'll rise."</p>
+          </blockquote>
+          <p class="piece__note">Angelou answers centuries of being written down and written off with pure confidence. She lists everything the world did to keep her there, then rises anyway, in rhythm, like the outcome was never in question. No pleading, no permission. It reads like a dare, and she wins.</p>
+          <div class="piece__links">
+            <a class="piece__link" href="https://www.poetryfoundation.org/poems/46446/still-i-rise" target="_blank" rel="noopener" data-magnetic>Read the full poem <span class="cta__arrow">→</span></a>
+            <a class="piece__link" href="https://www.youtube.com/watch?v=JqOqo50LSZ0" target="_blank" rel="noopener" data-magnetic>Hear her read it <span class="cta__arrow">→</span></a>
+          </div>
+        </div>
+      </article>
 
-      <p class="popculture__foot reveal">Starting points, not a canon. Who's on your feminist playlist?</p>
-      <p class="artist__credits reveal">Photos via Wikimedia Commons. Aretha Franklin: public domain. Beyoncé: Raph_PH (CC BY 2.0). Lizzo: Million Dollaz Worth of Game (CC BY 3.0). Alicia Keys: PhilipRomanoPhoto (CC BY 4.0). Janelle Monáe: Myles Kalus Anak Jihem (CC BY-SA 4.0). Whitney Houston: U.S. Department of Defense photo (public domain).</p>
+      <p class="popculture__foot reveal">A new piece lands every week. Got one that deserves this spot? <a class="piece__suggest" href="voice.html#wall">Put it on the wall →</a></p>
+      <p class="piece__credits reveal">Photo: Maya Angelou reciting "On the Pulse of Morning" at the 1993 presidential inauguration. White House Photograph Office, public domain, via Wikimedia Commons.</p>
     </div>
   </section>
 
@@ -199,7 +200,6 @@
   <script src="js/signature.js?v=1"></script>
   <script src="js/polish.js?v=82"></script>
   <script src="js/main.js?v=82"></script>
-  <script src="js/artists.js?v=1"></script>
   <script src="js/theme.js?v=1"></script>
 </body>
 </html>
