@@ -1,14 +1,21 @@
-/* The year machine — the visitor types their age, lands in 1912, and the
-   list shows how old they'd be when each right actually arrived in Canada.
+/* The year machine (voice.html) — the visitor types their age and is SENT
+   BACK: a full-screen takeover where the year itself ticks from 2026 down to
+   1912, landing on "It's 1912. You're 16." Then the takeover lifts and the
+   milestones unroll, each stamped with how old they'd be when the right
+   actually arrived in Canada. Ends at the wall: say something to the girls
+   still waiting.
+
    Everything runs on-page: the age is never stored or sent anywhere.
 
    The gut punch is the "line": a girl who was a teenager in 1912 could
    expect to live to about 68, so every milestone after that renders ghosted,
    because statistically she never saw it. */
 (function () {
-  var BASE = 1912;      // the year they land in
-  var LIFESPAN = 68;    // rough life expectancy for a girl who was a teen in 1912
+  var BASE = 1912;
+  var LIFESPAN = 68;
   var THIS_YEAR = 2026;
+  var TRAVEL_MS = 2400;   // the 2026 -> 1912 tick
+  var HOLD_MS = 1700;     // how long "It's 1912. You're 16." hangs alone
 
   var EVENTS = [
     { y: 1918, t: "Most women can vote federally for the first time. “Most”: Asian and Indigenous women are told to keep waiting.", dark: true },
@@ -28,14 +35,17 @@
   var go = document.getElementById("ymGo");
   var list = document.getElementById("ymList");
   var foot = document.getElementById("ymFoot");
+  var travel = document.getElementById("ymTravel");
+  var travelYear = document.getElementById("ymTravelYear");
+  var travelScene = document.getElementById("ymTravelScene");
   if (!input || !go || !list) return;
 
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var running = false;
 
   document.querySelectorAll(".ym__step").forEach(function (b) {
     b.addEventListener("click", function () {
-      var v = clampAge(parseInt(input.value, 10) + parseInt(b.getAttribute("data-d"), 10));
-      input.value = v;
+      input.value = clampAge(parseInt(input.value, 10) + parseInt(b.getAttribute("data-d"), 10));
     });
   });
 
@@ -51,16 +61,10 @@
     return li;
   }
 
-  function run() {
-    var age = clampAge(parseInt(input.value, 10));
-    input.value = age;
+  function buildRows(age) {
     var born = BASE - age;
-    list.innerHTML = "";
-    foot.hidden = true;
-
     var rows = [];
     rows.push(item("ym__item--open", '<p class="ym__scene">It’s ' + BASE + ". You’re " + age + ". You were born in " + born + ".</p>"));
-
     var crossed = false;
     EVENTS.forEach(function (e) {
       var at = age + (e.y - BASE);
@@ -74,27 +78,106 @@
         '<span class="ym__year">' + e.y + '</span><span class="ym__at">' + (gone ? "you’d have been " : "you’re ") + at + "</span><p>" + e.t + "</p>"
       ));
     });
-
     var nowAt = age + (THIS_YEAR - BASE);
     rows.push(item("ym__item--gone ym__item--now",
       '<span class="ym__year">' + THIS_YEAR + '</span><span class="ym__at">you’d have been ' + nowAt + "</span><p>The gap is still open: women in Canada earn about 89 cents on the man’s dollar, and for Black and racialized women it’s less. Some waits aren’t over.</p>"));
+    return rows;
+  }
 
+  function unroll(rows) {
     rows.forEach(function (li) { list.appendChild(li); });
-
-    // staggered arrival, unless the visitor asked for reduced motion
     if (reduceMotion) {
       rows.forEach(function (li) { li.classList.add("in"); });
       foot.hidden = false;
-    } else {
-      rows.forEach(function (li, i) {
-        setTimeout(function () { li.classList.add("in"); }, 350 + i * 420);
-      });
-      setTimeout(function () { foot.hidden = false; }, 350 + rows.length * 420);
+      return;
     }
+    rows.forEach(function (li, i) {
+      setTimeout(function () { li.classList.add("in"); }, 300 + i * 420);
+    });
+    setTimeout(function () { foot.hidden = false; }, 300 + rows.length * 420);
+  }
 
-    // keep the first lines in view on phones once they start landing
-    var top = list.getBoundingClientRect().top + window.scrollY - 120;
-    if (window.__lenis) { window.__lenis.scrollTo(top); } else { window.scrollTo(0, top); }
+  function scrollToList() {
+    var top = list.getBoundingClientRect().top + window.scrollY - 110;
+    if (window.__lenis) { window.__lenis.scrollTo(top, { immediate: true }); }
+    else { window.scrollTo(0, top); }
+  }
+
+  /* --- the takeover: year ticks 2026 -> 1912, scene line, then lift --- */
+  var travelDone = null;   // when set, finishing early is allowed (tap to skip)
+
+  function lockScroll(on) {
+    document.body.classList.toggle("ym-lock", on);
+    var lenis = window.__lenis;
+    if (lenis) { on ? lenis.stop() : lenis.start(); }
+  }
+
+  function runTravel(age, after) {
+    var start = null;
+    var finished = false;
+    var raf = null;
+    var holdTimer = null;
+
+    function finish() {
+      if (finished) return;
+      finished = true;
+      if (raf) cancelAnimationFrame(raf);
+      clearTimeout(holdTimer);
+      travel.classList.remove("on");
+      travelScene.classList.remove("show");
+      travel.setAttribute("aria-hidden", "true");
+      lockScroll(false);
+      travelDone = null;
+      after();
+    }
+    travelDone = finish;
+
+    travel.setAttribute("aria-hidden", "false");
+    travelYear.textContent = String(THIS_YEAR);
+    travelScene.textContent = "It’s " + BASE + ". You’re " + age + ".";
+    travel.classList.add("on");
+    lockScroll(true);
+
+    function ease(t) { return 1 - Math.pow(1 - t, 3); }   // fast leave, slow landing
+    function tick(ts) {
+      if (finished) return;
+      if (start === null) start = ts;
+      var p = Math.min(1, (ts - start) / TRAVEL_MS);
+      travelYear.textContent = String(Math.round(THIS_YEAR - (THIS_YEAR - BASE) * ease(p)));
+      if (p < 1) { raf = requestAnimationFrame(tick); return; }
+      travelScene.classList.add("show");
+      holdTimer = setTimeout(finish, HOLD_MS);
+    }
+    raf = requestAnimationFrame(tick);
+
+    // safety: never strand the visitor if rAF stalls (background tab, etc.)
+    setTimeout(function () {
+      if (!finished) { travelYear.textContent = String(BASE); travelScene.classList.add("show"); }
+      setTimeout(finish, HOLD_MS);
+    }, TRAVEL_MS + 250);
+  }
+
+  travel.addEventListener("click", function () { if (travelDone) travelDone(); });
+
+  function run() {
+    if (running) return;
+    running = true;
+    var age = clampAge(parseInt(input.value, 10));
+    input.value = age;
+    list.innerHTML = "";
+    foot.hidden = true;
+    var rows = buildRows(age);
+
+    if (reduceMotion) {
+      unroll(rows);
+      running = false;
+      return;
+    }
+    runTravel(age, function () {
+      scrollToList();
+      unroll(rows);
+      running = false;
+    });
   }
 
   go.addEventListener("click", run);

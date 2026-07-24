@@ -26,7 +26,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=177" />
+  <link rel="stylesheet" href="css/styles.css?v=178" />
   <link rel="stylesheet" href="css/preso.css?v=6" />
 </head>
 <body>
@@ -157,6 +157,39 @@
   </section>
 
   <!-- ===== The wall: anonymous story wall (shared with Community) ===== -->
+  <!-- ===== The year machine: type your age, get sent back to 1912, and watch
+       how old you'd be when each right finally arrived (js/yearmachine.js). -->
+  <section class="ym" id="yearmachine" aria-label="The year machine" data-bg="#241a3d">
+    <div class="ym__inner">
+      <p class="eyebrow eyebrow--light reveal">Before you speak</p>
+      <h2 class="ym__title reveal">What if <em>you</em> were there?</h2>
+      <p class="ym__lead reveal">The year is 1912. Same you, same age, same dreams. Type your age and see how long you would have waited for things you already have.</p>
+
+      <div class="ym__controls reveal">
+        <div class="ym__agebox">
+          <button class="ym__step" type="button" data-d="-1" aria-label="One year younger">−</button>
+          <input class="ym__age" id="ymAge" type="number" inputmode="numeric" min="10" max="25" value="16" aria-label="Your age" />
+          <button class="ym__step" type="button" data-d="1" aria-label="One year older">+</button>
+        </div>
+        <button class="ym__go" id="ymGo" type="button" data-magnetic>Send me back <span class="cta__arrow">→</span></button>
+      </div>
+      <p class="ym__privacy reveal">Nothing you type is saved or sent anywhere. This all happens on your screen.</p>
+
+      <ol class="ym__list" id="ymList"></ol>
+      <div class="ym__foot" id="ymFoot" hidden>
+        <p class="ym__foot-line">All of that is one lifetime. One girl, waiting. You made it back to 2026, and the wall is right below.</p>
+        <a class="ym__cta" href="#wall">Say something to the girls still waiting <span class="cta__arrow">↓</span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- the time-travel takeover (js/yearmachine.js): the year ticks 2026 -> 1912 -->
+  <div class="ym-travel" id="ymTravel" aria-hidden="true">
+    <p class="ym-travel__year" id="ymTravelYear">2026</p>
+    <p class="ym-travel__scene" id="ymTravelScene"></p>
+    <p class="ym-travel__skip">tap anywhere to skip</p>
+  </div>
+
   <section class="wall-section" id="wall" data-bg="#1a1330" data-scene>
     <canvas class="wall-canvas" id="wallCanvas" aria-hidden="true"></canvas>
     <div class="wall-section__inner">
@@ -198,6 +231,7 @@
   <script src="js/aiglow.js?v=78"></script>
   <script src="js/main.js?v=82"></script>
   <script src="js/preso.js?v=5"></script>
+  <script src="js/yearmachine.js?v=2"></script>
   <script src="js/wall3d.js?v=78"></script>
   <script src="js/thread.js?v=116"></script>
   <script src="js/theme.js?v=1"></script>
