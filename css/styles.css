@@ -1058,6 +1058,16 @@ section { position: relative; }
   margin-bottom: 14px;
 }
 
+.footer__mission {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.02rem;
+  color: var(--ink-dim);
+  max-width: 44ch;
+  margin: 0 auto 16px;
+  line-height: 1.5;
+}
+
 .footer__coming {
   font-family: var(--mono);
   font-size: 0.7rem;
@@ -2038,6 +2048,16 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
   font-size: 0.9rem;
   color: var(--ink-dim);
   font-variant-numeric: tabular-nums;
+}
+/* the thesis line: the 44% is the assignment the whole site answers */
+.sparkcard__mission {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.08rem;
+  color: var(--ink);
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+  margin: 18px 0 0;
 }
 /* scan-to-vote QR next to the graph */
 .sparkcard__qr { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
