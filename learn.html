@@ -26,7 +26,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=176" />
+  <link rel="stylesheet" href="css/styles.css?v=177" />
 </head>
 <body>
   <script>document.body.classList.add("is-loading");</script>
@@ -242,6 +242,32 @@
        leaves its right-margin ribbon and weaves through every .th-anchor
        here, lighting the event nodes as it passes. Driven by
        js/timeline.js; styles under ".tline" in css/styles.css. ===== -->
+  <!-- ===== The year machine: type your age, get sent back to 1912, and watch
+       how old you'd be when each right finally arrived (js/yearmachine.js). -->
+  <section class="ym" id="yearmachine" aria-label="The year machine" data-bg="#241a3d">
+    <div class="ym__inner">
+      <p class="eyebrow eyebrow--light reveal">Before you walk the history</p>
+      <h2 class="ym__title reveal">What if <em>you</em> were there?</h2>
+      <p class="ym__lead reveal">The year is 1912. Same you, same age, same dreams. Type your age and see how long you would have waited for things you already have.</p>
+
+      <div class="ym__controls reveal">
+        <div class="ym__agebox">
+          <button class="ym__step" type="button" data-d="-1" aria-label="One year younger">−</button>
+          <input class="ym__age" id="ymAge" type="number" inputmode="numeric" min="10" max="25" value="16" aria-label="Your age" />
+          <button class="ym__step" type="button" data-d="1" aria-label="One year older">+</button>
+        </div>
+        <button class="ym__go" id="ymGo" type="button" data-magnetic>Send me back <span class="cta__arrow">→</span></button>
+      </div>
+      <p class="ym__privacy reveal">Nothing you type is saved or sent anywhere. This all happens on your screen.</p>
+
+      <ol class="ym__list" id="ymList"></ol>
+      <div class="ym__foot" id="ymFoot" hidden>
+        <p class="ym__foot-line">All of that is one lifetime. One girl, waiting.</p>
+        <a class="ym__cta" href="#timeline">Now walk the whole fight <span class="cta__arrow">↓</span></a>
+      </div>
+    </div>
+  </section>
+
   <section class="tline" id="timeline" aria-label="The waves of feminism, as a timeline" data-bg="#faf6ef">
 
     <div class="tline__head">
@@ -775,6 +801,7 @@
   <script src="js/polish.js?v=82"></script>
   <script src="js/main.js?v=82"></script>
   <script src="js/timeline.js?v=4"></script>
+  <script src="js/yearmachine.js?v=1"></script>
   <script src="js/thread.js?v=116"></script>
   <script src="js/spark.js?v=90"></script>
   <script src="js/theme.js?v=1"></script>

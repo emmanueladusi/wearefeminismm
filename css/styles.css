@@ -3315,6 +3315,153 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
   .piece__photo { aspect-ratio: 3 / 2; }
 }
 
+/* ===== The year machine (learn.html, js/yearmachine.js) =====
+   Solid deep-violet panel (like .popculture) so the morph field can't wash
+   the text. In dark mode the global section-transparency rule lets it ride
+   the dark backdrop instead, which reads the same. */
+.ym {
+  background-color: #241a3d;
+  padding: var(--section-y) 0;
+  position: relative;
+}
+.ym__inner { max-width: 760px; margin: 0 auto; padding: 0 var(--gutter); }
+.ym__title {
+  font-family: var(--serif);
+  font-weight: 700;
+  color: var(--cream-on-dark);
+  font-size: clamp(2rem, 5.5vw, 3.4rem);
+  line-height: 1.05;
+  margin: 0.5rem 0 0;
+}
+.ym__title em { font-style: italic; color: var(--gold); }
+.ym__lead {
+  color: var(--dim-on-dark);
+  max-width: 52ch;
+  margin: 1.1rem 0 0;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+.ym__controls {
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: 14px 22px;
+  margin-top: clamp(22px, 3vw, 34px);
+}
+.ym__agebox {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: var(--r-pill);
+  padding: 4px;
+}
+.ym__step {
+  width: 44px; height: 44px;
+  border: 0; border-radius: 50%;
+  background: transparent;
+  color: var(--cream-on-dark);
+  font-size: 1.4rem; line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.ym__step:hover { background: rgba(217, 161, 63, 0.18); }
+.ym__age {
+  width: 3.2ch;
+  background: none; border: 0;
+  color: var(--gold);
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 2rem;
+  text-align: center;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+.ym__age::-webkit-inner-spin-button, .ym__age::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.ym__age:focus { outline: none; }
+.ym__agebox:focus-within { border-color: var(--gold); }
+.ym__go {
+  border: 0; cursor: pointer;
+  background: var(--gold);
+  color: #241a3d;
+  font-weight: 700;
+  font-size: 1rem;
+  border-radius: var(--r-pill);
+  padding: 14px 24px;
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+}
+.ym__go:hover { transform: translateY(-2px); box-shadow: 0 14px 34px rgba(217, 161, 63, 0.3); }
+.ym__privacy {
+  color: rgba(250, 246, 239, 0.4);
+  font-size: 0.78rem;
+  margin: 12px 0 0;
+}
+.ym__list { list-style: none; margin: clamp(26px, 4vw, 40px) 0 0; padding: 0; }
+.ym__item {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 4px 18px;
+  align-items: baseline;
+  padding: 14px 0 14px 18px;
+  border-left: 2px solid rgba(217, 161, 63, 0.35);
+  opacity: 0; transform: translateY(14px);
+  transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
+}
+.ym__item.in { opacity: 1; transform: none; }
+.ym__year {
+  font-family: var(--mono);
+  color: var(--gold);
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+}
+.ym__at {
+  grid-column: 2;
+  font-family: var(--serif);
+  font-style: italic;
+  color: var(--cream-on-dark);
+  font-size: 1.05rem;
+}
+.ym__item > p {
+  grid-column: 2;
+  color: var(--dim-on-dark);
+  font-size: 0.95rem;
+  line-height: 1.55;
+  margin: 0;
+}
+.ym__item--dark { border-left-color: var(--gold); background: rgba(217, 161, 63, 0.07); border-radius: 0 12px 12px 0; }
+.ym__item--open, .ym__item--line { grid-template-columns: 1fr; border-left-color: transparent; padding-left: 0; }
+.ym__scene {
+  font-family: var(--serif);
+  color: var(--cream-on-dark);
+  font-size: clamp(1.15rem, 2.4vw, 1.45rem);
+  line-height: 1.4;
+  margin: 0;
+}
+.ym__item--line { margin-top: 10px; padding-top: 22px; border-top: 1px dashed rgba(250, 246, 239, 0.35); }
+.ym__item--line .ym__scene { color: var(--gold); }
+.ym__item--gone { opacity: 0; }
+.ym__item--gone.in { opacity: 0.45; }
+.ym__item--gone .ym__at::after { content: " · you never saw it"; color: rgba(250, 246, 239, 0.5); font-size: 0.85em; }
+.ym__item--now.in { opacity: 0.8; }
+.ym__item--now .ym__at::after { content: " · still waiting"; color: var(--gold); font-size: 0.85em; }
+.ym__foot { margin-top: clamp(26px, 4vw, 40px); }
+.ym__foot-line {
+  font-family: var(--serif); font-style: italic;
+  color: var(--cream-on-dark);
+  font-size: 1.15rem;
+  margin: 0 0 14px;
+}
+.ym__cta {
+  color: var(--gold);
+  text-decoration: none;
+  font-weight: 700;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.35);
+  padding-bottom: 2px;
+}
+.ym__cta:hover { border-color: var(--gold); }
+@media (max-width: 560px) {
+  .ym__item { grid-template-columns: 1fr; }
+  .ym__year { grid-column: 1; }
+  .ym__at, .ym__item > p { grid-column: 1; }
+}
+
 /* ===== Resources: Black Canadian feminist scholars ===== */
 .resources {
   background-color: #f2ecf7;   /* solid, so the morph backdrop can't wash the text */
