@@ -163,7 +163,7 @@
     try {
       renderer = new THREE.WebGLRenderer({ canvas, alpha: false, antialias: false });
     } catch { canvas.style.display = "none"; return; }
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
+    renderer.setPixelRatio(1);   // ambient backdrop: 1x is plenty and halves the fill cost
     renderer.outputColorSpace = THREE.SRGBColorSpace;
 
     const DEEP = 0x2e2145;

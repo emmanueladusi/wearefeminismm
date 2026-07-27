@@ -89,7 +89,13 @@
      ============================================================ */
   const scenes = Array.from(document.querySelectorAll("[data-scene]"));
   if (!scenes.length) return;
-  scenes.forEach((el) => (el.style.willChange = "transform, opacity"));
+  /* will-change is a promise to the compositor, not a speed switch: holding
+     it on every scene keeps a full-size GPU texture per section alive for the
+     whole session. Promote only what is close to the viewport. */
+  function setPromotion(el, on) {
+    const want = on ? "transform, opacity" : "auto";
+    if (el.style.willChange !== want) el.style.willChange = want;
+  }
 
   let prevY = window.scrollY;
   let vel = 0;             // smoothed scroll velocity (px/frame)
@@ -118,6 +124,8 @@
       const ty = -p * 52;                      // counter-parallax so it feels held, not scrolled
       // (depth-of-field blur removed — the constant soft-focus on every
       //  section read as busy; the recede + fade carry the depth on their own.)
+      // ax is distance from viewport centre in viewport-heights
+      setPromotion(el, ax < 1.6);
       el.style.transform =
         `perspective(1000px) translate3d(0, ${ty.toFixed(2)}px, 0) rotateX(${rx.toFixed(3)}deg) scale(${scale.toFixed(4)}) scaleY(${(1 + vScale).toFixed(4)}) skewY(${skew.toFixed(3)}deg)`;
       el.style.opacity = opa.toFixed(3);

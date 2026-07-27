@@ -4072,6 +4072,7 @@ html[data-theme="dark"] .post, html[data-theme="dark"] .quiz-card, html[data-the
 html[data-theme="dark"] .myth-card { background: rgba(255, 255, 255, 0.06) !important; color: var(--ink) !important; }
 /* the light hero refract/prism art dims a touch on dark */
 html[data-theme="dark"] .refract { opacity: 0.5; }
+
 /* ---------- Accessible mode ---------- */
 html[data-a11y] {
   font-size: 115%;                                   /* larger text (scales rem) */
@@ -4432,8 +4433,8 @@ html[data-theme="dark"] .bwc-reel > span { color: #eab84f; }
    desktop radii anyway — the elements are roughly half the size, so halving
    the blur keeps the same visual softness at a fraction of the paint cost. */
 @media (max-width: 760px) {
-  .refract__band { filter: blur(16px); }
   .edge-glow__bloom { filter: blur(18px) saturate(1.55); }
+  .refract__band { filter: blur(16px); }
 }
 
 /* ---------- quick check ---------- */
