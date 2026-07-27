@@ -149,43 +149,6 @@ html {
   text-decoration: none;
 }
 
-.nav__links {
-  display: flex;
-  align-items: center;
-  gap: clamp(16px, 3vw, 34px);
-}
-
-.nav__links a {
-  color: var(--ink-dim);
-  text-decoration: none;
-  font-size: 0.88rem;
-  font-weight: 600;
-  position: relative;
-  transition: color 0.25s;
-}
-
-.nav__links a::after {
-  content: "";
-  position: absolute;
-  left: 0; bottom: -4px;
-  width: 100%; height: 1.5px;
-  background: var(--gold);
-  transform: scaleX(0);
-  transform-origin: right;
-  transition: transform 0.35s var(--ease);
-}
-
-.nav__links a:hover { color: var(--ink); }
-.nav__links a:hover::after { transform: scaleX(1); transform-origin: left; }
-
-.nav__links a.is-current { color: var(--ink); }
-.nav__links a.is-current::after { transform: scaleX(1); transform-origin: left; }
-
-/* ===== Mobile nav (≤760px): compact bar + full-screen overlay menu =====
-   The burger only exists here; desktop keeps the inline link row. The bar
-   drops backdrop-filter on mobile because a filtered ancestor becomes the
-   containing block for the fixed overlay (it would clip to the bar). */
-.nav__burger { display: none; }
 @media (max-width: 760px) {
   .nav {
     padding: 12px 20px;
@@ -194,65 +157,7 @@ html {
     backdrop-filter: none;
   }
   html[data-theme="dark"] header.nav { background: rgba(18, 14, 28, 0.94); }
-  .nav__burger {
-    display: inline-flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 5px;
-    width: 44px; height: 44px;
-    background: none; border: 0; padding: 0;
-    cursor: pointer;
-    position: relative; z-index: 130;
-  }
-  .nav__burger span {
-    display: block; width: 22px; height: 2px;
-    background: var(--ink); border-radius: 2px;
-    transition: transform 0.35s var(--ease), opacity 0.25s;
-  }
-  body.nav-open .nav__burger span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-  body.nav-open .nav__burger span:nth-child(2) { opacity: 0; }
-  body.nav-open .nav__burger span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-  .nav__links {
-    position: fixed; inset: 0;
-    flex-direction: column;
-    justify-content: center; align-items: center;
-    gap: clamp(20px, 3.6svh, 32px);
-    background: rgba(250, 246, 239, 0.98);
-    opacity: 0; visibility: hidden; pointer-events: none;
-    transition: opacity 0.4s var(--ease), visibility 0s linear 0.4s;
-    z-index: 120;
-  }
-  html[data-theme="dark"] .nav__links { background: rgba(18, 14, 28, 0.98); }
-  body.nav-open .nav__links {
-    opacity: 1; visibility: visible; pointer-events: auto;
-    transition: opacity 0.4s var(--ease);
-  }
-  .nav__links a {
-    font-family: var(--serif);
-    font-size: clamp(1.7rem, 8vw, 2.2rem);
-    font-weight: 600;
-    color: var(--ink);
-    padding: 4px 12px;
-    opacity: 0; transform: translateY(16px);
-    transition: color 0.25s, opacity 0.45s var(--ease), transform 0.45s var(--ease);
-  }
-  body.nav-open .nav__links a { opacity: 1; transform: none; }
-  body.nav-open .nav__links a:nth-of-type(1) { transition-delay: 0.06s; }
-  body.nav-open .nav__links a:nth-of-type(2) { transition-delay: 0.12s; }
-  body.nav-open .nav__links a:nth-of-type(3) { transition-delay: 0.18s; }
-  body.nav-open .nav__links a:nth-of-type(4) { transition-delay: 0.24s; }
-  .nav__links a::after { bottom: 2px; height: 2px; left: 12px; right: 12px; width: auto; }
-
-  .nav .nav__tools {
-    margin-left: 0;
-    margin-top: clamp(12px, 2.6svh, 22px);
-    gap: 14px;
-    opacity: 0;
-    transition: opacity 0.45s var(--ease) 0.3s;
-  }
-  body.nav-open .nav .nav__tools { opacity: 1; }
   .nav .nav__toggle { width: 44px; height: 44px; }
 
   body.nav-open { overflow: hidden; }
@@ -4967,4 +4872,139 @@ html.theme-shifting section {
 @media (prefers-reduced-motion: reduce) {
   html.theme-shifting, html.theme-shifting body,
   html.theme-shifting #morph, html.theme-shifting section { transition: none; }
+}
+
+/* =====================================================
+   Navigation — bar plus overlay panel.
+   The bar carries only the mark and the way in; the whole site lives in one
+   panel. Numbered rows so the order reads, restrained type and square-ish
+   radii so it stays editorial rather than cartoonish.
+   ===================================================== */
+.nav__right { display: flex; align-items: center; gap: clamp(10px, 1.6vw, 20px); }
+
+.nav__menu-btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  min-height: 44px; padding: 0 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: none;
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  cursor: pointer;
+  transition: border-color 0.3s, color 0.3s;
+}
+.nav__menu-btn:hover, .nav__menu-btn:focus-visible { border-color: var(--gold); color: var(--gold-ink); }
+html[data-theme="dark"] .nav__menu-btn:hover { color: var(--gold); }
+
+.nav__menu-bars { display: grid; gap: 4px; }
+.nav__menu-bars span {
+  display: block; width: 16px; height: 1.5px; background: currentColor;
+  transition: transform 0.3s var(--ease);
+}
+body.nav-open .nav__menu-bars span:nth-child(1) { transform: translateY(2.75px) rotate(45deg); }
+body.nav-open .nav__menu-bars span:nth-child(2) { transform: translateY(-2.75px) rotate(-45deg); }
+
+/* ---------- the panel ---------- */
+.menu { position: fixed; inset: 0; z-index: 300; }
+.menu[hidden] { display: none; }
+
+.menu__scrim {
+  position: absolute; inset: 0;
+  background: rgba(26, 19, 40, 0.55);
+  opacity: 0;
+  transition: opacity 0.35s var(--ease);
+}
+body.nav-open .menu__scrim { opacity: 1; }
+
+.menu__panel {
+  position: absolute;
+  top: clamp(12px, 2vh, 22px); right: clamp(12px, 2vw, 26px);
+  width: min(408px, calc(100vw - 24px));
+  max-height: calc(100svh - clamp(24px, 4vh, 44px));
+  overflow-y: auto;
+  padding: clamp(22px, 3vw, 32px);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: 0 30px 70px -28px rgba(44, 33, 64, 0.45);
+  transform: translateY(-10px);
+  opacity: 0;
+  transition: opacity 0.32s var(--ease), transform 0.32s var(--ease);
+}
+body.nav-open .menu__panel { opacity: 1; transform: none; }
+html[data-theme="dark"] .menu__panel { background: var(--paper-soft); }
+
+.menu__close {
+  position: absolute; top: 14px; right: 14px;
+  width: 40px; height: 40px;
+  display: grid; place-items: center;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: none;
+  color: var(--ink-dim);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: color 0.25s, border-color 0.25s;
+}
+.menu__close:hover, .menu__close:focus-visible { color: var(--gold-ink); border-color: var(--gold); }
+
+.menu__list { list-style: none; margin: 26px 0 0; padding: 0; }
+
+.menu__row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 14px;
+  padding: 15px 0;
+  border-bottom: 1px solid var(--line);
+  text-decoration: none;
+  color: var(--ink);
+}
+.menu__list li:first-child .menu__row { border-top: 1px solid var(--line); }
+
+.menu__num {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  color: var(--gold-ink);
+}
+.menu__label {
+  font-family: var(--serif);
+  font-size: clamp(1.3rem, 2.4vw, 1.6rem);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+.menu__go {
+  width: 34px; height: 34px;
+  display: grid; place-items: center;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  color: var(--ink-dim);
+  transition: transform 0.3s var(--ease), border-color 0.3s, color 0.3s;
+}
+.menu__row:hover .menu__go,
+.menu__row:focus-visible .menu__go { transform: translateX(4px); border-color: var(--gold); color: var(--gold-ink); }
+.menu__row[aria-current="page"] .menu__label { color: var(--gold-ink); }
+html[data-theme="dark"] .menu__row[aria-current="page"] .menu__label { color: var(--gold); }
+.menu__row:focus-visible { outline: 2px solid var(--gold-ink); outline-offset: 3px; border-radius: var(--r-sm); }
+
+.menu__foot { margin-top: 26px; }
+.menu__ig {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid var(--gold);
+  padding-bottom: 2px;
+}
+.menu__ig:hover { color: var(--gold-ink); }
+.menu__fine { margin: 16px 0 0; font-size: 0.78rem; line-height: 1.55; color: var(--ink-dim); }
+
+@media (prefers-reduced-motion: reduce) {
+  .menu__scrim, .menu__panel, .menu__go, .nav__menu-bars span { transition: none; }
 }

@@ -23,7 +23,7 @@
   <meta name="twitter:image" content="https://emmanueladusi.github.io/wearefeminismm/img/og-image.png" />
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-  <link rel="stylesheet" href="css/styles.css?v=202" />
+  <link rel="stylesheet" href="css/styles.css?v=206" />
   <script>(function(){var d=document.documentElement;d.classList.add("js");setTimeout(function(){if(!d.classList.contains("reveal-ready"))d.classList.remove("js");},2500);})();</script>
 </head>
 <body>
@@ -58,16 +58,55 @@
   <!-- ===== Nav ===== -->
   <header class="nav" id="nav">
     <a class="nav__logo" href="index.html" data-magnetic>wearefeminismm</a>
-    <nav class="nav__links" id="navLinks">
-      <a href="index.html" data-magnetic>Home</a>
-      <a href="learn.html" class="is-current" data-magnetic>Learn</a>
-      <a href="community.html" data-magnetic>Community</a>
-      <a href="voice.html" data-magnetic>Your voice</a>
+    <div class="nav__right">
       <span class="nav__tools"><button class="nav__toggle" id="darkToggle" type="button" title="Dark mode" aria-label="Dark mode" aria-pressed="false" data-magnetic><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.5 6.5 0 0 0 9.8 9.8z"/></svg></button>
       <button class="nav__toggle" id="a11yToggle" type="button" title="Accessible mode" aria-label="Accessible mode" aria-pressed="false" data-magnetic><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="7.3" r="1.4" fill="currentColor"/><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M7.6 10.2h8.8M12 10.6v4.2m0 0-1.9 3.2m1.9-3.2 1.9 3.2"/></svg></button></span>
-    </nav>
-    <button class="nav__burger" id="navBurger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks"><span></span><span></span><span></span></button>
+      <button class="nav__menu-btn" id="navBurger" type="button" aria-expanded="false" aria-controls="navMenu" data-magnetic>
+        <span class="nav__menu-word">Menu</span>
+        <span class="nav__menu-bars" aria-hidden="true"><span></span><span></span></span>
+      </button>
+    </div>
   </header>
+
+  <!-- Overlay menu: a single panel that carries the whole site, the way in
+       and the way to reach us. Numbered rows so the order is legible. -->
+  <div class="menu" id="navMenu" hidden>
+    <div class="menu__scrim" data-menu-close></div>
+    <nav class="menu__panel" aria-label="Site">
+      <button class="menu__close" type="button" aria-label="Close menu" data-menu-close>&#10005;</button>
+      <ul class="menu__list">
+        <li><a class="menu__row" href="index.html">
+          <span class="menu__num" aria-hidden="true">01</span>
+          <span class="menu__label">Home</span>
+          <span class="menu__go" aria-hidden="true">&#8594;</span>
+        </a></li>
+        <li><a class="menu__row" href="learn.html" aria-current="page">
+          <span class="menu__num" aria-hidden="true">02</span>
+          <span class="menu__label">Learn</span>
+          <span class="menu__go" aria-hidden="true">&#8594;</span>
+        </a></li>
+        <li><a class="menu__row" href="community.html">
+          <span class="menu__num" aria-hidden="true">03</span>
+          <span class="menu__label">Community</span>
+          <span class="menu__go" aria-hidden="true">&#8594;</span>
+        </a></li>
+        <li><a class="menu__row" href="voice.html">
+          <span class="menu__num" aria-hidden="true">04</span>
+          <span class="menu__label">Your voice</span>
+          <span class="menu__go" aria-hidden="true">&#8594;</span>
+        </a></li>
+        <li><a class="menu__row" href="receipts.html">
+          <span class="menu__num" aria-hidden="true">05</span>
+          <span class="menu__label">Receipts</span>
+          <span class="menu__go" aria-hidden="true">&#8594;</span>
+        </a></li>
+      </ul>
+      <div class="menu__foot">
+        <a class="menu__ig" href="https://instagram.com/ourfeministspacee" target="_blank" rel="noopener">@ourfeministspacee</a>
+        <p class="menu__fine">Anonymous, always. You never have to share your name.</p>
+      </div>
+    </nav>
+  </div>
 
   <!-- ===== Page intro =====
        Custom hero for Learn: a beam of light refracting into three colour
@@ -702,6 +741,6 @@
   <script src="js/timeline.js?v=4"></script>
   <script src="js/spark.js?v=90"></script>
   <script src="js/theme.js?v=2"></script>
-  <script src="js/nav.js?v=1"></script>
+  <script src="js/nav.js?v=4"></script>
 </body>
 </html>
