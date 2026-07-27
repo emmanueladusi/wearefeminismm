@@ -21,12 +21,9 @@
   <meta name="twitter:title" content="wearefeminism · Learn" />
   <meta name="twitter:description" content="Feminism, Black feminism, and intersectionality, explained with respect for your intelligence." />
   <meta name="twitter:image" content="https://emmanueladusi.github.io/wearefeminismm/img/og-image.png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=179" />
+  <link rel="stylesheet" href="css/styles.css?v=191" />
 </head>
 <body>
   <script>document.body.classList.add("is-loading");</script>
@@ -112,6 +109,7 @@
         </div>
       </div>
       <p class="sparkcard__mission">That number is the assignment. Everything on this page is the answer.</p>
+      <p class="sparkcard__receipt"><a class="receipt-link" href="receipts.html#method">How this number was collected →</a></p>
     </div>
   </section>
 
@@ -165,75 +163,6 @@
           <p class="lens__def">The knot that ties it back together: race, gender, class, all at once, under one movement.</p>
         </article>
       </div>
-    </div>
-  </section>
-
-  <!-- ===== Ask: "what is feminism?" on a dark panel with the
-       flicker-proof Apple-Intelligence rainbow border (see css) ===== -->
-  <section class="askpin" id="ask" aria-label="What is feminism" data-bg="#f4eef8">
-    <!-- turbulence displacement: warps the sharp ring so the border ripples
-         like real emitted light instead of a perfect rounded rectangle -->
-    <svg class="ag-defs" width="0" height="0" aria-hidden="true" focusable="false">
-      <filter id="ag-warp" x="-25%" y="-25%" width="150%" height="150%" color-interpolation-filters="sRGB">
-        <!-- static noise field (computed once, not per frame) — the rippling
-             edge still reads because the rainbow colours rotate through it -->
-        <feTurbulence type="fractalNoise" baseFrequency="0.008 0.012" numOctaves="1" seed="7" result="n" />
-        <feDisplacementMap in="SourceGraphic" in2="n" scale="13"
-                           xChannelSelector="R" yChannelSelector="G" />
-      </filter>
-      <!-- refraction the light leak drags across the content: js/engulf.js
-           ramps the displacement scale up then down as the streak sweeps -->
-      <filter id="ag-distort" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB">
-        <feTurbulence type="fractalNoise" baseFrequency="0.011 0.019" numOctaves="2" seed="3" result="dn" />
-        <feDisplacementMap id="ag-distort-map" in="SourceGraphic" in2="dn" scale="0"
-                           xChannelSelector="R" yChannelSelector="G" />
-      </filter>
-      <!-- wavy edges for the rainbow light leak — warps its straight sides
-           into an organic, rippling band of light -->
-      <filter id="ag-leakwave" x="-45%" y="-45%" width="190%" height="190%" color-interpolation-filters="sRGB">
-        <feTurbulence type="fractalNoise" baseFrequency="0.005 0.010" numOctaves="2" seed="9" result="lw" />
-        <feDisplacementMap in="SourceGraphic" in2="lw" scale="14"
-                           xChannelSelector="R" yChannelSelector="G" />
-      </filter>
-    </svg>
-    <div class="askpin__sticky">
-      <div class="ag-panel">
-        <div class="ag-stack" aria-hidden="true">
-          <!-- dark inner "well" so the rainbow reads as emitted light on the
-               light paper (the reference pops because it sits on near-black);
-               the panel centre + chat box stay cream. -->
-          <div class="ag-backing"></div>
-          <div class="ag-band ag-band1"><div class="ag-ring"></div></div>
-          <div class="ag-band ag-band2"><div class="ag-ring"></div></div>
-          <div class="ag-band ag-band3"><div class="ag-ring"></div></div>
-          <div class="ag-band ag-band4"><div class="ag-ring"></div></div>
-          <div class="ag-comet"><div class="ag-comet-ring"></div></div>
-          <!-- light leak: the rainbow FLARES — an arc of the border blooms
-               (ag-leak__emit, glued to the ring edge) and throws a soft slice
-               of its own colour inward across the frame (ag-leak__streak),
-               warping the question as it passes. Reads as emitted rainbow
-               light, not a stray streak. -->
-          <div class="ag-leak">
-            <span class="ag-leak__glow"></span>
-            <span class="ag-leak__emit"></span>
-            <span class="ag-leak__streak"></span>
-          </div>
-        </div>
-      </div>
-      <div class="askpin__content">
-        <!-- AI-style chat prompt: js/engulf.js auto-types the question in, then
-             the send "fires" the Apple-Intelligence border. Purely animated. -->
-        <div class="aichat" id="aiChat" aria-hidden="true">
-          <span class="aichat__spark">✦</span>
-          <div class="aichat__field">
-            <span class="aichat__text" id="aiChatText" data-placeholder="Ask anything…"></span><span class="aichat__caret"></span>
-          </div>
-          <span class="aichat__send" aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
-          </span>
-        </div>
-      </div>
-
     </div>
   </section>
 
@@ -688,7 +617,7 @@
     <div class="finale">
       <div class="end-dot th-anchor"></div>
       <h3>2026: the thread reaches <em>you.</em></h3>
-      <p>44% of students told us learning about feminism is boring.
+      <p>44% of the students in our survey told us learning about feminism is boring.
          This timeline is the counter-argument. The next node is yours to write.</p>
     </div>
 
@@ -757,6 +686,7 @@
     <p class="footer__mission">Students told us learning feminism was boring. This site is the rebuttal.</p>
     <p class="footer__coming">Next: workshops · mentorship · resource hub</p>
     <a class="footer__ig" href="https://instagram.com/ourfeministspacee" target="_blank" rel="noopener" data-magnetic>@ourfeministspacee on Instagram →</a>
+    <p class="footer__receipts"><a class="receipt-link" href="receipts.html">Receipts · sources, method, house rules →</a></p>
     <p class="footer__fine">Made with care. Your words are anonymous, and you never have to share your name.</p>
   </footer>
 
@@ -766,16 +696,8 @@
   <script src="js/scroll.js?v=79"></script>
   <script src="js/morph.js?v=79"></script>
   <script src="js/journey.js?v=79"></script>
-  <script src="js/pin.js?v=78"></script>
-  <!-- Frame-scrubbed underwater reef backdrop disabled — reverted to the plain
-       hand-drawn .seascape (kelp, dunes, coral, wreck, rays). Re-enable by
-       restoring this script: <script src="js/uwscrub.js?v=101"></script> -->
-  <!-- <script src="js/uwscrub.js?v=101"></script> -->
-  <script src="js/aiglow.js?v=78"></script>
-  <script src="js/aigspeed.js?v=94"></script>
-  <script src="js/engulf.js?v=92"></script>
   <script src="js/polish.js?v=82"></script>
-  <script src="js/main.js?v=82"></script>
+  <script src="js/main.js?v=87"></script>
   <script src="js/timeline.js?v=4"></script>
   <script src="js/thread.js?v=116"></script>
   <script src="js/spark.js?v=90"></script>

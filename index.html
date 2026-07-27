@@ -26,7 +26,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=179" />
+  <link rel="stylesheet" href="css/styles.css?v=191" />
 </head>
 <body>
   <script>document.body.classList.add("is-loading");</script>
@@ -97,32 +97,41 @@
   <!-- ===== Pathways ===== -->
   <section class="paths" id="paths" data-bg="#faf6ef" data-scene>
     <p class="eyebrow reveal">The whole site in three moves</p>
-    <div class="paths__list">
-      <a href="learn.html#whatis" class="pathway reveal">
-        <span class="pathway__num">01</span>
-        <div class="pathway__body">
-          <h2>Learn</h2>
-          <p>Feminism, Black feminism, intersectionality, explained with respect for your intelligence.</p>
-        </div>
-        <span class="pathway__arrow">→</span>
-      </a>
-      <a href="voice.html#wall" class="pathway reveal">
-        <span class="pathway__num">02</span>
-        <div class="pathway__body">
-          <h2>Share <em>your</em> story</h2>
-          <p>What you’ve lived through matters. Put it on the wall. No name, no account, no pressure.</p>
-        </div>
-        <span class="pathway__arrow">→</span>
-      </a>
-      <a href="community.html" class="pathway reveal">
-        <span class="pathway__num">03</span>
-        <div class="pathway__body">
-          <h2>Find <em>your</em> people</h2>
-          <p>Workshops, events, and the community building this across the GTA. You don't have to do any of it alone.</p>
-        </div>
-        <span class="pathway__arrow">→</span>
-      </a>
-    </div>
+    <!-- an ordered list, so the "three moves" sequence is carried by the
+         markup and the big numerals can be decorative (aria-hidden) instead
+         of muddying every link's accessible name -->
+    <ol class="paths__list">
+      <li class="paths__item reveal">
+        <a href="learn.html#whatis" class="pathway">
+          <span class="pathway__num" aria-hidden="true">01</span>
+          <div class="pathway__body">
+            <h2>Learn</h2>
+            <p>Feminism, Black feminism, intersectionality, explained with respect for your intelligence.</p>
+          </div>
+          <span class="pathway__arrow" aria-hidden="true">→</span>
+        </a>
+      </li>
+      <li class="paths__item reveal">
+        <a href="voice.html#wall" class="pathway">
+          <span class="pathway__num" aria-hidden="true">02</span>
+          <div class="pathway__body">
+            <h2>Share <em>your</em> story</h2>
+            <p>What you’ve lived through matters. Put it on the wall. No name, no account, no pressure.</p>
+          </div>
+          <span class="pathway__arrow" aria-hidden="true">→</span>
+        </a>
+      </li>
+      <li class="paths__item reveal">
+        <a href="community.html" class="pathway">
+          <span class="pathway__num" aria-hidden="true">03</span>
+          <div class="pathway__body">
+            <h2>Find <em>your</em> people</h2>
+            <p>Workshops, events, and the community building this across the GTA. You don't have to do any of it alone.</p>
+          </div>
+          <span class="pathway__arrow" aria-hidden="true">→</span>
+        </a>
+      </li>
+    </ol>
     <p class="paths__help reveal">Need real help right now? <strong>Kids Help Phone: text CONNECT to 686868.</strong> Free, confidential, 24/7.</p>
   </section>
 
@@ -165,8 +174,8 @@
       <h2 class="about__title reveal">This started as <em>research.</em></h2>
       <div class="about__grid">
         <div class="about__body">
-          <p class="reveal">In 2025, a youth-led research project with the TDSB asked students how feminism should be taught. The answers were clear: students want it in class, most misconceptions come from never being taught, and <a href="learn.html#boring-pulse" class="about__stat" data-magnetic>over 44% said learning about it was boring&nbsp;→</a></p>
-          <p class="reveal">wearefeminis<span class="about__mm">mm</span> is what those findings were built into. The same ideas, told in a way that actually holds your attention. If that 44% comes out lower for the people who spend time here, the site is doing its job.</p>
+          <p class="reveal">In 2025, a youth-led research project with the TDSB sat down with students and asked how feminism should be taught. The answers were clear: they want it in class, and most of the misunderstanding traces straight back to never being taught it. A survey that has been running ever since puts a number on the rest, and <a href="learn.html#boring-pulse" class="about__stat" data-magnetic>44% say learning about it is boring&nbsp;→</a></p>
+          <p class="reveal">wearefeminis<span class="about__mm">mm</span> is what those findings were built into. The same ideas, told in a way that actually holds your attention. If that 44% comes out lower for the people who spend time here, the site is doing its job. <a href="receipts.html#method" class="receipt-link">How both were measured →</a></p>
           <p class="reveal">It's led by Emmanuel Adusi, the student researcher behind the project. The double m is his signature, E<strong>mm</strong>anuel, stitched into the site's name. This fall he starts Honours Mathematics at the University of Waterloo.</p>
         </div>
         <aside class="about__connect reveal">
@@ -188,6 +197,7 @@
     <p class="footer__mission">Students told us learning feminism was boring. This site is the rebuttal.</p>
     <p class="footer__coming">Next: workshops · mentorship · resource hub</p>
     <a class="footer__ig" href="https://instagram.com/ourfeministspacee" target="_blank" rel="noopener" data-magnetic>@ourfeministspacee on Instagram →</a>
+    <p class="footer__receipts"><a class="receipt-link" href="receipts.html">Receipts · sources, method, house rules →</a></p>
     <p class="footer__fine">Made with care. Your words are anonymous, and you never have to share your name.</p>
   </footer>
 
@@ -203,7 +213,7 @@
   <script src="js/brandmarkCycle.js?v=109"></script>
   <script src="js/signature.js?v=1"></script>
   <script src="js/polish.js?v=82"></script>
-  <script src="js/main.js?v=82"></script>
+  <script src="js/main.js?v=87"></script>
   <script src="js/theme.js?v=1"></script>
   <script src="js/nav.js?v=1"></script>
 </body>

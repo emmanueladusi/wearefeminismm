@@ -7,9 +7,14 @@
 
    Everything runs on-page: the age is never stored or sent anywhere.
 
-   The gut punch is the "line": a girl who was a teenager in 1912 could
-   expect to live to about 68, so every milestone after that renders ghosted,
-   because statistically she never saw it. */
+   The gut punch is the "line": a girl of that generation who reached
+   adulthood could expect to live to about 68, so every milestone after that
+   renders ghosted. 68 is life expectancy AT AGE 20, not at birth (that was
+   far lower, dragged down by infant deaths) — the visitor is already 16 here,
+   so the conditional figure is the honest one. Period life tables also freeze
+   that year's death rates, so real women often outlived it: the copy hedges
+   with "most likely" rather than claiming she never saw it. Sources for every
+   date are on receipts.html#sources — update both together. */
 (function () {
   var BASE = 1912;
   var LIFESPAN = 68;
@@ -19,14 +24,15 @@
 
   var EVENTS = [
     { y: 1918, t: "Most women can vote federally for the first time. “Most”: Asian and Indigenous women are told to keep waiting.", dark: true },
-    { y: 1929, t: "The law finally agrees you are a “person.” Five women had to take it all the way to court to make that true." },
-    { y: 1948, t: "Canadians of Chinese and South Asian descent can finally vote federally.", dark: true },
+    { y: 1929, t: "Women count as “persons” who can be appointed to the Senate. Five women had to fight all the way to London to get that answer." },
+    { y: 1947, t: "Chinese and South Asian Canadians win back the federal vote after British Columbia drops its race bar.", dark: true },
+    { y: 1948, t: "Parliament strikes race out of the federal election law, and Japanese Canadians get the vote back. The first ballots are cast in 1949.", dark: true },
     { y: 1960, t: "Indigenous women (and men) can vote federally without being forced to give up their status.", dark: true },
     { y: 1964, t: "In Quebec, a married woman can finally open a bank account or sign a contract without her husband’s signature." },
-    { y: 1965, t: "Ontario closes its last legally segregated school. Nova Scotia keeps one open until 1983.", dark: true },
-    { y: 1969, t: "Birth control stops being a criminal offence in Canada." },
-    { y: 1971, t: "Federal law finally protects your job while you’re on maternity leave." },
-    { y: 1983, t: "Rape within marriage becomes a crime. Until now, marriage was treated as a legal defence." },
+    { y: 1965, t: "Ontario’s last segregated Black school closes, a year after the law allowing it was struck down. Nova Scotia ended segregation on paper in 1954, but its last Black school stays open until 1983.", dark: true },
+    { y: 1969, t: "Parliament takes birth control out of the Criminal Code. Until now it was a crime to sell or advertise contraception in Canada." },
+    { y: 1971, t: "Ottawa starts paying maternity benefits: 15 weeks of income if you had worked enough weeks. Keeping your actual job was still up to your province." },
+    { y: 1983, t: "Sexual assault inside a marriage becomes a crime. Until now the law defined rape so that a wife did not count." },
     { y: 1985, t: "Charter equality rights come into force, and Indigenous women who lost status by marrying begin to win it back.", dark: true },
     { y: 1993, t: "Canada swears in its first female Prime Minister. She is still the only one." }
   ];
@@ -40,7 +46,13 @@
   var travelScene = document.getElementById("ymTravelScene");
   if (!input || !go || !list) return;
 
-  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  /* Accessible mode is the site's own control and must carry the same
+     weight as the OS setting. Without the data-a11y half, a visitor who
+     deliberately turned motion down still got the full-screen takeover. */
+  function reduced() {
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+           document.documentElement.hasAttribute("data-a11y");
+  }
   var running = false;
 
   document.querySelectorAll(".ym__step").forEach(function (b) {
@@ -70,7 +82,7 @@
       var at = age + (e.y - BASE);
       if (!crossed && at > LIFESPAN) {
         crossed = true;
-        rows.push(item("ym__item--line", '<p class="ym__scene">A girl born in ' + born + " could expect about " + LIFESPAN + " years. Statistically, everything below this line arrived after you were gone.</p>"));
+        rows.push(item("ym__item--line", '<p class="ym__scene">A girl born in ' + born + " who made it to adulthood could expect to live to about " + LIFESPAN + ". Everything below this line most likely arrived after you were gone. Most likely: some women did see it.</p>"));
       }
       var gone = at > LIFESPAN;
       rows.push(item(
@@ -78,15 +90,16 @@
         '<span class="ym__year">' + e.y + '</span><span class="ym__at">' + (gone ? "you’d have been " : "you’re ") + at + "</span><p>" + e.t + "</p>"
       ));
     });
-    var nowAt = age + (THIS_YEAR - BASE);
+    /* no age on this row: "you'd have been 129" reads as a glitch and steals
+       the closing fact */
     rows.push(item("ym__item--gone ym__item--now",
-      '<span class="ym__year">' + THIS_YEAR + '</span><span class="ym__at">you’d have been ' + nowAt + "</span><p>The gap is still open: women in Canada earn about 89 cents on the man’s dollar, and for Black and racialized women it’s less. Some waits aren’t over.</p>"));
+      '<span class="ym__year">' + THIS_YEAR + '</span><span class="ym__at">today</span><p>The gap is still open: women in Canada earn about 89 cents an hour for every dollar a man earns, and racialized women about 78 cents. Some waits aren’t over.</p>'));
     return rows;
   }
 
   function unroll(rows) {
     rows.forEach(function (li) { list.appendChild(li); });
-    if (reduceMotion) {
+    if (reduced()) {
       rows.forEach(function (li) { li.classList.add("in"); });
       foot.hidden = false;
       return;
@@ -127,6 +140,7 @@
       travelScene.classList.remove("show");
       travel.setAttribute("aria-hidden", "true");
       lockScroll(false);
+      if (document.activeElement === travel) go.focus();
       travelDone = null;
       after();
     }
@@ -137,6 +151,8 @@
     travelScene.textContent = "It’s " + BASE + ". You’re " + age + ".";
     travel.classList.add("on");
     lockScroll(true);
+    // after .on: a visibility:hidden element cannot take focus
+    travel.focus();
 
     function ease(t) { return 1 - Math.pow(1 - t, 3); }   // fast leave, slow landing
     function tick(ts) {
@@ -157,7 +173,17 @@
     }, TRAVEL_MS + 250);
   }
 
+  /* Dismissal: pointer, Escape, or any key. It is a full-screen overlay with
+     locked scroll, so a keyboard user needs a real way out and the focus has
+     to live inside it while it is up. */
   travel.addEventListener("click", function () { if (travelDone) travelDone(); });
+  document.addEventListener("keydown", function (e) {
+    if (!travelDone) return;
+    if (e.key === "Escape" || e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      travelDone();
+    }
+  });
 
   function run() {
     if (running) return;
@@ -168,8 +194,9 @@
     foot.hidden = true;
     var rows = buildRows(age);
 
-    if (reduceMotion) {
+    if (reduced()) {
       unroll(rows);
+      scrollToList();
       running = false;
       return;
     }

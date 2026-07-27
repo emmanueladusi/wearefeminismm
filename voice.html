@@ -21,13 +21,10 @@
   <meta name="twitter:title" content="wearefeminism · Your voice" />
   <meta name="twitter:description" content="See where our research has travelled, then add your voice to the anonymous wall." />
   <meta name="twitter:image" content="https://emmanueladusi.github.io/wearefeminismm/img/og-image.png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=179" />
-  <link rel="stylesheet" href="css/preso.css?v=6" />
+  <link rel="stylesheet" href="css/styles.css?v=191" />
+  <link rel="stylesheet" href="css/preso.css?v=8" />
 </head>
 <body>
   <script>document.body.classList.add("is-loading");</script>
@@ -151,7 +148,7 @@
       <div class="hud">
         <span id="presoIdx">01 / 06</span>
         <span class="hud__bar"><span class="hud__fill" id="presoFill"></span></span>
-        <button class="hud__skip" id="presoSkip" type="button" aria-label="Skip last year's recap and jump to the wall">Skip last year's recap ↓</button>
+        <button class="hud__skip" id="presoSkip" type="button" aria-label="Skip last year's recap and jump to the year machine">Skip last year's recap ↓</button>
       </div>
     </div>
   </section>
@@ -179,35 +176,58 @@
       <div class="ym__foot" id="ymFoot" hidden>
         <p class="ym__foot-line">All of that is one lifetime. One girl, waiting. You made it back to 2026, and the wall is right below.</p>
         <a class="ym__cta" href="#wall">Say something to the girls still waiting <span class="cta__arrow">↓</span></a>
+        <p class="ym__sources"><a class="receipt-link receipt-link--light" href="receipts.html#sources">Every date here has a source →</a></p>
       </div>
     </div>
   </section>
 
   <!-- the time-travel takeover (js/yearmachine.js): the year ticks 2026 -> 1912 -->
-  <div class="ym-travel" id="ymTravel" aria-hidden="true">
+  <!-- tabindex so focus can move INTO the overlay while scroll is locked;
+       aria-modal because the rest of the page is unreachable while it is up -->
+  <div class="ym-travel" id="ymTravel" tabindex="-1" role="dialog" aria-modal="true"
+       aria-label="Travelling back to 1912" aria-hidden="true">
     <p class="ym-travel__year" id="ymTravelYear">2026</p>
     <p class="ym-travel__scene" id="ymTravelScene"></p>
-    <p class="ym-travel__skip">tap anywhere to skip</p>
+    <p class="ym-travel__skip">tap anywhere, or press any key, to skip</p>
   </div>
 
-  <section class="wall-section" id="wall" data-bg="#1a1330" data-scene>
+  <!-- no data-scene: journey.js fades a section by its distance from the
+       viewport centre, and once the wall has posts it is 2+ viewports tall,
+       so it never gets near the centre and sat at 0.18 opacity while being
+       read. The morph backdrop carries the transition instead, as on .ym -->
+  <section class="wall-section" id="wall" data-bg="#1a1330">
     <canvas class="wall-canvas" id="wallCanvas" aria-hidden="true"></canvas>
     <div class="wall-section__inner">
       <p class="eyebrow eyebrow--light reveal">Act three · your turn</p>
       <h2 class="wall-section__title reveal">Say what you <em>need</em> to say.</h2>
       <p class="wall-section__sub reveal">Every story here is anonymous. Every reply is a hand on a shoulder.</p>
 
+      <div class="houserules reveal">
+        <p class="houserules__row"><span>House rules</span> <a href="receipts.html#house-rules">Read all five →</a></p>
+        <p><strong>Leave names out of it.</strong> Yours, your school's, and the name of anyone your story is about. You can tell the whole truth without handing over anyone's identity.</p>
+        <p><strong>This wall lifts people up.</strong> Nothing cruel, nothing that outs someone, nothing that tells another person how to hurt themselves.</p>
+        <p><strong>Right now, posts stay on your device only.</strong> Nothing is uploaded, so nobody else online can read what you write yet. That also means anyone who uses this same phone or laptop can, so take a post down when you are done. A shared, moderated wall is coming, and it will open with these same rules.</p>
+      </div>
+
       <form class="composer reveal" id="wallForm" style="--r: 18px" data-aig data-aig-radius="18" data-aig-duration="8">
-        <textarea id="wallText" rows="3" placeholder="What do you want to share?" required></textarea>
+        <label class="visually-hidden" for="wallText">Your story, posted anonymously</label>
+        <textarea id="wallText" rows="3" maxlength="1200" placeholder="What do you want to share?" required></textarea>
+        <!-- the caution sits ABOVE the submit row: below it, a phone keyboard
+             pushed the crisis helpline off the bottom of the screen -->
+        <p class="composer__caution" id="wallCaution" role="status" hidden></p>
         <div class="composer__row">
           <span class="composer__anon">Posted anonymously, no names, no accounts</span>
           <button type="submit" class="btn" data-magnetic>Put it on the wall</button>
         </div>
       </form>
 
+      <p class="visually-hidden" id="wallStatus" role="status" aria-live="polite"></p>
       <div class="wall" id="wallList"></div>
 
-      <p class="wall-section__note reveal">Be gentle with each other. This wall lifts people up. It never tears them down.</p>
+      <div class="wall-section__foot">
+        <p class="wall-section__note reveal">Be gentle with each other. This wall lifts people up. It never tears them down.</p>
+        <button class="wall__clear" id="wallClear" type="button" hidden>Clear everything on this device</button>
+      </div>
     </div>
   </section>
 
@@ -217,6 +237,7 @@
     <p class="footer__mission">Students told us learning feminism was boring. This site is the rebuttal.</p>
     <p class="footer__coming">Next: workshops · mentorship · resource hub</p>
     <a class="footer__ig" href="https://instagram.com/ourfeministspacee" target="_blank" rel="noopener" data-magnetic>@ourfeministspacee on Instagram →</a>
+    <p class="footer__receipts"><a class="receipt-link" href="receipts.html">Receipts · sources, method, house rules →</a></p>
     <p class="footer__fine">Made with care. Your words are anonymous, and you never have to share your name.</p>
   </footer>
 
@@ -227,12 +248,11 @@
   <script src="js/scroll.js?v=79"></script>
   <script src="js/morph.js?v=79"></script>
   <script src="js/journey.js?v=79"></script>
-  <script src="js/pin.js?v=78"></script>
   <script src="js/polish.js?v=82"></script>
   <script src="js/aiglow.js?v=78"></script>
-  <script src="js/main.js?v=82"></script>
-  <script src="js/preso.js?v=5"></script>
-  <script src="js/yearmachine.js?v=2"></script>
+  <script src="js/main.js?v=87"></script>
+  <script src="js/preso.js?v=6"></script>
+  <script src="js/yearmachine.js?v=5"></script>
   <script src="js/wall3d.js?v=78"></script>
   <script src="js/thread.js?v=116"></script>
   <script src="js/theme.js?v=1"></script>

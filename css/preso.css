@@ -49,7 +49,7 @@
 /* mono caption used across scenes */
 .preso .cap {
   font-family: var(--mono);
-  font-size: clamp(0.62rem, 1.4vw, 0.8rem);
+  font-size: clamp(0.7rem, 1.4vw, 0.8rem);
   letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-dim);
 }
 .preso .cap b { color: var(--gold); font-weight: 700; }
@@ -57,7 +57,7 @@
 /* ── SCENE 1 · LAST YEAR ── */
 .preso .s1 .word { display: block; overflow: hidden; }
 .preso .s1 .word span {
-  display: inline-block; font-family: var(--serif); font-weight: 500;
+  display: inline-block; font-family: var(--serif); font-weight: 600;
   font-size: clamp(4rem, 17vw, 13rem); line-height: 0.94; letter-spacing: -0.02em;
 }
 .preso .is-on.s1 .word span { animation: prRise 0.8s var(--spring) both; animation-delay: calc(0.08s * var(--i)); }
@@ -98,11 +98,11 @@
 .preso .sm__text .cap { margin-bottom: clamp(10px, 2.4svh, 22px); }
 .preso .is-on.sm .sm__text .cap { animation: prFade 0.7s var(--ease) 0.2s both; }
 .preso .sm__line { overflow: hidden; }
-.preso .sm__line span { display: inline-block; font-family: var(--serif); font-weight: 500; font-size: clamp(1.9rem, 5.6vw, 4.2rem); line-height: 1.08; color: var(--ink); }
+.preso .sm__line span { display: inline-block; font-family: var(--serif); font-weight: 600; font-size: clamp(1.9rem, 5.6vw, 4.2rem); line-height: 1.08; color: var(--ink); }
 .preso .sm__line--em span { font-style: italic; color: var(--magenta); }
 .preso .is-on.sm .sm__line:nth-of-type(2) span { animation: prRise 0.75s var(--spring) 0.35s both; }
 .preso .is-on.sm .sm__line:nth-of-type(3) span { animation: prRise 0.75s var(--spring) 0.5s both; }
-.preso .sm__foot { margin-top: clamp(12px, 3svh, 26px); font-family: var(--mono); font-size: clamp(0.58rem, 1.3vw, 0.74rem); letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-dim); }
+.preso .sm__foot { margin-top: clamp(12px, 3svh, 26px); font-family: var(--mono); font-size: clamp(0.7rem, 1.3vw, 0.78rem); letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-dim); }
 .preso .is-on.sm .sm__foot { animation: prFade 0.7s var(--ease) 1.05s both; }
 .preso .sm__photo {
   flex: none; width: clamp(180px, 30vw, 360px); aspect-ratio: 3 / 4;
@@ -139,6 +139,8 @@
 .preso .is-on.s3 .strip { animation: prStrip 0.9s var(--ease) 1.5s both; }
 @keyframes prStrip { to { clip-path: inset(0 0 0 0); } }
 .preso .s3 .cap { position: absolute; left: 50%; bottom: clamp(10px, 4svh, 40px); transform: translateX(-50%); white-space: nowrap; }
+/* the YPAR caption is 465px wide and was clipped on both edges below ~500px */
+@media (max-width: 560px) { .preso .s3 .cap { white-space: normal; width: min(88vw, 420px); text-align: center; } }
 .preso .is-on.s3 .cap { animation: prFade 0.7s var(--ease) 2.1s both; }
 /* zoom-out reveal — no blur: blurring a 21rem word every frame is the single
    most expensive paint in the deck. Scale + fade reads the same, cheaply. */
@@ -158,7 +160,7 @@
 .preso .s4 .cards { position: relative; display: flex; gap: clamp(10px, 3vw, 34px); align-items: center; }
 .preso .s4 .card { width: clamp(120px, 24vw, 300px); aspect-ratio: 3 / 4; background: #fffdfa; padding: clamp(6px, 1.2vw, 12px); border-radius: 10px; box-shadow: 0 26px 60px -24px rgba(44, 33, 64, 0.4); }
 .preso .s4 .card .ph { width: 100%; height: 82%; background-size: cover; background-position: center; border-radius: 6px; }
-.preso .s4 .card .tag { height: 18%; display: grid; place-items: center; font-family: var(--mono); font-size: clamp(0.5rem, 1.2vw, 0.72rem); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-dim); }
+.preso .s4 .card .tag { height: 18%; display: grid; place-items: center; font-family: var(--mono); font-size: clamp(0.7rem, 1.2vw, 0.78rem); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-dim); }
 .preso .s4 .card:nth-child(1) { rotate: -5deg; }
 .preso .s4 .card:nth-child(2) { rotate: 2.5deg; margin-top: clamp(-40px, -4vw, -14px); }
 .preso .s4 .card:nth-child(3) { rotate: 6deg; }
@@ -202,7 +204,7 @@
   transition: color 0.3s var(--ease), border-color 0.3s var(--ease);
 }
 .preso .hud__skip:hover, .preso .hud__skip:focus-visible { color: var(--gold); border-color: var(--gold); }
-@media (max-width: 560px) { .preso .hud__skip { padding: 5px 11px; font-size: 0.66rem; } }
+@media (max-width: 560px) { .preso .hud__skip { padding: 5px 11px; font-size: 0.68rem; } }
 /* three collage cards at 120px min each overflow a 375px phone — let them
    shrink with the viewport instead */
 @media (max-width: 640px) {

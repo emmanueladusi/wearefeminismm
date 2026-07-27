@@ -1,8 +1,10 @@
 /* =====================================================
    wearefeminism — v2
    Editorial warmth: suffragette violet + gold on warm
-   off-white. Fraunces (regular, italic accents),
-   Figtree body, Space Mono labels. Lusion-grade motion,
+   off-white. Type is the SYSTEM stack (SF on Apple, Roboto
+   then Helvetica/Arial elsewhere) with one exception: the
+   hero wordmark cycle, which is Poppins SemiBold because its
+   geometry is baked to match brandmarkData.js. Lusion-grade motion,
    SOS-style pathway structure.
    ===================================================== */
 
@@ -10,12 +12,13 @@
   --paper: #faf6ef;
   --paper-soft: #f3ecdf;
   --ink: #2c2140;
-  --ink-dim: rgba(44, 33, 64, 0.62);
+  --ink-dim: rgba(44, 33, 64, 0.66);   /* 4.82:1 on --paper; 0.62 measured 4.27 and failed AA */
   --violet: #4a3568;
   --violet-deep: #2e2145;
   --lilac: #e8e0f2;
   --gold: #d9a13f;
   --gold-soft: rgba(217, 161, 63, 0.16);
+  --gold-ink: #8a5e10;        /* gold as TEXT on light: 5.3:1 on paper. --gold itself is 2.1:1 */
   --cream-on-dark: rgba(250, 246, 239, 0.92);
   --dim-on-dark: rgba(250, 246, 239, 0.55);
   --line: rgba(44, 33, 64, 0.14);
@@ -23,6 +26,21 @@
   --serif: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --mono: ui-monospace, "SF Mono", Menlo, Monaco, "Cascadia Code", monospace;
+
+  /* Type roles. Seven steps, and nothing is allowed between them: the sheet
+     had 109 distinct font-sizes, including six inside a single 0.96px window,
+     which is a pile rather than a scale. Display steps anchor their middle
+     term in rem as well as vw, so headings still outgrow body copy when a
+     visitor raises their default font size (they used to grow x1.17 while
+     body grew x2, collapsing the hierarchy for exactly the people who need
+     it most). */
+  --t-display: clamp(2.6rem, 1.2vw + 3.2rem, 4.5rem);
+  --t-title:   clamp(1.9rem, 0.9vw + 2.7rem, 3.6rem);
+  --t-card:    1.375rem;   /* 22px */
+  --t-lead:    1.25rem;    /* 20px */
+  --t-body:    1rem;       /* 16px */
+  --t-small:   0.875rem;   /* 14px */
+  --t-label:   0.75rem;    /* 12px, mono, tracked, uppercase */
 
   /* Layout rhythm — one vertical cadence and one page gutter,
      so every section breathes on the same scale. */
@@ -52,6 +70,23 @@ body {
 
 h1, h2, h3 { font-family: var(--serif); font-weight: 700; letter-spacing: -0.02em; }
 
+/* Buttons and fields inherited the UA default, so the year machine's primary
+   CTA ("Send me back") rendered in Arial on a page that is otherwise entirely
+   the system stack. Same for every nav toggle, on every page. */
+button, input, select, textarea { font: inherit; }
+
+/* Nothing here had wrap protection: at 320px a single long word ("intersectionality"
+   is core vocabulary on this site) pushed the document to 429-516px against a
+   320px viewport. */
+h1, h2, h3, h4, .footer__mark, .ec-heading, .brandmark__word--plain {
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+/* Display type was running at the body's 1.6 leading: .ec-heading set a 51.2px
+   face in an 81.9px line box. */
+.footer__mark, .ec-heading, .pathway__body h2, .piece__name { line-height: 1.1; }
+
 em { font-style: italic; color: var(--violet); }
 
 /* mono eyebrow labels */
@@ -61,11 +96,11 @@ em { font-style: italic; color: var(--violet); }
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.22em;
-  color: var(--gold);
+  color: var(--gold-ink);
   margin-bottom: 28px;
 }
 
-.eyebrow--light { color: var(--gold); }
+.eyebrow--light { color: var(--gold); }   /* on dark: 8.3:1, bright gold is correct here */
 
 /* the signature m — the doubled m in "wearefeminismm" is Emmanuel (js/signature.js) */
 .bmc-glyph--sig .bmc-fill { fill: var(--gold) !important; }
@@ -109,7 +144,7 @@ html {
 .nav__logo {
   font-family: var(--serif);
   font-size: 1.15rem;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--ink);
   text-decoration: none;
 }
@@ -375,7 +410,7 @@ body.morph-on .footer { background-color: transparent; }
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.22em;
-  color: var(--gold);
+  color: var(--gold-ink);
   margin-bottom: 34px;
 }
 
@@ -497,53 +532,108 @@ section { position: relative; }
   margin: 0 auto;
 }
 
-.paths__list { display: flex; flex-direction: column; }
+/* The three moves are this page's table of contents, and they used to be the
+   quietest thing on it: 2.9rem headings under a 10rem wordmark, with the
+   sequence reduced to a 0.78rem mono tag. The numerals now get the treatment
+   the year machine already gives its years — big, editorial, gold — and
+   everything else in the row steps back so that one move carries it. */
+.paths__list { list-style: none; margin: 0; padding: 0; }
+
+.paths__item { border-top: 1px solid var(--line); }
+.paths__item:last-child { border-bottom: 1px solid var(--line); }
+
+/* the gold rule that draws across the row on approach: the site's thread,
+   not a background fill (filling the row made everything louder and the
+   section flatter) */
+.paths__item { position: relative; }
+.paths__item::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: -1px;
+  height: 2px;
+  background: var(--gold);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.55s var(--ease);
+}
+.paths__item:hover::after,
+.paths__item:focus-within::after { transform: scaleX(1); }
 
 .pathway {
-  display: flex;
-  align-items: center;
-  gap: clamp(18px, 4vw, 48px);
-  padding: clamp(28px, 4vw, 44px) clamp(8px, 2vw, 24px);
-  border-top: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: baseline;
+  column-gap: clamp(16px, 3.5vw, 46px);
+  padding: clamp(34px, 5vw, 62px) clamp(4px, 1.5vw, 18px);
   text-decoration: none;
   color: var(--ink);
-  transition: background 0.35s var(--ease), padding-left 0.35s var(--ease);
 }
 
-.pathway:last-child { border-bottom: 1px solid var(--line); }
-
-.pathway:hover { background: var(--lilac); padding-left: clamp(16px, 3vw, 40px); }
-
+/* the move itself */
 .pathway__num {
-  font-family: var(--mono);
-  font-size: 0.78rem;
+  font-family: var(--serif);
   font-weight: 700;
-  color: var(--gold);
-  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(2rem, 6.5vw, 5rem);
+  line-height: 0.85;
+  letter-spacing: -0.03em;
+  color: var(--gold-ink);
+  transition: transform 0.55s var(--ease);
 }
 
-.pathway__body { flex: 1; }
+.paths__item:hover .pathway__num,
+.paths__item:focus-within .pathway__num { transform: translateY(-4px); }
+
+.pathway__body { min-width: 0; }
 
 .pathway__body h2 {
-  font-size: clamp(1.7rem, 4vw, 2.9rem);
-  margin-bottom: 6px;
+  font-size: clamp(2rem, 5.4vw, 4rem);
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  margin-bottom: 10px;
+  text-wrap: balance;
 }
 
+/* quieted on purpose: if the description grew too, nothing would read as the peak */
 .pathway__body p {
   color: var(--ink-dim);
-  max-width: 560px;
-  font-size: 0.98rem;
+  max-width: 52ch;
+  font-size: 1rem;
+  line-height: 1.55;
 }
 
+/* sits on the heading's baseline, not the row's centre: centred, it floated
+   in the gap between the copy and the edge and read as a stray mark */
 .pathway__arrow {
   font-family: var(--serif);
-  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  font-size: clamp(1.3rem, 2vw, 1.7rem);
   color: var(--violet);
-  transition: transform 0.35s var(--ease);
-  flex-shrink: 0;
+  transition: transform 0.45s var(--ease);
 }
 
-.pathway:hover .pathway__arrow { transform: translateX(10px); }
+.paths__item:hover .pathway__arrow,
+.paths__item:focus-within .pathway__arrow { transform: translateX(12px); }
+
+/* keyboard users get the same rule, and a real ring */
+.pathway:focus-visible { outline: 2px solid var(--gold-ink); outline-offset: -6px; border-radius: var(--r-sm); }
+
+@media (max-width: 640px) {
+  .pathway {
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 14px;
+    row-gap: 4px;
+  }
+  .pathway__num { font-size: clamp(1.6rem, 8vw, 2.4rem); }
+  .pathway__body { grid-column: 2; }
+  .pathway__arrow { grid-column: 2; justify-self: start; margin-top: 6px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .paths__item::after, .pathway__num, .pathway__arrow { transition: none; }
+}
+html[data-a11y] .paths__item::after,
+html[data-a11y] .pathway__num,
+html[data-a11y] .pathway__arrow { transition: none !important; }
 
 .paths__help {
   margin-top: 44px;
@@ -806,9 +896,11 @@ section { position: relative; }
   border: 1px solid rgba(250, 246, 239, 0.12);
   border-radius: var(--r-lg);
   padding: 26px;
-  animation: post-in 0.5s var(--ease);
   transition: border-color 0.3s;
 }
+
+/* only the card that just arrived animates */
+.post--new { animation: post-in 0.5s var(--ease); }
 
 .post:hover { border-color: rgba(217, 161, 63, 0.45); }
 
@@ -854,6 +946,8 @@ section { position: relative; }
   font-weight: 600;
   font-size: 0.85rem;
   cursor: pointer;
+  display: inline-flex; align-items: center;
+  min-height: 44px;          /* thumb-sized: these were 24px */
   padding: 4px 0;
   transition: color 0.2s, transform 0.15s;
 }
@@ -879,7 +973,7 @@ section { position: relative; }
 .reply { font-size: 0.92rem; color: rgba(250, 246, 239, 0.75); }
 .reply strong {
   font-family: var(--mono);
-  font-size: 0.65rem;
+  font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
   color: var(--gold);
@@ -1375,7 +1469,7 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
   left: 50%;
   transform: translateX(-50%);
   font-family: var(--serif);
-  font-weight: 500;
+  font-weight: 600;
   font-size: clamp(1.8rem, 4vw, 3.4rem);
   letter-spacing: -0.01em;
   color: var(--ink);
@@ -1473,7 +1567,7 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
 
 .ec-card h3 {
   font-family: var(--serif);
-  font-weight: 500;
+  font-weight: 600;
   font-size: clamp(1.15rem, 1.7vw, 1.7rem);
   letter-spacing: -0.01em;
 }
@@ -1584,320 +1678,6 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
 
 @media (prefers-reduced-motion: reduce) {
   .edge-glow { display: none; }
-}
-
-/* =====================================================
-   Ask section — "Hey, what is feminism?" full-screen dark
-   moment wearing the Apple-Intelligence rainbow border.
-
-   Built the LIGHTWEIGHT way — the SAME technique as the site's
-   .edge-glow, which is already flicker-free in Chrome: a few
-   viewport-sized conic gradients whose ANGLE is animated via an
-   @property custom property (a cheap in-place repaint), masked
-   into a rounded-rect ring and blurred. No spinning 2400px
-   elements, no blend modes, no isolated group buffer — so Chrome
-   renders it as smoothly as Safari (the old approach spun six
-   huge blurred layers, which Chrome's tiler thrashed on under
-   the page's WebGL fluid sim, hence the Chrome-only flicker).
-   ===================================================== */
-
-@property --ag-angle   { syntax: "<angle>"; inherits: true; initial-value: 0deg; }
-@property --ag-comet-a { syntax: "<angle>"; inherits: true; initial-value: 0deg; }
-
-.askpin {
-  --ag-cream: #ffedd7;
-  --ag-radius: 44px;
-  position: relative;
-  height: 130svh;          /* pin covers the locked beat; releases soon after the border has faded */
-  background: var(--paper);
-}
-
-/* sticky stage — pins the question centred on screen (same technique as the
-   #mission fly-through). The rainbow border fades in across the scroll. */
-.askpin__sticky {
-  position: sticky;
-  top: 0;
-  height: 100svh;
-  overflow: hidden;        /* clips the border glow to the viewport */
-  background: var(--paper);
-}
-
-/* the glow lives on a rounded frame INSET within the section (a margin all
-   around), so it fits the section rather than bleeding to the window edges.
-   No fill and no clip — the rainbow border frames a transparent interior and
-   its glow spills softly onto the page both sides. */
-.ag-panel {
-  position: absolute;
-  inset: 0;                       /* full viewport — border hugs the window edges */
-  border-radius: var(--ag-radius);
-}
-
-/* the stack drives the shared rotation angles; its OPACITY is driven by scroll
-   progress (--ag-reveal, set by js/engulf.js), so the border fades in as the
-   pinned question is scrolled through. .ag-live enables the rotation only
-   while the section is on screen. */
-.ag-stack {
-  position: absolute; inset: 0;
-  pointer-events: none;
-  --ag-angle: 0deg;
-  --ag-comet-a: 0deg;
-  --ag-reveal: 0;
-  opacity: var(--ag-reveal);
-  transition: opacity 1s ease;   /* border blooms in when js sets --ag-reveal to 1 */
-}
-.ag-stack.ag-live {
-  animation: ag-spin 9s linear infinite, ag-comet-spin 2.3s linear infinite;
-}
-
-/* rainbow bands — CRITICAL: mask lives on the inner .ag-ring, blur on the
-   outer .ag-band. CSS applies filter BEFORE mask, so putting both on one
-   element blurs then hard-clips to a thin crisp ring. Splitting them clips
-   to the ring FIRST, then blurs it — giving the wide, deep, soft glow of
-   the original. */
-/* dark inner well — a soft inset darkening hugging the rounded frame edge so
-   the rainbow border reads as emitted light on the light paper. Fades to
-   transparent before the centre, so the chat box still sits on cream. Lives
-   behind the bands; fades in with the stack (opacity = --ag-reveal). */
-.ag-backing {
-  position: absolute; inset: 0;
-  border-radius: var(--ag-radius);
-  pointer-events: none;
-  box-shadow: inset 0 0 120px 30px rgba(20, 10, 4, 0.55);
-}
-.ag-band { position: absolute; inset: 0; animation: ag-breathe 4.5s ease-in-out infinite; }
-.ag-ring {
-  position: absolute; inset: 0;
-  border-radius: var(--ag-radius);
-  box-sizing: border-box;
-  background: conic-gradient(from var(--ag-angle),
-    rgba(255,40,80,1), rgba(255,140,30,1), rgba(255,225,40,1), rgba(70,220,90,1),
-    rgba(30,210,235,1), rgba(45,110,255,1), rgba(150,55,255,1), rgba(255,55,190,1),
-    rgba(255,40,80,1));
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-          mask-composite: exclude;
-}
-/* PERF: bands 1 & 2 are wide diffuse halos — at blur(44px)/blur(22px) their
-   rotation is imperceptible, but re-blurring a full-viewport buffer every
-   frame is the single biggest cost. Pin them to a FIXED angle so they paint
-   ONCE and just sit there as a composited layer. Only the sharp rings
-   (bands 3 & 4) and the comet keep reading the animated --ag-angle, so the
-   visible rainbow flow is unchanged. */
-.ag-band1 { filter: blur(60px) saturate(3.0) brightness(1.14); --o: 0.74; --ag-angle: 130deg; }
-.ag-band1 .ag-ring { padding: 44px; }
-.ag-band2 { filter: blur(34px) saturate(3.0) brightness(1.14); --o: 0.98; --ag-angle: 290deg; }
-.ag-band2 .ag-ring { padding: 26px; }
-/* PERF (the big one): the crisp ring carries the SVG turbulence warp + the
-   drop-shadow chromatic aberration — the whole heavy filter chain. It is now
-   FROZEN at a fixed angle, so its filtered result is rasterised ONCE and
-   cached; it never re-runs while scrolling. It keeps the organic rippled,
-   lens-fringed edge — just static colours. The colour FLOW moves to band4
-   (a plain blurred ring, no SVG filter) + the comet, which are cheap to
-   repaint. So no SVG filter and no drop-shadow ever run per frame. */
-.ag-band3 {
-  --ag-angle: 40deg;
-  filter: url(#ag-warp) blur(3px) saturate(2.9) brightness(1.16)
-          drop-shadow(2.2px 0 0.5px rgba(255, 30, 90, 0.7))
-          drop-shadow(-2.2px 0 0.5px rgba(30, 140, 255, 0.7));
-  --o: 1;
-}
-.ag-band3 .ag-ring { padding: 12px; }
-/* the mid glow rotates now — a single plain blurred ring is the only
-   full-frame repaint per frame, giving the rainbow its living flow cheaply. */
-.ag-band4 { filter: blur(8px)  saturate(2.9) brightness(1.18); --o: 1; }
-.ag-band4 .ag-ring { padding: 18px; }
-
-/* travelling yellow comet — same mask-inner / blur-outer structure */
-.ag-comet { position: absolute; inset: 0; filter: blur(6px); }
-.ag-comet-ring {
-  position: absolute; inset: 0;
-  border-radius: var(--ag-radius);
-  box-sizing: border-box;
-  padding: 10px;
-  background: conic-gradient(from var(--ag-comet-a),
-    transparent 0deg, rgba(255,255,0,0.15) 6deg, rgba(255,255,0,0.6) 13deg,
-    rgba(255,255,0,1) 20deg, rgba(255,255,0,0.6) 27deg, rgba(255,255,0,0.15) 34deg,
-    transparent 42deg, transparent 360deg);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-          mask-composite: exclude;
-}
-
-/* ---- light leak: a single luminous, soft-blurred diagonal band that WIPES
-   all the way across the frame — entering fast and decelerating to a stop near
-   the end (strong ease-out). A warm→rose→violet→cyan gradient at moderate
-   opacity, blurred ONCE and moved only by transform, so the blur is cached and
-   the whole sweep is GPU-cheap. Normal compositing so it reads over the light
-   interior as well as the border. Plus one faint static ambient glow so the
-   frame isn't empty between wipes. ---- */
-.ag-leak {
-  position: absolute; inset: 0;
-  border-radius: var(--ag-radius);
-  overflow: hidden;
-  pointer-events: none;
-}
-/* faint ambient warmth living in a corner */
-.ag-leak__glow {
-  position: absolute;
-  right: -20vmax; top: -22vmax;
-  width: 55vmax; height: 55vmax;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,205,165,0.42), rgba(255,150,190,0) 62%);
-  filter: blur(34px);
-  mix-blend-mode: screen;
-}
-/* the EMISSION: a warm-rainbow bloom fixed to the left arc of the ring. It
-   brightens where the border sits, so the light visibly LEAVES the rainbow —
-   the anchor point the inward streak peels away from. Screen-blended. */
-.ag-leak__emit {
-  position: absolute;
-  left: -10vmax; top: 50%;
-  width: 46vmax; height: 82vmax;
-  transform: translateY(-50%) scale(0.9);
-  border-radius: 50%;
-  background: radial-gradient(closest-side at 64% 50%,
-    rgba(255,246,228,0.95),
-    rgba(255,178,110,0.72) 30%,
-    rgba(255,95,165,0.42) 52%,
-    rgba(150,120,255,0.16) 72%,
-    rgba(150,120,255,0)    84%);
-  filter: blur(26px) brightness(1.5);
-  mix-blend-mode: screen;
-  opacity: 0;
-  will-change: opacity, transform;
-}
-
-/* the inward STREAK: a slice of the rainbow's own colours that peels off the
-   flaring arc and sweeps inward across the whole frame (warping the question as
-   it passes), then dissolves. Rooted at the ring (transform-origin left), so it
-   always reads as light radiating FROM the rainbow, not arriving from nowhere. */
-.ag-leak__streak {
-  position: absolute;
-  top: -50%;
-  left: -12vmax;
-  width: 72vmax;
-  height: 220%;
-  transform-origin: left center;
-  transform: translateX(-16vmax) rotate(-10deg) scaleX(0.7);
-  opacity: 0;
-  will-change: transform, opacity;
-  background: linear-gradient(100deg,
-    rgba(255,150,90,0)     0%,
-    rgba(255,165,100,0.42) 10%,   /* warm ring edge — where it leaves the arc */
-    rgba(255,228,150,0.66) 24%,   /* yellow */
-    rgba(255,252,242,0.92) 39%,   /* hot core */
-    rgba(150,240,185,0.62) 55%,   /* green */
-    rgba(120,205,255,0.50) 71%,   /* cyan */
-    rgba(170,130,255,0.30) 86%,   /* violet fringe */
-    rgba(170,130,255,0)    100%);
-  filter: url(#ag-leakwave) blur(40px) saturate(1.9) brightness(1.77);
-  mix-blend-mode: screen;
-}
-
-/* the flare pulses on at the ring, and the slice peels inward across the frame
-   and dissolves — one slow, soft breath, synced to the border's live beat. */
-.ag-stack.ag-live .ag-leak__emit {
-  animation: ag-emit 7.5s ease-in-out 0.3s forwards;
-}
-.ag-stack.ag-live .ag-leak__streak {
-  animation: ag-sweep 7.5s cubic-bezier(0.42, 0, 0.58, 1) 0.3s forwards;
-}
-
-@keyframes ag-emit {
-  0%   { opacity: 0;   transform: translateY(-50%) scale(0.8); }
-  26%  { opacity: 1; }
-  66%  { opacity: 0.85; }
-  100% { opacity: 0;   transform: translateY(-50%) scale(1.12); }
-}
-/* peels off the left arc (rooted, narrow) and fans inward across the whole
-   frame, growing + dissolving — never a free-floating band from off-screen. */
-@keyframes ag-sweep {
-  0%   { transform: translateX(-16vmax) rotate(-10deg) scaleX(0.7);  opacity: 0; }
-  24%  { opacity: 1; }
-  50%  { transform: translateX(34vmax) rotate(-10deg) scaleX(1.08); }
-  74%  { opacity: 1; }
-  100% { transform: translateX(96vmax) rotate(-10deg) scaleX(1.28); opacity: 0; }
-}
-
-/* content — the question, crisp above the glow */
-.askpin__content {
-  position: absolute; inset: 0; z-index: 20;
-  display: flex; align-items: center; justify-content: center;
-  padding: 0 6vw; text-align: center;
-  opacity: 1;
-  transition: opacity 0.9s ease;  /* fades away 3s after the border is up */
-}
-.askpin__content.ask-faded { opacity: 0; }
-
-/* ===== AI-style chat prompt (js/engulf.js types into it) ===== */
-.aichat {
-  display: flex;
-  align-items: center;
-  gap: clamp(10px, 1.6vw, 16px);
-  width: min(560px, 88vw);
-  padding: 14px 14px 14px clamp(18px, 2.4vw, 24px);
-  background: #fffdfa;
-  border: 1px solid rgba(44, 33, 64, 0.12);
-  border-radius: var(--r-lg);
-  box-shadow: 0 18px 50px -16px rgba(44, 33, 64, 0.32), 0 2px 8px rgba(44, 33, 64, 0.06);
-  text-align: left;
-}
-.aichat__spark { color: var(--gold); font-size: 1.15rem; line-height: 1; flex: none; }
-.aichat__field {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  min-height: 1.7em;
-  font-family: var(--sans);
-  font-size: clamp(1.05rem, 2.5vw, 1.4rem);
-  /* the chat box is always cream (#fffdfa) in BOTH themes, so the typed text is
-     hardcoded near-black — using var(--ink) turned it cream-on-cream (invisible)
-     in dark mode. */
-  color: #14101f;
-}
-/* placeholder while the field is still empty (before typing starts) */
-.aichat__text:empty::before { content: attr(data-placeholder); color: rgba(20, 16, 31, 0.45); }
-.aichat__caret {
-  width: 2px;
-  height: 1.25em;
-  margin-left: 2px;
-  background: #4a3568;
-  opacity: 0;               /* only blinks while typing */
-  flex: none;
-}
-.aichat--typing .aichat__caret { animation: aichat-blink 1s steps(1) infinite; }
-.aichat__send {
-  width: 40px; height: 40px;
-  border-radius: 50%;
-  background: var(--violet);
-  color: var(--paper);
-  display: grid; place-items: center;
-  flex: none;
-  transition: background 0.35s var(--ease);
-}
-.aichat--sent .aichat__send { background: var(--gold); animation: aichat-send 0.55s var(--ease); }
-
-@keyframes aichat-blink { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
-@keyframes aichat-send  { 0% { transform: scale(1); } 42% { transform: scale(0.82); } 100% { transform: scale(1); } }
-
-@media (prefers-reduced-motion: reduce) {
-  .aichat__caret { display: none; }
-}
-
-/* hide the site-wide edge glow while this section fills the screen so the
-   two borders don't clash (js toggles .ask-glow-active on <body>) */
-.ask-glow-active .edge-glow { opacity: 0 !important; visibility: hidden !important; }
-
-@keyframes ag-spin       { to { --ag-angle: 360deg; } }
-@keyframes ag-comet-spin { to { --ag-comet-a: 360deg; } }
-@keyframes ag-breathe    { 0%,100% { opacity: calc(var(--o,1) * 0.72); } 50% { opacity: var(--o,1); } }
-
-@media (prefers-reduced-motion: reduce) {
-  .ag-stack.ag-live, .ag-band, .ag-leak__streak, .ag-leak__emit { animation: none !important; }
-  .ag-stack { opacity: 1; }
 }
 
 /* =====================================================
@@ -2303,7 +2083,7 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
 
 .quiz-card__feedback {
   min-height: 1.2em; margin-top: 18px;
-  font-family: var(--sans); font-weight: 500; font-size: 0.95rem; line-height: 1.55; color: var(--ink-dim);
+  font-family: var(--sans); font-weight: 600; font-size: 0.95rem; line-height: 1.55; color: var(--ink-dim);
 }
 .quiz-card__feedback.is-correct { color: #3f9d6e; }
 .quiz-card__feedback.is-soft { color: var(--violet); }
@@ -2556,7 +2336,7 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
   line-height: 1.1;
   text-align: center;
   font-family: var(--serif);
-  font-weight: 500;
+  font-weight: 600;
   font-size: clamp(2rem, 11vw, 10rem);
   letter-spacing: -0.015em;
   color: var(--ink);
@@ -2649,7 +2429,7 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
 .learn__title {
   font-family: var(--serif);
   font-weight: 700;
-  font-size: clamp(2.1rem, 6vw, 4rem);
+  font-size: var(--t-title);
   line-height: 1.04;
   letter-spacing: -0.02em;
   margin: 0 0 0.5em;
@@ -2701,7 +2481,7 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
 }
 .lens__name {
   font-family: var(--serif);
-  font-weight: 500;
+  font-weight: 600;
   font-size: 1.4rem;
   margin: 22px 0 10px;
   color: #fff;
@@ -2725,7 +2505,7 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
 }
 .glyph-cap {
   font-family: var(--mono);
-  font-size: 0.6rem;
+  font-size: 0.68rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--dim-on-dark);
@@ -2802,10 +2582,6 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
    rainbow); js/waves.js scrubs the four waves + rising
    ocean as you keep scrolling through #ask.
    ===================================================== */
-
-/* extra scroll length after the chat beat so the waves can scrub.
-   Added by js/engulf.js on the motion path only. */
-.askpin.aw-cine { height: 460svh; }
 
 /* the dark screen inside the ring — starts inset so the rainbow shows around
    it (its glow spilling onto these rounded edges), then expands to FULL-BLEED
@@ -3126,7 +2902,7 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
 .about__title {
   font-family: var(--serif);
   font-weight: 700;
-  font-size: clamp(2rem, 5.5vw, 3.5rem);
+  font-size: var(--t-title);
   line-height: 1.05;
   letter-spacing: -0.02em;
   color: var(--ink);
@@ -3143,7 +2919,7 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
   line-height: 1.66;
   color: var(--ink-dim);
   margin: 0 0 1.1em;
-  max-width: 62ch;
+  max-width: 47ch;
 }
 .about__body > p:last-child { margin-bottom: 0; }
 .about__body strong { color: var(--ink); font-weight: 700; }
@@ -3202,7 +2978,7 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
   color: var(--ink-dim);
   max-width: 26ch;
 }
-@media (max-width: 760px) {
+@media (max-width: 900px) {
   .about__grid { grid-template-columns: 1fr; }
   .about__connect { position: static; }
 }
@@ -3218,7 +2994,7 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
   font-family: var(--serif);
   font-weight: 700;
   color: var(--cream-on-dark);
-  font-size: clamp(2rem, 5.5vw, 3.4rem);
+  font-size: var(--t-title);
   line-height: 1.05;
   letter-spacing: -0.01em;
   margin: 0.5rem 0 0;
@@ -3226,7 +3002,7 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
 .popculture__title em { font-style: italic; color: var(--gold); }
 .popculture__lead {
   color: var(--dim-on-dark);
-  max-width: 56ch;
+  max-width: 48ch;
   margin: 1.1rem 0 0;
   font-size: 1.05rem;
   line-height: 1.6;
@@ -3309,7 +3085,7 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
   text-decoration: none;
   font-weight: 600;
   font-size: 0.95rem;
-  border-bottom: 1px solid rgba(212, 175, 55, 0.35);
+  border-bottom: 1px solid rgba(217, 161, 63, 0.45);
   padding-bottom: 2px;
   transition: border-color 0.25s var(--ease), opacity 0.25s var(--ease);
 }
@@ -3325,10 +3101,10 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
 .piece__suggest:hover { text-decoration: underline; }
 .piece__credits {
   color: rgba(250, 246, 239, 0.4);
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   line-height: 1.55;
   margin: clamp(16px, 2vw, 22px) 0 0;
-  max-width: 78ch;
+  max-width: 52ch;
 }
 @media (max-width: 760px) {
   .piece { grid-template-columns: 1fr; }
@@ -3369,7 +3145,7 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
 .ym__agebox {
   display: inline-flex; align-items: center; gap: 4px;
   background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(212, 175, 55, 0.25);
+  border: 1px solid rgba(217, 161, 63, 0.3);   /* was rgb(212,175,55): a second, undeclared gold */
   border-radius: var(--r-pill);
   padding: 4px;
 }
@@ -3409,7 +3185,7 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
 }
 .ym__go:hover { transform: translateY(-2px); box-shadow: 0 14px 34px rgba(217, 161, 63, 0.3); }
 .ym__privacy {
-  color: rgba(250, 246, 239, 0.4);
+  color: rgba(250, 246, 239, 0.55);   /* 5.46:1; 0.4 measured 3.54 */
   font-size: 0.78rem;
   margin: 12px 0 0;
 }
@@ -3456,10 +3232,19 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
 }
 .ym__item--line { margin-top: 10px; padding-top: 22px; border-top: 1px dashed rgba(250, 246, 239, 0.35); }
 .ym__item--line .ym__scene { color: var(--gold); }
+/* Rights that arrived after she was gone: the gold drains out and the
+   border goes dashed like the mortality rule above. The words stay fully
+   legible on purpose. Fading them was worth 2.16:1, which put the whole
+   payoff of the page below AA for anyone with low vision. */
 .ym__item--gone { opacity: 0; }
-.ym__item--gone.in { opacity: 0.45; }
-.ym__item--gone .ym__at::after { content: " · you never saw it"; color: rgba(250, 246, 239, 0.5); font-size: 0.85em; }
-.ym__item--now.in { opacity: 0.8; }
+.ym__item--gone.in { opacity: 1; }
+.ym__item--gone { border-left-style: dashed; border-left-color: rgba(250, 246, 239, 0.22); }
+.ym__item--gone .ym__year { color: rgba(250, 246, 239, 0.6); }
+.ym__item--gone .ym__at { color: rgba(250, 246, 239, 0.6); font-style: italic; }
+.ym__item--gone > p { color: rgba(250, 246, 239, 0.55); }
+.ym__item--gone.ym__item--dark { background: rgba(250, 246, 239, 0.04); border-left-color: rgba(250, 246, 239, 0.3); }
+.ym__item--gone .ym__at::after { content: " · most likely after you"; color: rgba(250, 246, 239, 0.5); font-size: 0.85em; }
+.ym__item--now.in { opacity: 1; }
 .ym__item--now .ym__at::after { content: " · still waiting"; color: var(--gold); font-size: 0.85em; }
 .ym__foot { margin-top: clamp(26px, 4vw, 40px); }
 .ym__foot-line {
@@ -3469,6 +3254,8 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
   margin: 0 0 14px;
 }
 .ym__cta {
+  display: inline-flex; align-items: center;
+  min-height: 44px;
   color: var(--gold);
   text-decoration: none;
   font-weight: 700;
@@ -3524,7 +3311,7 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
   position: absolute;
   bottom: max(20px, env(safe-area-inset-bottom, 20px));
   left: 0; right: 0;
-  color: rgba(250, 246, 239, 0.35);
+  color: rgba(250, 246, 239, 0.55);   /* 0.35 measured 3.05:1 */
   font-size: 0.75rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -3543,7 +3330,7 @@ body.ym-lock { overflow: hidden; }
 .resources__title {
   font-family: var(--serif);
   font-weight: 700;
-  font-size: clamp(2rem, 5.5vw, 3.5rem);
+  font-size: var(--t-title);
   line-height: 1.04;
   letter-spacing: -0.02em;
   margin: 0 0 0.35em;
@@ -3553,7 +3340,7 @@ body.ym-lock { overflow: hidden; }
   font-size: clamp(1.02rem, 2.1vw, 1.28rem);
   line-height: 1.5;
   color: var(--ink-dim);
-  max-width: 60ch;
+  max-width: 48ch;
   margin: 0 0 clamp(40px, 6vw, 64px);
 }
 .resources__grid {
@@ -3609,7 +3396,7 @@ body.ym-lock { overflow: hidden; }
 .getinvolved__title {
   font-family: var(--serif);
   font-weight: 700;
-  font-size: clamp(2rem, 5.5vw, 3.5rem);
+  font-size: var(--t-title);
   line-height: 1.04;
   letter-spacing: -0.02em;
   margin: 0 0 0.35em;
@@ -3620,7 +3407,7 @@ body.ym-lock { overflow: hidden; }
   font-size: clamp(1.02rem, 2.1vw, 1.28rem);
   line-height: 1.5;
   color: var(--dim-on-dark);
-  max-width: 62ch;
+  max-width: 47ch;
   margin: 0 0 clamp(38px, 5vw, 56px);
 }
 
@@ -3721,7 +3508,7 @@ body.ym-lock { overflow: hidden; }
 }
 .involve__area {
   font-family: var(--mono);
-  font-size: 0.66rem;
+  font-size: 0.68rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--gold);
@@ -3729,7 +3516,7 @@ body.ym-lock { overflow: hidden; }
 }
 .involve__name {
   font-family: var(--serif);
-  font-weight: 500;
+  font-weight: 600;
   font-size: 1.2rem;
   line-height: 1.2;
   color: #fff;
@@ -3773,13 +3560,13 @@ span.resource__photo {
   color: var(--cream-on-dark);
   font-family: var(--serif);
   font-style: italic;
-  font-weight: 500;
+  font-weight: 600;
   font-size: clamp(1.7rem, 3vw, 2.3rem);
   letter-spacing: 0.02em;
 }
 .resource__name {
   font-family: var(--serif);
-  font-weight: 500;
+  font-weight: 600;
   font-size: 1.32rem;
   line-height: 1.15;
   color: var(--ink);
@@ -3850,11 +3637,6 @@ span.resource__photo {
   .glyph-knot, .owave, .ocean__crest, .ocean__body { animation: none !important; }
   .owave { translate: none !important; }
 
-  /* drop the pinned ring choreography; show the question then a plain,
-     readable stack of the four waves. */
-  .askpin { height: auto; }
-  .askpin__sticky { position: static; height: auto; overflow: visible; }
-  .ag-panel, .ag-backing, .askpin__content { display: none; }
   .askwaves {
     position: static; inset: auto; opacity: 1; border-radius: 0;
     padding: 12vh 6vw 12vh;
@@ -4250,6 +4032,7 @@ html[data-theme="dark"] {
   --lilac: #241c3a;
   --line: rgba(250, 246, 239, 0.15);
   --gold-soft: rgba(217, 161, 63, 0.22);
+  --gold-ink: var(--gold);   /* on dark the bright gold is the readable one (8.3:1) */
 }
 html[data-theme="dark"] body { background: #14101f; }
 /* the colour-morph backdrop becomes a calm deep-violet field, overriding the
@@ -4278,14 +4061,6 @@ html[data-theme="dark"] .post, html[data-theme="dark"] .quiz-card, html[data-the
 html[data-theme="dark"] .myth-card { background: rgba(255, 255, 255, 0.06) !important; color: var(--ink) !important; }
 /* the light hero refract/prism art dims a touch on dark */
 html[data-theme="dark"] .refract { opacity: 0.5; }
-/* The Apple-Intelligence rainbow border ("light leak") was tuned to read as
-   emitted light on light paper. On the near-black dark backdrop the same fully
-   saturated, screen-blended rainbow blooms far too hot — so pull its overall
-   saturation and brightness down and ease the screen-blend so it glows softly
-   instead of glaring. */
-html[data-theme="dark"] .ag-stack { filter: saturate(0.62) brightness(0.66); }
-html[data-theme="dark"] .ag-backing { box-shadow: inset 0 0 120px 30px rgba(8, 5, 14, 0.7); }
-
 /* ---------- Accessible mode ---------- */
 html[data-a11y] {
   font-size: 115%;                                   /* larger text (scales rem) */
@@ -4402,7 +4177,7 @@ html[data-theme="dark"] .bwc-reel > span { color: #eab84f; }
 .tline .roll__meta { margin-left: auto; }
 .tline .roll__word {
   position: relative; overflow: hidden; display: block;
-  font-family: var(--serif); font-weight: 800;
+  font-family: var(--serif); font-weight: 700;
   font-size: clamp(1.9rem, 5.8vw, 4rem);
   line-height: 1.04; letter-spacing: -0.02em;
 }
@@ -4535,7 +4310,7 @@ html[data-theme="dark"] .bwc-reel > span { color: #eab84f; }
 @keyframes tlDrift { from { transform: translateX(-6%); } to { transform: translateX(6%); } }
 .tline .art .num {
   position: absolute; top: 7%; left: 7%;
-  font-family: var(--serif); font-weight: 800;
+  font-family: var(--serif); font-weight: 700;
   font-size: clamp(3rem, 9vw, 7rem); line-height: 1;
   color: transparent; -webkit-text-stroke: 2px rgba(250, 246, 239, 0.5);
 }
@@ -4606,14 +4381,14 @@ html[data-theme="dark"] .bwc-reel > span { color: #eab84f; }
 .tline .node__why {
   margin-top: 14px; padding: 13px 15px;
   background: var(--gold-soft); border-radius: var(--r);
-  font-size: 0.93rem;
+  font-size: var(--t-small);   /* was 0.93rem, 0.32px from its own sibling */
 }
 .tline .node__why b {
-  font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.2em;
+  font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.2em;
   text-transform: uppercase; color: var(--gold); display: block; margin-bottom: 5px;
 }
 .tline .node__hint {
-  margin-top: 12px; font-family: var(--mono); font-size: 0.62rem;
+  margin-top: 12px; font-family: var(--mono); font-size: 0.68rem;
   letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-dim);
   transition: opacity 0.3s;
 }
@@ -4632,7 +4407,7 @@ html[data-theme="dark"] .bwc-reel > span { color: #eab84f; }
 .tline .node--bridge .node__why { background: rgba(217, 161, 63, 0.14); color: var(--cream-on-dark); }
 .tline .node--bridge .node__hint { color: var(--dim-on-dark); }
 .tline .bridge-label {
-  font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.24em;
+  font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.24em;
   text-transform: uppercase; color: var(--gold); margin-bottom: 10px; display: block;
 }
 /* phones hold the page further from the eye — the mono micro-labels need a
@@ -4648,10 +4423,6 @@ html[data-theme="dark"] .bwc-reel > span { color: #eab84f; }
 @media (max-width: 760px) {
   .refract__band { filter: blur(16px); }
   .edge-glow__bloom { filter: blur(18px) saturate(1.55); }
-  .ag-band1 { filter: blur(28px) saturate(3.0) brightness(1.14); }
-  .ag-band2 { filter: blur(18px) saturate(3.0) brightness(1.14); }
-  .ag-leak__glow { filter: blur(16px); }
-  .ag-leak__emit { filter: blur(14px) brightness(1.5); }
 }
 
 /* ---------- quick check ---------- */
@@ -4716,7 +4487,7 @@ html[data-theme="dark"] .bwc-reel > span { color: #eab84f; }
 .tlskip {
   position: fixed; left: clamp(14px, 3vw, 40px); bottom: clamp(16px, 4vh, 42px);
   z-index: 40;
-  font-family: var(--mono); font-weight: 700; font-size: 0.66rem;
+  font-family: var(--mono); font-weight: 700; font-size: 0.68rem;
   text-transform: uppercase; letter-spacing: 0.18em;
   color: var(--ink-dim);
   background: rgba(250, 246, 239, 0.82);
@@ -4766,3 +4537,408 @@ html[data-a11y] .tline .hero-pin { position: static; height: auto; padding: 10vh
 html[data-a11y] .tline .hero-art { width: min(88vw, 720px); height: auto; aspect-ratio: 4 / 3; transform: none !important; }
 html[data-a11y] .tline .hero-title { position: static; opacity: 1 !important; transform: none !important; color: var(--ink); text-shadow: none; max-width: none; text-align: center; margin-top: 20px; }
 html[data-a11y] .tline .hero-title .tag { color: var(--ink-dim); }
+
+/* =====================================================
+   Receipts (receipts.html) — the quiet page.
+   Every number, date and rule the rest of the site leans
+   on, with its source attached. Deliberately calm: no
+   WebGL, no takeovers, just paper and citations.
+   ===================================================== */
+.rc {
+  padding: clamp(90px, 11vw, 150px) var(--gutter) var(--section-y);
+  max-width: 1180px;
+  margin: 0 auto;
+  scroll-margin-top: 90px;   /* anchor links clear the fixed nav */
+}
+
+.rc + .rc { padding-top: 0; }
+
+.rc__head { max-width: 47ch; margin-bottom: clamp(38px, 5vw, 64px); }
+
+.rc__title {
+  font-size: clamp(1.9rem, 4.4vw, 3.1rem);
+  line-height: 1.06;
+  margin: 10px 0 18px;
+}
+
+.rc__lead { font-size: clamp(1rem, 1.5vw, 1.12rem); color: var(--ink-dim); max-width: 48ch; }
+
+/* --- the standing note: what a receipt is, and what it isn't --- */
+.rc__note {
+  border-left: 3px solid var(--gold);
+  background: var(--gold-soft);
+  border-radius: 0 var(--r) var(--r) 0;
+  padding: 18px 22px;
+  margin: 26px 0 0;
+  font-size: 0.95rem;
+  max-width: 47ch;
+}
+
+.rc__note strong { color: var(--violet); }
+
+/* --- a study / source block --- */
+.rc__block {
+  border-top: 1px solid var(--line);
+  padding: clamp(26px, 3.4vw, 40px) 0;
+  display: grid;
+  grid-template-columns: minmax(150px, 0.9fr) minmax(0, 2.6fr);
+  gap: clamp(18px, 4vw, 54px);
+  align-items: start;
+}
+
+.rc__label {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--ink-dim);
+  padding-top: 6px;
+}
+
+.rc__label b { display: block; color: var(--gold); font-size: 1.5rem; letter-spacing: 0; margin-bottom: 6px; }
+
+.rc__body h3 {
+  font-size: clamp(1.15rem, 2vw, 1.5rem);
+  margin-bottom: 10px;
+  line-height: 1.2;
+}
+
+.rc__body p { margin-bottom: 12px; max-width: 48ch; }
+.rc__body p:last-child { margin-bottom: 0; }
+
+.rc__facts { list-style: none; margin: 14px 0 16px; max-width: 48ch; }
+
+.rc__facts li {
+  position: relative;
+  padding-left: 22px;
+  margin-bottom: 9px;
+  font-size: 0.96rem;
+}
+
+.rc__facts li::before {
+  content: "";
+  position: absolute;
+  left: 2px; top: 0.62em;
+  width: 8px; height: 2px;
+  background: var(--gold);
+}
+
+/* the citation line under a claim */
+.rc__cite {
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  line-height: 1.55;
+  color: var(--ink-dim);
+  border-top: 1px dashed var(--line);
+  padding-top: 10px;
+  margin-top: 4px;
+}
+
+.rc__cite a { color: var(--violet); text-decoration: none; border-bottom: 1px solid var(--gold-soft); }
+.rc__cite a:hover, .rc__cite a:focus-visible { border-bottom-color: var(--gold); }
+
+/* a flag on a claim that needs care, e.g. a number that moves */
+.rc__flag {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--violet);
+  background: var(--lilac);
+  border-radius: var(--r-pill);
+  padding: 4px 11px;
+  margin-bottom: 10px;
+}
+
+/* --- house rules --- */
+.rc__rules { list-style: none; counter-reset: rule; display: grid; gap: 16px; max-width: 52ch; }
+
+.rc__rules li {
+  counter-increment: rule;
+  position: relative;
+  padding-left: 46px;
+}
+
+.rc__rules li::before {
+  content: counter(rule, decimal-leading-zero);
+  position: absolute;
+  left: 0; top: 1px;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: var(--gold);
+}
+
+.rc__rules b { display: block; font-family: var(--serif); font-size: 1.06rem; margin-bottom: 3px; }
+.rc__rules p { font-size: 0.95rem; color: var(--ink-dim); }
+
+/* --- help strip: always reachable from the receipts page --- */
+.rc__help {
+  margin-top: clamp(30px, 4vw, 50px);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: clamp(20px, 3vw, 30px);
+  background: var(--paper-soft);
+  max-width: 52ch;
+}
+
+.rc__help h3 { font-size: 1.12rem; margin-bottom: 8px; }
+.rc__help p { font-size: 0.95rem; color: var(--ink-dim); margin-bottom: 10px; }
+.rc__help p:last-child { margin-bottom: 0; }
+.rc__help strong { color: var(--ink); }
+
+/* --- back links out of the quiet page --- */
+.rc__back {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--ink-dim);
+  text-decoration: none;
+  margin-top: 34px;
+  transition: color 0.25s;
+}
+
+.rc__back:hover, .rc__back:focus-visible { color: var(--gold); }
+
+html[data-theme="dark"] .rc__help { background: rgba(255, 255, 255, 0.03); }
+html[data-theme="dark"] .rc__flag { background: rgba(232, 224, 242, 0.12); color: var(--lilac); }
+
+@media (max-width: 760px) {
+  .rc__block { grid-template-columns: 1fr; gap: 14px; }
+  .rc__label { padding-top: 0; }
+  .rc__label b { display: inline-block; margin-right: 10px; margin-bottom: 0; vertical-align: -3px; }
+}
+
+/* ---------- links to the receipts, dropped into other pages ---------- */
+.receipt-link {
+  display: inline-flex; align-items: center; gap: 7px;
+  min-height: 44px;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--ink-dim);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color 0.25s, border-color 0.25s;
+}
+
+.receipt-link:hover, .receipt-link:focus-visible { color: var(--gold); border-bottom-color: var(--gold); }
+.receipt-link--light { color: var(--dim-on-dark); }
+.receipt-link--light:hover, .receipt-link--light:focus-visible { color: var(--gold); }
+
+/* ---------- house rules, inline above the wall composer ---------- */
+.houserules {
+  max-width: 640px;
+  margin: 0 auto 18px;
+  text-align: left;
+  border: 1px solid rgba(250, 246, 239, 0.16);
+  border-radius: var(--r);
+  padding: 15px 18px;
+  background: rgba(250, 246, 239, 0.04);
+}
+
+.houserules p.houserules__row {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+
+.houserules p {
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--dim-on-dark);
+  margin: 0 0 7px;
+}
+
+.houserules p:last-child { margin-bottom: 0; }
+.houserules strong { color: var(--cream-on-dark); }
+.houserules a { display: inline-flex; align-items: center; min-height: 44px; color: var(--cream-on-dark); text-decoration: none; border-bottom: 1px solid var(--gold); }
+.houserules a:hover, .houserules a:focus-visible { color: var(--gold); }
+
+/* the gentle stop shown when a post looks like it names someone or shares contact info */
+.composer__caution {
+  margin: 0 0 14px;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--cream-on-dark);
+  border-left: 2px solid var(--gold);
+  padding-left: 12px;
+  text-align: left;
+}
+
+.composer__caution[hidden] { display: none; }
+
+/* receipt links dropped into the year machine and the pulse card */
+.ym__sources { margin-top: 18px; }
+.sparkcard__receipt { margin-top: 12px; }
+.footer__receipts { margin-bottom: 14px; }
+
+/* ---------- screen-reader-only utility ---------- */
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- taking a post back down ----------
+   Deliberately quieter than Respond, but never hidden behind a menu: on a
+   shared school laptop this is the control that matters most, and it must
+   never be harder to reach than posting was. */
+.post__action--remove { margin-left: auto; color: var(--dim-on-dark); }
+.post__action--remove:hover,
+.post__action--remove:focus-visible { color: var(--gold); border-color: var(--gold); }
+
+.wall-section__foot {
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+  margin-top: clamp(30px, 4vw, 46px);
+}
+
+.wall__clear {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  min-height: 44px;
+  padding: 0 18px;
+  color: var(--dim-on-dark);
+  background: none;
+  border: 1px solid rgba(250, 246, 239, 0.18);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: color 0.25s, border-color 0.25s;
+}
+.wall__clear:hover, .wall__clear:focus-visible { color: var(--gold); border-color: var(--gold); }
+.wall__clear[hidden] { display: none; }
+
+/* the reply caution has to break out of the flex row to be readable */
+.reply-form { flex-wrap: wrap; }
+.reply-caution { flex: 1 0 100%; margin: 4px 0 0; }
+
+/* focus rings: three controls stripped their outline and replaced it with a
+   1px colour shift, which is not a visible focus indicator on its own */
+.composer textarea:focus-visible,
+.reply-form input:focus-visible,
+.ym__age:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* =====================================================
+   The stitch — the moment after you post.
+   You have just typed the hardest sentence of your week and pressed a
+   button. What used to happen: the box emptied and a card appeared.
+   Now a single gold thread pulls from the box down to your words and
+   settles into a running stitch, then leaves. Thread is this site's own
+   material for one voice joined to the others, so the gesture is the
+   product's, not a stock confetti burst. It is quiet on purpose: this is
+   an acknowledgement, not a celebration, and some of these posts are
+   about the worst thing that ever happened to someone.
+   ===================================================== */
+.wall__stitch {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 2;
+  animation: stitch-fade 0.5s var(--ease) 1.15s forwards;
+}
+
+.wall__stitch path {
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 2;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 6px rgba(217, 161, 63, 0.45));
+  stroke-dasharray: var(--len) var(--len);
+  stroke-dashoffset: var(--len);
+  animation:
+    stitch-draw 0.62s cubic-bezier(0.16, 1, 0.3, 1) forwards,
+    stitch-set 0.34s var(--ease) 0.62s forwards;
+}
+
+/* the thread is pulled through... */
+@keyframes stitch-draw { to { stroke-dashoffset: 0; } }
+/* ...then becomes stitches */
+@keyframes stitch-set { to { stroke-dasharray: 7 6; } }
+@keyframes stitch-fade { to { opacity: 0; } }
+
+/* the knot that lands on the card */
+.wall__stitch circle {
+  fill: var(--gold);
+  opacity: 0;
+  animation: knot-pop 0.4s var(--ease) 0.58s forwards;
+}
+@keyframes knot-pop {
+  0%   { opacity: 0; transform: scale(0.2); }
+  60%  { opacity: 1; transform: scale(1.35); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* what she reads while that happens. Visible only: #wallStatus already
+   carries the announcement, so this must not double-speak. */
+.wall__ack {
+  margin: 15px 0 0;
+  padding-left: 38px;        /* clears the stitch running down the gutter */
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--cream-on-dark);
+  opacity: 0;
+  animation: ack-in 0.55s var(--ease) 0.5s forwards;
+}
+
+.wall__ack b { font-style: normal; font-weight: 600; color: var(--gold); }
+
+@keyframes ack-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+/* Reduced motion and accessible mode: the words still arrive, nothing moves.
+   The stitch is never rendered at all (js/main.js), so there is no loop to
+   stop and nothing to skip. */
+@media (prefers-reduced-motion: reduce) {
+  .wall__ack { animation: none; opacity: 1; transform: none; }
+  .post--new { animation: none; }
+}
+html[data-a11y] .wall__ack { animation: none !important; opacity: 1; transform: none; }
+html[data-a11y] .post--new { animation: none !important; }
+
+/* =====================================================
+   Light text on dark surfaces.
+   The site alternates warm paper and deep violet, but every dark section
+   set its type identically to its light-background twin: .resources__lead
+   and .getinvolved__lead were character-for-character the same rule, and
+   all 29 dark-theme blocks changed nothing but colour. Light-on-dark needs
+   a little more room and a little more tracking to read at the same ease,
+   because the glyphs bloom optically against the darker field.
+   ===================================================== */
+/* :where() so this carries ZERO specificity. It beats inheritance, which is
+   all it needs to do, and it loses to every explicit rule, which is what it
+   must do: written as a normal selector it outranked the mono label rules and
+   flattened their 0.14-0.22em tracking down to 0.006em. Compensation should
+   fill gaps, never overrule a decision someone already made. */
+:where(.popculture, .ym, .wall-section, .learn, .getinvolved) :where(p, li) {
+  line-height: 1.68;
+  letter-spacing: 0.006em;
+}
+
+/* tracked labels on dark need MORE tracking, not less: gold on violet at 11.5px */
+.eyebrow--light { letter-spacing: 0.24em; }
+
+/* .piece__credits measured 3.59:1 against #1e1533 and failed AA outright */
+.piece__credits { line-height: 1.7; color: rgba(250, 246, 239, 0.62); }
+
+/* the darkest panel on the site was also the one running tightest */
+.lens__def { line-height: 1.66; }

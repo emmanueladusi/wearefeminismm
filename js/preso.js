@@ -99,7 +99,9 @@
   // "Skip last year's recap" — the HUD button jumps straight past the
   // pinned slideshow to the wall, for anyone who doesn't want the recap.
   const skip = document.getElementById("presoSkip");
-  const wall = document.getElementById("wall");
+  // land on the year machine, not past it: skipping the recap used to skip
+  // Act two as well, which is the one part of the page about the visitor
+  const wall = document.getElementById("yearmachine") || document.getElementById("wall");
   if (skip && wall) {
     skip.addEventListener("click", () => {
       const reduce =

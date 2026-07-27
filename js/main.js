@@ -94,7 +94,10 @@ if (!reduceMotion && marquee) {
 }
 
 /* =====================================================
-   The Wall (only present on community.html)
+   The Wall (voice.html)
+   Anonymous stories, written mostly by 13-19 year olds. Three rules shape
+   everything below: nothing leaves the device, every input gets the same
+   safety pass, and anything you post you can take back down.
    ===================================================== */
 const wallList = document.getElementById("wallList");
 const wallForm = document.getElementById("wallForm");
@@ -120,28 +123,122 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
+/* Posts store a timestamp, not the words "just now": a post read tomorrow
+   used to still claim it was written a second ago. */
+function timeAgo(ts) {
+  if (!ts) return "a while ago";
+  const mins = Math.floor((Date.now() - ts) / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return mins + (mins === 1 ? " minute ago" : " minutes ago");
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return hrs + (hrs === 1 ? " hour ago" : " hours ago");
+  const days = Math.floor(hrs / 24);
+  return days + (days === 1 ? " day ago" : " days ago");
+}
+
+/* --- the safety pass ------------------------------------------------------
+   Two things get a second look before anything lands: details that could
+   identify someone, and words that sound like a crisis. Neither is a block.
+   Identifying details ask for one more press. Crisis words put a real
+   helpline on screen first. Both are deliberately easy to walk past, because
+   a wall that stops a girl mid-sentence is worse than one that pauses her.
+   This runs on every input on the wall, the composer and every reply box
+   alike: the reply box is exactly where someone answers a hard story with a
+   harder one, so it cannot be the unguarded door. */
+const CRISIS = /\b(kill myself|killing myself|end my life|take my (own )?life|want to die|wanna die|suicid\w*|self[- ]harm|hurt myself|cut myself|cutting myself)\b/i;
+const IDENTIFYING = [
+  /[\w.+-]+@[\w-]+\.[a-z]{2,}/i,                 // email
+  /\b(?:\+?1[\s.-]?)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}\b/, // phone
+  /(^|\s)@[a-z0-9._]{3,}/i,                       // social handle
+  /\bhttps?:\/\/\S+/i,                            // link
+  /\bmy name is\b/i,
+];
+
+function screenText(text) {
+  if (CRISIS.test(text)) {
+    return (
+      "Before this goes up: if any of that is happening to you right now, please talk to someone who can help tonight. " +
+      "<strong>Kids Help Phone: text CONNECT to 686868</strong>, free and confidential, any hour. " +
+      "You can also call or text <strong>988</strong>. Your words are still yours, and sending again will put them on the wall."
+    );
+  }
+  if (IDENTIFYING.some((re) => re.test(text))) {
+    return (
+      "That looks like it might name someone or share a way to contact you. " +
+      "Take it out if you can, then send again. Your story lands just as hard without it, and staying unidentifiable is what keeps this wall safe."
+    );
+  }
+  return null;
+}
+
+/* One guarded submit, shared by the composer and every reply form.
+   `field` is the input, `caution` the status line under it, `onPass` the
+   thing that actually posts. Returns nothing; it either warns or posts. */
+function guardedSubmit(field, caution, onPass) {
+  const text = field.value.trim();
+  if (!text) return;
+
+  if (caution && caution.dataset.armed !== "true") {
+    const warning = screenText(text);
+    if (warning) {
+      caution.innerHTML = warning;
+      caution.hidden = false;
+      caution.dataset.armed = "true";   // the next send goes through unchanged
+      return;
+    }
+  }
+  if (caution) {
+    caution.hidden = true;
+    caution.dataset.armed = "false";
+  }
+  onPass(text);
+}
+
+/* editing after a caution re-arms the check, so a fresh problem is caught */
+function watchForEdits(field, caution) {
+  if (!field || !caution) return;
+  field.addEventListener("input", () => {
+    if (caution.dataset.armed !== "true") return;
+    caution.dataset.armed = "false";
+    caution.hidden = true;
+  });
+}
+
+/* Announcements. Everything here used to happen in total silence: the box
+   emptied, a card appeared, and a screen reader was told nothing at all. */
+const wallStatus = document.getElementById("wallStatus");
+function announce(msg) {
+  if (!wallStatus) return;
+  wallStatus.textContent = "";
+  // re-setting after a tick makes repeat messages announce again
+  setTimeout(() => { wallStatus.textContent = msg; }, 50);
+}
+
 function renderPosts() {
   if (!posts.length) {
     wallList.innerHTML = `
       <div class="wall__empty">
         <p><strong>The wall is waiting for its first story.</strong><br />
-        One sentence is enough. No one will ever know it was you.</p>
+        One sentence is enough. Nothing you write leaves this device.</p>
       </div>`;
+    if (wallClear) wallClear.hidden = true;
     return;
   }
+  if (wallClear) wallClear.hidden = false;
 
   wallList.innerHTML = posts
     .map(
-      (p) => `
-    <article class="post" data-id="${p.id}">
+      (p, i) => `
+    <article class="post${p.id === justPosted ? " post--new" : ""}" data-id="${p.id}" tabindex="-1" aria-label="Anonymous story ${i + 1} of ${posts.length}">
       <div class="post__meta">
         <span class="post__name">Anonymous</span>
-        <span class="post__time">${p.time}</span>
+        <span class="post__time">${timeAgo(p.ts)}</span>
       </div>
       <p class="post__body">${escapeHtml(p.body)}</p>
       <div class="post__actions">
-        <button class="post__action" data-act="reply">Respond</button>
-        <button class="post__action" data-act="heart">♥ With you (${p.hearts || 0})</button>
+        <button class="post__action" type="button" data-act="reply" aria-expanded="false">Respond</button>
+        <button class="post__action" type="button" data-act="heart">♥ With you (${p.hearts || 0})</button>
+        <button class="post__action post__action--remove" type="button" data-act="remove">Take it down</button>
       </div>
       ${
         p.replies.length
@@ -151,8 +248,10 @@ function renderPosts() {
           : ""
       }
       <form class="reply-form" hidden>
-        <input type="text" placeholder="Respond with care..." required />
+        <label class="visually-hidden" for="reply-${p.id}">Respond to this story</label>
+        <input type="text" id="reply-${p.id}" maxlength="600" placeholder="Respond with care..." required />
         <button type="submit">Send</button>
+        <p class="composer__caution reply-caution" role="status" hidden></p>
       </form>
     </article>`
     )
@@ -164,11 +263,17 @@ wallList.addEventListener("click", (e) => {
   if (!btn) return;
   const postEl = btn.closest(".post");
   const post = posts.find((p) => p.id === postEl.dataset.id);
+  if (!post) return;
 
   if (btn.dataset.act === "reply") {
     const form = postEl.querySelector(".reply-form");
     form.hidden = !form.hidden;
-    if (!form.hidden) form.querySelector("input").focus();
+    btn.setAttribute("aria-expanded", String(!form.hidden));
+    if (!form.hidden) {
+      const input = form.querySelector("input");
+      watchForEdits(input, form.querySelector(".reply-caution"));
+      input.focus();
+    }
   }
 
   if (btn.dataset.act === "heart") {
@@ -179,37 +284,185 @@ wallList.addEventListener("click", (e) => {
     void btn.offsetWidth; // restart animation
     btn.classList.add("is-pop");
   }
+
+  /* No confirmation dialog on purpose: taking something back down should
+     never be harder than putting it up. */
+  if (btn.dataset.act === "remove") {
+    posts = posts.filter((p) => p.id !== post.id);
+    savePosts(posts);
+    renderPosts();
+    announce("Taken down. It is gone from this device.");
+  }
 });
 
+/* Replies go through the same gate as the composer. Only the affected post
+   is re-rendered, so a draft typed into another reply box survives. */
 wallList.addEventListener("submit", (e) => {
   e.preventDefault();
-  const postEl = e.target.closest(".post");
+  const form = e.target.closest(".reply-form");
+  if (!form) return;
+  const postEl = form.closest(".post");
   const post = posts.find((p) => p.id === postEl.dataset.id);
-  const input = e.target.querySelector("input");
-  post.replies.push({ body: input.value.trim() });
-  savePosts(posts);
-  renderPosts();
+  if (!post) return;
+  const input = form.querySelector("input");
+  const caution = form.querySelector(".reply-caution");
+
+  guardedSubmit(input, caution, (text) => {
+    post.replies.push({ body: text });
+    savePosts(posts);
+
+    const existing = postEl.querySelector(".replies");
+    const markup = post.replies
+      .map((r) => `<div class="reply"><strong>Anonymous</strong> · ${escapeHtml(r.body)}</div>`)
+      .join("");
+    if (existing) {
+      existing.innerHTML = markup;
+    } else {
+      const wrap = document.createElement("div");
+      wrap.className = "replies";
+      wrap.innerHTML = markup;
+      postEl.querySelector(".post__actions").after(wrap);
+    }
+    form.reset();
+    form.hidden = true;
+    postEl.querySelector('[data-act="reply"]').setAttribute("aria-expanded", "false");
+    announce("Your response was added.");
+  });
 });
+
+/* --- the stitch ----------------------------------------------------------
+   The moment after posting used to be nothing: the box emptied, a card
+   appeared, and the page said not one word about what had just taken
+   effort. This pulls a gold thread from the composer down to her words,
+   lets it settle into a running stitch, and leaves. It is deliberately an
+   acknowledgement rather than a celebration, because some of what lands
+   here is the worst thing that ever happened to someone and confetti
+   would be an insult.
+
+   Never blocks: the card is already in the DOM and readable before the
+   thread starts drawing. Skipped entirely under reduced motion or the
+   site's own accessible mode. */
+let justPosted = null;
+
+function motionOff() {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+         document.documentElement.hasAttribute("data-a11y");
+}
+
+const NS = "http://www.w3.org/2000/svg";
+
+function drawStitch(card) {
+  const inner = wallList.closest(".wall-section__inner");
+  if (!inner || !card || motionOff()) return;
+
+  const ir = inner.getBoundingClientRect();
+  const cr = wallForm.getBoundingClientRect();
+  const kr = card.getBoundingClientRect();
+
+  /* Down the LEFT GUTTER, not across the middle: the acknowledgement line
+     sits between the composer and the card, and a thread drawn to the card's
+     centre struck straight through those words. A stitch in the margin reads
+     the way a real one does and never crosses type. */
+  const GUTTER = 14;
+  const x1 = GUTTER;
+  const y1 = cr.bottom - ir.top - 10;   // starts inside the box she typed in
+  const x2 = GUTTER;
+  const y2 = kr.top - ir.top + 22;      // ends inside the card, so it binds
+  if (y2 - y1 < 24) return;   // too tight to be worth drawing
+
+  const svg = document.createElementNS(NS, "svg");
+  svg.setAttribute("class", "wall__stitch");
+  svg.setAttribute("aria-hidden", "true");
+  svg.setAttribute("preserveAspectRatio", "none");
+  svg.setAttribute("viewBox", `0 0 ${Math.round(ir.width)} ${Math.round(ir.height)}`);
+
+  const path = document.createElementNS(NS, "path");
+  const bow = 7;   // slight lean, so it looks sewn rather than ruled
+  const d = `M ${x1} ${y1} C ${x1 + bow} ${y1 + (y2 - y1) * 0.3}, ` +
+            `${x2 - bow} ${y1 + (y2 - y1) * 0.7}, ${x2} ${y2}`;
+  path.setAttribute("d", d);
+  svg.appendChild(path);
+
+  const knot = document.createElementNS(NS, "circle");
+  knot.setAttribute("cx", x2);
+  knot.setAttribute("cy", y2);
+  knot.setAttribute("r", 3.5);
+  svg.appendChild(knot);
+
+  inner.appendChild(svg);
+  const len = path.getTotalLength();
+  path.style.setProperty("--len", len);
+  svg.addEventListener("animationend", (e) => {
+    if (e.animationName === "stitch-fade") svg.remove();
+  });
+  // belt and braces: never leave an orphan overlay behind
+  setTimeout(() => svg.remove(), 2600);
+}
+
+/* The line she actually reads. #wallStatus does the announcing, so this is
+   hidden from assistive tech to avoid saying it twice. */
+function acknowledge() {
+  const old = document.querySelector(".wall__ack");
+  if (old) old.remove();
+  const p = document.createElement("p");
+  p.className = "wall__ack";
+  p.setAttribute("aria-hidden", "true");
+  p.innerHTML = "<span>Stitched in. It stays on this device, and <b>you can take it down</b> whenever you want.</span>";
+  wallForm.after(p);
+  setTimeout(() => {
+    p.style.transition = "opacity .6s ease";
+    p.style.opacity = "0";
+    setTimeout(() => p.remove(), 700);
+  }, 7000);
+}
+
+const wallText = document.getElementById("wallText");
+const wallCaution = document.getElementById("wallCaution");
+const wallClear = document.getElementById("wallClear");
+watchForEdits(wallText, wallCaution);
 
 wallForm.addEventListener("submit", (e) => {
   e.preventDefault();
-  const text = document.getElementById("wallText").value.trim();
-  posts.unshift({
-    id: "post-" + Date.now(),
-    time: "just now",
-    body: text,
-    replies: [],
+  guardedSubmit(wallText, wallCaution, (text) => {
+    posts.unshift({
+      id: "post-" + Date.now(),
+      ts: Date.now(),
+      body: text,
+      replies: [],
+      hearts: 0,
+    });
+    savePosts(posts);
+    justPosted = posts[0].id;
+    renderPosts();
+    wallForm.reset();
+    announce("It is on the wall. You can take it down any time.");
+    const first = wallList.querySelector(".post");
+    if (first) {
+      // preventScroll: the card lands directly under the composer, so jumping
+      // the viewport would only throw away the thread she is meant to see
+      first.focus({ preventScroll: true });
+      acknowledge();
+      drawStitch(first);
+    }
+    justPosted = null;
   });
-  savePosts(posts);
-  renderPosts();
-  wallForm.reset();
 });
+
+if (wallClear) {
+  wallClear.addEventListener("click", () => {
+    if (!posts.length) return;
+    posts = [];
+    savePosts(posts);
+    renderPosts();
+    announce("The wall on this device is empty again.");
+  });
+}
 
 renderPosts();
 }
 
 /* =====================================================
-   Pulse check (only present on voice.html)
+   Pulse check (only present on community.html)
    ===================================================== */
 const pulseScale = document.getElementById("pulseScale");
 const pulseResults = document.getElementById("pulseResults");
