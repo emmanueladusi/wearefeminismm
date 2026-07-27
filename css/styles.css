@@ -517,13 +517,24 @@ section { position: relative; }
 .paths, .grounding, .pulse, .footer { background: var(--paper); }
 .marquee { position: relative; }
 
-.reveal {
+/* The supporting layer, deliberately demoted.
+   62 elements across four pages shared this one entrance at 0.9s and 36px --
+   the duration reserved for an authored focal moment. When every paragraph
+   arrives like an event, nothing does, and the wordmark building itself, the
+   year ticking back to 1912 and the stitch had nothing to contrast against.
+   Now it reads as content settling rather than content performing.
+
+   Guarded on html.js so the page is VISIBLE by default: hiding content in CSS
+   and relying on script to bring it back means a blocked or broken main.js
+   renders the whole site blank, which on a school network is a real outcome. */
+.reveal { transition: opacity 0.5s var(--ease), transform 0.5s var(--ease); }
+
+.js .reveal {
   opacity: 0;
-  transform: translateY(36px);
-  transition: opacity 0.9s var(--ease), transform 0.9s var(--ease);
+  transform: translateY(14px);
 }
 
-.reveal.is-visible { opacity: 1; transform: translateY(0); }
+.js .reveal.is-visible { opacity: 1; transform: translateY(0); }
 
 /* ===== Pathways ===== */
 .paths {
@@ -4942,3 +4953,17 @@ html[data-a11y] .post--new { animation: none !important; }
 
 /* the darkest panel on the site was also the one running tightest */
 .lens__def { line-height: 1.66; }
+
+/* Theme change is a state change, so it gets continuity rather than a hard
+   cut. The class is added on toggle and removed after, so this never fires
+   during initial paint (which is what makes most colour transitions janky). */
+html.theme-shifting,
+html.theme-shifting body,
+html.theme-shifting #morph,
+html.theme-shifting section {
+  transition: background-color 0.42s var(--ease), color 0.42s var(--ease);
+}
+@media (prefers-reduced-motion: reduce) {
+  html.theme-shifting, html.theme-shifting body,
+  html.theme-shifting #morph, html.theme-shifting section { transition: none; }
+}

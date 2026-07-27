@@ -14,14 +14,20 @@ window.addEventListener(
   { passive: true }
 );
 
-/* ===== Scroll reveals — staggered within each section ===== */
+/* ===== Scroll reveals =====
+   Stagger belongs to things that read AS a list. Applied to every section it
+   turns the whole page into one long staggered list, which is how the generic
+   layer ended up competing with the page's authored moments. */
+const LIST_LIKE = "ol, ul, .paths__list, .wall, .deck, .resources__grid, [class*='__list'], [class*='__grid']";
 const staggerGroups = new Map();
 document.querySelectorAll(".reveal").forEach((el) => {
   const group = el.parentElement;
+  if (!group || !group.matches(LIST_LIKE)) { el.style.transitionDelay = "0s"; return; }
   const idx = staggerGroups.get(group) || 0;
-  el.style.transitionDelay = `${Math.min(idx * 0.09, 0.36)}s`;
+  el.style.transitionDelay = `${Math.min(idx * 0.07, 0.28)}s`;
   staggerGroups.set(group, idx + 1);
 });
+document.documentElement.classList.add("reveal-ready");
 
 const revealObserver = new IntersectionObserver(
   (entries) => {

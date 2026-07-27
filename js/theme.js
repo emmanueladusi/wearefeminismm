@@ -26,7 +26,21 @@
     }
   }
 
+  /* Flipping the theme repaints the whole page at once. Carrying it with a
+     short tint reads as one state change rather than a hard cut. The class is
+     only present for the length of the transition, so it can never fire during
+     initial paint, which is what makes most theme transitions feel janky. */
+  var shiftTimer = null;
+  function carryThemeChange() {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+        root.hasAttribute("data-a11y")) return;
+    root.classList.add("theme-shifting");
+    clearTimeout(shiftTimer);
+    shiftTimer = setTimeout(function () { root.classList.remove("theme-shifting"); }, 480);
+  }
+
   function setDark(on) {
+    carryThemeChange();
     root.setAttribute("data-theme", on ? "dark" : "light");
     try { localStorage.setItem(LS_THEME, on ? "dark" : "light"); } catch (e) {}
     sync();
