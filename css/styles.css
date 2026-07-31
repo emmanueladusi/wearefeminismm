@@ -5990,137 +5990,56 @@ html[data-a11y] .wsplit__i { transform: none !important; }
 html[data-a11y] .wipe-row { clip-path: none !important; }
 html[data-a11y] .stat-pop { transform: none !important; opacity: 1 !important; }
 
+
 /* =====================================================
-   Learn · Part three: the stacked scholar panels
-   Borrowed from juliencalot.com: each panel pins at the top while the
-   next slides up over it, so you meet one person at a time instead of
-   skimming a grid. Pure CSS position:sticky, no JS and no library.
+   Home · the three moves, gently stacked
+   The same idea as the juliencalot.com panel stack, dialled right
+   down: each row pins just under the nav for a moment and the next
+   slides over it on its own paper ground, with a soft top edge and
+   a shadow so the overlap reads. No full-screen panels, no pinning
+   drama, and the rows keep their existing type and gold rule.
+   Pure position:sticky, no script.
    ===================================================== */
-.resources--stack { padding-bottom: 0; }
-.resources--stack .resources__inner { margin-bottom: clamp(28px, 5vh, 56px); }
+@media (min-width: 761px) {
+  .paths__list { position: relative; }
 
-.stack {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  /* the stack needs room to travel: one screen per panel */
-  padding-bottom: 12vh;
-}
+  .paths__item {
+    position: sticky;
+    /* Each row parks a full row-height below the last, so a pinned row stays
+       completely readable instead of being buried by the next one. At a 12px
+       step the earlier rows were covered within a few pixels and their
+       descriptions vanished, which is the opposite of useful. The three end
+       up fanned open together, then release as a set. */
+    top: calc(92px + var(--s, 0) * 162px);
+    background: var(--paper);
+    border-radius: 12px 12px 0 0;
+    /* the shadow only appears where a row overlaps the one before */
+    box-shadow: 0 -14px 30px -22px rgba(44, 33, 64, 0.5);
+    transition: box-shadow 0.4s var(--ease);
+  }
+  .paths__item:nth-child(1) { --s: 0; }
+  .paths__item:nth-child(2) { --s: 1; }
+  .paths__item:nth-child(3) { --s: 2; }
 
-.stackp {
-  position: sticky;
-  top: 0;
-  height: 100svh;
-  /* each panel sits one notch further down so the edge of the one beneath
-     stays visible, which is what makes the stack legible as a stack */
-  padding-top: calc(var(--i) * 14px);
-}
+  /* the first row has nothing to overlap, so it carries no lip */
+  .paths__item:first-child { box-shadow: none; }
 
-.stackp__link {
-  position: relative;
-  display: block;
-  height: 100%;
-  overflow: hidden;
-  border-radius: 18px 18px 0 0;
-  text-decoration: none;
-  color: var(--cream-on-dark);
-  background: var(--violet-deep);
-  box-shadow: 0 -18px 50px -24px rgba(20, 14, 34, 0.6);
-}
-.stackp__link:focus-visible { outline: 3px solid var(--gold); outline-offset: -5px; }
+  /* the section needs a little run-out so the last row settles before the
+     page moves on to the weekly piece */
+  .paths__list { padding-bottom: 18vh; }
 
-.stackp__img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  /* the photos are portraits at mixed sizes; a slight desaturation keeps six
-     very different sources reading as one series */
-  filter: saturate(0.85) contrast(1.03);
+  [data-theme="dark"] .paths__item {
+    background: #14101f;
+    box-shadow: 0 -14px 30px -20px rgba(0, 0, 0, 0.75);
+  }
+  [data-theme="dark"] .paths__item:first-child { box-shadow: none; }
 }
 
-.stackp__scrim {
-  position: absolute;
-  inset: 0;
-  /* the caption sits at mid-height, not at the foot, so the panel sliding up
-     over this one cannot swallow the name before it has been read. The scrim
-     is therefore weighted to the middle band rather than the bottom. */
-  background:
-    linear-gradient(to top, rgba(20,14,34,0.55) 0%, rgba(20,14,34,0.80) 34%,
-                            rgba(20,14,34,0.62) 58%, rgba(20,14,34,0.10) 100%),
-    linear-gradient(to right, rgba(20,14,34,0.55) 0%, rgba(20,14,34,0.12) 62%, transparent 100%);
-}
-
-.stackp__meta {
-  position: absolute;
-  left: 0; right: 0; top: 42%;
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: start;
-  gap: 12px clamp(18px, 3vw, 44px);
-  padding: 0 clamp(20px, 5vw, 64px);
-}
-
-.stackp__num {
-  font-family: var(--mono);
-  font-size: var(--t-small);
-  letter-spacing: 0.12em;
-  color: var(--gold);
-  padding-top: 6px;
-}
-.stackp__of { opacity: 0.6; }
-
-.stackp__body { display: block; max-width: 56ch; }
-.stackp__name {
-  display: block;
-  font-family: var(--serif);
-  font-size: clamp(1.6rem, 0.9vw + 1.5rem, 2.6rem);
-  font-weight: 700;
-  line-height: 1.1;
-  letter-spacing: -0.015em;
-}
-.stackp__role {
-  display: block;
-  margin-top: 6px;
-  font-family: var(--mono);
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: rgba(250, 246, 239, 0.72);
-}
-.stackp__what {
-  display: block;
-  margin-top: 12px;
-  font-size: var(--t-small);
-  line-height: 1.6;
-  color: rgba(250, 246, 239, 0.86);
-}
-.stackp__go {
-  font-size: var(--t-small);
-  font-weight: 700;
-  white-space: nowrap;
-  border-bottom: 2px solid var(--gold);
-  padding-bottom: 3px;
-  margin-top: 6px;
-}
-.stackp__link:hover .stackp__go { color: var(--gold); }
-
-/* --- narrow screens: a sticky full-height stack traps the scroll on a
-   phone, so below 760px it becomes an ordinary list of cards --- */
-@media (max-width: 760px) {
-  .stack { padding-bottom: 0; }
-  .stackp { position: static; height: auto; padding-top: 0; margin-bottom: 14px; }
-  .stackp__link { border-radius: 16px; min-height: 62svh; }
-  .stackp__meta { grid-template-columns: 1fr; gap: 8px; position: absolute; top: auto; bottom: 0; padding: 0 20px 24px; }
-  .stackp__img { position: absolute; }
-}
-
-/* --- reduced motion / accessible mode: unpin everything --- */
+/* phones keep the plain list: a sticky chain in a short viewport just
+   fights the scroll */
 @media (prefers-reduced-motion: reduce) {
-  .stackp { position: static; height: auto; padding-top: 0; margin-bottom: 14px; }
-  .stackp__link { min-height: 60svh; border-radius: 16px; }
+  .paths__item { position: static; box-shadow: none; }
+  .paths__list { padding-bottom: 0; }
 }
-html[data-a11y] .stackp { position: static !important; height: auto; padding-top: 0; margin-bottom: 14px; }
-html[data-a11y] .stackp__link { min-height: 60svh; }
-html[data-a11y] .stackp__scrim { background: rgba(20, 14, 34, 0.86); }
+html[data-a11y] .paths__item { position: static !important; box-shadow: none !important; }
+html[data-a11y] .paths__list { padding-bottom: 0; }
