@@ -52,13 +52,14 @@ const plFill = document.getElementById("plFill");
 const plDot = document.getElementById("plDot");
 
 function scrubUpdate() {
+  if (!plFill || !plDot) return;   // the guide line only exists on Home now
   const max = document.documentElement.scrollHeight - innerHeight;
   const pageT = max > 0 ? window.scrollY / max : 0;
   plFill.style.transform = `scaleY(${pageT})`;
   plDot.style.top = `${pageT * 100}%`;
 }
 
-if (!reduceMotion) {
+if (!reduceMotion && plFill && plDot) {
   let ticking = false;
   window.addEventListener(
     "scroll",
@@ -224,8 +225,8 @@ function renderPosts() {
   if (!posts.length) {
     wallList.innerHTML = `
       <div class="wall__empty">
-        <p><strong>The wall is waiting for its first story.</strong><br />
-        One sentence is enough. Nothing you write leaves this device.</p>
+        <p><strong>Nothing saved on this device yet.</strong><br />
+        One sentence is enough. What you write stays here, on this device, and no one else can read it.</p>
       </div>`;
     if (wallClear) wallClear.hidden = true;
     return;
@@ -235,27 +236,27 @@ function renderPosts() {
   wallList.innerHTML = posts
     .map(
       (p, i) => `
-    <article class="post${p.id === justPosted ? " post--new" : ""}" data-id="${p.id}" tabindex="-1" aria-label="Anonymous story ${i + 1} of ${posts.length}">
+    <article class="post${p.id === justPosted ? " post--new" : ""}" data-id="${p.id}" tabindex="-1" aria-label="Your reflection ${i + 1} of ${posts.length}">
       <div class="post__meta">
-        <span class="post__name">Anonymous</span>
+        <span class="post__name">Your reflection</span>
         <span class="post__time">${timeAgo(p.ts)}</span>
       </div>
       <p class="post__body">${escapeHtml(p.body)}</p>
       <div class="post__actions">
-        <button class="post__action" type="button" data-act="reply" aria-expanded="false">Respond</button>
-        <button class="post__action" type="button" data-act="heart">♥ With you (${p.hearts || 0})</button>
-        <button class="post__action post__action--remove" type="button" data-act="remove">Take it down</button>
+        <button class="post__action" type="button" data-act="reply" aria-expanded="false">Add a note</button>
+        <button class="post__action" type="button" data-act="heart">★ Mark this (${p.hearts || 0})</button>
+        <button class="post__action post__action--remove" type="button" data-act="remove">Delete</button>
       </div>
       ${
         p.replies.length
           ? `<div class="replies">${p.replies
-              .map((r) => `<div class="reply"><strong>Anonymous</strong> · ${escapeHtml(r.body)}</div>`)
+              .map((r) => `<div class="reply"><strong>Note</strong> · ${escapeHtml(r.body)}</div>`)
               .join("")}</div>`
           : ""
       }
       <form class="reply-form" hidden>
-        <label class="visually-hidden" for="reply-${p.id}">Respond to this story</label>
-        <input type="text" id="reply-${p.id}" maxlength="600" placeholder="Respond with care..." required />
+        <label class="visually-hidden" for="reply-${p.id}">Add a note to this reflection</label>
+        <input type="text" id="reply-${p.id}" maxlength="600" placeholder="Add a note to this…" required />
         <button type="submit">Send</button>
         <p class="composer__caution reply-caution" role="status" hidden></p>
       </form>
@@ -319,7 +320,7 @@ wallList.addEventListener("submit", (e) => {
 
     const existing = postEl.querySelector(".replies");
     const markup = post.replies
-      .map((r) => `<div class="reply"><strong>Anonymous</strong> · ${escapeHtml(r.body)}</div>`)
+      .map((r) => `<div class="reply"><strong>Note</strong> · ${escapeHtml(r.body)}</div>`)
       .join("");
     if (existing) {
       existing.innerHTML = markup;

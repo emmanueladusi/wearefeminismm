@@ -129,24 +129,70 @@
 
   let latest = null; // last data received
   let inView = false; // is the card currently on screen?
+  let poller = null;
+
+  /* Last tally we recorded by hand. If the endpoint is unreachable the card
+     shows THIS with its date rather than sitting on "Collecting responses…"
+     forever — a stale-but-labelled number beats an empty panel. */
+  const LAST_KNOWN = { yes: 36, no: 82 - 36, on: "27 July 2026" };
+
+  const fbEl = () => document.getElementById("sparkFallback");
+
+  function showFallback() {
+    render(LAST_KNOWN, false);
+    const el = fbEl();
+    if (el) {
+      el.hidden = false;
+      el.querySelector("[data-spark-msg]").textContent =
+        "Live count unavailable right now. Showing the last recorded total from " +
+        LAST_KNOWN.on + ".";
+    }
+  }
+
+  function hideFallback() {
+    const el = fbEl();
+    if (el) el.hidden = true;
+  }
+
+  // fetch with a real timeout — a hanging request is the usual reason a
+  // counter like this gets stuck on its loading state
+  function fetchWithTimeout(url, ms) {
+    if (typeof AbortController === "undefined") return fetch(url, { cache: "no-store" });
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), ms);
+    return fetch(url, { cache: "no-store", signal: ctrl.signal }).finally(() =>
+      clearTimeout(t)
+    );
+  }
 
   async function loadLive() {
     try {
-      const res = await fetch(DATA_URL, { cache: "no-store" });
+      const res = await fetchWithTimeout(DATA_URL, 6000);
       const data = await res.json();
       const next = { yes: +data.yes || 0, no: +data.no || 0 };
+      if (!next.yes && !next.no) throw new Error("empty tally");
       // did someone just respond since we last checked?
       const changed = !latest || next.yes !== latest.yes || next.no !== latest.no;
       latest = next;
+      hideFallback();
       // if the count changed while the card is visible, redraw the line live so
       // you actually SEE the new response land; otherwise update silently so the
       // fresh number is ready the next time it scrolls into view.
       render(latest, changed && inView);
     } catch (e) {
       console.warn("spark: could not load live data", e);
-      if (!latest) renderWaiting(false);
+      if (!latest) showFallback(); // never leave the card empty
     }
   }
+
+  // Retry button in the fallback panel
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-spark-retry]");
+    if (!btn) return;
+    const msg = document.querySelector("[data-spark-msg]");
+    if (msg) msg.textContent = "Checking again…";
+    loadLive();
+  });
 
   // Track visibility so a response that lands WHILE the card is on screen
   // redraws live (see loadLive). The actual replay-on-view is driven by the
@@ -164,6 +210,11 @@
   renderWaiting(false);
   if (DATA_URL) {
     loadLive();
-    setInterval(loadLive, REFRESH_MS);
+    poller = setInterval(loadLive, REFRESH_MS);
+    // If nothing has landed after 8s the endpoint is effectively down: show the
+    // last recorded total instead of leaving "Collecting responses…" on screen.
+    setTimeout(() => { if (!latest) showFallback(); }, 8000);
+  } else {
+    showFallback();
   }
 })();

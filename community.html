@@ -4,29 +4,29 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script>(function(){try{var t=localStorage.getItem("wf-theme");var d=t?t==="dark":matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.setAttribute("data-theme",d?"dark":"light");if(localStorage.getItem("wf-a11y"))document.documentElement.setAttribute("data-a11y","");}catch(e){}})();</script>
-  <title>wearefeminism · Community</title>
+  <title>wearefeminismm · Community</title>
   <meta name="description" content="Read what other students have lived through, and add your own: no name, no account. A supportive, anonymous community space for students." />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <meta name="theme-color" content="#4a3568" />
   <!-- Open Graph / social share -->
   <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="wearefeminism" />
-  <meta property="og:title" content="wearefeminism · Community" />
+  <meta property="og:site_name" content="wearefeminismm" />
+  <meta property="og:title" content="wearefeminismm · Community" />
   <meta property="og:description" content="Read what other students have lived through, and add your own: no name, no account. A supportive, anonymous space." />
   <meta property="og:url" content="https://emmanueladusi.github.io/wearefeminismm/community.html" />
   <meta property="og:image" content="https://emmanueladusi.github.io/wearefeminismm/img/og-image.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="wearefeminism · Community" />
+  <meta name="twitter:title" content="wearefeminismm · Community" />
   <meta name="twitter:description" content="Read what other students have lived through, and add your own: no name, no account." />
   <meta name="twitter:image" content="https://emmanueladusi.github.io/wearefeminismm/img/og-image.png" />
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-  <link rel="stylesheet" href="css/styles.css?v=212" />
+  <link rel="stylesheet" href="css/styles.css?v=214" />
   <script>(function(){var d=document.documentElement;d.classList.add("js");setTimeout(function(){if(!d.classList.contains("reveal-ready"))d.classList.remove("js");},2500);})();</script>
 </head>
-<body>
+<body class="page-flat">
   <script>document.body.classList.add("is-loading");</script>
   <noscript><style>.preloader{display:none}</style></noscript>
 
@@ -43,17 +43,7 @@
   <div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
   <div class="cursor-ring" id="cursorRing" aria-hidden="true"></div>
 
-  <!-- Global colour-morph backdrop: one living field that shifts colour
-       across the whole scroll (js/morph.js). Sits behind the fluid sim. -->
-  <div class="morph-bg" id="morph" aria-hidden="true"></div>
-
   <!-- (Cursor-reactive fluid banner lives on Home only.) -->
-
-  <!-- page-wide scroll guide line -->
-  <div class="progress-line" aria-hidden="true">
-    <div class="progress-line__fill" id="plFill"></div>
-    <div class="progress-line__dot" id="plDot"></div>
-  </div>
 
   <!-- ===== Nav ===== -->
   <header class="nav" id="nav">
@@ -117,26 +107,160 @@
   <!-- ===== Page intro =====
        hero-07: our own photo up top (the team after presenting), tagline
        left, title and ways-in right. -->
-  <section class="h7" id="top" data-bg="#f3ecdf">
-    <div class="h7__media">
-      <img class="h7__img" src="img/preso/team.jpg" alt="The wearefeminismm team standing together after a presentation" decoding="async" fetchpriority="high" />
+  <!-- ===== Community is a directory. The masthead is one screen-line tall and
+       the search sits immediately under it, so the page is useful in seconds. -->
+  <header class="masthead" id="top">
+    <div class="pwrap">
+      <p class="masthead__eyebrow">Community</p>
+      <h1 class="masthead__title">Find programs and organizations near you.</h1>
+      <p class="masthead__lead">Feminist and girl-led organizations across the Greater Toronto Area
+        running workshops, mentorship and programs you can actually join. Search, filter, or browse
+        the map.</p>
     </div>
-    <div class="h7__grid">
-      <p class="h7__tag">Peer support, education, and advocacy, led by students.</p>
-      <div class="h7__body">
-        <h1 class="h7__title">What we’re building.</h1>
-        <p class="h7__desc">Three pillars and a wall, where every story is anonymous and every reply is a hand on a shoulder.</p>
-        <div class="h7__ctas">
-          <a href="#pillars" class="cta" data-magnetic>See the three pillars <span class="cta__arrow">→</span></a>
-          <a href="voice.html#wall" class="cta cta--quiet" data-magnetic>Go straight to the wall <span class="cta__arrow">→</span></a>
+  </header>
+
+  <nav class="secnav" data-secnav aria-label="Sections on this page">
+    <a href="#directory">Directory</a>
+    <a href="#events">Events</a>
+    <a href="#recommend">Recommend an org</a>
+    <a href="#involved">Get involved</a>
+    <a href="#pillars">What we're working toward</a>
+  </nav>
+
+  <!-- ===== The directory ===== -->
+  <section class="psec" id="directory">
+    <div class="pwrap">
+      <form class="dirbar" id="dirBar" role="search" aria-label="Search the organization directory" onsubmit="return false">
+        <div class="dirsearch">
+          <label class="visually-hidden" for="dirQ">Search organizations by name or keyword</label>
+          <input type="search" id="dirQ" placeholder="Search by name, program or keyword…" autocomplete="off" />
+          <button class="dirbtn" type="button" id="dirClear">Clear all filters</button>
         </div>
+
+        <div class="dirfilters">
+          <div class="dirfield">
+            <label for="fLoc">Location</label>
+            <select id="fLoc"><option value="">All locations</option></select>
+          </div>
+          <div class="dirfield">
+            <label for="fAge">Age group</label>
+            <select id="fAge"><option value="">All ages</option></select>
+          </div>
+          <div class="dirfield">
+            <label for="fType">Program type</label>
+            <select id="fType"><option value="">All types</option></select>
+          </div>
+          <div class="dirfield">
+            <label for="fCost">Cost</label>
+            <select id="fCost"><option value="">Any cost</option></select>
+          </div>
+          <div class="dirfield">
+            <span class="dirfield-label" id="viewLabel">View</span>
+            <div role="group" aria-labelledby="viewLabel" class="dirtoggle">
+              <button class="dirbtn" type="button" id="viewList" aria-pressed="true">List</button>
+              <button class="dirbtn" type="button" id="viewMap" aria-pressed="false">Map</button>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <div class="dirstatus">
+        <p id="dirCount" role="status" aria-live="polite"><b>5</b> organizations</p>
+        <p class="dirstatus__note">Details are taken from each organization's own site. Where we could
+          not confirm something, it says <em>Not listed</em> rather than a guess.</p>
+      </div>
+
+      <!-- MAP VIEW: the existing dot-field map, with its accessible pin labels -->
+      <div id="mapView" hidden>
+              <div class="gtamap-wrap">
+        <canvas class="gtamap-canvas" aria-hidden="true"></canvas><svg class="gtamap-pins" viewBox="0 0 1000 680" xmlns="http://www.w3.org/2000/svg" aria-label="Five organizations across the Greater Toronto Area"><path class="gtamap__arc" pathLength="1" d="M 190 452 C 210.8 426.7 259.2 341.2 315 300 C 370.8 258.8 460.0 195.0 525 205 C 590.0 215.0 716.7 320.8 705 360 C 693.3 399.2 496.7 426.7 455 440" /><g class="gtamap__pins"><a class="pin" style="--i:0" href="https://niacentre.org/offerings/for-youth/" target="_blank" rel="noopener" aria-label="Nia Centre for the Arts"><circle class="pin__hit" cx="190" cy="452" r="28"/><circle class="pin__ping" cx="190" cy="452" r="17" style="transform-origin:190px 452px"/><g class="pin__mark" style="transform-origin:190px 452px"><polygon class="pin__house-roof" points="174,448 190,432 206,448"/><rect class="pin__house-body" x="178" y="448" width="24" height="18" rx="1.5"/><rect class="pin__house-door" x="185.5" y="456" width="9" height="10" rx="1"/></g><g class="pin__label" transform="translate(84,410)"><rect width="213" height="24" rx="12"/><text x="106" y="16" text-anchor="middle">Nia Centre for the Arts</text></g></a><a class="pin" style="--i:1" href="https://www.ywcatoronto.org/ourprograms/girlsprograms/ywcagirlscentre" target="_blank" rel="noopener" aria-label="YWCA Girls&#x27; Centre"><circle class="pin__hit" cx="315" cy="300" r="28"/><circle class="pin__ping" cx="315" cy="300" r="17" style="transform-origin:315px 300px"/><g class="pin__mark" style="transform-origin:315px 300px"><rect class="pin__house-roof" x="297" y="284" width="36" height="4" rx="1"/><rect class="pin__house-body" x="299" y="288" width="32" height="28" rx="1.5"/><rect class="pin__win" x="303" y="292" width="5" height="5.5"/><rect class="pin__win" x="312" y="292" width="5" height="5.5"/><rect class="pin__win" x="321" y="292" width="5" height="5.5"/><rect class="pin__win" x="303" y="301" width="5" height="5.5"/><rect class="pin__win" x="312" y="301" width="5" height="5.5"/><rect class="pin__win" x="321" y="301" width="5" height="5.5"/><rect class="pin__house-door" x="311" y="308" width="8" height="8" rx="1"/></g><g class="pin__label" transform="translate(229,258)"><rect width="172" height="24" rx="12"/><text x="86" y="16" text-anchor="middle">YWCA Girls&#x27; Centre</text></g></a><a class="pin" style="--i:2" href="https://www.girlsrocktoronto.org/programs" target="_blank" rel="noopener" aria-label="Girls Rock Camp Toronto"><circle class="pin__hit" cx="525" cy="205" r="28"/><circle class="pin__ping" cx="525" cy="205" r="17" style="transform-origin:525px 205px"/><g class="pin__mark" style="transform-origin:525px 205px"><polygon class="pin__house-roof" points="509,201 525,185 541,201"/><rect class="pin__house-body" x="513" y="201" width="24" height="18" rx="1.5"/><rect class="pin__house-door" x="520.5" y="209" width="9" height="10" rx="1"/></g><g class="pin__label" transform="translate(419,163)"><rect width="213" height="24" rx="12"/><text x="106" y="16" text-anchor="middle">Girls Rock Camp Toronto</text></g></a><a class="pin" style="--i:3" href="https://www.canadalearningcode.ca/" target="_blank" rel="noopener" aria-label="Canada Learning Code"><circle class="pin__hit" cx="705" cy="360" r="28"/><circle class="pin__ping" cx="705" cy="360" r="17" style="transform-origin:705px 360px"/><g class="pin__mark" style="transform-origin:705px 360px"><rect class="pin__house-roof" x="694" y="336" width="22" height="4" rx="1"/><rect class="pin__house-body" x="696" y="340" width="18" height="36" rx="1.5"/><rect class="pin__win" x="699" y="344" width="4.2" height="5"/><rect class="pin__win" x="706" y="344" width="4.2" height="5"/><rect class="pin__win" x="699" y="352" width="4.2" height="5"/><rect class="pin__win" x="706" y="352" width="4.2" height="5"/><rect class="pin__win" x="699" y="360" width="4.2" height="5"/><rect class="pin__win" x="706" y="360" width="4.2" height="5"/><rect class="pin__win" x="699" y="368" width="4.2" height="5"/><rect class="pin__win" x="706" y="368" width="4.2" height="5"/></g><g class="pin__label" transform="translate(611,318)"><rect width="188" height="24" rx="12"/><text x="94" y="16" text-anchor="middle">Canada Learning Code</text></g></a><a class="pin" style="--i:4" href="https://helpagirlout.org/" target="_blank" rel="noopener" aria-label="Help A Girl Out"><circle class="pin__hit" cx="455" cy="440" r="28"/><circle class="pin__ping" cx="455" cy="440" r="17" style="transform-origin:455px 440px"/><g class="pin__mark" style="transform-origin:455px 440px"><rect class="pin__house-roof" x="437" y="424" width="36" height="4" rx="1"/><rect class="pin__house-body" x="439" y="428" width="32" height="28" rx="1.5"/><rect class="pin__win" x="443" y="432" width="5" height="5.5"/><rect class="pin__win" x="452" y="432" width="5" height="5.5"/><rect class="pin__win" x="461" y="432" width="5" height="5.5"/><rect class="pin__win" x="443" y="441" width="5" height="5.5"/><rect class="pin__win" x="452" y="441" width="5" height="5.5"/><rect class="pin__win" x="461" y="441" width="5" height="5.5"/><rect class="pin__house-door" x="451" y="448" width="8" height="8" rx="1"/></g><g class="pin__label" transform="translate(382,398)"><rect width="147" height="24" rx="12"/><text x="74" y="16" text-anchor="middle">Help A Girl Out</text></g></a></g></svg>
+      </div>
+      </div>
+
+      <!-- LIST VIEW -->
+      <ul class="dirgrid" id="dirGrid"></ul>
+      <noscript>
+        <ul class="dirgrid">
+          <li class="orgcard"><h3 class="orgcard__name">Nia Centre for the Arts</h3><p class="orgcard__desc">Toronto. Free youth mentorship and creative workshops, ages 14 to 29.</p><a class="orgcard__go ext" href="https://niacentre.org/offerings/for-youth/" target="_blank" rel="noopener">Visit Nia Centre for the Arts</a></li>
+          <li class="orgcard"><h3 class="orgcard__name">YWCA Toronto · Girls' Centre</h3><p class="orgcard__desc">Toronto. Leadership, empowerment and after-school programs built for and by girls.</p><a class="orgcard__go ext" href="https://www.ywcatoronto.org/ourprograms/girlsprograms/ywcagirlscentre" target="_blank" rel="noopener">Visit YWCA Toronto Girls' Centre</a></li>
+          <li class="orgcard"><h3 class="orgcard__name">Girls Rock Camp Toronto</h3><p class="orgcard__desc">Toronto. Music, self-expression and self-esteem for girls, trans and gender non-conforming youth.</p><a class="orgcard__go ext" href="https://www.girlsrocktoronto.org/programs" target="_blank" rel="noopener">Visit Girls Rock Camp Toronto</a></li>
+          <li class="orgcard"><h3 class="orgcard__name">Canada Learning Code</h3><p class="orgcard__desc">GTA-wide. Coding and tech workshops focused on women, girls and underrepresented youth.</p><a class="orgcard__go ext" href="https://www.canadalearningcode.ca/" target="_blank" rel="noopener">Visit Canada Learning Code</a></li>
+          <li class="orgcard"><h3 class="orgcard__name">Help A Girl Out</h3><p class="orgcard__desc">Toronto. Menstrual equity: free products and education workshops in schools and youth centres.</p><a class="orgcard__go ext" href="https://helpagirlout.org/" target="_blank" rel="noopener">Visit Help A Girl Out</a></li>
+        </ul>
+      </noscript>
+
+
+      <div class="dirempty" id="dirEmpty" hidden>
+        <p><strong>No organizations match those filters.</strong></p>
+        <p>Try clearing a filter, or searching a broader word like "mentorship" or "arts".</p>
+        <button class="dirbtn" type="button" data-clear-all>Clear all filters</button>
       </div>
     </div>
   </section>
 
-  <!-- ===== Pillars: scroll-pinned deck fans out, then flips ===== -->
-  <section class="ec-section" id="pillars" aria-label="What we're building" data-bg="#f3ecdf">
-    <h2 class="ec-heading">What we're <em>building.</em></h2>
+  <!-- ===== Events: honest empty state ===== -->
+  <section class="psec" id="events">
+    <div class="pwrap">
+      <h2 class="sec-h2">Upcoming events</h2>
+      <div class="emptynote" style="margin-top:18px">
+        <p style="margin:0 0 10px"><strong>No events are scheduled right now.</strong></p>
+        <p style="margin:0">We would rather show you an empty shelf than a fake one. When workshops and
+          meetups are booked they will be listed here with dates, locations and how to sign up. Until
+          then, the organizations above run their own programming year-round, and
+          <a class="ext" href="https://instagram.com/ourfeministspacee" target="_blank" rel="noopener">our Instagram<span class="visually-hidden"> (opens in a new tab)</span></a>
+          is where anything new gets announced first.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Recommend an organization ===== -->
+  <section class="psec" id="recommend">
+    <div class="pwrap">
+      <h2 class="sec-h2">Know a group we should add?</h2>
+      <p class="sec-lead">This directory is small on purpose: everything on it has been checked. If you
+        know a feminist or girl-led organization in the GTA that belongs here, tell us and we will look
+        it up and add it.</p>
+      <div class="masthead__actions">
+        <a class="cta ext" href="https://instagram.com/ourfeministspacee" target="_blank" rel="noopener">Message us on Instagram<span class="visually-hidden"> (opens in a new tab)</span></a>
+        <a class="cta cta--quiet" href="mailto:wearefeminismm@gmail.com?subject=Organization%20recommendation">Email a recommendation <span class="cta__arrow">→</span></a>
+      </div>
+      <p class="lesson__sources" style="margin-top:16px">Useful to include: the name, a link, who it is
+        for, and roughly what it costs.</p>
+    </div>
+  </section>
+
+  <!-- ===== Ways to get involved with us ===== -->
+  <section class="psec" id="involved">
+    <div class="pwrap">
+      <h2 class="sec-h2">Ways to get involved with wearefeminismm</h2>
+      <div class="choices">
+        <a class="choice" href="learn.html">
+          <span class="choice__k">Learn</span>
+          <h3 class="choice__t">Work through the lessons</h3>
+          <p class="choice__d">Seven of them, about ten minutes each. The fastest way to be able to
+            explain any of this to someone else.</p>
+          <span class="choice__go">Open the lessons <span class="cta__arrow">→</span></span>
+        </a>
+        <a class="choice" href="https://qrto.org/eaBfI5" target="_blank" rel="noopener">
+          <span class="choice__k">Two minutes</span>
+          <h3 class="choice__t">Answer the survey</h3>
+          <p class="choice__d">The live number on the Learn page comes from students answering this.
+            Only the yes and no totals are ever collected.<span class="visually-hidden"> (opens in a new tab)</span></p>
+          <span class="choice__go ext">Take the survey</span>
+        </a>
+        <a class="choice" href="voice.html#wall">
+          <span class="choice__k">Private</span>
+          <h3 class="choice__t">Write a reflection</h3>
+          <p class="choice__d">Put something into words. It stays on your own device, and nobody else
+            can read it.</p>
+          <span class="choice__go">Open the wall <span class="cta__arrow">→</span></span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="ec-section" id="pillars" aria-label="What we're working toward" data-bg="#f3ecdf">
+    <h2 class="ec-heading">What we're <em>working toward.</em></h2>
     <div class="ec-cards">
       <div class="ec-card" style="--accent:#2e2145">
         <div class="ec-card-front" style="background-image:url('img/card-faces-framed.webp')"><div class="ec-card-panel"><span class="ec-card-index">01</span><h3>Community</h3><ul><li><a href="voice.html#wall">Peer support</a></li><li class="soon">Events <span>soon</span></li><li><a href="#getinvolved">Workshops</a></li><li><a href="#getinvolved">Mentorship</a></li></ul></div></div>
@@ -157,61 +281,6 @@
     </div>
   </section>
 
-  <!-- ===== Get involved: GTA orgs + workshops, over a drifting aurora ===== -->
-  <section class="getinvolved" id="getinvolved" data-bg="#160f2b">
-
-    <div class="getinvolved__inner">
-      <p class="eyebrow eyebrow--light reveal">Get involved</p>
-      <h2 class="getinvolved__title reveal">Find your people in the <em>GTA.</em></h2>
-      <p class="getinvolved__lead reveal">Feminist and girl-led organizations across the Greater Toronto Area running workshops, mentorship, and programs you can join. Tap one to learn more.</p>
-
-      <!-- dotted GTA map: pins for each org, a bouncing arc draws between them
-           (recreated from the reference locations animation) -->
-      <div class="gtamap-wrap reveal">
-        <canvas class="gtamap-canvas" aria-hidden="true"></canvas><svg class="gtamap-pins" viewBox="0 0 1000 680" xmlns="http://www.w3.org/2000/svg" aria-label="Five organizations across the Greater Toronto Area"><path class="gtamap__arc" pathLength="1" d="M 190 452 C 210.8 426.7 259.2 341.2 315 300 C 370.8 258.8 460.0 195.0 525 205 C 590.0 215.0 716.7 320.8 705 360 C 693.3 399.2 496.7 426.7 455 440" /><g class="gtamap__pins"><a class="pin" style="--i:0" href="https://niacentre.org/offerings/for-youth/" target="_blank" rel="noopener" aria-label="Nia Centre for the Arts"><circle class="pin__hit" cx="190" cy="452" r="28"/><circle class="pin__ping" cx="190" cy="452" r="17" style="transform-origin:190px 452px"/><g class="pin__mark" style="transform-origin:190px 452px"><polygon class="pin__house-roof" points="174,448 190,432 206,448"/><rect class="pin__house-body" x="178" y="448" width="24" height="18" rx="1.5"/><rect class="pin__house-door" x="185.5" y="456" width="9" height="10" rx="1"/></g><g class="pin__label" transform="translate(84,410)"><rect width="213" height="24" rx="12"/><text x="106" y="16" text-anchor="middle">Nia Centre for the Arts</text></g></a><a class="pin" style="--i:1" href="https://www.ywcatoronto.org/ourprograms/girlsprograms/ywcagirlscentre" target="_blank" rel="noopener" aria-label="YWCA Girls&#x27; Centre"><circle class="pin__hit" cx="315" cy="300" r="28"/><circle class="pin__ping" cx="315" cy="300" r="17" style="transform-origin:315px 300px"/><g class="pin__mark" style="transform-origin:315px 300px"><rect class="pin__house-roof" x="297" y="284" width="36" height="4" rx="1"/><rect class="pin__house-body" x="299" y="288" width="32" height="28" rx="1.5"/><rect class="pin__win" x="303" y="292" width="5" height="5.5"/><rect class="pin__win" x="312" y="292" width="5" height="5.5"/><rect class="pin__win" x="321" y="292" width="5" height="5.5"/><rect class="pin__win" x="303" y="301" width="5" height="5.5"/><rect class="pin__win" x="312" y="301" width="5" height="5.5"/><rect class="pin__win" x="321" y="301" width="5" height="5.5"/><rect class="pin__house-door" x="311" y="308" width="8" height="8" rx="1"/></g><g class="pin__label" transform="translate(229,258)"><rect width="172" height="24" rx="12"/><text x="86" y="16" text-anchor="middle">YWCA Girls&#x27; Centre</text></g></a><a class="pin" style="--i:2" href="https://www.girlsrocktoronto.org/programs" target="_blank" rel="noopener" aria-label="Girls Rock Camp Toronto"><circle class="pin__hit" cx="525" cy="205" r="28"/><circle class="pin__ping" cx="525" cy="205" r="17" style="transform-origin:525px 205px"/><g class="pin__mark" style="transform-origin:525px 205px"><polygon class="pin__house-roof" points="509,201 525,185 541,201"/><rect class="pin__house-body" x="513" y="201" width="24" height="18" rx="1.5"/><rect class="pin__house-door" x="520.5" y="209" width="9" height="10" rx="1"/></g><g class="pin__label" transform="translate(419,163)"><rect width="213" height="24" rx="12"/><text x="106" y="16" text-anchor="middle">Girls Rock Camp Toronto</text></g></a><a class="pin" style="--i:3" href="https://www.canadalearningcode.ca/" target="_blank" rel="noopener" aria-label="Canada Learning Code"><circle class="pin__hit" cx="705" cy="360" r="28"/><circle class="pin__ping" cx="705" cy="360" r="17" style="transform-origin:705px 360px"/><g class="pin__mark" style="transform-origin:705px 360px"><rect class="pin__house-roof" x="694" y="336" width="22" height="4" rx="1"/><rect class="pin__house-body" x="696" y="340" width="18" height="36" rx="1.5"/><rect class="pin__win" x="699" y="344" width="4.2" height="5"/><rect class="pin__win" x="706" y="344" width="4.2" height="5"/><rect class="pin__win" x="699" y="352" width="4.2" height="5"/><rect class="pin__win" x="706" y="352" width="4.2" height="5"/><rect class="pin__win" x="699" y="360" width="4.2" height="5"/><rect class="pin__win" x="706" y="360" width="4.2" height="5"/><rect class="pin__win" x="699" y="368" width="4.2" height="5"/><rect class="pin__win" x="706" y="368" width="4.2" height="5"/></g><g class="pin__label" transform="translate(611,318)"><rect width="188" height="24" rx="12"/><text x="94" y="16" text-anchor="middle">Canada Learning Code</text></g></a><a class="pin" style="--i:4" href="https://helpagirlout.org/" target="_blank" rel="noopener" aria-label="Help A Girl Out"><circle class="pin__hit" cx="455" cy="440" r="28"/><circle class="pin__ping" cx="455" cy="440" r="17" style="transform-origin:455px 440px"/><g class="pin__mark" style="transform-origin:455px 440px"><rect class="pin__house-roof" x="437" y="424" width="36" height="4" rx="1"/><rect class="pin__house-body" x="439" y="428" width="32" height="28" rx="1.5"/><rect class="pin__win" x="443" y="432" width="5" height="5.5"/><rect class="pin__win" x="452" y="432" width="5" height="5.5"/><rect class="pin__win" x="461" y="432" width="5" height="5.5"/><rect class="pin__win" x="443" y="441" width="5" height="5.5"/><rect class="pin__win" x="452" y="441" width="5" height="5.5"/><rect class="pin__win" x="461" y="441" width="5" height="5.5"/><rect class="pin__house-door" x="451" y="448" width="8" height="8" rx="1"/></g><g class="pin__label" transform="translate(382,398)"><rect width="147" height="24" rx="12"/><text x="74" y="16" text-anchor="middle">Help A Girl Out</text></g></a></g></svg>
-      </div>
-
-      <div class="involve-grid">
-        <a class="involve reveal" href="https://niacentre.org/offerings/for-youth/" target="_blank" rel="noopener">
-          <span class="involve__area">Toronto</span>
-          <span class="involve__name">Nia Centre for the Arts</span>
-          <span class="involve__desc">Toronto's Black arts centre: free youth mentorship and creative workshops for ages 14–29.</span>
-          <span class="involve__go">Visit <span aria-hidden="true">→</span></span>
-        </a>
-
-        <a class="involve reveal" href="https://www.ywcatoronto.org/ourprograms/girlsprograms/ywcagirlscentre" target="_blank" rel="noopener">
-          <span class="involve__area">Toronto</span>
-          <span class="involve__name">YWCA Toronto · Girls' Centre</span>
-          <span class="involve__desc">Leadership, empowerment, and after-school programs built for and by girls.</span>
-          <span class="involve__go">Visit <span aria-hidden="true">→</span></span>
-        </a>
-
-        <a class="involve reveal" href="https://www.girlsrocktoronto.org/programs" target="_blank" rel="noopener">
-          <span class="involve__area">Toronto</span>
-          <span class="involve__name">Girls Rock Camp Toronto</span>
-          <span class="involve__desc">Music, self-expression, and self-esteem for girls, trans, and gender non-conforming youth.</span>
-          <span class="involve__go">Visit <span aria-hidden="true">→</span></span>
-        </a>
-
-        <a class="involve reveal" href="https://www.canadalearningcode.ca/" target="_blank" rel="noopener">
-          <span class="involve__area">GTA-wide</span>
-          <span class="involve__name">Canada Learning Code</span>
-          <span class="involve__desc">Coding and tech workshops with a focus on women, girls, and underrepresented youth.</span>
-          <span class="involve__go">Visit <span aria-hidden="true">→</span></span>
-        </a>
-
-        <a class="involve reveal" href="https://helpagirlout.org/" target="_blank" rel="noopener">
-          <span class="involve__area">Toronto</span>
-          <span class="involve__name">Help A Girl Out</span>
-          <span class="involve__desc">Menstrual equity: free products and education workshops in schools and youth centres.</span>
-          <span class="involve__go">Visit <span aria-hidden="true">→</span></span>
-        </a>
-      </div>
-
-      <p class="getinvolved__note reveal">Know a group we should add? <a href="https://instagram.com/ourfeministspacee" target="_blank" rel="noopener">Tell us on Instagram.</a></p>
-    </div>
-  </section>
-
 
   <!-- ===== Footer ===== -->
   <footer class="footer" data-bg="#faf6ef" data-scene>
@@ -227,9 +296,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
   <script src="js/scroll.js?v=79"></script>
-  <script src="js/morph.js?v=79"></script>
-  <script src="js/journey.js?v=80"></script>
-  <script src="js/pin.js?v=78"></script>
   <script src="js/aigspeed.js?v=94"></script>
   <script src="js/polish.js?v=82"></script>
   <script src="js/main.js?v=88"></script>
@@ -238,6 +304,8 @@
   <script src="js/gtamap.js?v=6"></script>
   <script src="js/theme.js?v=2"></script>
   <script src="js/nav.js?v=4"></script>
+  <script src="js/ui.js?v=1"></script>
+  <script src="js/directory.js?v=1"></script>
   <script src="js/transition.js?v=1"></script>
 </body>
 </html>

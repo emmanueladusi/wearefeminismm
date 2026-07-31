@@ -111,19 +111,25 @@
   root.querySelectorAll(".check__opts").forEach((opts) => {
     const right = +opts.dataset.answer;
     const verdict = opts.parentElement.querySelector(".check__verdict");
+    // the verdict is announced, and always leads with a word: colour and the
+    // shake animation are never the only signal that an answer was wrong
+    if (verdict) {
+      verdict.setAttribute("role", "status");
+      verdict.setAttribute("aria-live", "polite");
+    }
     [...opts.children].forEach((btn, i) => {
       btn.addEventListener("click", (e) => {
         e.stopPropagation();
         if (i === right) {
           btn.classList.add("right");
           opts.parentElement.classList.add("correct");
-          verdict.innerHTML = verdict.dataset.right;
+          verdict.innerHTML = "<b>✓ Correct.</b> " + verdict.dataset.right;
           [...opts.children].forEach((b) => (b.disabled = true));
         } else {
           btn.classList.remove("wrong");
           void btn.offsetWidth; // restart the shake
           btn.classList.add("wrong");
-          verdict.textContent = verdict.dataset.wrong;
+          verdict.innerHTML = "<b>✕ Not quite.</b> " + verdict.dataset.wrong;
         }
       });
     });

@@ -4,30 +4,29 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script>(function(){try{var t=localStorage.getItem("wf-theme");var d=t?t==="dark":matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.setAttribute("data-theme",d?"dark":"light");if(localStorage.getItem("wf-a11y"))document.documentElement.setAttribute("data-a11y","");}catch(e){}})();</script>
-  <title>wearefeminism · Your voice</title>
+  <title>wearefeminismm · Your voice</title>
   <meta name="description" content="See where our research has travelled, then add your voice to the anonymous wall. A student-led space where every voice matters." />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <meta name="theme-color" content="#4a3568" />
   <!-- Open Graph / social share -->
   <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="wearefeminism" />
-  <meta property="og:title" content="wearefeminism · Your voice" />
+  <meta property="og:site_name" content="wearefeminismm" />
+  <meta property="og:title" content="wearefeminismm · Your voice" />
   <meta property="og:description" content="See where our research has travelled, then add your voice to the anonymous wall. A student-led space where every voice matters." />
   <meta property="og:url" content="https://emmanueladusi.github.io/wearefeminismm/voice.html" />
   <meta property="og:image" content="https://emmanueladusi.github.io/wearefeminismm/img/og-image.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="wearefeminism · Your voice" />
+  <meta name="twitter:title" content="wearefeminismm · Your voice" />
   <meta name="twitter:description" content="See where our research has travelled, then add your voice to the anonymous wall." />
   <meta name="twitter:image" content="https://emmanueladusi.github.io/wearefeminismm/img/og-image.png" />
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-  <link rel="stylesheet" href="css/styles.css?v=212" />
-  <link rel="stylesheet" href="css/preso.css?v=8" />
+  <link rel="stylesheet" href="css/styles.css?v=214" />
   <script>(function(){var d=document.documentElement;d.classList.add("js");setTimeout(function(){if(!d.classList.contains("reveal-ready"))d.classList.remove("js");},2500);})();</script>
 </head>
-<body>
+<body class="page-flat">
   <script>document.body.classList.add("is-loading");</script>
   <noscript><style>.preloader{display:none}</style></noscript>
 
@@ -44,17 +43,7 @@
   <div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
   <div class="cursor-ring" id="cursorRing" aria-hidden="true"></div>
 
-  <!-- Global colour-morph backdrop: one living field that shifts colour
-       across the whole scroll (js/morph.js). Sits behind the fluid sim. -->
-  <div class="morph-bg" id="morph" aria-hidden="true"></div>
-
   <!-- (Cursor-reactive fluid banner lives on Home only.) -->
-
-  <!-- page-wide scroll guide line -->
-  <div class="progress-line" aria-hidden="true">
-    <div class="progress-line__fill" id="plFill"></div>
-    <div class="progress-line__dot" id="plDot"></div>
-  </div>
 
   <!-- ===== Nav ===== -->
   <header class="nav" id="nav">
@@ -119,116 +108,132 @@
        Poster hero, unique to this page: no photo, no prism, no wordmark.
        Oversized type and the words land one at a time with a small spring
        (the bounce borrowed from the user's Aardvark reference). -->
-  <section class="hero hero--poster" id="top" data-bg="#f2ecf7">
-    <p class="hero__eyebrow line-reveal"><span>Your voice</span></p>
-    <h1 class="poster">
-      <span class="poster__line"><span class="pw" style="--w:0">See</span> <span class="pw" style="--w:1">the</span> <span class="pw" style="--w:2">work,</span></span>
-      <span class="poster__line"><span class="pw" style="--w:3">then</span> <span class="pw" style="--w:4">add</span> <span class="pw pw--gold" style="--w:5">your</span> <span class="pw pw--gold" style="--w:6"><em>voice.</em></span></span>
-    </h1>
-    <p class="hero__sub line-reveal"><span>Our research has travelled from Toronto classrooms to a Vancouver stage. The wall is where you speak. Anonymous, always. No accounts, no pressure.</span></p>
-    <div class="hero__ctas line-reveal"><span>
-      <a class="cta" href="#yearmachine" data-magnetic>Try the year machine <span class="cta__arrow">→</span></a>
-      <a class="cta cta--quiet" href="#wall" data-magnetic>Read the wall <span class="cta__arrow">→</span></a>
-    </span></div>
-  </section>
+  <!-- ===== Short hero. Your Voice is an activity hub, so the page states
+       the offer and gets straight to the three things you can do. ===== -->
+  <header class="masthead hero--poster" id="top">
+    <div class="pwrap">
+      <p class="masthead__eyebrow">Your voice</p>
+      <h1 class="poster">
+        <span class="poster__line"><span class="pw" style="--w:0">See</span> <span class="pw" style="--w:1">the</span> <span class="pw" style="--w:2">work,</span></span>
+        <span class="poster__line"><span class="pw" style="--w:3">then</span> <span class="pw" style="--w:4">add</span> <span class="pw pw--gold" style="--w:5">your</span> <span class="pw pw--gold" style="--w:6"><em>voice.</em></span></span>
+      </h1>
+      <p class="masthead__lead">Three things you can do on this page. Pick whichever one you want.</p>
+    </div>
+  </header>
 
-  <!-- ===== Last year's research: kinetic-typography slideshow (moved from Home).
-       Scroll-driven (js/preso.js), self-pinning; journey.js skips it. -->
-<section class="preso" id="preso" data-bg="#faf6ef">
-    <div class="preso__stage">
+  <!-- ===== The three activities ===== -->
+  <section class="psec" id="activities">
+    <div class="pwrap">
+      <div class="choices">
+        <a class="choice" href="#yearmachine">
+          <span class="choice__k">Activity · 2 minutes</span>
+          <h2 class="choice__t">Try the year machine</h2>
+          <p class="choice__d">Enter your age and travel back to 1912. You will see, right down the
+            page, how old you would have been when each right you already have finally arrived. Nothing
+            you type is saved or sent anywhere.</p>
+          <span class="choice__go">Start the machine <span class="cta__arrow">↓</span></span>
+        </a>
 
-      <!-- SCENE · kinetic title -->
-      <section class="scene s1 is-on">
-        <span class="word"><span style="--i:0">L</span><span style="--i:1">A</span><span style="--i:2">S</span><span style="--i:3">T</span></span>
-        <span class="word word--two"><span style="--i:4">Y</span><span style="--i:5">E</span><span style="--i:6">A</span><span style="--i:7">R</span></span>
-        <div class="rule"></div>
-        <p class="cap">Act one · what we found · 2025</p>
-      </section>
+        <a class="choice" href="#research">
+          <span class="choice__k">Read · 1 minute</span>
+          <h2 class="choice__t">See what students told us</h2>
+          <p class="choice__d">The three findings from our 2025 interview study, and where the work has
+            been presented. It was a small qualitative study, and the page says so plainly.</p>
+          <span class="choice__go">Read the findings <span class="cta__arrow">↓</span></span>
+        </a>
 
-      <!-- SCENE · photo inside the type -->
-      <section class="scene s2">
-        <p class="over">we took it all the way to</p>
-        <h2 class="masked" data-photo="vancouver">VANCOUVER</h2>
-        <p class="cap">presenting our findings · <b>vancouver</b></p>
-      </section>
-
-      <!-- SCENE · the Vancouver moment (editorial spread) -->
-      <section class="scene sm">
-        <span class="sm__ghost" aria-hidden="true">VANCOUVER</span>
-        <div class="sm__spread">
-          <div class="sm__text">
-            <p class="cap">vancouver · 2025</p>
-            <p class="sm__line"><span>The work got</span></p>
-            <p class="sm__line sm__line--em"><span>a handshake.</span></p>
-            <p class="sm__foot">sfu · fletcher challenge canada theatre</p>
-          </div>
-          <figure class="sm__photo" data-photo="moment"></figure>
-        </div>
-      </section>
-
-      <!-- SCENE · YPAR split reveal -->
-      <section class="scene s3">
-        <div class="split">
-          <div class="half half--top"><span>YPAR</span></div>
-          <div class="half half--bot"><span>YPAR</span></div>
-          <div class="strip" data-photo="ypar"></div>
-          <p class="cap">the <b>ypar</b> conference · youth participatory action research</p>
-        </div>
-      </section>
-
-      <!-- SCENE · collage over ghost type -->
-      <section class="scene s4">
-        <span class="ghost" aria-hidden="true">THE WORK</span>
-        <div class="cards">
-          <div class="card"><div class="ph" data-photo="team"></div><div class="tag">01 · the team</div></div>
-          <div class="card"><div class="ph" data-photo="stage"></div><div class="tag">02 · on stage</div></div>
-          <div class="card"><div class="ph" data-photo="room"></div><div class="tag">03 · the room</div></div>
-        </div>
-        <p class="cap">what we heard · what we made · who showed up</p>
-      </section>
-
-      <!-- SCENE · manifesto -->
-      <section class="scene s5">
-        <div class="stack">
-          <div class="line"><span>WE ASKED.</span></div>
-          <div class="line line--ghost"><span>WE LISTENED.</span></div>
-          <div class="line"><span>WE PRESENTED.</span></div>
-        </div>
-        <p class="closer">…and we're just getting <em>started →</em></p>
-      </section>
-
-      <!-- scene counter + scroll progress + skip -->
-      <div class="hud">
-        <span id="presoIdx">01 / 06</span>
-        <span class="hud__bar"><span class="hud__fill" id="presoFill"></span></span>
-        <button class="hud__skip" id="presoSkip" type="button" aria-label="Skip last year's recap and jump to the year machine">Skip last year's recap ↓</button>
+        <a class="choice" href="#wall">
+          <span class="choice__k">Write · private</span>
+          <h2 class="choice__t">Write a private reflection</h2>
+          <p class="choice__d">Put something into words and keep it. Reflections stay on this device
+            only. Nothing is uploaded, and no other visitor can read them.</p>
+          <span class="choice__go">Open the reflection wall <span class="cta__arrow">↓</span></span>
+        </a>
       </div>
     </div>
   </section>
 
-  <!-- ===== The wall: anonymous story wall (shared with Community) ===== -->
-  <!-- ===== The year machine: type your age, get sent back to 1912, and watch
-       how old you'd be when each right finally arrived (js/yearmachine.js). -->
+  <!-- ===== The research, compressed from six pinned scenes to two blocks.
+       The findings lead; where it was presented is a single line. ===== -->
+  <section class="psec" id="research">
+    <div class="pwrap">
+      <p class="eyebrow">The research behind this site</p>
+      <h2 class="sec-h2">What students actually told us.</h2>
+      <p class="sec-lead">In August 2025 we ran a youth participatory action research study with the
+        TDSB Centre of Excellence for Black Student Achievement. It was qualitative and small:
+        <strong>three semi-structured interviews, chosen by convenience sampling.</strong> Read it as a
+        signal worth chasing, not as a measurement of all students.</p>
+
+      <ol class="findings">
+        <li class="finding">
+          <span class="finding__n">01</span>
+          <div>
+            <h3 class="finding__t">It is not talked about at home.</h3>
+            <p class="finding__d">Two of the three participants said feminism was rarely or never
+              discussed at home, both from African households. If the conversation never starts
+              anywhere, school is the only place left for it.</p>
+          </div>
+        </li>
+        <li class="finding">
+          <span class="finding__n">02</span>
+          <div>
+            <h3 class="finding__t">Girls and boys are treated differently at school, including in academics.</h3>
+            <p class="finding__d">Raised in two of the three interviews. Not as a grievance, as an
+              observation about who gets encouraged and in which subjects.</p>
+          </div>
+        </li>
+        <li class="finding">
+          <span class="finding__n">03</span>
+          <div>
+            <h3 class="finding__t">Every participant said feminism belongs in the curriculum.</h3>
+            <p class="finding__d">And most misunderstanding traced straight back to never being taught
+              it. Both female participants had encountered the idea that feminism just means "treating
+              girls right." It does not, and that gap is most of the reason this site exists.</p>
+          </div>
+        </li>
+      </ol>
+
+      <p class="research__where">Presented at the CEBSA YPAR showcase in Toronto, 12 to 15 August 2025,
+        and later at Simon Fraser University in Vancouver.
+        <a class="receipt-link" href="receipts.html#method">Full method, sample and limits →</a></p>
+
+      <div class="research__shots">
+        <figure><img src="img/preso/ypar-stage.jpg" alt="Presenting the research at the YPAR conference" loading="lazy" decoding="async" /><figcaption>The YPAR showcase, Toronto</figcaption></figure>
+        <figure><img src="img/preso/vancouver-1.jpg" alt="In Vancouver for the presentation" loading="lazy" decoding="async" /><figcaption>Vancouver</figcaption></figure>
+        <figure><img src="img/preso/room.jpg" alt="The room during the presentation" loading="lazy" decoding="async" /><figcaption>The room</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
   <section class="ym" id="yearmachine" aria-label="The year machine" data-bg="#241a3d">
     <div class="ym__inner">
-      <p class="eyebrow eyebrow--light reveal">Act two · what it would have cost you</p>
-      <h2 class="ym__title reveal">What if <em>you</em> were there?</h2>
-      <p class="ym__lead reveal">The year is 1912. Same you, same age, same dreams. Type your age and see how long you would have waited for things you already have.</p>
+      <p class="eyebrow eyebrow--light">Activity · about two minutes</p>
+      <h2 class="ym__title">What if <em>you</em> were there?</h2>
+      <p class="ym__lead">Set your age and the page sends you back to 1912. You will then see, one row
+        at a time, how old you would have been when each right you already have finally arrived in
+        Canada. Every date is sourced.</p>
 
-      <div class="ym__controls reveal">
+      <div class="ym__controls">
         <div class="ym__agebox">
           <button class="ym__step" type="button" data-d="-1" aria-label="One year younger">−</button>
-          <input class="ym__age" id="ymAge" type="number" inputmode="numeric" min="10" max="25" value="16" aria-label="Your age" />
+          <input class="ym__age" id="ymAge" type="number" inputmode="numeric" min="10" max="25" value="16" aria-label="Your age in years" />
           <button class="ym__step" type="button" data-d="1" aria-label="One year older">+</button>
         </div>
         <button class="ym__go" id="ymGo" type="button" data-magnetic>Send me back <span class="cta__arrow">→</span></button>
+        <button class="ym__all" id="ymAll" type="button">Show all results now</button>
       </div>
-      <p class="ym__privacy reveal">Nothing you type is saved or sent anywhere. This all happens on your screen.</p>
+      <p class="ym__privacy">Your age is never saved or sent anywhere. All of this happens on your screen.</p>
+
+      <div class="ym__progress" id="ymProgress" hidden>
+        <p class="ym__progress-label"><span id="ymProgressText">Travelling…</span></p>
+        <div class="ym__progress-track"><div class="ym__progress-fill" id="ymProgressFill"></div></div>
+      </div>
 
       <ol class="ym__list" id="ymList"></ol>
       <div class="ym__foot" id="ymFoot" hidden>
-        <p class="ym__foot-line">All of that is one lifetime. One girl, waiting. You made it back to 2026, and the wall is right below.</p>
-        <a class="ym__cta" href="#wall">Say something to the girls still waiting <span class="cta__arrow">↓</span></a>
+        <p class="ym__summary" id="ymSummary"></p>
+        <p class="ym__foot-line">All of that is one lifetime. One girl, waiting. You made it back to 2026.</p>
+        <a class="ym__cta" href="#wall">Write a private reflection <span class="cta__arrow">↓</span></a>
         <p class="ym__sources"><a class="receipt-link receipt-link--light" href="receipts.html#sources">Every date here has a source →</a></p>
       </div>
     </div>
@@ -248,29 +253,51 @@
        viewport centre, and once the wall has posts it is 2+ viewports tall,
        so it never gets near the centre and sat at 0.18 opacity while being
        read. The morph backdrop carries the transition instead, as on .ym -->
+  <!-- ===== Private Reflection Wall.
+       Named for what it actually is. Until a shared, moderated wall exists,
+       nothing here implies anyone else can read or reply to a reflection. -->
   <section class="wall-section" id="wall" data-bg="#1a1330">
     <canvas class="wall-canvas" id="wallCanvas" aria-hidden="true"></canvas>
     <div class="wall-section__inner">
-      <p class="eyebrow eyebrow--light reveal">Act three · your turn</p>
-      <h2 class="wall-section__title reveal">Say what you <em>need</em> to say.</h2>
-      <p class="wall-section__sub reveal">Every story here is anonymous. Every reply is a hand on a shoulder.</p>
+      <p class="eyebrow eyebrow--light">Write · private to this device</p>
+      <h2 class="wall-section__title">Private Reflection Wall</h2>
+      <p class="wall-section__sub">Somewhere to put it into words. What you write stays on this device.</p>
 
-      <div class="houserules reveal">
-        <p class="houserules__row"><span>House rules</span> <a href="receipts.html#house-rules">Read all five →</a></p>
-        <p><strong>Leave names out of it.</strong> Yours, your school's, and the name of anyone your story is about. You can tell the whole truth without handing over anyone's identity.</p>
-        <p><strong>This wall lifts people up.</strong> Nothing cruel, nothing that outs someone, nothing that tells another person how to hurt themselves.</p>
-        <p><strong>Right now, posts stay on your device only.</strong> Nothing is uploaded, so nobody else online can read what you write yet. That also means anyone who uses this same phone or laptop can, so take a post down when you are done. A shared, moderated wall is coming, and it will open with these same rules.</p>
+      <div class="houserules">
+        <p class="houserules__row"><span>What happens to what you write</span> <a href="receipts.html#house-rules">Read the full rules →</a></p>
+        <ul class="privacy-list">
+          <li><strong>Reflections stay on the device you are using.</strong> They are saved in this
+            browser and nowhere else.</li>
+          <li><strong>Nothing is uploaded.</strong> Your words never reach a server, ours or anyone
+            else's.</li>
+          <li><strong>Other visitors cannot see them.</strong> There is no shared feed, and nobody can
+            reply to you here.</li>
+          <li><strong>Anyone using this same device may be able to see them.</strong> If you share a
+            phone, a laptop, or a school computer, delete a reflection when you are done.</li>
+          <li><strong>You can delete any reflection, any time</strong>, one at a time or all at once.</li>
+        </ul>
+        <p class="houserules__soon">A shared, moderated wall is planned. If it is ever built, it will
+          open with its own clear rules, and it will not quietly turn these private notes public.</p>
       </div>
 
-      <form class="composer reveal" id="wallForm" style="--r: 18px" data-aig data-aig-radius="18" data-aig-duration="8">
-        <label class="visually-hidden" for="wallText">Your story, posted anonymously</label>
-        <textarea id="wallText" rows="3" maxlength="1200" placeholder="What do you want to share?" required></textarea>
+      <div class="prompts">
+        <p class="prompts__label">Not sure where to start? These are prompts, not other people's posts.</p>
+        <ul class="prompts__list">
+          <li><button class="prompt" type="button" data-prompt="Something I noticed at school this week was ">Something I noticed at school this week…</button></li>
+          <li><button class="prompt" type="button" data-prompt="Something I wish someone had told me earlier is ">Something I wish someone had told me earlier…</button></li>
+          <li><button class="prompt" type="button" data-prompt="After reading the timeline, the thing that stayed with me was ">After the timeline, what stayed with me…</button></li>
+        </ul>
+      </div>
+
+      <form class="composer" id="wallForm" style="--r: 18px" data-aig data-aig-radius="18" data-aig-duration="8">
+        <label class="visually-hidden" for="wallText">Your private reflection</label>
+        <textarea id="wallText" rows="3" maxlength="1200" placeholder="Write it here. It stays on this device."></textarea>
         <!-- the caution sits ABOVE the submit row: below it, a phone keyboard
              pushed the crisis helpline off the bottom of the screen -->
         <p class="composer__caution" id="wallCaution" role="status" hidden></p>
         <div class="composer__row">
-          <span class="composer__anon">Posted anonymously, no names, no accounts</span>
-          <button type="submit" class="btn" data-magnetic>Put it on the wall</button>
+          <span class="composer__anon">Saved on this device only</span>
+          <button type="submit" class="btn" data-magnetic>Save reflection</button>
         </div>
       </form>
 
@@ -278,11 +305,15 @@
       <div class="wall" id="wallList"></div>
 
       <div class="wall-section__foot">
-        <p class="wall-section__note reveal">Be gentle with each other. This wall lifts people up. It never tears them down.</p>
-        <button class="wall__clear" id="wallClear" type="button" hidden>Clear everything on this device</button>
+        <p class="wall-section__note">Be gentle with yourself here. If something is heavy, the numbers
+          below are free, confidential and open right now.</p>
+        <p class="wall-section__help">Kids Help Phone: text <strong>CONNECT</strong> to <strong>686868</strong>,
+          or call <strong>1-800-668-6868</strong>. Suicide Crisis Helpline: call or text <strong>988</strong>.</p>
+        <button class="wall__clear" id="wallClear" type="button" hidden>Delete every reflection on this device</button>
       </div>
     </div>
   </section>
+
 
   <!-- ===== Footer ===== -->
   <footer class="footer" data-bg="#faf6ef" data-scene>
@@ -299,17 +330,15 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
   <script src="js/scroll.js?v=79"></script>
-  <script src="js/morph.js?v=79"></script>
-  <script src="js/journey.js?v=80"></script>
   <script src="js/polish.js?v=82"></script>
   <script src="js/aiglow.js?v=78"></script>
   <script src="js/main.js?v=88"></script>
-  <script src="js/preso.js?v=6"></script>
   <script src="js/inkgarden.js?v=1"></script>
   <script src="js/yearmachine.js?v=5"></script>
   <script src="js/wall3d.js?v=79"></script>
   <script src="js/theme.js?v=2"></script>
   <script src="js/nav.js?v=4"></script>
+  <script src="js/ui.js?v=1"></script>
   <script src="js/transition.js?v=1"></script>
 </body>
 </html>

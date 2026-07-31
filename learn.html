@@ -4,29 +4,29 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script>(function(){try{var t=localStorage.getItem("wf-theme");var d=t?t==="dark":matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.setAttribute("data-theme",d?"dark":"light");if(localStorage.getItem("wf-a11y"))document.documentElement.setAttribute("data-a11y","");}catch(e){}})();</script>
-  <title>wearefeminism · Learn</title>
+  <title>wearefeminismm · Learn</title>
   <meta name="description" content="Feminism, Black feminism, and intersectionality, explained with respect for your intelligence. Part of a student-led, anonymous learning space." />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <meta name="theme-color" content="#4a3568" />
   <!-- Open Graph / social share -->
   <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="wearefeminism" />
-  <meta property="og:title" content="wearefeminism · Learn" />
+  <meta property="og:site_name" content="wearefeminismm" />
+  <meta property="og:title" content="wearefeminismm · Learn" />
   <meta property="og:description" content="Feminism, Black feminism, and intersectionality, explained with respect for your intelligence." />
   <meta property="og:url" content="https://emmanueladusi.github.io/wearefeminismm/learn.html" />
   <meta property="og:image" content="https://emmanueladusi.github.io/wearefeminismm/img/og-image.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="wearefeminism · Learn" />
+  <meta name="twitter:title" content="wearefeminismm · Learn" />
   <meta name="twitter:description" content="Feminism, Black feminism, and intersectionality, explained with respect for your intelligence." />
   <meta name="twitter:image" content="https://emmanueladusi.github.io/wearefeminismm/img/og-image.png" />
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-  <link rel="stylesheet" href="css/styles.css?v=212" />
+  <link rel="stylesheet" href="css/styles.css?v=214" />
   <script>(function(){var d=document.documentElement;d.classList.add("js");setTimeout(function(){if(!d.classList.contains("reveal-ready"))d.classList.remove("js");},2500);})();</script>
 </head>
-<body>
+<body class="page-flat">
   <script>document.body.classList.add("is-loading");</script>
   <noscript><style>.preloader{display:none}</style></noscript>
 
@@ -43,17 +43,7 @@
   <div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
   <div class="cursor-ring" id="cursorRing" aria-hidden="true"></div>
 
-  <!-- Global colour-morph backdrop: one living field that shifts colour
-       across the whole scroll (js/morph.js). Sits behind the fluid sim. -->
-  <div class="morph-bg" id="morph" aria-hidden="true"></div>
-
   <!-- (Cursor-reactive fluid banner lives on Home only.) -->
-
-  <!-- page-wide scroll guide line -->
-  <div class="progress-line" aria-hidden="true">
-    <div class="progress-line__fill" id="plFill"></div>
-    <div class="progress-line__dot" id="plDot"></div>
-  </div>
 
   <!-- ===== Nav ===== -->
   <header class="nav" id="nav">
@@ -119,111 +109,392 @@
        light refracting into three colour bands, literally "one word,
        three lenses," and a nod to intersectionality. Pure CSS (js-free,
        reduced-motion aware). -->
-  <section class="hero hero--refract" id="top" data-bg="#f2ecf7">
-    <div class="refract" aria-hidden="true">
-      <span class="refract__beam"></span>
-      <span class="refract__prism"></span>
-      <span class="refract__band refract__band--v"></span>
-      <span class="refract__band refract__band--m"></span>
-      <span class="refract__band refract__band--g"></span>
-    </div>
-    <p class="hero__eyebrow line-reveal"><span>Learn</span></p>
-    <h1 class="hero__title">
-      <span class="line-reveal"><span>One word,</span></span>
-      <span class="line-reveal"><span><em>three lenses.</em></span></span>
-    </h1>
-    <p class="hero__sub line-reveal"><span>Why this space exists, where feminism came from, and what it actually means, explained with respect for your intelligence.</span></p>
-    <div class="hero__ctas line-reveal"><span>
-      <a class="cta" href="#whatis" data-magnetic>Start with the words <span class="cta__arrow">→</span></a>
-      <a class="cta cta--quiet" href="#timeline" data-magnetic>Walk the timeline <span class="cta__arrow">→</span></a>
-    </span></div>
-  </section>
-
-  <!-- ===== Pulse sparkline: live Yes/No tally from the pre-survey ===== -->
-  <section class="sparkpulse" id="boring-pulse" data-bg="#efeaf5">
-    <div class="sparkcard">
-      <p class="eyebrow">Pulse · live from the pre-survey</p>
-      <h2 class="sparkcard__q">Do students find learning about feminism <em>boring?</em></h2>
-      <div class="sparkcard__top">
-        <div class="sparkcard__big"><span id="sparkPct">…</span><small> said Yes</small></div>
-        <div class="sparkcard__verdict" id="sparkVerdict"></div>
+  <!-- ===== Masthead: compact. Learn is a course, not a cinema, so it opens
+       at working height with the question the page answers. ===== -->
+  <header class="masthead">
+    <div class="pwrap">
+      <p class="masthead__eyebrow">Learn</p>
+      <h1 class="masthead__title">Feminism, explained properly.</h1>
+      <p class="masthead__lead">Seven short lessons. Start anywhere, in any order. Each one gives you a
+        definition you could repeat to someone else, a real example from school, and a way to check
+        you have it.</p>
+      <div class="masthead__actions">
+        <a class="cta" href="#modules">See the lessons <span class="cta__arrow">→</span></a>
+        <a class="cta cta--quiet" data-opens="mod-history" href="#mod-history">Jump to the timeline <span class="cta__arrow">→</span></a>
       </div>
-      <svg class="sparkcard__chart" id="sparkSvg" viewBox="0 0 500 120" preserveAspectRatio="none" aria-hidden="true">
-        <path id="sparkPath" class="sparkline-path"></path>
-        <circle id="sparkDot" class="spark-end-dot" r="6"></circle>
-      </svg>
-      <div class="sparkcard__foot">
-        <div class="sparkcard__counts" id="sparkCounts">Collecting responses…</div>
-        <div class="sparkcard__qr" aria-label="Voice your opinion: scan the QR code to take the survey">
-          <span class="sparkcard__qr-label">Voice your Opinion</span>
-          <img src="img/pulse-qr.png" alt="QR code to take the survey" width="235" height="320" loading="lazy" decoding="async" />
+    </div>
+  </header>
+
+  <nav class="secnav" data-secnav aria-label="Sections on this page">
+    <a href="#modules">Lessons</a>
+    <a href="#mod-history">Timeline</a>
+    <a href="#boring-pulse">The survey</a>
+    <a href="#resources">Scholars</a>
+  </nav>
+
+  <!-- ===== The dashboard: pick a lesson. This is the page's spine. ===== -->
+  <section class="psec" id="modules">
+    <div class="pwrap">
+      <h2 class="sec-h2">What do you want to understand?</h2>
+      <p class="sec-lead">Every lesson is self-contained. Open one, close it, open another.</p>
+
+      <div class="modgrid">
+        <button class="modcard" type="button" data-opens="mod-what">
+          <span class="modcard__n">01</span>
+          <span class="modcard__t">What is feminism?</span>
+          <span class="modcard__d">The definition, in plain words, before any branches.</span>
+        </button>
+        <button class="modcard" type="button" data-opens="mod-black">
+          <span class="modcard__n">02</span>
+          <span class="modcard__t">Black feminism</span>
+          <span class="modcard__d">What white feminism leaves out, and the tradition that names it.</span>
+        </button>
+        <button class="modcard" type="button" data-opens="mod-inter">
+          <span class="modcard__n">03</span>
+          <span class="modcard__t">Intersectionality</span>
+          <span class="modcard__d">Crenshaw's framework for identities and systems that overlap.</span>
+        </button>
+        <button class="modcard" type="button" data-opens="mod-myths">
+          <span class="modcard__n">04</span>
+          <span class="modcard__t">Myths and misconceptions</span>
+          <span class="modcard__d">The five things people get wrong most, answered directly.</span>
+        </button>
+        <button class="modcard" type="button" data-opens="mod-school">
+          <span class="modcard__n">05</span>
+          <span class="modcard__t">Feminism in student life</span>
+          <span class="modcard__d">Where this actually shows up in a school day.</span>
+        </button>
+        <button class="modcard" type="button" data-opens="mod-history">
+          <span class="modcard__n">06</span>
+          <span class="modcard__t">History of feminism</span>
+          <span class="modcard__d">178 years as a walkable timeline. The long one.</span>
+        </button>
+        <button class="modcard" type="button" data-opens="mod-action">
+          <span class="modcard__n">07</span>
+          <span class="modcard__t">How to take action</span>
+          <span class="modcard__d">What you can actually do, at your own size.</span>
+        </button>
+      </div>
+
+      <!-- ===== The lessons themselves ===== -->
+      <div class="acc" data-acc data-acc-single>
+
+        <!-- 01 -->
+        <div class="acc__item">
+          <h3>
+            <button class="acc__btn" type="button" data-acc-btn aria-expanded="false" aria-controls="mod-what">
+              <span class="acc__num">01</span>
+              <span class="acc__name">What is feminism?</span>
+              <span class="acc__sign" aria-hidden="true">+</span>
+            </button>
+          </h3>
+          <div class="acc__panel lesson" id="mod-what" hidden>
+            <p class="lesson__def"><strong>Feminism is the belief that people of all genders should have
+              equal rights, opportunities and freedom, together with the organised effort to make that
+              real.</strong> It studies how societies have handed men more power by default, and it works
+              to change the rules, habits and institutions that keep it that way.</p>
+
+            <p>Two things are worth separating. Feminism is a <em>belief</em> about equality, and it is
+              also a <em>movement</em> that does something about it. You can agree with the belief and
+              still be learning the movement's history. Most people start there.</p>
+
+            <p>It is about gender as a whole, not only about women. Rigid ideas of masculinity hurt boys
+              too: they are the reason "man up" gets said to a fourteen-year-old who needs help. A
+              feminist analysis has room for that.</p>
+
+            <h4>What it looks like at school</h4>
+            <p>Two students hand in equally strong physics tests. One is asked whether she is sure she
+              wants to continue with the subject next year; the other is asked which university he is
+              aiming for. Nobody in that room intends any harm. The pattern is still doing work, and it
+              is the kind of pattern feminism exists to notice and interrupt.</p>
+
+            <h4>Why it matters</h4>
+            <p>Because the effects are measurable, not theoretical. In Canada, women aged 25 to 54 earn
+              about 89 cents for every dollar men earn hourly; for racialised women the figure is closer
+              to 78 cents. Those gaps start forming in the years you are in school now, in which subjects
+              get encouraged and which do not.</p>
+
+            <h4>A common misconception</h4>
+            <p><strong>"Feminism means women should be above men."</strong> It does not. The word for that
+              would be supremacy, and feminism is the argument against exactly that logic. Equality is
+              not a zero-sum transfer: when women entered medicine in large numbers, medicine did not
+              shrink, it grew.</p>
+
+            <div class="kc" data-kc>
+              <p class="kc__q">Quick check: which of these is closest to what feminism argues?</p>
+              <div class="kc__opts">
+                <button class="kc__opt" type="button" data-kc-opt="wrong" data-kc-why="That is a description of supremacy, which feminism specifically argues against.">Women should hold more power than men.</button>
+                <button class="kc__opt" type="button" data-kc-opt="correct" data-kc-why="Yes. Equal rights and opportunities across genders, plus the work of changing the systems that prevent it.">People of all genders should have equal rights and opportunity, and systems should change to make that real.</button>
+                <button class="kc__opt" type="button" data-kc-opt="wrong" data-kc-why="Being polite is good, but courtesy is not the same as equal rights, pay or safety. This is the single most common mix-up.">Men should be more polite to women.</button>
+              </div>
+              <p class="kc__fb" data-kc-fb role="status" aria-live="polite"></p>
+            </div>
+
+            <h4>Read further</h4>
+            <p class="lesson__sources">
+              Statistics Canada, <a class="ext" href="https://www150.statcan.gc.ca/n1/pub/75-004-m/75-004-m2019004-eng.htm" target="_blank" rel="noopener">The gender wage gap in Canada: 1998 to 2018<span class="visually-hidden"> (opens in a new tab)</span></a>.<br />
+              hooks, bell (2000). <em>Feminism Is for Everybody: Passionate Politics.</em> South End Press. The clearest short introduction written.<br />
+              <a class="receipt-link" href="receipts.html#method">How this site's own research was done →</a>
+            </p>
+          </div>
         </div>
-      </div>
-      <p class="sparkcard__mission">That number is the assignment. Everything on this page is the answer.</p>
-      <p class="sparkcard__receipt"><a class="receipt-link" href="receipts.html#method">How this number was collected →</a></p>
-    </div>
-  </section>
 
-  <!-- ===== Learn: three lenses on feminism.
-       Solid deep-violet scene (morph shows through). Concept cards with
-       tiny looping CSS "data glyphs" so the ideas move, not just sit. ===== -->
-  <section class="learn" id="whatis" aria-label="What is feminism: three lenses" data-bg="#2e2145">
-    <div class="learn__inner">
-      <div class="learn__head">
-        <div class="learn__intro">
-          <p class="eyebrow eyebrow--light">Part one · the words</p>
-          <h2 class="learn__title">One word, <em>three lenses.</em></h2>
-          <p class="learn__lead">It isn't one flat idea. Look through three lenses and the whole picture snaps into focus.</p>
+        <!-- 02 -->
+        <div class="acc__item">
+          <h3>
+            <button class="acc__btn" type="button" data-acc-btn aria-expanded="false" aria-controls="mod-black">
+              <span class="acc__num">02</span>
+              <span class="acc__name">Black feminism</span>
+              <span class="acc__sign" aria-hidden="true">+</span>
+            </button>
+          </h3>
+          <div class="acc__panel lesson" id="mod-black" hidden>
+            <p class="lesson__def"><strong>Black feminism is a tradition of thought and organising, built
+              by Black women, that examines racism, sexism, class exploitation and other systems
+              together</strong> rather than one at a time, because that is how they are lived. It treats
+              Black women's experience and scholarship as a source of knowledge, not a special case
+              appended to someone else's theory.</p>
+
+            <h4>First, what "white feminism" means</h4>
+            <p>This is a description of a <em>pattern</em>, not an insult aimed at individual white women.
+              White feminism refers to feminist thinking and campaigning that centres the experiences of
+              white, usually middle-class, women and treats those experiences as universal, while
+              overlooking race, class, disability, immigration status and other systems that shape what
+              being a woman actually costs.</p>
+            <p>A concrete example: a campaign whose central demand is getting women out of the home and
+              into paid work speaks powerfully to women who were kept out of the workforce. It speaks
+              much less to Black and working-class women, many of whom had been working, often in other
+              women's homes, the entire time. The demand was not wrong. It was partial, and it was
+              presented as if it were everyone's.</p>
+
+            <h4>What Black feminism adds</h4>
+            <p>It argues that you cannot understand a Black woman's situation by taking "the women's
+              experience" and adding "the Black experience," because neither of those is neutral. The
+              Combahee River Collective put the political conclusion plainly in 1977: if Black women were
+              free, it would mean everyone else had to be free, since their freedom would require
+              dismantling every system at once. That is why this site measures progress from the most
+              excluded person up.</p>
+
+            <h4>What it looks like at school</h4>
+            <p>Research in Canadian schools has repeatedly found Black girls are read as louder, older
+              and more confrontational than their classmates for identical behaviour, a pattern
+              researchers call adultification. A dress code enforced evenly on paper can still land
+              unevenly in a hallway. A feminism that only counts gender cannot see that; Black feminism
+              is built to.</p>
+
+            <h4>A common misconception</h4>
+            <p><strong>"Black feminism divides the movement."</strong> The reverse claim is the one the
+              evidence supports: it was Black feminists who kept pointing out where feminism's wins were
+              not reaching everyone, and those corrections are why the movement became more accurate.
+              Sojourner Truth was making this argument in 1851, well before there was a name for it.</p>
+
+            <div class="kc" data-kc>
+              <p class="kc__q">Quick check: what does "white feminism" describe?</p>
+              <div class="kc__opts">
+                <button class="kc__opt" type="button" data-kc-opt="wrong" data-kc-why="It is not about individuals or their intentions. It names a pattern in how a movement frames its priorities.">Any feminist who happens to be white.</button>
+                <button class="kc__opt" type="button" data-kc-opt="correct" data-kc-why="Exactly. The issue is treating one group's experience as if it were every woman's, so race and class drop out of the analysis.">Feminism that centres white women's experiences as universal and overlooks race, class and other systems.</button>
+                <button class="kc__opt" type="button" data-kc-opt="wrong" data-kc-why="Not quite. It is a critique of how feminism has often been practised, not an organised group with members.">A formal organisation founded in the 1970s.</button>
+              </div>
+              <p class="kc__fb" data-kc-fb role="status" aria-live="polite"></p>
+            </div>
+
+            <h4>Read further</h4>
+            <p class="lesson__sources">
+              The Combahee River Collective Statement (1977). <a class="ext" href="https://www.blackpast.org/african-american-history/combahee-river-collective-statement-1977/" target="_blank" rel="noopener">Full text at BlackPast<span class="visually-hidden"> (opens in a new tab)</span></a>.<br />
+              hooks, bell (1981). <em>Ain't I a Woman: Black Women and Feminism.</em> South End Press.<br />
+              Maynard, R. (2017). <em>Policing Black Lives.</em> Fernwood Publishing. The Canadian context specifically.
+            </p>
+          </div>
         </div>
-        <img class="learn__glasses" src="img/three-lenses.svg" alt="A pair of glasses with three lenses" width="540" height="260" loading="lazy" decoding="async" />
-      </div>
 
-      <div class="lenses">
-        <article class="lens" data-lens="white">
-          <div class="lens__viz" aria-hidden="true">
-            <span class="glyph-bar glyph-bar--solo"></span>
-            <span class="glyph-cap">gender</span>
+        <!-- 03 -->
+        <div class="acc__item">
+          <h3>
+            <button class="acc__btn" type="button" data-acc-btn aria-expanded="false" aria-controls="mod-inter">
+              <span class="acc__num">03</span>
+              <span class="acc__name">Intersectionality</span>
+              <span class="acc__sign" aria-hidden="true">+</span>
+            </button>
+          </h3>
+          <div class="acc__panel lesson" id="mod-inter" hidden>
+            <p class="lesson__def"><strong>Intersectionality is a framework for understanding how a
+              person's overlapping identities, and the systems of power attached to them, combine to
+              produce experiences that none of those systems explains on its own.</strong> It was named
+              by legal scholar Kimberlé Crenshaw in 1989.</p>
+
+            <h4>Where it came from, and why that matters</h4>
+            <p>Crenshaw was studying real court cases. In one, Black women sued a car manufacturer for
+              discrimination. The court found the company hired women, so it could not be sexist, and
+              hired Black people, so it could not be racist, and dismissed the case. Both findings were
+              true in isolation. The women had been hired for neither set of jobs: the company hired
+              white women for office work and Black men for the factory floor. The discrimination was
+              real and the law could not see it, because the law examined one axis at a time.</p>
+            <p>That is the whole idea. It is not a statement that some people have harder lives. It is a
+              statement about <em>analysis</em>: examine systems one at a time and you will miss harms
+              that only appear where they meet.</p>
+
+            <h4>What it looks like at school</h4>
+            <p>A school introduces a rule against head coverings, aimed at hats. A Muslim student who
+              wears hijab is now in breach of a rule that was never written about her. Gender-only
+              analysis misses it, religion-only analysis misses it. The overlap is where it lives.</p>
+
+            <h4>A common misconception</h4>
+            <p><strong>"Intersectionality is about ranking who is most oppressed."</strong> It is not, and
+              Crenshaw has said so directly. It is a tool for seeing structures, not a scoreboard for
+              people. Used as a ranking, it stops doing the job it was built for.</p>
+
+            <div class="kc" data-kc>
+              <p class="kc__q">Quick check: what problem was intersectionality created to solve?</p>
+              <div class="kc__opts">
+                <button class="kc__opt" type="button" data-kc-opt="wrong" data-kc-why="No. Crenshaw has explicitly rejected the reading of it as a ranking system.">Deciding which group has it worst.</button>
+                <button class="kc__opt" type="button" data-kc-opt="correct" data-kc-why="Yes. Courts examined race and sex separately and so could not see discrimination that only appeared at the overlap.">That looking at one system at a time makes harms at the overlap invisible.</button>
+                <button class="kc__opt" type="button" data-kc-opt="wrong" data-kc-why="Not quite. It began in legal scholarship about anti-discrimination cases, not in campaign strategy.">Getting more people to attend protests.</button>
+              </div>
+              <p class="kc__fb" data-kc-fb role="status" aria-live="polite"></p>
+            </div>
+
+            <h4>Read further</h4>
+            <p class="lesson__sources">
+              Crenshaw, K. (1989). <a class="ext" href="https://chicagounbound.uchicago.edu/uclf/vol1989/iss1/8/" target="_blank" rel="noopener">Demarginalizing the Intersection of Race and Sex<span class="visually-hidden"> (opens in a new tab)</span></a>, <em>University of Chicago Legal Forum.</em> The original paper.<br />
+              Crenshaw, K. (2016). <a class="ext" href="https://www.ted.com/talks/kimberle_crenshaw_the_urgency_of_intersectionality" target="_blank" rel="noopener">The urgency of intersectionality<span class="visually-hidden"> (opens in a new tab)</span></a>, TED. Eighteen minutes, and she explains the court case herself.
+            </p>
           </div>
-          <h3 class="lens__name">White feminism</h3>
-          <p class="lens__def">Sees <em>one</em> axis: gender. Fights for women, full stop.</p>
-        </article>
+        </div>
 
-        <article class="lens" data-lens="black">
-          <div class="lens__viz" aria-hidden="true">
-            <span class="glyph-stack">
-              <span class="glyph-bar"></span><span class="glyph-bar"></span>
-              <span class="glyph-bar"></span><span class="glyph-bar"></span>
-            </span>
-            <span class="glyph-cap">not equal weight</span>
+        <!-- 04 -->
+        <div class="acc__item">
+          <h3>
+            <button class="acc__btn" type="button" data-acc-btn aria-expanded="false" aria-controls="mod-myths">
+              <span class="acc__num">04</span>
+              <span class="acc__name">Myths and misconceptions</span>
+              <span class="acc__sign" aria-hidden="true">+</span>
+            </button>
+          </h3>
+          <div class="acc__panel lesson" id="mod-myths" hidden>
+            <p class="lesson__def"><strong>The five things people most often get wrong.</strong> Our own
+              interviews found that most misunderstanding traced back to one cause: never having been
+              taught the word in the first place. None of these are stupid questions.</p>
+
+            <h4>1. "Feminism just means treating girls right"</h4>
+            <p>This one came directly out of our 2025 interviews: both female participants had met it.
+              Being decent to the girls around you is good, and it is not what the word means. Feminism
+              is about rights, pay, safety, representation and law. A person can be perfectly polite and
+              still vote against equal pay legislation. Courtesy is not equality.</p>
+
+            <h4>2. "Feminists hate men"</h4>
+            <p>The target is a system, not a gender. And the same rigid expectations that feminism
+              criticises are the ones that tell boys not to cry, not to ask for help, and to solve things
+              with aggression. Plenty of feminist writing is about exactly that harm.</p>
+
+            <h4>3. "We already have equality, so it's finished"</h4>
+            <p>Legal equality and lived equality are different things, and Canada has the gaps documented:
+              the hourly wage gap, one female prime minister in the country's history, and the fact that
+              some women could not vote federally until 1948 or, for many First Nations women, 1960.
+              Recent, not ancient.</p>
+
+            <h4>4. "It's a Western idea being exported"</h4>
+            <p>Women's movements developed independently in many places and long predate the current
+              vocabulary. Treating one region as the origin point is itself the kind of framing Black and
+              postcolonial feminists have spent decades correcting.</p>
+
+            <h4>5. "It has nothing to do with me"</h4>
+            <p>If you have a mother, sister, friend or classmate, the wage gap is a household number. If
+              you are a boy who has been told to man up, the script being criticised is one you are being
+              handed too.</p>
+
+            <div class="kc" data-kc>
+              <p class="kc__q">Quick check: our interviews found most misunderstanding came from…</p>
+              <div class="kc__opts">
+                <button class="kc__opt" type="button" data-kc-opt="wrong" data-kc-why="Not what participants described. Disagreement was rarely the starting point.">Students disagreeing with feminism on principle.</button>
+                <button class="kc__opt" type="button" data-kc-opt="correct" data-kc-why="Yes. Participants said it was rarely or never discussed at home and was not taught in class, so people filled the gap with guesses.">Never having been taught what the word means.</button>
+                <button class="kc__opt" type="button" data-kc-opt="wrong" data-kc-why="Social media came up, but participants pointed at the absence of teaching first.">Social media alone.</button>
+              </div>
+              <p class="kc__fb" data-kc-fb role="status" aria-live="polite"></p>
+            </div>
+
+            <h4>Read further</h4>
+            <p class="lesson__sources">
+              <a class="receipt-link" href="receipts.html#method">Our interview findings, with their limits stated →</a><br />
+              Adichie, C.N. (2014). <em>We Should All Be Feminists.</em> Fourth Estate. Fifty pages, adapted from her TEDx talk.
+            </p>
           </div>
-          <h3 class="lens__name">Black feminism</h3>
-          <p class="lens__def">Names what the first lens misses: <em>not every woman carries the same weight.</em></p>
-        </article>
+        </div>
 
-        <article class="lens" data-lens="inter">
-          <div class="lens__viz" aria-hidden="true">
-            <span class="glyph-cross">
-              <span class="glyph-axis glyph-axis--a"></span>
-              <span class="glyph-axis glyph-axis--b"></span>
-              <span class="glyph-axis glyph-axis--c"></span>
-              <span class="glyph-knot"></span>
-            </span>
-            <span class="glyph-cap">all at once</span>
+        <!-- 05 -->
+        <div class="acc__item">
+          <h3>
+            <button class="acc__btn" type="button" data-acc-btn aria-expanded="false" aria-controls="mod-school">
+              <span class="acc__num">05</span>
+              <span class="acc__name">Feminism in student life</span>
+              <span class="acc__sign" aria-hidden="true">+</span>
+            </button>
+          </h3>
+          <div class="acc__panel lesson" id="mod-school" hidden>
+            <p class="lesson__def"><strong>Where this actually shows up between 8:45 and 3:15.</strong>
+              Our interviews found girls and boys are treated differently at school, including in
+              academics. Here is what that looks like in practice.</p>
+
+            <h4>Dress codes</h4>
+            <p>Ask who gets pulled out of class for what. When enforcement falls mostly on girls, and the
+              stated reason is that other students will be distracted, the rule has quietly made one
+              group responsible for another group's behaviour. Worth asking your student council to look
+              at the actual numbers.</p>
+
+            <h4>Who talks in class</h4>
+            <p>The same contribution is often read as confident from one student and aggressive from
+              another. Notice who gets interrupted in seminars and group work. Notice who gets credited
+              when an idea is repeated back five minutes later.</p>
+
+            <h4>Group projects</h4>
+            <p>Watch who ends up doing the organising, the formatting and the chasing. It is called office
+              housework in workplace research, and it starts well before anyone has an office.</p>
+
+            <h4>Subject choice</h4>
+            <p>Encouragement is a resource, and it is not handed out evenly. Who gets told they have a
+              knack for physics, and who gets asked whether they are sure.</p>
+
+            <h4>A common misconception</h4>
+            <p><strong>"If nobody meant it, nothing happened."</strong> Intent and effect are separate.
+              Most of what is described above is done by people with no bad intentions at all, which is
+              exactly why noticing patterns matters more than assigning blame.</p>
+
+            <div class="kc" data-kc>
+              <p class="kc__q">Quick check: a dress code enforced mainly on girls, to stop others being distracted, is an example of…</p>
+              <div class="kc__opts">
+                <button class="kc__opt" type="button" data-kc-opt="correct" data-kc-why="Yes. The rule transfers responsibility for one group's behaviour onto another group's clothing.">Making one group responsible for another group's behaviour.</button>
+                <button class="kc__opt" type="button" data-kc-opt="wrong" data-kc-why="A rule can be applied unevenly in practice even when it is written neutrally. That is the point worth checking.">A neutral rule, since it is written for everyone.</button>
+                <button class="kc__opt" type="button" data-kc-opt="wrong" data-kc-why="Effects do not require intent. Most of these patterns are produced by people meaning no harm.">Nothing, because nobody intended harm.</button>
+              </div>
+              <p class="kc__fb" data-kc-fb role="status" aria-live="polite"></p>
+            </div>
+
+            <h4>Read further</h4>
+            <p class="lesson__sources">
+              <a class="receipt-link" href="receipts.html#method">What our participants said about school →</a><br />
+              See also lesson 07 for what to do with any of this.
+            </p>
           </div>
-          <h3 class="lens__name">Intersectionality</h3>
-          <p class="lens__def">The knot that ties it back together: race, gender, class, all at once, under one movement.</p>
-        </article>
-      </div>
-    </div>
-  </section>
+        </div>
 
-  <!-- ===== The timeline: one thread, four waves, 178 years.
-       Replaces the old wave-scrub screen. The four waves are now the
-       CHAPTERS of an interactive timeline; the gold thread (js/thread.js)
-       leaves its right-margin ribbon and weaves through every .th-anchor
-       here, lighting the event nodes as it passes. Driven by
-       js/timeline.js; styles under ".tline" in css/styles.css. ===== -->
-  <section class="tline" id="timeline" aria-label="The waves of feminism, as a timeline" data-bg="#faf6ef">
+        <!-- 06 · the timeline lives inside this module -->
+        <div class="acc__item">
+          <h3>
+            <button class="acc__btn" type="button" data-acc-btn aria-expanded="false" aria-controls="mod-history">
+              <span class="acc__num">06</span>
+              <span class="acc__name">History of feminism</span>
+              <span class="acc__meta">Explore the full timeline · the long one</span>
+              <span class="acc__sign" aria-hidden="true">+</span>
+            </button>
+          </h3>
+          <div class="acc__panel" id="mod-history" hidden>
+            <p class="lesson__def" style="margin-bottom:18px"><strong>178 years, walked as a timeline.</strong>
+              Four waves, the moments between them, and a quick check at the end of each.</p>
+            <p class="tline__caveat"><strong>One caution before you start.</strong> The "waves" model is a
+              common way of organising this history, and it is also debated by historians. It can make
+              the movement look like it stopped between waves, when organising continued the whole time,
+              which is exactly why the bridge entries below exist. Treat the waves as chapter headings,
+              not as facts about when people were working.</p>
+              <section class="tline" id="timeline" aria-label="The waves of feminism, as a timeline" data-bg="#faf6ef">
 
     <div class="tline__head">
       <p class="eyebrow">Part two · the history · 178 years in four waves</p>
@@ -680,56 +951,182 @@
       I know enough <span aria-hidden="true">↓</span>
     </button>
   </section>
+          </div>
+        </div>
 
+        <!-- 07 -->
+        <div class="acc__item">
+          <h3>
+            <button class="acc__btn" type="button" data-acc-btn aria-expanded="false" aria-controls="mod-action">
+              <span class="acc__num">07</span>
+              <span class="acc__name">How to take action</span>
+              <span class="acc__sign" aria-hidden="true">+</span>
+            </button>
+          </h3>
+          <div class="acc__panel lesson" id="mod-action" hidden>
+            <p class="lesson__def"><strong>Action does not have to mean a protest.</strong> Most of what
+              changes a school is smaller, closer and more boring than that, and it works.</p>
 
-  <!-- ===== Resources: Black Canadian feminist scholars ===== -->
-  <section class="resources" id="resources" data-bg="#f2ecf7">
-    <div class="resources__inner">
-      <p class="eyebrow reveal">Part three · the people</p>
-      <h2 class="resources__title reveal">Scholars we learn from.</h2>
-      <p class="resources__lead reveal">Black Canadian feminist scholars whose work shapes how we understand feminism, education, and the lives of Black students. Tap a scholar to visit their page.</p>
+            <h4>Start where you already are</h4>
+            <p>Ask one question in class that makes a pattern visible. Ask your student council for the
+              dress-code enforcement numbers. Suggest one book for the library list. Small, specific,
+              answerable requests get further than general ones.</p>
 
-      <!-- Photo cards. To add a real (permitted/licensed) photo, replace the
-           monogram span with:  <img class="resource__photo" src="img/scholars/NAME.jpg" alt="…"> -->
-      <div class="resources__grid">
-        <a class="resource reveal" href="https://discover.research.utoronto.ca/21734-njoki-wane" target="_blank" rel="noopener">
-          <img class="resource__photo" src="img/scholars/njoki-wane.jpg" alt="Njoki Nathani Wane" width="500" height="500" loading="lazy" decoding="async" style="object-position:center 30%" />
-          <span class="resource__name">Njoki Nathani Wane</span>
-          <span class="resource__role">Professor · OISE, University of Toronto</span>
-        </a>
+            <h4>Learn before you argue</h4>
+            <p>The fastest way to be taken seriously is to know the thing. Lessons 01 to 03 are enough to
+              hold a conversation. The reading lists give you the rest.</p>
 
-        <a class="resource reveal" href="https://www.torontomu.ca/early-childhood-studies/about/people/faculty/janelle-brady/" target="_blank" rel="noopener">
-          <img class="resource__photo" src="img/scholars/janelle-brady.webp" alt="Janelle Brady" width="600" height="800" loading="lazy" decoding="async" style="object-position:center 20%" />
-          <span class="resource__name">Janelle Brady</span>
-          <span class="resource__role">Assistant Professor · Toronto Metropolitan University</span>
-        </a>
+            <h4>Find people already doing it</h4>
+            <p>You do not have to start something. Five organisations across the GTA run programs you can
+              join this term. <a href="community.html">See the directory →</a></p>
 
-        <a class="resource reveal" href="https://www.oise.utoronto.ca/about/news/10-27-25-new-oise-grad-dr-tanitia-munroe-entering-new-era-leadership-and-service" target="_blank" rel="noopener">
-          <img class="resource__photo" src="img/scholars/tanitia-munroe.jpg" alt="Tanitiã Munroe" width="1200" height="627" loading="lazy" decoding="async" style="object-position:27% center" />
-          <span class="resource__name">Tanitiã Munroe</span>
-          <span class="resource__role">PhD, OISE · former TDSB research coordinator</span>
-        </a>
+            <h4>Say the thing that is hard to say</h4>
+            <p>If something happened to you and you have nowhere to put it, the reflection wall is private
+              to your own device. <a href="voice.html#wall">Write it down →</a></p>
 
-        <a class="resource reveal" href="https://arts-sciences.buffalo.edu/africana-and-american-studies/faculty/faculty-directory/walcott-rinaldo.html" target="_blank" rel="noopener">
-          <img class="resource__photo" src="img/scholars/rinaldo-walcott.jpg" alt="Rinaldo Walcott" width="1280" height="1280" loading="lazy" decoding="async" style="object-position:center 38%" />
-          <span class="resource__name">Rinaldo Walcott</span>
-          <span class="resource__role">Professor & Chair · Africana &amp; American Studies, University at Buffalo</span>
-        </a>
+            <h4>A common misconception</h4>
+            <p><strong>"If I can't fix everything, there's no point."</strong> The Persons Case turned on
+              one word in one statute. Idle No More started with four women. Scale is not the entry
+              requirement.</p>
 
-        <a class="resource reveal" href="https://www.torontomu.ca/child-youth-care/about/people/faculty/travonne-edwards/" target="_blank" rel="noopener">
-          <img class="resource__photo" src="img/scholars/travonne-edwards.webp" alt="Travonne Edwards" width="2400" height="3000" loading="lazy" decoding="async" style="object-position:center 18%" />
-          <span class="resource__name">Travonne Edwards</span>
-          <span class="resource__role">Assistant Professor · Child &amp; Youth Care, Toronto Metropolitan University</span>
-        </a>
+            <div class="kc" data-kc>
+              <p class="kc__q">Quick check: which request is most likely to actually get somewhere?</p>
+              <div class="kc__opts">
+                <button class="kc__opt" type="button" data-kc-opt="wrong" data-kc-why="Broad and unanswerable. There is nothing for anyone to say yes to.">"The school should be less sexist."</button>
+                <button class="kc__opt" type="button" data-kc-opt="correct" data-kc-why="Yes. Specific, answerable, and it asks for information rather than an argument, which is much harder to refuse.">"Could student council publish how many dress-code warnings went to each year group?"</button>
+                <button class="kc__opt" type="button" data-kc-opt="wrong" data-kc-why="Venting is understandable, and it rarely produces a decision anyone can act on.">Posting about it and leaving it there.</button>
+              </div>
+              <p class="kc__fb" data-kc-fb role="status" aria-live="polite"></p>
+            </div>
+          </div>
+        </div>
 
-        <a class="resource reveal" href="https://www.torontomu.ca/sociology/people/faculty/sam-tecle/" target="_blank" rel="noopener">
-          <img class="resource__photo" src="img/scholars/sam-tecle.jpg" alt="Sam Tecle" width="1200" height="900" loading="lazy" decoding="async" style="object-position:40% 42%" />
-          <span class="resource__name">Sam Tecle</span>
-          <span class="resource__role">Assistant Professor · Sociology, Toronto Metropolitan University</span>
-        </a>
       </div>
     </div>
   </section>
+
+  <!-- ===== The survey that started this ===== -->
+  <section class="psec" id="boring-pulse">
+    <div class="pwrap">
+      <div class="sparkcard">
+        <p class="eyebrow">Pulse · live from the pre-survey</p>
+        <h2 class="sparkcard__q">Do students find learning about feminism <em>boring?</em></h2>
+        <div class="sparkcard__top">
+          <div class="sparkcard__big"><span id="sparkPct">…</span><small> said Yes</small></div>
+          <div class="sparkcard__verdict" id="sparkVerdict"></div>
+        </div>
+        <svg class="sparkcard__chart" id="sparkSvg" viewBox="0 0 500 120" preserveAspectRatio="none" aria-hidden="true">
+          <path id="sparkPath" class="sparkline-path"></path>
+          <circle id="sparkDot" class="spark-end-dot" r="6"></circle>
+        </svg>
+
+        <!-- shown only if the live endpoint is unreachable, so the card never
+             sits on "Collecting responses…" with nothing in it -->
+        <div class="sparkfb" id="sparkFallback" hidden>
+          <p data-spark-msg role="status" aria-live="polite"></p>
+          <button class="dirbtn" type="button" data-spark-retry>Retry</button>
+        </div>
+
+        <div class="sparkcard__foot">
+          <div class="sparkcard__counts" id="sparkCounts">Collecting responses…</div>
+          <div class="sparkcard__qr">
+            <span class="sparkcard__qr-label">Voice your opinion</span>
+            <img src="img/pulse-qr.png" alt="" width="235" height="320" loading="lazy" decoding="async" />
+            <a class="cta cta--quiet ext" href="https://qrto.org/eaBfI5" target="_blank" rel="noopener">Take the survey<span class="visually-hidden"> (opens in a new tab)</span></a>
+          </div>
+        </div>
+        <p class="sparkcard__mission">That number is the assignment. Everything on this page is the answer.</p>
+        <p class="sparkcard__receipt"><a class="receipt-link" href="receipts.html#method">How this number was collected →</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Scholars: now with what each person actually contributed and one
+       thing to read or watch, so the section teaches rather than lists. ===== -->
+  <section class="psec" id="resources">
+    <div class="pwrap">
+      <p class="eyebrow">Part three · the people</p>
+      <h2 class="sec-h2">Scholars we learn from.</h2>
+      <p class="sec-lead">Black Canadian feminist scholars whose work shapes how this site understands
+        feminism, education, and the lives of Black students. Each card says what they contributed and
+        gives you one place to start.</p>
+
+      <ul class="scholars">
+        <li class="scholar">
+          <img class="scholar__photo" src="img/scholars/njoki-wane.jpg" alt="Njoki Nathani Wane" width="500" height="500" loading="lazy" decoding="async" style="object-position:center 30%" />
+          <div class="scholar__body">
+            <h3 class="scholar__name">Njoki Nathani Wane</h3>
+            <p class="scholar__role">Professor · OISE, University of Toronto</p>
+            <p class="scholar__what">A leading voice on Black feminism and anti-colonial thought in
+              Canadian education, and on treating African Indigenous knowledge as scholarship rather
+              than folklore.</p>
+            <p class="scholar__start"><span>Start with</span> <a class="ext" href="https://discover.research.utoronto.ca/21734-njoki-wane" target="_blank" rel="noopener">Her research profile and publication list<span class="visually-hidden"> (opens in a new tab)</span></a></p>
+          </div>
+        </li>
+
+        <li class="scholar">
+          <img class="scholar__photo" src="img/scholars/janelle-brady.webp" alt="Janelle Brady" width="600" height="800" loading="lazy" decoding="async" style="object-position:center 20%" />
+          <div class="scholar__body">
+            <h3 class="scholar__name">Janelle Brady</h3>
+            <p class="scholar__role">Assistant Professor · Toronto Metropolitan University</p>
+            <p class="scholar__what">Works on anti-Black racism in schooling and on equity policy that
+              changes practice rather than just wording, with a focus on early childhood and youth
+              education.</p>
+            <p class="scholar__start"><span>Start with</span> <a class="ext" href="https://www.torontomu.ca/early-childhood-studies/about/people/faculty/janelle-brady/" target="_blank" rel="noopener">Her faculty page and current research<span class="visually-hidden"> (opens in a new tab)</span></a></p>
+          </div>
+        </li>
+
+        <li class="scholar">
+          <img class="scholar__photo" src="img/scholars/tanitia-munroe.jpg" alt="Tanitiã Munroe" width="500" height="500" loading="lazy" decoding="async" />
+          <div class="scholar__body">
+            <h3 class="scholar__name">Tanitiã Munroe</h3>
+            <p class="scholar__role">PhD, OISE · former TDSB research coordinator</p>
+            <p class="scholar__what">Researches the experiences of Black students inside the very board
+              this project's interviews came from, including how school data does and does not capture
+              what students live.</p>
+            <p class="scholar__start"><span>Start with</span> <a class="ext" href="https://www.oise.utoronto.ca/" target="_blank" rel="noopener">OISE, her research home<span class="visually-hidden"> (opens in a new tab)</span></a></p>
+          </div>
+        </li>
+
+        <li class="scholar">
+          <img class="scholar__photo" src="img/scholars/rinaldo-walcott.jpg" alt="Rinaldo Walcott" width="500" height="500" loading="lazy" decoding="async" />
+          <div class="scholar__body">
+            <h3 class="scholar__name">Rinaldo Walcott</h3>
+            <p class="scholar__role">Professor &amp; Chair · Africana &amp; American Studies, University at Buffalo</p>
+            <p class="scholar__what">Writes on Black life, gender and sexuality in Canada, and on why
+              "diversity" language often leaves the underlying structures completely intact.</p>
+            <p class="scholar__start"><span>Start with</span> <a class="ext" href="https://arts-sciences.buffalo.edu/africana-american-studies.html" target="_blank" rel="noopener">His department page<span class="visually-hidden"> (opens in a new tab)</span></a></p>
+          </div>
+        </li>
+
+        <li class="scholar">
+          <img class="scholar__photo" src="img/scholars/travonne-edwards.webp" alt="Travonne Edwards" width="500" height="500" loading="lazy" decoding="async" />
+          <div class="scholar__body">
+            <h3 class="scholar__name">Travonne Edwards</h3>
+            <p class="scholar__role">Assistant Professor · Child &amp; Youth Care, Toronto Metropolitan University</p>
+            <p class="scholar__what">Studies how child welfare and youth services treat Black children and
+              families, and what changes when those systems are examined together rather than separately.</p>
+            <p class="scholar__start"><span>Start with</span> <a class="ext" href="https://www.torontomu.ca/child-youth-care/people/faculty/travonne-edwards/" target="_blank" rel="noopener">His faculty page<span class="visually-hidden"> (opens in a new tab)</span></a></p>
+          </div>
+        </li>
+
+        <li class="scholar">
+          <img class="scholar__photo" src="img/scholars/sam-tecle.jpg" alt="Sam Tecle" width="500" height="500" loading="lazy" decoding="async" />
+          <div class="scholar__body">
+            <h3 class="scholar__name">Sam Tecle</h3>
+            <p class="scholar__role">Assistant Professor · Sociology, Toronto Metropolitan University</p>
+            <p class="scholar__what">Works on Black youth, community organising and education in Toronto,
+              often alongside the communities being written about rather than at a distance from them.</p>
+            <p class="scholar__start"><span>Start with</span> <a class="ext" href="https://www.torontomu.ca/sociology/people/faculty/" target="_blank" rel="noopener">His department page<span class="visually-hidden"> (opens in a new tab)</span></a></p>
+          </div>
+        </li>
+      </ul>
+
+      <p class="lesson__sources" style="margin-top:26px">Four books this site leans on are listed with full
+        citations on the <a class="receipt-link" href="receipts.html#reading">receipts page →</a></p>
+    </div>
+  </section>
+
 
   <!-- ===== Footer ===== -->
   <footer class="footer" data-bg="#faf6ef" data-scene>
@@ -745,8 +1142,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
   <script src="js/scroll.js?v=79"></script>
-  <script src="js/morph.js?v=79"></script>
-  <script src="js/journey.js?v=80"></script>
   <script src="js/polish.js?v=82"></script>
   <script src="js/main.js?v=88"></script>
   <script src="js/timeline.js?v=4"></script>
@@ -757,6 +1152,7 @@
   <script src="js/spark.js?v=91"></script>
   <script src="js/theme.js?v=2"></script>
   <script src="js/nav.js?v=4"></script>
+  <script src="js/ui.js?v=1"></script>
   <script src="js/transition.js?v=1"></script>
 </body>
 </html>

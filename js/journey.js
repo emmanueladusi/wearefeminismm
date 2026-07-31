@@ -118,8 +118,11 @@
       const ax = Math.abs(p);
       const t = clamp((ax - 0.05) / 0.72, 0, 1); // tiny dead-zone, then ramp hard
       const e = t * t * (3 - 2 * t);           // smoothstep the ramp
-      const scale = 1 - 0.17 * e;              // recede toward you-ward depth (1 → 0.83)
-      const opa = 1 - 0.82 * e;                // and dissolve (1 → 0.18)
+      const scale = 1 - 0.12 * e;              // recede toward you-ward depth (1 → 0.88)
+      // Dissolve floor raised from 0.18 to 0.62: at 0.18 the copy in a passing
+      // section was effectively unreadable, which is content hidden behind
+      // opacity. The depth still reads; the words survive it.
+      const opa = 1 - 0.38 * e;                // (1 → 0.62)
       const rx = clamp(-p * 10, -11, 11);      // tilt through space: planes lean as they pass
       const ty = -p * 52;                      // counter-parallax so it feels held, not scrolled
       // (depth-of-field blur removed — the constant soft-focus on every

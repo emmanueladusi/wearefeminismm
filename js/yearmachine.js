@@ -97,17 +97,89 @@
     return rows;
   }
 
+  /* ---- progress + summary ----
+     The rows arrive one at a time, which is the point, but without a progress
+     indicator there is no way to tell how much is left or whether it has
+     stalled. "Show all results now" is the escape hatch for anyone who does
+     not want to wait through the stagger. */
+  var progress = document.getElementById("ymProgress");
+  var progressFill = document.getElementById("ymProgressFill");
+  var progressText = document.getElementById("ymProgressText");
+  var summary = document.getElementById("ymSummary");
+  var showAllBtn = document.getElementById("ymAll");
+  var pendingTimers = [];
+
+  function setProgress(done, total) {
+    if (!progress) return;
+    progress.hidden = false;
+    var pct = total ? Math.round((done / total) * 100) : 0;
+    if (progressFill) progressFill.style.width = pct + "%";
+    if (progressText) {
+      progressText.textContent =
+        done >= total ? "All " + total + " moments shown." : done + " of " + total + " moments";
+    }
+    progress.setAttribute("aria-valuenow", String(pct));
+  }
+
+  function writeSummary(age) {
+    if (!summary) return;
+    // 1918 is the first federal vote; 1993 the first female PM. Both are in the
+    // sourced event list, so the summary states the span rather than inventing.
+    var waitVote = 1918 - 1912;
+    summary.innerHTML =
+      "<strong>The short version:</strong> starting at " + age +
+      " in 1912, you would have waited about " + waitVote +
+      " years for a federal vote you may not have been allowed to use, and " +
+      "you would have been " + (age + (1993 - 1912)) +
+      " before Canada had its first female prime minister. Some of the waits on " +
+      "this list are still running.";
+  }
+
+  function finishAll(rows) {
+    pendingTimers.forEach(clearTimeout);
+    pendingTimers = [];
+    rows.forEach(function (li) { li.classList.add("in"); });
+    setProgress(rows.length, rows.length);
+    foot.hidden = false;
+  }
+
   function unroll(rows) {
     rows.forEach(function (li) { list.appendChild(li); });
+    var total = rows.length;
+    setProgress(0, total);
+
     if (reduced()) {
-      rows.forEach(function (li) { li.classList.add("in"); });
-      foot.hidden = false;
+      finishAll(rows);
       return;
     }
     rows.forEach(function (li, i) {
-      setTimeout(function () { li.classList.add("in"); }, 300 + i * 420);
+      pendingTimers.push(setTimeout(function () {
+        li.classList.add("in");
+        setProgress(i + 1, total);
+      }, 300 + i * 420));
     });
-    setTimeout(function () { foot.hidden = false; }, 300 + rows.length * 420);
+    pendingTimers.push(setTimeout(function () { foot.hidden = false; }, 300 + total * 420));
+  }
+
+  /* "Show all results now" has to work at any point, including before you have
+     pressed Send me back and during the 1912 takeover. It builds the rows if
+     they do not exist yet, skips the takeover, and drops straight to the list. */
+  var lastRows = null;
+  if (showAllBtn) {
+    showAllBtn.addEventListener("click", function () {
+      if (travelDone) travelDone();          // cut the takeover short if it is up
+      if (!lastRows || !list.children.length) {
+        var age = clampAge(parseInt(input.value, 10));
+        input.value = age;
+        list.innerHTML = "";
+        lastRows = buildRows(age);
+        writeSummary(age);
+        lastRows.forEach(function (li) { list.appendChild(li); });
+      }
+      finishAll(lastRows);
+      running = false;
+      scrollToList();
+    });
   }
 
   function scrollToList() {
@@ -193,6 +265,8 @@
     list.innerHTML = "";
     foot.hidden = true;
     var rows = buildRows(age);
+    writeSummary(age);
+    lastRows = rows;
 
     if (reduced()) {
       unroll(rows);
