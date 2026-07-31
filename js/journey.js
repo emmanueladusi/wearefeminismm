@@ -110,27 +110,27 @@
       return (r.top + r.height / 2 - vh / 2) / vh; // 0 = centred, ± = off
     });
 
-    const vScale = clamp(Math.abs(vel) * 0.0013, 0, 0.05); // vertical stretch on fast scroll
-    const skew = clamp(vel * 0.007, -3, 3);                // lean into the motion
-
     scenes.forEach((el, i) => {
       const p = measured[i];                   // 0 = centred, +below / -above
       const ax = Math.abs(p);
       const t = clamp((ax - 0.05) / 0.72, 0, 1); // tiny dead-zone, then ramp hard
       const e = t * t * (3 - 2 * t);           // smoothstep the ramp
-      const scale = 1 - 0.12 * e;              // recede toward you-ward depth (1 → 0.88)
+      const scale = 1 - 0.07 * e;              // recede a little (1 → 0.93)
       // Dissolve floor raised from 0.18 to 0.62: at 0.18 the copy in a passing
       // section was effectively unreadable, which is content hidden behind
       // opacity. The depth still reads; the words survive it.
       const opa = 1 - 0.38 * e;                // (1 → 0.62)
-      const rx = clamp(-p * 10, -11, 11);      // tilt through space: planes lean as they pass
-      const ty = -p * 52;                      // counter-parallax so it feels held, not scrolled
-      // (depth-of-field blur removed — the constant soft-focus on every
-      //  section read as busy; the recede + fade carry the depth on their own.)
-      // ax is distance from viewport centre in viewport-heights
+      const ty = -p * 34;                      // counter-parallax so it feels held, not scrolled
+
+      /* rotateX, skewY and the velocity scaleY are gone on purpose.
+         rotateX(-p * 10) leaned each section away from you as it passed,
+         which read as the page tipping over backwards; skewY(vel * 0.007)
+         slanted the whole block diagonally whenever you scrolled quickly, so
+         section edges arrived visibly crooked. What is left is a straight
+         recede and fade: depth without the section ever leaving square. */
       setPromotion(el, ax < 1.6);
       el.style.transform =
-        `perspective(1000px) translate3d(0, ${ty.toFixed(2)}px, 0) rotateX(${rx.toFixed(3)}deg) scale(${scale.toFixed(4)}) scaleY(${(1 + vScale).toFixed(4)}) skewY(${skew.toFixed(3)}deg)`;
+        `translate3d(0, ${ty.toFixed(2)}px, 0) scale(${scale.toFixed(4)})`;
       el.style.opacity = opa.toFixed(3);
     });
   }
