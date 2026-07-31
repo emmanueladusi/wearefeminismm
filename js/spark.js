@@ -100,6 +100,9 @@
     const yesMaj = percentYes > 50, tie = percentYes === 50;
 
     $("sparkPct").textContent = Math.round(percentYes) + "%";
+    // the Learn hero features the same number; fill it when the element exists
+    const heroPct = document.getElementById("heroPulsePct");
+    if (heroPct) heroPct.textContent = Math.round(percentYes) + "%";
     $("sparkCounts").innerHTML =
       `<b>${data.yes}</b> Yes · <b>${data.no}</b> No · ${total} responses`;
 

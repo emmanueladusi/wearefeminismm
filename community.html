@@ -23,7 +23,7 @@
   <meta name="twitter:image" content="https://emmanueladusi.github.io/wearefeminismm/img/og-image.png" />
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-  <link rel="stylesheet" href="css/styles.css?v=206" />
+  <link rel="stylesheet" href="css/styles.css?v=211" />
   <script>(function(){var d=document.documentElement;d.classList.add("js");setTimeout(function(){if(!d.classList.contains("reveal-ready"))d.classList.remove("js");},2500);})();</script>
 </head>
 <body>
@@ -58,6 +58,12 @@
   <!-- ===== Nav ===== -->
   <header class="nav" id="nav">
     <a class="nav__logo" href="index.html" data-magnetic>wearefeminismm</a>
+    <nav class="nav__links" aria-label="Primary">
+      <a href="index.html">Home</a>
+      <a href="learn.html">Learn</a>
+      <a href="community.html" aria-current="page">Community</a>
+      <a href="voice.html">Your voice</a>
+    </nav>
     <div class="nav__right">
       <span class="nav__tools"><button class="nav__toggle" id="darkToggle" type="button" title="Dark mode" aria-label="Dark mode" aria-pressed="false" data-magnetic><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.5 6.5 0 0 0 9.8 9.8z"/></svg></button>
       <button class="nav__toggle" id="a11yToggle" type="button" title="Accessible mode" aria-label="Accessible mode" aria-pressed="false" data-magnetic><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="7.3" r="1.4" fill="currentColor"/><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M7.6 10.2h8.8M12 10.6v4.2m0 0-1.9 3.2m1.9-3.2 1.9 3.2"/></svg></button></span>
@@ -108,18 +114,23 @@
     </nav>
   </div>
 
-  <!-- ===== Page intro ===== -->
-  <section class="hero" id="top" data-bg="#f3ecdf">
-    <p class="hero__eyebrow line-reveal"><span>Community</span></p>
-    <h1 class="hero__title">
-      <span class="line-reveal"><span>What we're</span></span>
-      <span class="line-reveal"><span><em>building.</em></span></span>
-    </h1>
-    <p class="hero__sub line-reveal"><span>Peer support, education, advocacy, and the wall, where every story is anonymous and every reply is a hand on a shoulder.</span></p>
-    <div class="hero__ctas line-reveal">
-      <span>
-        <a href="voice.html#wall" class="cta" data-magnetic>Go straight to the wall <span class="cta__arrow">→</span></a>
-      </span>
+  <!-- ===== Page intro =====
+       hero-07: our own photo up top (the team after presenting), tagline
+       left, title and ways-in right. -->
+  <section class="h7" id="top" data-bg="#f3ecdf">
+    <div class="h7__media">
+      <img class="h7__img" src="img/preso/team.jpg" alt="The wearefeminismm team standing together after a presentation" decoding="async" fetchpriority="high" />
+    </div>
+    <div class="h7__grid">
+      <p class="h7__tag">Peer support, education, and advocacy, led by students.</p>
+      <div class="h7__body">
+        <h1 class="h7__title">What we’re building.</h1>
+        <p class="h7__desc">Three pillars and a wall, where every story is anonymous and every reply is a hand on a shoulder.</p>
+        <div class="h7__ctas">
+          <a href="#pillars" class="cta" data-magnetic>See the three pillars <span class="cta__arrow">→</span></a>
+          <a href="voice.html#wall" class="cta cta--quiet" data-magnetic>Go straight to the wall <span class="cta__arrow">→</span></a>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -227,5 +238,6 @@
   <script src="js/gtamap.js?v=6"></script>
   <script src="js/theme.js?v=2"></script>
   <script src="js/nav.js?v=4"></script>
+  <script src="js/transition.js?v=1"></script>
 </body>
 </html>

@@ -141,6 +141,32 @@ html {
 
 .nav.is-scrolled { border-bottom-color: var(--line); }
 
+/* visible primary links: the whole site readable from the bar. The Menu
+   overlay stays for small screens (and still carries Receipts + socials). */
+.nav__links {
+  display: flex;
+  gap: clamp(18px, 2.6vw, 34px);
+}
+.nav__links a {
+  font-size: var(--t-small);
+  font-weight: 600;
+  color: var(--ink-dim);
+  text-decoration: none;
+  padding: 6px 2px;
+  border-bottom: 2px solid transparent;
+  transition: color 0.25s, border-color 0.25s;
+}
+.nav__links a:hover { color: var(--ink); }
+.nav__links a[aria-current="page"] {
+  color: var(--ink);
+  border-bottom-color: var(--gold);
+}
+.nav__links a:focus-visible { outline: 2px solid var(--gold-ink); outline-offset: 2px; border-radius: 4px; }
+
+@media (max-width: 880px) {
+  .nav__links { display: none; }
+}
+
 .nav__logo {
   font-family: var(--serif);
   font-size: 1.15rem;
@@ -241,6 +267,167 @@ html {
   .refract__band--m { transform: translateY(-50%) rotate(-3deg); opacity: 0.55; }
   .refract__band--g { transform: translateY(-50%) rotate(9deg); opacity: 0.5; }
 }
+
+/* ===== hero-07: image-led editorial hero (Learn / Community / Voice) =====
+   Ported from the hero-07 React component the user supplied, in this
+   site's vanilla stack: landscape image up top that fades out at its
+   foot, then a 12-column band below it — a small tagline holding the
+   left, title / description / ways-in on the right. Entrance is a
+   staggered rise-and-unblur; the image drops in first. */
+.h7 { position: relative; }
+
+.h7__media { position: relative; overflow: hidden; }
+.h7__img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  object-fit: cover;
+  object-position: center;
+  outline: 1px solid rgba(0, 0, 0, 0.1);
+  outline-offset: -1px;
+  -webkit-mask-image: linear-gradient(to bottom, #000 78%, transparent 97%);
+  mask-image: linear-gradient(to bottom, #000 78%, transparent 97%);
+}
+@media (min-width: 640px) {
+  .h7__img { aspect-ratio: 9 / 4; }
+}
+/* soft paper wash so any photo sits in the site's palette */
+.h7__media::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: rgba(250, 246, 239, 0.14);
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+[data-theme="dark"] .h7__img { filter: brightness(0.9) saturate(0.92); outline-color: rgba(255,255,255,0.1); }
+[data-theme="dark"] .h7__media::after { background: rgba(20, 14, 34, 0.3); mix-blend-mode: multiply; }
+
+.h7__grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: clamp(28px, 4vh, 48px) clamp(20px, 7vw, 96px) clamp(130px, 18vh, 220px);
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: clamp(24px, 3vw, 40px);
+  align-items: start;
+}
+
+.h7__tag {
+  grid-column: 1 / span 4;
+  margin: 6px 0 0;
+  font-size: var(--t-small);
+  line-height: 1.6;
+  letter-spacing: -0.005em;
+  color: var(--ink-dim);
+  max-width: 24ch;
+}
+
+.h7__body {
+  grid-column: 7 / span 6;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(18px, 2.6vh, 28px);
+}
+
+.h7__title {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: var(--t-title);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+  overflow-wrap: break-word;
+}
+
+.h7__desc {
+  margin: 0;
+  font-size: var(--t-body);
+  line-height: 1.6;
+  color: var(--ink-dim);
+  max-width: 52ch;
+}
+
+.h7__ctas { display: flex; flex-wrap: wrap; gap: 16px 28px; }
+
+/* entrance: image drops and unblurs, copy rises behind it */
+@keyframes h7-drop {
+  from { opacity: 0; transform: translateY(-20px); filter: blur(8px); }
+  to   { opacity: 1; transform: translateY(0);     filter: blur(0); }
+}
+@keyframes h7-rise {
+  from { opacity: 0; transform: translateY(12px); filter: blur(6px); }
+  to   { opacity: 1; transform: translateY(0);    filter: blur(0); }
+}
+.js .h7__media { opacity: 0; animation: h7-drop 0.5s var(--ease) 0.1s forwards; }
+.js .h7__tag,
+.js .h7__title,
+.js .h7__desc,
+.js .h7__ctas { opacity: 0; animation: h7-rise 0.45s var(--ease) forwards; }
+.js .h7__tag   { animation-delay: 0.28s; }
+.js .h7__title { animation-delay: 0.36s; }
+.js .h7__desc  { animation-delay: 0.44s; }
+.js .h7__ctas  { animation-delay: 0.52s; }
+
+@media (max-width: 880px) {
+  .h7__tag  { grid-column: 1 / -1; max-width: 46ch; margin: 0; }
+  .h7__body { grid-column: 1 / -1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js .h7__media, .js .h7__tag, .js .h7__title, .js .h7__desc, .js .h7__ctas {
+    opacity: 1; animation: none;
+  }
+}
+
+/* ===== Voice hero: the poster =====
+   Oversized type, and every word lands with a small spring, one after
+   another (the bounce from the Aardvark reference). One deliberate extra
+   type step: the poster wants more presence than --t-display, and the
+   clamp stays rem-dominant so it keeps outgrowing body text under zoom. */
+/* the Ink Garden dither canvas (js/inkgarden.js) sits behind the poster
+   type as a breathing texture; .hero > * would lift it to z-index 1, so
+   pin it back down */
+.hero--poster .inkgarden {
+  position: absolute !important;
+  top: 0; bottom: 0;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);   /* full-bleed out of the 1200px column */
+  z-index: 0 !important;
+  pointer-events: none;
+}
+
+.poster {
+  margin: 8px 0 0;
+  font-family: var(--serif);
+  font-size: clamp(2.8rem, 1.6vw + 3.4rem, 5.6rem);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+}
+.poster__line { display: block; }
+.pw { display: inline-block; }
+.pw--gold { color: var(--gold-ink); }
+
+.js .pw {
+  opacity: 0;
+  transform: translateY(0.7em) rotate(4deg);
+  animation: pw-pop 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.2) calc(0.15s + var(--w) * 0.07s) forwards;
+}
+@keyframes pw-pop {
+  60% { transform: translateY(-0.05em) rotate(-1.2deg); opacity: 1; }
+  to  { transform: translateY(0) rotate(0); opacity: 1; }
+}
+body.is-loading .pw { animation-play-state: paused; }
+
+@media (prefers-reduced-motion: reduce) {
+  .js .pw { opacity: 1; animation: none; transform: none; }
+}
+html[data-a11y] .pw { opacity: 1 !important; animation: none !important; transform: none !important; }
+html[data-a11y] .h7__media, html[data-a11y] .h7__tag, html[data-a11y] .h7__title,
+html[data-a11y] .h7__desc, html[data-a11y] .h7__ctas { opacity: 1 !important; animation: none !important; }
 
 /* ===== Global colour-morph backdrop (js/morph.js) =====
    One fixed field behind the fluid sim; its colour is interpolated across
@@ -1120,6 +1307,49 @@ html[data-a11y] .pathway__arrow { transition: none !important; }
    v3 additions — polish layer + extra WebGL moments
    ===================================================== */
 
+/* ===== Blob page transition (js/transition.js) =====
+   A deep-violet blob swells from the bottom edge and swallows the page on
+   the way out; the next page's preloader curtain, in the same violet,
+   plays the arrival. */
+.pt {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  visibility: hidden;
+  overflow: hidden;
+}
+.pt__blob {
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 280vmax;
+  height: 280vmax;
+  background: var(--violet-deep);
+  border-radius: 41% 59% 52% 48% / 47% 42% 58% 53%;
+  transform: translate(-50%, -50%) scale(0) rotate(0deg);
+  will-change: transform;
+}
+.pt__mark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: var(--t-lead);
+  color: rgba(250, 246, 239, 0.92);
+  opacity: 0;
+}
+body.page-exit .pt { visibility: visible; pointer-events: auto; }
+body.page-exit .pt__blob { animation: pt-cover 0.5s cubic-bezier(0.6, 0, 0.3, 1) forwards; }
+body.page-exit .pt__mark { animation: pt-mark 0.28s ease-out 0.24s forwards; }
+@keyframes pt-cover {
+  to { transform: translate(-50%, -50%) scale(1) rotate(10deg); }
+}
+@keyframes pt-mark { to { opacity: 1; } }
+
 /* ===== Preloader ===== */
 .preloader {
   position: fixed;
@@ -1173,6 +1403,8 @@ body.is-loading { overflow: hidden; }
 
 /* hold the hero reveal until the curtain lifts */
 body.is-loading .line-reveal > span { animation-play-state: paused; }
+body.is-loading .h7__media, body.is-loading .h7__tag, body.is-loading .h7__title,
+body.is-loading .h7__desc, body.is-loading .h7__ctas { animation-play-state: paused; }
 
 @media (prefers-reduced-motion: reduce) {
   .preloader { display: none; }
@@ -1674,7 +1906,10 @@ body.is-loading .line-reveal > span { animation-play-state: paused; }
   top: 22vh;
   margin: 0 auto;
   width: 520px;
-  max-width: 94vw;
+  /* min(…, 100%) keeps the card inside the section's own padding — plain
+     94vw beat the padded box on small screens and left a 1px sideways
+     wiggle on the whole page */
+  max-width: min(94vw, 100%);
   background: #fffdfa;
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
@@ -2924,18 +3159,16 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
   line-height: 1.6;
 }
 /* the piece of the week — one featured work, swapped by hand each week */
+/* text on the left, photo on the right, no box around the pair — the two
+   simply sit side by side on the section */
 .piece {
   margin: clamp(30px, 4vw, 48px) 0 0;
   display: grid;
-  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
-  gap: clamp(22px, 3vw, 44px);
+  grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+  gap: clamp(26px, 4vw, 56px);
   align-items: center;
-  background: rgba(255, 255, 255, 0.045);
-  border: 1px solid rgba(212, 175, 55, 0.22);
-  border-radius: 20px;
-  padding: clamp(18px, 2.6vw, 34px);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
 }
+.piece__body { order: -1; }
 .piece__photo {
   border-radius: 14px;
   overflow: hidden;
@@ -3022,9 +3255,11 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
   margin: clamp(16px, 2vw, 22px) 0 0;
   max-width: 52ch;
 }
+/* the piece stays side-by-side at every width: the photo column just gets
+   narrower instead of stacking on top of the text */
 @media (max-width: 760px) {
-  .piece { grid-template-columns: 1fr; }
-  .piece__photo { aspect-ratio: 3 / 2; }
+  .piece { grid-template-columns: minmax(110px, 2fr) minmax(0, 3fr); align-items: start; }
+  .piece__photo { aspect-ratio: 4 / 5; }
 }
 
 /* ===== The year machine (learn.html, js/yearmachine.js) =====
@@ -3971,6 +4206,19 @@ html[data-theme="dark"] .involve, html[data-theme="dark"] .composer,
 html[data-theme="dark"] .pathway, html[data-theme="dark"] .lens, html[data-theme="dark"] .ec-card-panel {
   background: rgba(255, 255, 255, 0.05) !important;
   border-color: var(--line) !important;
+}
+/* the pillar-card panels can't ride that 5% glass: backdrop blur smears the
+   card art straight through it. Solid dark panel, no blur, art stays crisp. */
+html[data-theme="dark"] .ec-card-panel {
+  background: rgba(24, 17, 40, 0.85) !important;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+/* card 01's deep-violet accent vanishes on the dark panel: lift every
+   accent toward lilac just enough to read (falls back to the raw accent
+   where color-mix is unsupported) */
+html[data-theme="dark"] .ec-card-panel h3 {
+  color: color-mix(in srgb, var(--accent) 45%, #e8e0f2);
 }
 /* any element still carrying a near-white inline/hardcoded panel goes dark-glass */
 html[data-theme="dark"] .post, html[data-theme="dark"] .quiz-card, html[data-theme="dark"] .bias-post,
@@ -4964,6 +5212,22 @@ html[data-theme="dark"] .menu__panel { background: var(--paper-soft); }
   color: var(--ink);
 }
 .menu__list li:first-child .menu__row { border-top: 1px solid var(--line); }
+
+/* numbered roll-in: each row rolls up from beneath its hairline when the
+   panel opens, top to bottom */
+.menu__list li { overflow: hidden; }
+@keyframes menu-roll {
+  from { transform: translateY(115%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+body.nav-open .menu__row { animation: menu-roll 0.55s var(--ease) both; }
+body.nav-open .menu__list li:nth-child(1) .menu__row { animation-delay: 0.05s; }
+body.nav-open .menu__list li:nth-child(2) .menu__row { animation-delay: 0.11s; }
+body.nav-open .menu__list li:nth-child(3) .menu__row { animation-delay: 0.17s; }
+body.nav-open .menu__list li:nth-child(4) .menu__row { animation-delay: 0.23s; }
+body.nav-open .menu__list li:nth-child(5) .menu__row { animation-delay: 0.29s; }
+@media (prefers-reduced-motion: reduce) { body.nav-open .menu__row { animation: none; } }
+html[data-a11y] .menu__row { animation: none !important; }
 
 .menu__num {
   font-family: var(--mono);

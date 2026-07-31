@@ -23,7 +23,7 @@
   <meta name="twitter:image" content="https://emmanueladusi.github.io/wearefeminismm/img/og-image.png" />
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-  <link rel="stylesheet" href="css/styles.css?v=206" />
+  <link rel="stylesheet" href="css/styles.css?v=211" />
   <link rel="stylesheet" href="css/preso.css?v=8" />
   <script>(function(){var d=document.documentElement;d.classList.add("js");setTimeout(function(){if(!d.classList.contains("reveal-ready"))d.classList.remove("js");},2500);})();</script>
 </head>
@@ -59,6 +59,12 @@
   <!-- ===== Nav ===== -->
   <header class="nav" id="nav">
     <a class="nav__logo" href="index.html" data-magnetic>wearefeminismm</a>
+    <nav class="nav__links" aria-label="Primary">
+      <a href="index.html">Home</a>
+      <a href="learn.html">Learn</a>
+      <a href="community.html">Community</a>
+      <a href="voice.html" aria-current="page">Your voice</a>
+    </nav>
     <div class="nav__right">
       <span class="nav__tools"><button class="nav__toggle" id="darkToggle" type="button" title="Dark mode" aria-label="Dark mode" aria-pressed="false" data-magnetic><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.5 6.5 0 0 0 9.8 9.8z"/></svg></button>
       <button class="nav__toggle" id="a11yToggle" type="button" title="Accessible mode" aria-label="Accessible mode" aria-pressed="false" data-magnetic><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="7.3" r="1.4" fill="currentColor"/><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M7.6 10.2h8.8M12 10.6v4.2m0 0-1.9 3.2m1.9-3.2 1.9 3.2"/></svg></button></span>
@@ -109,14 +115,21 @@
     </nav>
   </div>
 
-  <!-- ===== Page intro ===== -->
-  <section class="hero" id="top" data-bg="#f2ecf7">
+  <!-- ===== Page intro =====
+       Poster hero, unique to this page: no photo, no prism, no wordmark.
+       Oversized type and the words land one at a time with a small spring
+       (the bounce borrowed from the user's Aardvark reference). -->
+  <section class="hero hero--poster" id="top" data-bg="#f2ecf7">
     <p class="hero__eyebrow line-reveal"><span>Your voice</span></p>
-    <h1 class="hero__title">
-      <span class="line-reveal"><span>See the work,</span></span>
-      <span class="line-reveal"><span><em>then add your voice.</em></span></span>
+    <h1 class="poster">
+      <span class="poster__line"><span class="pw" style="--w:0">See</span> <span class="pw" style="--w:1">the</span> <span class="pw" style="--w:2">work,</span></span>
+      <span class="poster__line"><span class="pw" style="--w:3">then</span> <span class="pw" style="--w:4">add</span> <span class="pw pw--gold" style="--w:5">your</span> <span class="pw pw--gold" style="--w:6"><em>voice.</em></span></span>
     </h1>
-    <p class="hero__sub line-reveal"><span>Where our research has travelled, and a wall to say what you need to say. Anonymous, always. No accounts, no pressure.</span></p>
+    <p class="hero__sub line-reveal"><span>Our research has travelled from Toronto classrooms to a Vancouver stage. The wall is where you speak. Anonymous, always. No accounts, no pressure.</span></p>
+    <div class="hero__ctas line-reveal"><span>
+      <a class="cta" href="#yearmachine" data-magnetic>Try the year machine <span class="cta__arrow">→</span></a>
+      <a class="cta cta--quiet" href="#wall" data-magnetic>Read the wall <span class="cta__arrow">→</span></a>
+    </span></div>
   </section>
 
   <!-- ===== Last year's research: kinetic-typography slideshow (moved from Home).
@@ -292,9 +305,11 @@
   <script src="js/aiglow.js?v=78"></script>
   <script src="js/main.js?v=88"></script>
   <script src="js/preso.js?v=6"></script>
+  <script src="js/inkgarden.js?v=1"></script>
   <script src="js/yearmachine.js?v=5"></script>
   <script src="js/wall3d.js?v=79"></script>
   <script src="js/theme.js?v=2"></script>
   <script src="js/nav.js?v=4"></script>
+  <script src="js/transition.js?v=1"></script>
 </body>
 </html>
