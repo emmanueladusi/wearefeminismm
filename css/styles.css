@@ -5946,3 +5946,46 @@ body.page-flat { background: var(--paper); }
 /* Receipts: tighter rhythm — it is a reference page, not a scroll journey */
 .rc { padding-top: clamp(56px, 6.5vw, 92px); padding-bottom: clamp(40px, 5vw, 68px); }
 .rc:first-of-type { padding-top: clamp(96px, 12vh, 132px); }
+
+/* =====================================================
+   Home scroll vocabulary (js/homescroll.js)
+   One move per section instead of the same fade everywhere.
+   Every hidden state below is applied by script, never by CSS
+   alone, so the page stays readable if the script never runs.
+   ===================================================== */
+
+/* per-word rise: outer clips, inner travels */
+.wsplit { display: inline-block; overflow: hidden; vertical-align: bottom; }
+.wsplit__i {
+  display: inline-block;
+  transform: translateY(105%);
+  transition: transform 0.72s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.words-in .wsplit__i { transform: translateY(0); }
+
+/* pathway rows wipe in from the left */
+.wipe-row {
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.wipe-row.wipe-in { clip-path: inset(0 0 0 0); }
+
+/* the weekly piece opens out of its frame as you approach it */
+.frame-open { will-change: clip-path; }
+.frame-open img { will-change: transform; }
+
+/* the 44% stat settles rather than fading */
+.stat-pop {
+  display: inline-block;
+  transform: scale(0.94);
+  opacity: 0.55;
+  transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s ease;
+}
+.stat-pop.stat-in { transform: scale(1); opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .wsplit__i, .wipe-row, .stat-pop { transition: none; transform: none; clip-path: none; opacity: 1; }
+}
+html[data-a11y] .wsplit__i { transform: none !important; }
+html[data-a11y] .wipe-row { clip-path: none !important; }
+html[data-a11y] .stat-pop { transform: none !important; opacity: 1 !important; }
