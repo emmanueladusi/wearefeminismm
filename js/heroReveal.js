@@ -42,6 +42,25 @@
     }
     host.__built = true;
     var isHero = section.hasAttribute("data-hero"); // opening hero: full sequence plays on load
+
+    /* data-hero-rig · the rig does not fully dissolve.
+       Every letter here is drawn from its real vector anchor points, and
+       that whole apparatus used to evaporate at 3.25s — the hero spent all
+       of its craft in the opening two seconds and then had nothing at rest.
+       This leaves a deliberate residue of it instead: the blueprint grid as
+       a whisper, a sparse scatter of amber anchor nodes still sitting on
+       the curves, and the two hero construction circles.
+
+       Sparse is the whole point. Every node left up reads as an unfinished
+       render; one in five reads as a drafting mark. Opacity only — no
+       geometry, no colour and no motion is added, so this costs nothing at
+       rest and the wordmark stays the loudest thing on the page. */
+    var wantsRig = section.hasAttribute("data-hero-rig");
+    /* keepEvery was 5 before the drafting sheet existed, when the nodes were
+       the only residue and had to carry it alone. The sheet now carries the
+       construction idea across the whole section, so the nodes step back to
+       being a detail you find rather than a texture that competes with it. */
+    var RIG = { grid: 0.55, node: 0.55, circ: 0.2, keepEvery: 9 };
     // Hero opens the page: don't start until the preloader curtain lifts (body
     // loses .is-loading), or the reveal plays behind it and you catch only the
     // tail. Safety-fires after the preloader's own max so it can't get stuck.
@@ -59,6 +78,12 @@
     var ST = window.ScrollTrigger;
     var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     var narrow = window.matchMedia("(max-width: 860px)").matches;
+    /* The residue needs size to read. On a phone the wordmark is small
+       enough that an anchor node lands on roughly a pixel, and a scatter of
+       amber specks along the letter edges reads as fringing or a bad
+       render, not as construction. Same call as the lede re-centring at
+       this width: the idea is right, the scale is not. */
+    var keepRig = wantsRig && !narrow;
 
     var FS = DATA.fontSize || 280;
     var vb = DATA.viewBox;
@@ -83,14 +108,66 @@
 
     // blueprint grid
     var gridG = make("g", { class: "bmc-grid" });
-    var cols = 8, rows = 4;
-    for (var i = 0; i <= cols; i++) {
-      var x = vb[0] + (vb[2] * i) / cols;
-      gridG.appendChild(make("line", { x1: x, y1: vb[1], x2: x, y2: vb[1] + vb[3] }));
-    }
-    for (var j = 0; j <= rows; j++) {
-      var y = vb[1] + (vb[3] * j) / rows;
-      gridG.appendChild(make("line", { x1: vb[0], y1: y, x2: vb[0] + vb[2], y2: y }));
+    if (keepRig) {
+      /* ---- the drafting sheet ----
+         The 8x4 grid below is sized to the viewBox, so it only ever existed
+         BEHIND the word and vanished with it — the hero had no surface, just
+         flat paper. With residue on, the same idea is built as an actual
+         drawing sheet: it extends far past the SVG box (.bmc-svg is
+         overflow:visible) and .brandmark's own overflow:hidden crops it to
+         the section, so it bleeds edge to edge without ever causing scroll.
+
+         Two things stop this being wallpaper. The module is the wordmark's
+         own: the minor step is half the baked font size and the major is a
+         full one, so the squares are the letterforms' measure rather than
+         an arbitrary pixel grid. And it is generated outward from 0, which
+         puts a grid line exactly on the baseline.
+
+         Then the metric rules — baseline, x-height, ascender — read off the
+         real glyph bounding boxes, full width. They are what makes this a
+         type drawing and not graph paper: the wordmark visibly SITS on its
+         baseline instead of floating in cream. */
+      var tops = DATA.glyphs.map(function (g) { return g.bbox[1]; });
+      var bots = DATA.glyphs.map(function (g) { return g.bbox[3]; });
+      var baseline = Math.min.apply(null, bots);          // flat letters; round ones overshoot below
+      var xheight  = Math.max.apply(null, tops);          // flat x-height; round ones overshoot above
+      var ascender = Math.min.apply(null, tops);          // the f
+
+      var minor = FS / 2, major = FS;
+      var x0 = vb[0] - vb[2] * 3, x1 = vb[0] + vb[2] * 4;
+      var y0 = vb[1] - vb[3] * 3, y1 = vb[1] + vb[3] * 4;
+
+      var minorG = make("g", { class: "bmc-sheet" });
+      var majorG = make("g", { class: "bmc-sheet bmc-sheet--major" });
+      var k, v;
+      for (k = Math.ceil(x0 / minor); k * minor <= x1; k++) {
+        v = k * minor;
+        (v % major === 0 ? majorG : minorG).appendChild(
+          make("line", { x1: v, y1: y0, x2: v, y2: y1 }));
+      }
+      for (k = Math.ceil(y0 / minor); k * minor <= y1; k++) {
+        v = k * minor;
+        (v % major === 0 ? majorG : minorG).appendChild(
+          make("line", { x1: x0, y1: v, x2: x1, y2: v }));
+      }
+      gridG.appendChild(minorG);
+      gridG.appendChild(majorG);
+
+      var metricG = make("g", { class: "bmc-metric" });
+      [baseline, xheight, ascender].forEach(function (y) {
+        metricG.appendChild(make("line", { x1: x0, y1: y, x2: x1, y2: y }));
+      });
+      gridG.appendChild(metricG);
+    } else {
+      var cols = 8, rows = 4;
+      for (var i = 0; i <= cols; i++) {
+        var x = vb[0] + (vb[2] * i) / cols;
+        gridG.appendChild(make("line", { x1: x, y1: vb[1], x2: x, y2: vb[1] + vb[3] }));
+      }
+      for (var j = 0; j <= rows; j++) {
+        var y = vb[1] + (vb[3] * j) / rows;
+        gridG.appendChild(make("line", { x1: vb[0], y1: y, x2: vb[0] + vb[2], y2: y }));
+      }
     }
     svg.appendChild(gridG);
 
@@ -101,7 +178,7 @@
     if (roundIdx.length) { heroSet[roundIdx[0]] = 1; heroSet[roundIdx[roundIdx.length - 1]] = 1; }
 
     var glyphGs = [], offsets = [], fills = [], strokes = [], nodeGs = [], handleGs = [],
-        boxes = [], heroCircles = [], nonHeroCircles = [];
+        boxes = [], heroCircles = [], nonHeroCircles = [], allNodes = [];
 
     DATA.glyphs.forEach(function (g, idx) {
       var gcx = g.center[0], gcy = g.center[1];
@@ -148,10 +225,22 @@
 
       var ng = make("g", { class: "bmc-nodes" });
       g.nodes.forEach(function (n) {
-        ng.appendChild(make("rect", { x: n[0] - nodeS / 2, y: n[1] - nodeS / 2, width: nodeS, height: nodeS, class: "bmc-node" }));
+        var nr = make("rect", { x: n[0] - nodeS / 2, y: n[1] - nodeS / 2, width: nodeS, height: nodeS, class: "bmc-node" });
+        ng.appendChild(nr);
+        allNodes.push(nr);   // flat list so the residue can be spread across the WORD, not per letter
       });
       ng.style.opacity = 0;
       gg.appendChild(ng); nodeGs.push(ng);
+      /* With residue, the anchor nodes go BEHIND the ink. Painted on top
+         they read as damage — chunky amber squares breaking the letter
+         edges like bad anti-aliasing. Behind, the finished ink occludes
+         them and only the part of each square that overhangs the real
+         contour survives, which is exactly what an anchor point looks
+         like on a drawing that is still showing its construction. It also
+         means the residue can never hurt legibility.
+         During the reveal the fill is still transparent, so the rig reads
+         exactly as it always did. */
+      if (keepRig) gg.insertBefore(ng, gg.firstChild);
 
       svg.appendChild(gg);
       glyphGs.push(gg);
@@ -161,14 +250,35 @@
     host.innerHTML = "";
     host.appendChild(svg);
 
+    /* Which anchor nodes survive. Taken off the flat, word-wide list so the
+       survivors scatter across the whole wordmark instead of clumping into
+       whichever letters happen to carry the most points. */
+    var keptNodes = [], droppedNodes = [];
+    allNodes.forEach(function (n, k) {
+      (keepRig && k % RIG.keepEvery === 0 ? keptNodes : droppedNodes).push(n);
+    });
+
+    /* The resting state of the rig. Reused by all three render paths so a
+       reduced-motion visitor and a narrow one land on the same hero as
+       everyone else — they just do not watch it get there. */
+    function restRig() {
+      gridG.style.opacity = keepRig ? RIG.grid : 0;
+      heroCircles.forEach(function (c) { c.style.opacity = keepRig ? RIG.circ : 0; });
+      keptNodes.forEach(function (n) { n.style.opacity = RIG.node; });
+      droppedNodes.forEach(function (n) { n.style.opacity = 0; });
+      // the node GROUPS stay up when there is residue; the per-node opacity
+      // above is what actually decides which marks are left standing
+      nodeGs.forEach(function (r) { r.style.opacity = keepRig ? 1 : 0; });
+    }
+
     /* ---- static fallback: just the finished wordmark ---- */
     function renderStatic() {
-      gridG.style.opacity = 0;
       strokes.forEach(function (s) { s.style.opacity = 0; });
       boxes.forEach(function (b) { b.style.opacity = 0; });
-      handleGs.concat(nodeGs).forEach(function (r) { r.style.opacity = 0; });
-      heroCircles.concat(nonHeroCircles).forEach(function (c) { c.style.opacity = 0; });
+      handleGs.forEach(function (r) { r.style.opacity = 0; });
+      nonHeroCircles.forEach(function (c) { c.style.opacity = 0; });
       fills.forEach(function (f) { f.style.opacity = 1; });
+      restRig();
     }
 
     if (reduce || !gsap || !ST) {
@@ -188,11 +298,11 @@
     /* ---- narrow: light fade of the finished wordmark, no pin, no rig ---- */
     if (narrow) {
       try { console.log("[wordcycle] reveal path = NARROW (width<=860) — plain fade, NO word-cycle. Widen the window."); } catch (e) {}
-      gridG.style.opacity = 0;
       strokes.forEach(function (s) { s.style.opacity = 0; });
       boxes.forEach(function (b) { b.style.opacity = 0; });
-      handleGs.concat(nodeGs).forEach(function (r) { r.style.opacity = 0; });
-      heroCircles.concat(nonHeroCircles).forEach(function (c) { c.style.opacity = 0; });
+      handleGs.forEach(function (r) { r.style.opacity = 0; });
+      nonHeroCircles.forEach(function (c) { c.style.opacity = 0; });
+      restRig();
       var tlN = gsap.timeline({ paused: true });
       tlN.fromTo(fills, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.7, ease: "power2.out", stagger: { each: 0.03, from: "center" } });
       ST.create({
@@ -232,12 +342,25 @@
     // ---- resolve ----
     tl.to(handleGs, { opacity: 0, duration: 0.5, stagger: 0.015 }, 2.15);      // handles commit first
     tl.to(fills, { opacity: 1, duration: 0.9, stagger: { each: 0.035, from: "center" } }, 2.35); // ink materialises
-    tl.to(nodeGs, { opacity: 0, duration: 0.55, stagger: 0.015 }, 2.5);
     tl.to(strokes, { opacity: 0, duration: 0.55, stagger: 0.015 }, 2.55);
     tl.to(boxes, { opacity: 0, duration: 0.45 }, 2.45);
     tl.to(nonHeroCircles, { opacity: 0, duration: 0.55, stagger: 0.03 }, 2.55);
-    tl.to(gridG, { opacity: 0, duration: 0.7 }, 2.7);
-    tl.to(heroCircles, { opacity: 0, duration: 1.0, ease: "power2.inOut" }, 3.25); // linger, fade last
+
+    if (keepRig) {
+      /* The rig settles instead of leaving. Same beats, same order — the
+         marks that stay simply stop at their resting value rather than 0,
+         so the ending reads as the drawing being FINISHED rather than the
+         scaffolding being taken away. The survivors ease down last and
+         slowest, which is what makes them look chosen rather than left. */
+      tl.to(droppedNodes, { opacity: 0, duration: 0.55, stagger: 0.004 }, 2.5);
+      tl.to(gridG, { opacity: RIG.grid, duration: 0.7 }, 2.7);
+      tl.to(keptNodes, { opacity: RIG.node, duration: 0.9, ease: "power2.inOut", stagger: 0.012 }, 2.95);
+      tl.to(heroCircles, { opacity: RIG.circ, duration: 1.0, ease: "power2.inOut" }, 3.25);
+    } else {
+      tl.to(nodeGs, { opacity: 0, duration: 0.55, stagger: 0.015 }, 2.5);
+      tl.to(gridG, { opacity: 0, duration: 0.7 }, 2.7);
+      tl.to(heroCircles, { opacity: 0, duration: 1.0, ease: "power2.inOut" }, 3.25); // linger, fade last
+    }
 
     /* ---- hard scroll-lock while the reveal plays ----
        Pinning alone only holds the section in place — a fast scroll still

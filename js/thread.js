@@ -109,6 +109,22 @@
   }
 
   function docHeight() {
+    /* The thread SVG is position:absolute on <body>, so its own height counts
+       toward body.scrollHeight. Measuring the page that way makes the height a
+       RATCHET: once the svg is tall it holds the document at that height, the
+       next build reads the inflated number back, and the page can never shrink
+       again. Invisible before js/tlstage.js (the page only ever grew); with the
+       stage swapping three chapters out it stranded ~15 screens of empty
+       scroll below the footer.
+
+       So measure the real content instead. The footer is the last block on the
+       page, and it is in normal flow, so its bottom edge IS the content
+       height — and it shrinks when the content does. */
+    const foot = document.querySelector("body > footer");
+    if (foot) {
+      const r = foot.getBoundingClientRect();
+      if (r.height) return Math.round(r.bottom + window.scrollY);
+    }
     return Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
   }
 
@@ -460,6 +476,9 @@
 
   window.__thread = {
     syncSpark: syncSpark,
+    // js/tlstage.js: swapping a timeline chapter changes which .th-anchor
+    // points exist, so the thread has to be re-woven through the new ones
+    relayout: build,
   };
 
   window.addEventListener("scroll", () => update(false), { passive: true });

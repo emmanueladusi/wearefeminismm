@@ -53,7 +53,11 @@
       n.classList.toggle("lit", reduce || nodeYs[i] <= targetY)
     );
 
-    if (reduce) return; // heroes stay as cards; CSS shows the titles
+    // heroes stay as cards; CSS shows the titles. Stage mode (js/tlstage.js)
+    // opts out too: with one chapter on a stage there is no 235vh of scroll to
+    // grow through, and writing inline transforms here would fight the stage's
+    // own layout.
+    if (reduce || root.dataset.stage === "on") return;
 
     // card scale: what makes a 100vw-wide art read as a min(46vw, 520px)
     // card (never narrower than 280px). The art's layout never changes —
@@ -81,9 +85,13 @@
     }
   }
 
-  /* ---- rolling index: jump to a chapter ---- */
+  /* ---- rolling index: jump to a chapter ----
+     In stage mode the index is a tablist and js/tlstage.js owns these clicks:
+     the chapter is swapped onto the stage instead of scrolled to. Scrolling to
+     it here as well would fight that (and three of the four are [hidden]). */
   root.querySelectorAll("[data-goto]").forEach((btn) => {
     btn.addEventListener("click", () => {
+      if (root.dataset.stage === "on") return;
       const target = document.getElementById(btn.dataset.goto);
       if (!target) return;
       const l = window.__lenis;
@@ -205,4 +213,7 @@
   }
   window.addEventListener("load", () => setTimeout(measure, 80));
   measure();
+
+  // js/tlstage.js swaps chapters in and out, which moves every dot on the page
+  window.__timeline = { measure: measure };
 })();

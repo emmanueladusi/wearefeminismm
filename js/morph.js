@@ -109,4 +109,8 @@
   // pins created after this script runs).
   setTimeout(() => { measure(); update(); }, 400);
   setTimeout(() => { measure(); update(); }, 1400);
+
+  // js/tlstage.js swaps timeline chapters, which changes the page height
+  // without a resize — the cached offsets go stale unless it says so.
+  window.__morph = { measure: () => { measure(); update(); } };
 })();

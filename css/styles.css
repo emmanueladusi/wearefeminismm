@@ -2519,6 +2519,82 @@ body.is-loading .h7__desc, body.is-loading .h7__ctas { animation-play-state: pau
   letter-spacing: -0.015em;
   color: var(--ink);
 }
+/* ---------------------------------------------------------------------
+   v2 hero · .brandmark--axis (index-hero-v2.html)
+
+   The shipped hero centres everything on one axis, which is the one thing
+   no other section on the page does — Paths, Pop culture and About are all
+   editorial grids. This hangs the lede off the wordmark's own LEFT edge
+   instead, and leaves the wordmark centred.
+
+   The lede box is given the SAME width as .brandmark__word rather than a
+   guessed margin, so "the wordmark's left edge" stays true at every
+   viewport, including the min()/max() crossover. The reading measure moves
+   onto the children so the BOX can stay full width — the box is what does
+   the aligning.
+
+   Purely additive: .brandmark--hero is untouched, so index.html is
+   unaffected whether or not it picks up this stylesheet.
+   --------------------------------------------------------------------- */
+.brandmark--axis .brandmark__lede {
+  width: min(92vw, 1180px);
+  max-width: none;
+  align-items: flex-start;
+  text-align: left;
+}
+.brandmark--axis .brandmark__cap { max-width: 46ch; }
+.brandmark--axis .brandmark__note { max-width: 54ch; }
+.brandmark--axis .brandmark__ctas > span { justify-content: flex-start; }
+
+/* The drafting sheet behind the hero. Solid hairlines, not the dashed
+   6/10 of .bmc-grid — at this density a dash pattern turns to mush and
+   reads as noise. The whole group is held at RIG.grid (0.55) by the
+   timeline, so these alphas are roughly half again fainter in practice.
+   The sheet must stay a surface you notice only after the wordmark. */
+.brandmark--axis .bmc-sheet line { stroke: rgba(44, 33, 64, 0.17); stroke-dasharray: none; }
+.brandmark--axis .bmc-sheet--major line { stroke: rgba(44, 33, 64, 0.28); stroke-dasharray: none; }
+/* the type metrics carry the amber of the rest of the construction rig */
+.brandmark--axis .bmc-metric line { stroke: rgba(207, 140, 48, 0.62); stroke-dasharray: 16 11; }
+
+html[data-theme="dark"] .brandmark--axis .bmc-sheet line { stroke: rgba(250, 246, 239, 0.13); }
+html[data-theme="dark"] .brandmark--axis .bmc-sheet--major line { stroke: rgba(250, 246, 239, 0.22); }
+html[data-theme="dark"] .brandmark--axis .bmc-metric line { stroke: rgba(250, 246, 239, 0.42); }
+
+/* The rig residue has to flip with the theme, not just dim.
+
+   In light the ink is deep violet and the marks are amber, so a mark on a
+   contour reads instantly as construction. Dark inverts that: the ink
+   ITSELF becomes gold, the amber marks lose all contrast against it, and
+   the overhangs read as chipped, badly-rasterised letter edges. Recoloured
+   to paper, they read as anchor points again.
+
+   Done in CSS rather than JS so it follows the theme toggle live — the
+   residue's opacity is animated from the timeline, but its colour is not,
+   and colour is the only thing that needs to change here. */
+/* The signature mm keeps no anchor marks at all.
+
+   It is gold in both themes, and neither option works on it: amber has no
+   contrast against the gold and the edges read as chipped, while ink has
+   far too much and reads as chunks missing from the letter. Since the mm
+   is the founder's signature and the one piece of the wordmark carrying
+   brand colour, it should be the cleanest thing here, not the busiest.
+   Two glyphs out of fourteen lose their anchors and nobody can tell. */
+.brandmark--axis .bmc-glyph--sig .bmc-node { display: none; }
+
+html[data-theme="dark"] .brandmark--axis .bmc-node { fill: #faf6ef; }
+html[data-theme="dark"] .brandmark--axis .bmc-circ { stroke: rgba(250, 246, 239, 0.34); }
+html[data-theme="dark"] .brandmark--axis .bmc-grid line { stroke: rgba(250, 246, 239, 0.07); }
+
+/* At the wordmark's own narrow breakpoint the centred column is correct
+   again: under a near-full-bleed wordmark, a left-hung lede stops reading
+   as a decision and starts reading as a margin error. */
+@media (max-width: 860px) {
+  .brandmark--axis .brandmark__lede { align-items: center; text-align: center; }
+  .brandmark--axis .brandmark__ctas > span { justify-content: center; }
+  .brandmark--axis .brandmark__cap,
+  .brandmark--axis .brandmark__note { max-width: 46ch; }
+}
+
 .bmc-svg { display: block; width: 100%; height: auto; overflow: visible; }
 .bmc-grid line { stroke: rgba(44, 33, 64, 0.07); stroke-width: 1; stroke-dasharray: 6 10; }
 .bmc-fill { stroke: none; }
@@ -2559,6 +2635,9 @@ body.is-loading .h7__desc, body.is-loading .h7__ctas { animation-play-state: pau
   color: #2b1f42;                       /* solid plum — always visible */
 }
 .bwc-suffix, .bwc-reel > span { color: #2b1f42; }
+/* the signature m, matching .bmc-glyph--sig in the baked SVG so the colour
+   does not change when the live text takes over from it */
+.bwc-sig { color: var(--gold); }
 .bwc-slot {
   position: relative; height: 1em; overflow: hidden;
   width: 0; transition: width 460ms cubic-bezier(.5,0,.2,1);
@@ -4729,6 +4808,128 @@ html[data-a11y] .tline .hero-pin { position: static; height: auto; padding: 10vh
 html[data-a11y] .tline .hero-art { width: min(88vw, 720px); height: auto; aspect-ratio: 4 / 3; transform: none !important; }
 html[data-a11y] .tline .hero-title { position: static; opacity: 1 !important; transform: none !important; color: var(--ink); text-shadow: none; max-width: none; text-align: center; margin-top: 20px; }
 html[data-a11y] .tline .hero-title .tag { color: var(--ink-dim); }
+
+/* =====================================================
+   Timeline stage mode — see js/tlstage.js
+   The four chapters stop being 25 screens stacked end to
+   end and become one stage the chapter index swaps. Every
+   rule here is keyed on [data-stage="on"], which only
+   tlstage.js sets: if the script never runs, the timeline
+   is the scrolling version it has always been and all four
+   chapters stay readable.
+   ===================================================== */
+.tline[data-stage="on"] .index { padding-bottom: 5vh; }
+
+/* the open chapter, marked in the index */
+.tline[data-stage="on"] .roll__btn[aria-selected="true"] .roll__word .face { transform: translateY(-105%); }
+.tline[data-stage="on"] .roll__btn[aria-selected="true"] .roll__word .alt { transform: translateY(0); }
+.tline[data-stage="on"] .roll__btn[aria-selected="true"] .roll__wave,
+.tline[data-stage="on"] .roll__btn[aria-selected="true"] .roll__meta { color: var(--gold); }
+.tline[data-stage="on"] .roll__item::after {
+  content: ""; position: absolute; left: 0; bottom: -1px;
+  height: 2px; width: 0; background: var(--gold);
+  transition: width 0.55s var(--ease);
+}
+.tline[data-stage="on"] .roll__item.is-open::after { width: 100%; }
+/* A wave you've already opened keeps a quiet tick, so "what's left" is
+   readable at a glance rather than something you have to remember.
+   Absolutely positioned in the gutter, NOT a flex child of .roll__btn: as a
+   child it took width off .roll__word, which narrowed the chapter name enough
+   that the selected state's italic line wrapped and got clipped by the word's
+   own overflow:hidden ("THE" instead of "THE BALLOT"). */
+.tline[data-stage="on"] .roll__item.is-seen::before {
+  content: "✓";
+  position: absolute; left: -22px; top: 50%; transform: translateY(-50%);
+  color: var(--gold); font-size: 0.8rem; line-height: 1;
+}
+.tline[data-stage="on"] .roll__item.is-open::before { content: "▸"; }
+@media (max-width: 860px) { .tline[data-stage="on"] .roll__item::before { display: none; } }
+
+/* the roll animation swaps two copies of the chapter name inside a clipped
+   box; neither copy may wrap, or the second line is cut off mid-word */
+.tline .roll__word .face, .tline .roll__word .alt { white-space: nowrap; }
+
+/* The hero stops being a 235vh scroll-grow — with one chapter on a stage
+   there is nothing to grow through — and becomes the chapter's opening card.
+   Same geometry the accessible mode already used, a little larger, since on
+   the stage this is the wave's headline moment rather than a fallback. */
+.tline[data-stage="on"] .hero-wrap { height: auto; }
+.tline[data-stage="on"] .hero-pin { position: static; height: auto; padding: 2vh 0 0; }
+.tline[data-stage="on"] .hero-art {
+  width: min(88vw, 900px); height: auto; aspect-ratio: 16 / 9;
+  margin: 0 auto;
+  transform: none !important;
+  border-radius: var(--r-lg) !important;
+}
+.tline[data-stage="on"] .hero-title {
+  position: static; max-width: none; text-align: center; margin-top: 22px;
+  opacity: 1 !important; transform: none !important;
+  color: var(--ink); text-shadow: none;
+}
+.tline[data-stage="on"] .hero-title .tag { color: var(--ink-dim); }
+/* the side rails read off a full-bleed frame; on a centred card they'd sit on
+   top of the art. The wave number and years live in the tab and the progress
+   line instead. */
+.tline[data-stage="on"] .hero-side { display: none; }
+.tline[data-stage="on"] .events { padding-top: 8vh; }
+.tline[data-stage="on"] .check { padding-bottom: 7vh; }
+
+/* the swap itself: the chapter arrives rather than blinking into place */
+.tline[data-stage="on"] .chapter.is-active { animation: tlSwapIn 0.5s var(--ease) both; }
+@keyframes tlSwapIn {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ---------- stage footer: move between waves, and see how far in you are ---------- */
+.tlnav {
+  position: relative; z-index: 4;
+  max-width: 1060px; margin: 0 auto;
+  padding: 0 var(--gutter) clamp(60px, 9vh, 110px);
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 18px; flex-wrap: wrap;
+}
+.tlnav__btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  min-height: 44px; padding: 12px 20px;
+  font-family: var(--mono); font-weight: 700; font-size: 0.72rem;
+  text-transform: uppercase; letter-spacing: 0.16em;
+  color: var(--ink); background: transparent;
+  border: 1px solid var(--line); border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: color 0.3s var(--ease), border-color 0.3s var(--ease),
+              background 0.3s var(--ease);
+}
+.tlnav__btn:hover:not(:disabled),
+.tlnav__btn:focus-visible:not(:disabled) { color: var(--gold); border-color: var(--gold); }
+.tlnav__btn:disabled { opacity: 0.35; cursor: default; }
+.tlnav__btn--next { border-color: var(--gold); }
+.tlnav__prog {
+  font-family: var(--mono); font-weight: 700; font-size: 0.7rem;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-dim); text-align: center; flex: 1 1 auto;
+}
+
+/* the finish line: an ending, which is the one thing a long scroll never gave */
+.finale__done {
+  margin-top: 22px; font-family: var(--mono); font-weight: 700;
+  font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0; transform: translateY(8px);
+  transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+}
+.finale.is-complete .finale__done { opacity: 1; transform: none; }
+
+@media (max-width: 720px) {
+  .tlnav { justify-content: center; }
+  .tlnav__prog { order: -1; flex-basis: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tline[data-stage="on"] .chapter.is-active { animation: none; }
+  .finale__done { transition: none; }
+}
+html[data-a11y] .tline[data-stage="on"] .chapter.is-active { animation: none !important; }
 
 /* =====================================================
    Receipts (receipts.html) — the quiet page.

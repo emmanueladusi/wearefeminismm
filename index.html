@@ -26,7 +26,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=218" />
+  <link rel="stylesheet" href="css/styles.css?v=221" />
   <script>(function(){var d=document.documentElement;d.classList.add("js");setTimeout(function(){if(!d.classList.contains("reveal-ready"))d.classList.remove("js");},2500);})();</script>
 </head>
 <body>
@@ -121,7 +121,15 @@
        word-cycle runs (weare → iam → youare + gold sweep), then the caption
        and the two ways in fade up. data-hero (js/heroReveal.js) starts the
        full sequence once the preloader lifts and briefly holds scroll for it. -->
-  <section class="brandmark brandmark--hero" id="brandmark" data-hero data-bg="#faf6ef">
+  <!-- brandmark--axis  the lede hangs off the wordmark's LEFT edge instead of
+                        sitting on the centre line, like every other section.
+       data-hero-rig    the construction rig does not fully dissolve: the
+                        blueprint becomes a drafting sheet across the whole
+                        hero, with metric rules on the wordmark's real
+                        baseline, x-height and ascender, and a sparse residue
+                        of anchor nodes on the curves. Both stand down below
+                        860px, where the scale stops carrying them. -->
+  <section class="brandmark brandmark--hero brandmark--axis" id="brandmark" data-hero data-hero-rig data-bg="#faf6ef">
     <h1 class="brandmark__word" id="brandmarkWord" aria-label="wearefeminismm"></h1>
     <div class="brandmark__lede">
       <p class="brandmark__cap"><span>A space for students, especially girls and Black girls, to learn about feminism, share real experiences, and stand behind each other. Anonymous, always.</span></p>
@@ -256,8 +264,8 @@
   <script src="js/journey.js?v=80"></script>
   <script src="js/pin.js?v=78"></script>
   <script src="js/brandmarkData.js?v=80"></script>
-  <script src="js/heroReveal.js?v=112"></script>
-  <script src="js/brandmarkCycle.js?v=109"></script>
+  <script src="js/heroReveal.js?v=114"></script>
+  <script src="js/brandmarkCycle.js?v=903"></script>
   <script src="js/signature.js?v=1"></script>
   <script src="js/polish.js?v=82"></script>
   <script src="js/main.js?v=88"></script>
