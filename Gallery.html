@@ -487,13 +487,39 @@ img{max-width:100%;display:block}
 }
 .gtex{position:absolute;inset:0;z-index:5;pointer-events:none;overflow:hidden;
   transition:opacity .5s ease}
-/* parallax offsets, written by the cursor loop. They live on #gallery so
-   the texture layers AND the lobby architecture read the same numbers. */
 /* One smoothed pointer vector, written once per frame by the single
    animation loop. Every layer below derives its own magnitude from it,
    which is what produces real depth instead of one flat sheet sliding.
-   Nothing else writes these, and no CSS transition touches them. */
-#gallery{--mx:0; --my:0; --gp-x:0px; --gp-y:0px}
+   Nothing else writes these, and no CSS transition touches them.
+
+   ---- REGISTERED, AND DELIBERATELY NOT INHERITED --------------------
+   These used to live on #gallery and be inherited down. That is the
+   single most expensive thing this file did. A plain custom property is
+   inherited, so writing one on an ancestor forces Chrome to recompute
+   the COMPUTED STYLE of the entire subtree — and the subtree here is the
+   texture stack and the lobby, whose backgrounds are stacks of five and
+   six radial-gradients built out of nested calc()/var() chains. Every
+   one of those had to be re-resolved on every frame the pointer moved,
+   to arrive at exactly the value it already had.
+
+   Measured (headless, 6x CPU throttle, 1440x900, median of 3): style
+   recalculation was 737ms in the look phase and 722ms in travel. With
+   the writes removed entirely as a bisect it was 153ms and 307ms — so
+   roughly a second of main-thread CPU, 22% of everything the page spent,
+   went on re-resolving gradients that never changed.
+
+   Registering them with inherits:false makes them independent custom
+   properties: a write invalidates only the element written to, and only
+   its transform. They are therefore written on the seven elements that
+   actually READ them (see setWallVar) rather than on three ancestors.
+   Same numbers, same transforms, same pixels.
+
+   Graceful on an engine without @property: the properties stay plain
+   inherited ones, and since every write now lands on the consumer
+   itself, the transforms still resolve correctly — just without the
+   invalidation saving. */
+@property --mx{syntax:'<number>';inherits:false;initial-value:0}
+@property --my{syntax:'<number>';inherits:false;initial-value:0}
 .gtex > *{position:absolute;inset:-3%}
 /* was -8%: max parallax travel on these layers is ~12-14px, so an 8%
    margin (~120px on a 1500px layer) was over 6x the actual travel
@@ -573,7 +599,16 @@ img{max-width:100%;display:block}
 .glines{position:absolute;inset:-3%;pointer-events:none;overflow:visible;
   /* was -10%: --gl-par tops out at 26px (near layer), well under a 3% margin. */
   transition:opacity .8s ease}
-.glines svg{width:100%;height:100%;display:block;overflow:visible}
+/* overflow:hidden, not visible. The paths deliberately run off every edge
+   (they start at viewBox x=-260 and end at x=1900 on a 0..1600 box), and
+   with overflow:visible the compositor sized the layer to the painted
+   bounds instead of the element: 2082x965 and 2044x866 against a 1440x813
+   room, i.e. ~1.4 MPx of tile memory holding line ends that are drawn
+   outside .glines — which is itself already inset -3%, so every one of
+   those pixels is off screen. preserveAspectRatio="slice" guarantees the
+   viewBox covers the element, so clipping to the element can only remove
+   content that was outside it. Pixel-identical, two smaller layers. */
+.glines svg{width:100%;height:100%;display:block;overflow:hidden}
 .glines path{fill:none;stroke-linecap:round;stroke-linejoin:round;
   vector-effect:non-scaling-stroke;
   transition:stroke .9s ease, opacity .9s ease, stroke-width .9s ease}
@@ -732,8 +767,14 @@ body.touchmode .glines--near{display:none}
 
 /* Floor · a slightly darker plaster band with light bouncing back up, so
    the room has a bottom and the pieces read as floating above something. */
+/* No transform. --gp-x/--gp-y were declared 0px on #gallery and never
+   written by anything, so this resolved to translate3d(0,0,0) on every
+   frame the room has ever drawn — an identity transform whose only effect
+   was to promote a 1672x278 strip to its own compositing layer and hold
+   tile memory for it. Removing it is pixel-identical and hands the tiles
+   back, which matters because tile memory is the budget this gallery
+   actually runs out of. */
 .gtex__floor{inset:auto -8% -8% -8%;height:34%;
-  transform:translate3d(calc(var(--gp-x) * .2),calc(var(--gp-y) * .2),0);
   background:
     linear-gradient(180deg, transparent, var(--wall-deep)),
     radial-gradient(60% 100% at 50% 100%, rgba(217,161,63,.05), transparent 70%)}
@@ -821,7 +862,13 @@ body.touchmode .gtex{--grain-opacity:.035;--gallery-fibre-opacity:0;
 }
 body.touchmode .gtex__fibre{display:none}
 body.touchmode .gtex > *{transform:none !important}
-body.touchmode #gallery{--mx:0 !important;--my:0 !important}
+/* --mx/--my are registered inherits:false now, so pinning them on
+   #gallery would no longer reach anything. Pinned on the consumers
+   instead — the same seven elements surfaceParallax() writes to. */
+body.touchmode .gtex__fibre,body.touchmode .gtex__light,
+body.touchmode .gtex__arch,body.touchmode .glines__pan,
+body.touchmode .lobby__wall,body.touchmode .lobby__floor{
+  --mx:0 !important;--my:0 !important}
 
 /* ---- PROTOTYPE ONLY · art-direction switcher ---- */
 
@@ -2081,6 +2128,75 @@ noscript .flat__note{display:block}
    nobody touching the page; on the weakest machines the composition stays,
    the drift stops */
 :root[data-q="low"] .glines__pan{animation:none}
+
+/* =====================================================================
+   POWER SAVER · the same room, quieter.
+
+   Everything above this line is the design as authored and is never
+   changed by anything the device reports. This block is the one place
+   the gallery is allowed to look different, it is opt-in or offered, and
+   it is announced in the HUD while it is on.
+
+   The rule it follows: take away ATMOSPHERE, never CONTENT. The hang,
+   the perspective, the artwork, the palette, the typography and the
+   linework composition are all untouched. What goes is the woven fibre,
+   the film burn, the near linework, the pointer parallax and the lens
+   pane — five full-viewport composited layers, three of which exist only
+   to be felt rather than seen, plus a mix-blend-mode:multiply that an
+   integrated GPU pays for in bandwidth on every single frame.
+
+   Why these five and not, say, the shadows: on a shared-memory GPU the
+   binding constraint is tile memory and fill rate, and a full-viewport
+   layer costs both whether or not anything in it changed. Halving a blur
+   radius saves a raster that happens rarely; removing a layer saves
+   memory that is held continuously.
+   ===================================================================== */
+body.powersave .gtex__fibre{display:none}
+body.powersave .glines--near{display:none}
+body.powersave .lobby__burn{display:none}   /* also drops a multiply blend */
+body.powersave .lensframe{display:none}
+body.powersave .glines__pan{animation:none}
+/* the wall is still lit and still has depth; it just stops sliding */
+body.powersave .gtex__light,body.powersave .gtex__arch,
+body.powersave .glines__pan,body.powersave .lobby__wall,
+body.powersave .lobby__floor{--mx:0 !important;--my:0 !important}
+/* the collage stays, printed a little fainter so it reads as one wall
+   rather than as a photograph with nothing laid over it */
+body.powersave .lobby__photo{opacity:calc(var(--wall-photo-o,0) * .78)}
+/* the cursor badge is a fixed element that transitions four properties on
+   every hover target; the native cursor does the same job for free */
+body.powersave .vcur{display:none}
+body.powersave .reel,body.powersave .roomnav{cursor:auto}
+
+/* the toggle, and the notice that it is on */
+.hudbtn--power[aria-pressed="true"]{color:var(--gallery-gold)}
+.hudbtn--power[aria-pressed="true"]::after{opacity:.9;background:var(--gallery-gold)}
+
+/* =====================================================================
+   THE DIAGNOSTIC READOUT · press D in the gallery, or the HUD button.
+   Deliberately plain and self-contained: it is meant to be screenshotted
+   or copied and sent, not admired.
+   ===================================================================== */
+.perfpanel{position:fixed;right:14px;bottom:14px;z-index:120;width:min(370px,92vw);
+  max-height:min(78vh,720px);overflow:auto;display:none;
+  background:#14111c;color:#efe9df;border:1px solid rgba(239,233,223,.22);
+  border-radius:12px;padding:14px 16px 12px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;
+  line-height:1.5;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+body.perfopen .perfpanel{display:block}
+.perfpanel h3{font:inherit;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;margin:0 0 8px;color:#d8a833}
+.perfpanel table{width:100%;border-collapse:collapse}
+.perfpanel td{padding:1px 0;vertical-align:top}
+.perfpanel td:last-child{text-align:right;color:#fff}
+.perfpanel .bad{color:#ff8f7a}
+.perfpanel .ok{color:#8fd6a4}
+.perfpanel hr{border:0;border-top:1px solid rgba(239,233,223,.16);margin:9px 0}
+.perfpanel__row{display:flex;gap:8px;margin-top:11px}
+.perfpanel__row button{flex:1;border:1px solid rgba(239,233,223,.3);border-radius:7px;
+  padding:7px 8px;color:#efe9df;font:inherit;cursor:pointer}
+.perfpanel__row button:hover{border-color:#d8a833;color:#d8a833}
+.perfpanel__hint{margin-top:9px;color:rgba(239,233,223,.6)}
 </style>
 </head>
 <body>
@@ -2148,7 +2264,9 @@ noscript .flat__note{display:block}
         </ul>
         <p class="wall__how-calm">Prefer less motion? The
           <button type="button" id="calmBtn2">calm version</button> holds every word as a
-          plain page, and you can switch at any moment.</p>
+          plain page, and you can switch at any moment. On a slower machine the gallery
+          opens in <button type="button" id="powerBtn2">power saver</button>, a quieter
+          room that runs lighter — that is a switch in the bar at the top, either way.</p>
       </div>
     </nav>
   </div>
@@ -2229,12 +2347,18 @@ noscript .flat__note{display:block}
     </div>
     <div class="hud__btns">
       <button class="hudbtn" id="dirBtn">Collection</button>
+      <button class="hudbtn hudbtn--power" id="powerBtn" aria-pressed="false">Power saver</button>
       <button class="hudbtn" id="calmBtn3">Calm view</button>
       <button class="hudbtn hudbtn--exit" id="exitBtn">Exit gallery</button>
     </div>
   </header>
 
   <p class="hint" id="hint">scroll to walk · move your cursor to look · click a piece to inspect · esc to exit</p>
+
+  <!-- The diagnostic readout. Not dev-only instrumentation: this is the
+       one thing that can answer "is it smooth on YOUR machine", which no
+       amount of measuring on mine can. Press D, or the HUD button. -->
+  <aside class="perfpanel" id="perfPanel" aria-live="polite" aria-label="Performance diagnostics"></aside>
 
   <!-- focused piece -->
   <div class="detail" id="detail" role="dialog" aria-modal="true" aria-label="Art piece detail">
@@ -2456,6 +2580,43 @@ S.tablet = !S.touch && matchMedia('(max-width:1180px)').matches;
 const SP = 780;                       // corridor spacing (px of depth per piece)
 const STEP = {corridor:SP, orbit:1, field:1, feed:1};   // camera units per piece
 const $ = s => document.querySelector(s);
+
+/* =====================================================================
+   POWER SAVER'S TEXTURE SET
+   The same pictures, encoded at the size they are actually displayed at.
+   The entrance board shows a print at 244-456px and a sticker at ~130px,
+   and the originals ship at 1100-1200px -- so each one decodes to 3-4 MB
+   of resident bitmap to be drawn into a fifth of that. Resident decoded
+   bytes go from 32.9 MB to 10.4 MB and the first load from 1.89 MB to
+   0.66 MB over the wire, which on eMMC storage and a GPU sharing 4GB
+   with the CPU is the largest single thing power saver does.
+
+   Full quality never calls through: with the class off this returns
+   exactly the URL it was handed, so the default view still loads and
+   draws the originals.
+
+   The set is explicit rather than pattern-matched so that adding an
+   image without a derivative cannot silently 404 the room. ===== */
+const SMALL_SET = new Set([
+  'img/board/third-world-womens-alliance.jpg','img/board/womens-liberation.jpg',
+  'img/board/feminism-poster.jpg','img/board/profiles.jpg',
+  'img/stickers/fist-roundel.png','img/stickers/never-apologize.png',
+  'img/waves/wave-01.jpg','img/waves/wave-02.jpg','img/waves/wave-03.jpg',
+  'img/waves/wave-04.jpg','img/card-faces.jpg','img/scholars/njoki-wane.jpg'
+]);
+function IMG(u){
+  if (!u || !SMALL_SET.has(u)) return u;
+  if (!document.body.classList.contains('powersave')) return u;
+  /* prefers-reduced-motion is a request about MOTION, not about a slow
+     machine — it is routinely set on fast hardware for vestibular
+     reasons. Such a visitor gets everything else power saver does (the
+     room stops moving, which is exactly what they asked for) but keeps
+     the full-resolution prints, because softening their pictures answers
+     a question they did not ask. */
+  if (!POWER.lowTextures) return u;
+  return u.replace(/\.(jpg|jpeg|png)$/i, '.sm.$1');
+}
+
 const el = (tag, cls, html) => { const n=document.createElement(tag); if(cls)n.className=cls; if(html!=null)n.innerHTML=html; return n; };
 if (S.touch) document.body.classList.add('touchmode');
 
@@ -2494,9 +2655,9 @@ function piecesInChapter(c){
 /* The cover a chapter hangs by. Every one of these already exists in the
    project; nothing new is downloaded. */
 function chapterCover(c){
-  if (c.wave) return c.wave.img;
-  if (c.type==='lenses')   return 'img/card-faces.jpg';
-  if (c.type==='scholars') return 'img/scholars/njoki-wane.jpg';
+  if (c.wave) return IMG(c.wave.img);
+  if (c.type==='lenses')   return IMG('img/card-faces.jpg');
+  if (c.type==='scholars') return IMG('img/scholars/njoki-wane.jpg');
   return null;
 }
 /* How each work is hung: how much width it takes in the strip, and how tall
@@ -2628,7 +2789,7 @@ function buildDirLists(){
     li.style.setProperty('--cw', d.w);
     li.style.setProperty('--cr', d.r);
     li.style.setProperty('--cz', d.z);
-    const img = '<img src="'+d.src+'" alt="" loading="lazy" decoding="async">';
+    const img = '<img src="'+IMG(d.src)+'" alt="" loading="lazy" decoding="async">';
     if (d.t === 'sticker'){ li.classList.add('is-sticker'); li.innerHTML = img; }
     else {
       li.style.setProperty('--cb', d.b);
@@ -2694,7 +2855,7 @@ function buildFlat(){
   SCHOLARS.items.forEach(p=>{
     const c = el('article','flatcard');
     const row = el('div','flatscholar');
-    const img = el('img'); img.src=p.img; img.alt=p.name; img.loading='lazy'; img.style.objectPosition=p.pos;
+    const img = el('img'); img.src=IMG(p.img); img.alt=p.name; img.loading='lazy'; img.style.objectPosition=p.pos;
     const t = el('div');
     t.append(el('h3',null,p.name), el('p',null,p.role),
       el('p','flatscholar__niche',p.niche),
@@ -2731,6 +2892,7 @@ function openGallery(chapterId){
   }
   S.lastFocus = document.activeElement;
   if (!S.open){
+    ensureTextures();       // idle callback may not have run yet; see boot
     g.classList.add('open'); S.open=true;
     document.documentElement.style.overflow='hidden';
     startBG();
@@ -3236,11 +3398,11 @@ function buildDirectoryRoom(world){
    and left alone. */
 function coverArtFallback(it){
   if (it.type==='col' && it.kind==='lenses')   return null;   // typographic, no photo
-  if (it.type==='col' && it.kind==='waves')    return {url:WAVES[1].img, pos:'center'};
-  if (it.type==='col' && it.kind==='scholars') return {url:SCHOLARS.items[0].img, pos:'center'};
-  if (it.type==='wavework') return {url:it.wave.img, pos:'center'};
+  if (it.type==='col' && it.kind==='waves')    return {url:IMG(WAVES[1].img), pos:'center'};
+  if (it.type==='col' && it.kind==='scholars') return {url:IMG(SCHOLARS.items[0].img), pos:'center'};
+  if (it.type==='wavework') return {url:IMG(it.wave.img), pos:'center'};
   if (it.type==='lenswork') return null;                      // typographic, no photo
-  return {url:it.sc.img, pos:it.sc.pos};                       // an individual scholar
+  return {url:IMG(it.sc.img), pos:it.sc.pos};                       // an individual scholar
 }
 function coverArt(it){
   if (it.type==='col' && it.kind==='lenses'){
@@ -3255,18 +3417,18 @@ function coverArt(it){
   if (it.type==='col' && it.kind==='waves'){
     /* one photograph stands for the collection; four thin marks imply the
        chapters. Deliberately not four posters at once. */
-    return '<span class="cover__img" style="background-image:url(\''+WAVES[1].img+'\')"></span>'+
+    return '<span class="cover__img" style="background-image:url(\''+IMG(WAVES[1].img)+'\')"></span>'+
 '';
   }
   if (it.type==='col' && it.kind==='scholars'){
     return '<span class="cover__img" style="background:linear-gradient(168deg,'+
       'var(--v-art-a),var(--v-art-b))"></span>'+
       '<span class="contact" aria-hidden="true">'+
-      SCHOLARS.items.map(sc=>'<i style="background-image:url(\''+sc.img+'\');--p:'+sc.pos+'"></i>').join('')+
+      SCHOLARS.items.map(sc=>'<i style="background-image:url(\''+IMG(sc.img)+'\');--p:'+sc.pos+'"></i>').join('')+
       '</span>';
   }
   if (it.type==='wavework')
-    return '<span class="cover__img" style="background-image:url(\''+it.wave.img+'\')"></span>';
+    return '<span class="cover__img" style="background-image:url(\''+IMG(it.wave.img)+'\')"></span>';
   if (it.type==='lenswork'){
     /* each lens is its own typographic work, not one panel with the
        paragraph swapped out */
@@ -3277,7 +3439,7 @@ function coverArt(it){
         '<span class="lenswork__d">'+it.lens.def+'</span>'+
       '</span>';
   }
-  return '<span class="cover__img" style="background-image:url(\''+it.sc.img+'\');'+
+  return '<span class="cover__img" style="background-image:url(\''+IMG(it.sc.img)+'\');'+
          'background-position:'+it.sc.pos+'"></span>';
 }
 /* The small printed card beside a work. Every piece in the room carries
@@ -3445,9 +3607,22 @@ function pickQuality(){
   if (cores <= 6 || mem <= 6)           return 'med';
   return 'high';
 }
+/* The gallery is folded into learn.html by build_learn.py, which rewrites
+   every `:root` selector to the wrapper `#wfgallery` so the gallery's
+   tokens stop restyling the rest of the page. That is correct, but it
+   means the quality rules below ship as `#wfgallery[data-q="low"]` while
+   this function was stamping data-q on <html> — so on the LIVE page the
+   entire quality-tier system has never applied to anything. It works
+   only in the standalone prototype, which is the one place it is not
+   needed. Stamped on both now: <html> for the standalone file, the
+   wrapper for the built page. */
+function qualityRoots(){
+  const w = document.getElementById('wfgallery');
+  return w ? [document.documentElement, w] : [document.documentElement];
+}
 function applyQuality(q){
   S.quality = q;
-  document.documentElement.setAttribute('data-q', q);
+  qualityRoots().forEach(n => n.setAttribute('data-q', q));
 }
 function applyTier(t){
   S.tier = t;
@@ -3460,7 +3635,13 @@ function applyTier(t){
      screen: at dpr 2 a 1440x900 window is 5.2 million pixels per draw */
   /* the shader is the one full-screen thing whose cost is purely
      resolution, so quality sets it directly */
-  const qd = {high:1.5, med:1, low:.75}[S.quality || 'high'];
+  /* One place decides the shader's resolution, so power saver and the
+     motion tier cannot disagree about it. Power saver wins when on: the
+     wall is a smooth gradient plus a little noise, so a half-scale draw
+     upsampled by the compositor is not a visible change, and it is the
+     one full-screen cost here that is purely a pixel count. */
+  const qd = document.body.classList.contains('powersave')
+    ? .6 : {high:1.5, med:1, low:.75}[S.quality || 'high'];
   S.glDpr = t==='full' ? Math.min(devicePixelRatio||1, qd) : Math.min(1, qd);
   if (typeof sizeBG==='function'){ S.glW = 0; sizeBG(); }
   GALLERY.wallDirty = true;
@@ -3866,20 +4047,38 @@ function setVar(node, name, value){
    .lobby. Not one of them is inside .reel. So the variables are written
    on those three roots instead, and the covers are never touched.
 
-   #gtex and #glinesNear are built once and live for the session. The
-   lobby is rebuilt with every room, and caching it by any proxy (a
-   chapter id, an isConnected check) got this wrong: setChapter calls
-   aimSpotlight BEFORE it builds the room, so the cache was refilled for
-   the new chapter while the new lobby did not exist yet, and the lobby
-   then sat at its CSS fallbacks with no parallax and no light. So the
-   lobby is re-queried on every call and compared by identity. One
-   querySelector per write is nothing next to being silently wrong. */
+   ---- AND THEN ONE LEVEL FURTHER -------------------------------------
+   Writing on the three ROOTS was still the most expensive thing in the
+   file, for the same reason one level up was: a plain custom property is
+   inherited, so a write on #gtex re-resolves the computed style of all
+   eight texture layers, and a write on .lobby re-resolves five lobby
+   layers plus their four pseudo-elements — every one of which carries a
+   background built from four to six radial-gradients over nested
+   calc()/var() chains. That is a full gradient re-resolve per layer per
+   frame, to land on the value it already had.
+
+   --mx/--my are now registered inherits:false (see the @property block in
+   the stylesheet), so they are written on the elements that actually read
+   them. Seven elements, each invalidating only itself and only its
+   transform. There is no ancestor in the path any more.
+
+   The list is queried rather than hard-coded per room because .lobby is
+   rebuilt with every room, and caching it by any proxy (a chapter id, an
+   isConnected check) got this wrong before: setChapter calls aimSpotlight
+   BEFORE it builds the room, so the cache was refilled for the new
+   chapter while the new lobby did not exist yet, and the lobby then sat
+   at its CSS fallbacks with no parallax and no light. So the lobby is
+   re-queried on every call and compared by identity. One querySelector
+   per write is nothing next to being silently wrong. */
+const WALL_PARALLAX_SEL =
+  '.gtex__fibre,.gtex__light,.gtex__arch,.glines__pan,.lobby__wall,.lobby__floor';
 let _wallRoots = null, _wallLobby = null;
 function wallRoots(){
   const lobby = $('.lobby');
   if (!_wallRoots || lobby !== _wallLobby){
     _wallLobby = lobby;
-    _wallRoots = [$('#gtex'), $('#glinesNear'), lobby].filter(Boolean);
+    const g = $('#gallery');
+    _wallRoots = g ? [...g.querySelectorAll(WALL_PARALLAX_SEL)] : [];
   }
   return _wallRoots;
 }
@@ -4566,7 +4765,7 @@ function lensViz(kind){
 function detailScholar(sc){
   openDetail('<span class="detail__year">Scholars we learn from</span>'+
     '<h3 class="detail__title">'+sc.name+'</h3>'+
-    '<div class="detail__img" style="max-height:320px"><img src="'+sc.img+'" alt="'+sc.name+'" style="object-position:'+sc.pos+'"/></div>'+
+    '<div class="detail__img" style="max-height:320px"><img src="'+IMG(sc.img)+'" alt="'+sc.name+'" style="object-position:'+sc.pos+'"/></div>'+
     '<p class="detail__role">'+sc.role+'</p>'+
     '<p class="detail__niche">'+sc.niche+'</p>'+
     '<a class="detail__ext" href="'+sc.href+'" target="_blank" rel="noopener">View their page ↗<span class="visually-hidden"> (opens in a new tab)</span></a>');
@@ -4601,14 +4800,14 @@ function buildWaveRoom(world, chapter){
   hero.setAttribute('role','button'); hero.tabIndex=0;
   hero.dataset.pid=w.id+'hero';
   hero.setAttribute('aria-label','Wave '+w.num+', '+w.title+'. Open the introduction.');
-  hero.innerHTML='<div class="frame"><div class="piece__img"><img src="'+w.img+'" alt="" loading="lazy"/></div>'+
+  hero.innerHTML='<div class="frame"><div class="piece__img"><img src="'+IMG(w.img)+'" alt="" loading="lazy"/></div>'+
     '<span class="piece__year">WAVE '+w.num+' · '+w.range+'</span>'+
     '<h3 class="piece__title">'+w.title+'</h3>'+
     '<p class="piece__blurb">'+w.tag+'</p>'+
     '<p class="piece__hint">open the piece</p></div>';
   wireOpen(hero, ()=>{ openDetail('<span class="detail__year">WAVE '+w.num+' · '+w.range+'</span>'+
       '<h3 class="detail__title">'+w.title+'</h3>'+
-      '<div class="detail__img"><img src="'+w.img+'" alt=""/></div>'+
+      '<div class="detail__img"><img src="'+IMG(w.img)+'" alt=""/></div>'+
       '<p class="detail__blurb"><em>'+w.tag+'</em></p>');
     markViewed(w.id, w.id+'hero'); });
   items.push({elm:hero,id:w.id+'hero'});
@@ -4795,7 +4994,7 @@ function buildScholarRoom(world){
     p.style.setProperty('--py', (row? 198:-103)+'px');
     p.style.setProperty('--pz', (col===1? -40 : -150)+'px');
     p.style.setProperty('--pry', ((1-col)*6)+'deg');
-    p.innerHTML='<div class="frame"><div class="scholar__photo"><img src="'+sc.img+'" alt="'+sc.name+'" loading="lazy" style="object-position:'+sc.pos+'"/></div>'+
+    p.innerHTML='<div class="frame"><div class="scholar__photo"><img src="'+IMG(sc.img)+'" alt="'+sc.name+'" loading="lazy" style="object-position:'+sc.pos+'"/></div>'+
       '<h3 class="scholar__name">'+sc.name+'</h3><p class="scholar__role">'+sc.role+'</p>'+
       '<p class="piece__hint">open the portrait</p></div>';
     wireOpen(p, ()=>detailScholar(sc));
@@ -4935,6 +5134,12 @@ function loop(now){
      cannot teleport the room. */
   let _dt = _lastFrameT ? (_t - _lastFrameT) : 16.667;
   if (!(_dt > 0)) _dt = 16.667;
+  /* The recorder rides frames that were happening anyway — see PERF. It
+     is fed here rather than from its own rAF precisely so that measuring
+     costs nothing and cannot keep the loop awake. GALLERY.resumed has
+     already reset _lastFrameT above on a wake-up frame, so the sleep gap
+     is never recorded as a slow frame. */
+  if (_lastFrameT){ PERF.add(_dt); POWER.sample(_dt); }
   EASE_F = Math.min(50, _dt) / 16.667;
   _lastFrameT = _t;
   if (!S.open){ S.raf=null; return; }          // closed: no frames at all
@@ -5129,6 +5334,10 @@ addEventListener('keydown',e=>{
   if(e.key==='g'||e.key==='G'){                    // quick hop to the directory
     if(!e.metaKey&&!e.ctrlKey&&!/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)){
       e.preventDefault(); setChapter('directory'); return; }
+  }
+  if(e.key==='d'||e.key==='D'){                    // the diagnostic readout
+    if(!e.metaKey&&!e.ctrlKey&&!/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)){
+      e.preventDefault(); togglePerfPanel(); return; }
   }
   if(S.touch||!isWave(S.chapter))return;
   if($('#detail').classList.contains('open'))return;
@@ -5515,9 +5724,307 @@ $('#exitBtn').addEventListener('click',exitGallery);
 // One backward action, one level at a time. Exit is a separate control.
 $('#dirBtn').addEventListener('click',navBack);
 
+/* =====================================================================
+   THE FRAME RECORDER
+
+   Deliberately parasitic: it records the frames the camera loop was
+   already going to run, from the dt that loop already computes, and it
+   never asks for a frame of its own. That matters — the loop sleeps when
+   the room is still, and a recorder that kept rAF alive to watch it would
+   be a permanent cost added by the thing measuring the cost.
+
+   Frames are bucketed by which mode was active when they were drawn, so
+   one dump can carry a before AND an after if the visitor toggles power
+   saver while looking around. That is what makes a single round trip
+   enough.
+
+   Wake-up frames are dropped. The gap between the loop going to sleep
+   and an input waking it is not a slow frame, and counting it as one
+   would report a hundreds-of-milliseconds stall every time somebody
+   paused. GALLERY.resumed already marks exactly that frame.
+   ===================================================================== */
+const PERF = {
+  cap: 4000,
+  runs: {full:[], power:[]},
+  worstFrame: 0, longTasks: 0, started: performance.now(),
+  add(dt){
+    if (!(dt > 0) || dt > 2000) return;
+    const a = this.runs[document.body.classList.contains('powersave') ? 'power' : 'full'];
+    if (a.length < this.cap) a.push(dt);
+    if (dt > this.worstFrame) this.worstFrame = dt;
+  },
+  stats(a){
+    if (!a.length) return null;
+    const s = [...a].sort((x,y)=>x-y);
+    const at = p => s[Math.min(s.length-1, Math.floor(s.length*p))];
+    /* the worst 1%, averaged. A single max is one GC pause and tells you
+       nothing; the mean of the worst 1% is what actually reads as a hitch */
+    const tail = s.slice(Math.floor(s.length*.99));
+    const mean = v => v.reduce((p,q)=>p+q,0)/v.length;
+    return {
+      frames:s.length,
+      median:+at(.5).toFixed(1), p95:+at(.95).toFixed(1),
+      worst1pct:+mean(tail.length?tail:[s[s.length-1]]).toFixed(1),
+      max:+s[s.length-1].toFixed(1),
+      over32:s.filter(v=>v>32).length, over50:s.filter(v=>v>50).length,
+      pctOver32:+(100*s.filter(v=>v>32).length/s.length).toFixed(1)
+    };
+  },
+  /* decoded bitmap bytes actually resident: this is the number that hurts
+     a machine sharing 4GB between the CPU and the GPU, and it is nowhere
+     near the number of bytes downloaded */
+  images(){
+    let n=0, bytes=0, top=[];
+    for (const im of document.images){
+      if (!im.complete || !im.naturalWidth) continue;
+      const b = im.naturalWidth*im.naturalHeight*4;
+      n++; bytes+=b;
+      top.push({src:(im.currentSrc||im.src).split('/').pop(),
+                px:im.naturalWidth+'x'+im.naturalHeight,
+                shown:Math.round(im.getBoundingClientRect().width)+'px',
+                mb:+(b/1e6).toFixed(2)});
+    }
+    top.sort((a,b)=>b.mb-a.mb);
+    return {count:n, mb:+(bytes/1e6).toFixed(1), largest:top.slice(0,6)};
+  },
+  dump(){
+    const nav = navigator;
+    return {
+      v:'wf-gallery-perf/1',
+      when:new Date().toISOString(),
+      device:{
+        cores:nav.hardwareConcurrency||null,
+        memoryGB:nav.deviceMemory||null,      // caps at 8, see POWER.detect
+        dpr:+(devicePixelRatio||1).toFixed(2),
+        window:innerWidth+'x'+innerHeight,
+        chromeOS:/CrOS/.test(nav.userAgent),
+        touch:matchMedia('(pointer:coarse)').matches,
+        reducedMotion:matchMedia('(prefers-reduced-motion: reduce)').matches,
+        ua:nav.userAgent.slice(0,120)
+      },
+      mode:{
+        powerSaver:document.body.classList.contains('powersave'),
+        source:POWER.source, tier:S.tier, quality:S.quality,
+        shaderScale:S.glDpr, webgl:!!GL,
+        probe:POWER.probeResult
+      },
+      frames:{full:this.stats(this.runs.full), power:this.stats(this.runs.power)},
+      images:this.images(),
+      uptimeS:+((performance.now()-this.started)/1000).toFixed(1)
+    };
+  }
+};
+
+/* =====================================================================
+   POWER SAVER
+
+   Three signals, because no one of them is honest on its own:
+
+     cores   navigator.hardwareConcurrency. The best STATIC separator we
+             get: a Celeron/MediaTek Chromebook reports 2-4, a current
+             laptop 8+. <=4 is treated as weak.
+     memory  navigator.deviceMemory. Deliberately NOT the main signal —
+             the spec caps it at 8, so an 8GB Chromebook and a 32GB
+             workstation both report "8" and it cannot tell them apart.
+             It is only trusted at the bottom, where <=4 is unambiguous.
+     probe   what the machine actually DOES. Measured from real frames
+             during the first seconds inside the room, which is the only
+             signal that reflects the GPU, the thermal state and whatever
+             else the visitor has open. Trips if a quarter of the frames
+             in the sample run past 32ms.
+
+   Any one of cores/memory being weak turns it on at boot, before the
+   entrance board is even built. The probe can turn it on later, and
+   persists that so the NEXT load starts light. Nothing ever turns it off
+   automatically: a mode that oscillates is worse than one that is
+   slightly too conservative.
+
+   An explicit choice always wins and is remembered.
+   ===================================================================== */
+const POWER = {
+  KEY:'wf-gallery-power', source:'default', probeResult:null,
+  /* whether power saver should also drop to the smaller texture set. On
+     for every device-capability reason and for an explicit choice; off
+     when the only reason was prefers-reduced-motion. See IMG(). */
+  lowTextures:true,
+  stored(){ try{ return localStorage.getItem(this.KEY); }catch(e){ return null; } },
+  save(v){ try{ localStorage.setItem(this.KEY, v); }catch(e){} },
+  detect(){
+    /* ?power=1 / ?power=0 is read HERE rather than late in boot, because
+       the decision has to be made before buildDirLists() writes the
+       entrance board's <img> tags -- that is the one thing power saver
+       changes which cannot be restyled after the fact. */
+    const q = new URLSearchParams(location.search).get('power');
+    if (q === '1' || q === '0'){
+      this.source = 'forced by ?power=' + q;
+      this.probeDone = true; this.lowTextures = true;
+      this.save(q === '1' ? 'on' : 'off');
+      return q === '1';
+    }
+    const pick = this.stored();
+    if (pick === 'on' || pick === 'off'){
+      this.source = 'remembered choice';
+      return pick === 'on';
+    }
+    const cores = navigator.hardwareConcurrency || 4;
+    const mem   = navigator.deviceMemory || 4;
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches){
+      this.source = 'prefers-reduced-motion';
+      this.lowTextures = false;         // a motion preference, not a slow machine
+      return true;
+    }
+    if (cores <= 4){ this.source = 'cores<=4 ('+cores+')'; return true; }
+    if (mem <= 4){   this.source = 'deviceMemory<=4 ('+mem+'GB)'; return true; }
+    this.source = 'auto: looks capable ('+cores+' cores, '+mem+'GB)';
+    return false;
+  },
+  apply(on, why){
+    document.body.classList.toggle('powersave', on);
+    if (why) this.source = why;
+    const b = $('#powerBtn');
+    if (b){ b.setAttribute('aria-pressed', on ? 'true':'false');
+            b.textContent = on ? 'Power saver · on' : 'Power saver'; }
+    /* power saver forces the cheapest quality tier and a half-resolution
+       wall. The wall is a smooth gradient with a little noise, so a
+       half-scale draw upsampled is not a visible change — it is the one
+       full-screen cost here that is purely a pixel count. */
+    applyQuality(on ? 'low' : pickQuality());
+    applyTier(S.tier || pickTier());    // owns S.glDpr and re-sizes the canvas
+    GALLERY.wallDirty = true;
+    S.mxLast = S.myLast = null;         // re-publish parallax at the new pin
+    GALLERY.wake('power');
+    if (S.open) renderPerfPanel();
+  },
+  toggle(){
+    const on = !document.body.classList.contains('powersave');
+    this.save(on ? 'on' : 'off');
+    this.probeDone = true;              // an explicit choice ends the probe
+    this.lowTextures = true;            // asked for outright, so give the lot
+    this.apply(on, 'chosen by you');
+    /* Everything else power saver does is CSS and re-reads itself, but the
+       entrance board's <img> sources were written once at boot. Rebuild it
+       so a mid-session choice actually changes which bitmaps are resident;
+       the room's own covers are rebuilt on every room change anyway. */
+    try{ buildDirLists(); }catch(e){}
+  },
+  /* the probe: real frames, once, shortly after the room opens */
+  probeDone:false, _samples:[],
+  sample(dt){
+    if (this.probeDone) return;
+    if (performance.now() - PERF.started < 1200) return;   // ignore warm-up
+    this._samples.push(dt);
+    if (this._samples.length < 90) return;
+    this.probeDone = true;
+    const slow = this._samples.filter(v => v > 32).length;
+    const pct  = slow / this._samples.length;
+    const med  = [...this._samples].sort((a,b)=>a-b)[Math.floor(this._samples.length/2)];
+    this.probeResult = {frames:this._samples.length, pctOver32:+(pct*100).toFixed(1),
+                        median:+med.toFixed(1)};
+    if (pct >= .25 && !document.body.classList.contains('powersave')){
+      this.save('on');                  // next load starts light
+      this.apply(true, 'measured: '+Math.round(pct*100)+'% of frames over 32ms');
+    }
+  }
+};
+
+/* =====================================================================
+   THE READOUT
+   ===================================================================== */
+function fmtStats(s, label){
+  if (!s) return '';
+  const bad = v => v ? ' class="bad"' : ' class="ok"';
+  return '<hr><h3>'+label+'</h3><table>'
+    + '<tr><td>frames sampled</td><td>'+s.frames+'</td></tr>'
+    + '<tr><td>median frame</td><td>'+s.median+' ms</td></tr>'
+    + '<tr><td>95th percentile</td><td>'+s.p95+' ms</td></tr>'
+    + '<tr><td>worst 1% (mean)</td><td'+bad(s.worst1pct>50)+'>'+s.worst1pct+' ms</td></tr>'
+    + '<tr><td>worst single</td><td>'+s.max+' ms</td></tr>'
+    + '<tr><td>hitches &gt;32ms</td><td'+bad(s.pctOver32>10)+'>'+s.over32+' ('+s.pctOver32+'%)</td></tr>'
+    + '<tr><td>hitches &gt;50ms</td><td'+bad(s.over50>0)+'>'+s.over50+'</td></tr>'
+    + '</table>';
+}
+function renderPerfPanel(){
+  const p = $('#perfPanel'); if(!p || !document.body.classList.contains('perfopen')) return;
+  const d = PERF.dump();
+  p.innerHTML =
+    '<h3>Gallery diagnostics</h3><table>'
+    + '<tr><td>power saver</td><td>'+(d.mode.powerSaver?'ON':'off')+'</td></tr>'
+    + '<tr><td>why</td><td>'+POWER.source+'</td></tr>'
+    + '<tr><td>cores / memory</td><td>'+(d.device.cores||'?')+' / '+(d.device.memoryGB||'?')+'GB</td></tr>'
+    + '<tr><td>window / dpr</td><td>'+d.device.window+' @'+d.device.dpr+'</td></tr>'
+    + '<tr><td>wall shader</td><td>'+(d.mode.webgl?('on, '+d.mode.shaderScale+'x'):'off')+'</td></tr>'
+    + '<tr><td>decoded images</td><td>'+d.images.mb+' MB / '+d.images.count+'</td></tr>'
+    + '</table>'
+    + fmtStats(d.frames.full,  'frames · full quality')
+    + fmtStats(d.frames.power, 'frames · power saver')
+    + '<div class="perfpanel__row">'
+    +   '<button type="button" id="perfCopy">Copy diagnostics</button>'
+    +   '<button type="button" id="perfReset">Reset counters</button>'
+    + '</div>'
+    + '<p class="perfpanel__hint">Walk a couple of rooms, then Copy and paste it back. '
+    +   'Toggling power saver records both, so one paste is enough.</p>';
+  $('#perfCopy').onclick = () => {
+    const txt = JSON.stringify(PERF.dump(), null, 1);
+    const done = () => { $('#perfCopy').textContent = 'Copied'; };
+    if (navigator.clipboard) navigator.clipboard.writeText(txt).then(done, ()=>fallback(txt,done));
+    else fallback(txt, done);
+    function fallback(t, cb){
+      const ta = document.createElement('textarea');
+      ta.value = t; ta.style.cssText='position:fixed;left:-9999px';
+      document.body.appendChild(ta); ta.select();
+      try{ document.execCommand('copy'); cb(); }catch(e){}
+      ta.remove();
+    }
+  };
+  $('#perfReset').onclick = () => {
+    PERF.runs.full.length = 0; PERF.runs.power.length = 0;
+    PERF.worstFrame = 0; PERF.started = performance.now(); renderPerfPanel();
+  };
+}
+function togglePerfPanel(){
+  document.body.classList.toggle('perfopen');
+  renderPerfPanel();
+  if (document.body.classList.contains('perfopen')){
+    clearInterval(S.perfTick);
+    S.perfTick = setInterval(renderPerfPanel, 1000);   // not a rAF; 1Hz
+  } else clearInterval(S.perfTick);
+}
+$('#powerBtn').addEventListener('click', ()=>POWER.toggle());
+$('#powerBtn2').addEventListener('click', ()=>{
+  POWER.toggle();
+  $('#powerBtn2').textContent = document.body.classList.contains('powersave')
+    ? 'power saver (on)' : 'power saver';
+});
+
+/* --- version switching: no reload, no state reset, listeners bound once --- */
+/* Decided before buildDirLists() runs, which is what lets power saver
+   choose the entrance board's image sources rather than only restyling
+   what is already there. The whole block is synchronous and ahead of the
+   first paint, so a weak machine never sees a frame of the full room. */
+POWER.apply(POWER.detect());
+if (!document.body.classList.contains('powersave')) applyQuality(pickQuality());
+applyTier(pickTier());
+
 buildDirLists();
 buildFlat(); // pre-built so screen readers can reach all content from the start
-makeTextures();
+/* makeTextures() fills 16k pixels of ImageData, strokes 3060 line segments
+   and then runs two SYNCHRONOUS toDataURL('image/png') encodes. Random
+   noise is incompressible, so those encodes are the slow part and they
+   cannot be made cheap — but nothing they produce is visible at boot.
+   Both tiles are read only by .gtex__grain / .gtex__fibre / .frame::after,
+   and all three live inside #gallery, which is display:none until the
+   visitor enters. So this came off the boot critical path entirely: it
+   runs when the machine is idle, and openGallery() forces it first if the
+   visitor beat the idle callback to it. Identical tiles either way — the
+   generator is unchanged, only when it is called. */
+let _texDone = false;
+function ensureTextures(){
+  if (_texDone) return;
+  _texDone = true;
+  makeTextures();
+}
+(window.requestIdleCallback || (f => setTimeout(f, 200)))(
+  () => ensureTextures(), {timeout: 3000});
 
 /* =====================================================================
    DEV-ONLY · live tuner.  Press T inside the gallery to show or hide it.
@@ -5587,9 +6094,6 @@ const JS_KNOBS = [['Camera', [
 ]]];
 
 
-/* --- version switching: no reload, no state reset, listeners bound once --- */
-applyQuality(pickQuality());
-applyTier(pickTier());
 
 /* --- the wall photograph's strength: three options, Balanced default --- */
 /* The wall photograph ships at its chosen strength. The three-way picker
@@ -5610,9 +6114,21 @@ pruneBlankLayers();
 addEventListener('pointerleave',()=>{ S.look.tx=0; S.look.ty=0; GALLERY.wake('look'); },{passive:true});
 document.addEventListener('mouseleave',()=>{ S.look.tx=0; S.look.ty=0; GALLERY.wake('look'); },{passive:true});
 
+const QS=new URLSearchParams(location.search);
+/* ?perf=1 · open with the readout already showing. This is the link to
+   send someone whose machine you cannot test on: they open it, walk a
+   room or two, hit Copy and paste it back. No instructions to remember
+   and no key to find. ?power=1 / ?power=0 force the mode for a
+   like-for-like comparison in the same sitting. */
+/* ?power= is handled inside POWER.detect(), before the board is built */
+if (QS.get('perf')){
+  document.body.classList.add('perfopen');
+  clearInterval(S.perfTick); S.perfTick = setInterval(renderPerfPanel, 1000);
+  renderPerfPanel();
+}
+
 /* ?room=w2 · open straight into a room. Kept from the texture-comparison
    pass because it makes screenshotting any single room one URL away. */
-const QS=new URLSearchParams(location.search);
 if(QS.get('room')) addEventListener('load',()=>{
   $('#enterBtn').click(); setChapter(QS.get('room'));
 });
