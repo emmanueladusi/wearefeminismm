@@ -1,35 +1,21 @@
+<!-- VERSION: v1 (gtex inset trim only, -8% -> -3%) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script>(function(){try{var t=localStorage.getItem("wf-theme");var d=t?t==="dark":matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.setAttribute("data-theme",d?"dark":"light");if(localStorage.getItem("wf-a11y"))document.documentElement.setAttribute("data-a11y","");}catch(e){}})();</script>
-  <title>wearefeminism · Learn</title>
-  <meta name="description" content="Feminism, Black feminism, and intersectionality, explained with respect for your intelligence. Part of a student-led, anonymous learning space." />
-  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
-  <meta name="theme-color" content="#4a3568" />
-  <!-- Open Graph / social share -->
-  <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="wearefeminism" />
-  <meta property="og:title" content="wearefeminism · Learn" />
-  <meta property="og:description" content="Feminism, Black feminism, and intersectionality, explained with respect for your intelligence." />
-  <meta property="og:url" content="https://emmanueladusi.github.io/wearefeminismm/learn.html" />
-  <meta property="og:image" content="https://emmanueladusi.github.io/wearefeminismm/img/og-image.png" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="wearefeminism · Learn" />
-  <meta name="twitter:description" content="Feminism, Black feminism, and intersectionality, explained with respect for your intelligence." />
-  <meta name="twitter:image" content="https://emmanueladusi.github.io/wearefeminismm/img/og-image.png" />
-  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-  <link rel="stylesheet" href="css/styles.css?v=221" />
-  <!-- webfonts the gallery needs; the rest of Learn is unaffected -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>wearefeminismm · The Gallery (chapter prototype)</title>
+<meta name="robots" content="noindex" />
+<!-- Exhibition typography, two faces only:
+     Newsreader  — curatorial display: room titles, the lens poster.
+     Archivo     — everything else, including metadata set in uppercase
+                   with measured tracking rather than a monospace face.
+     Both SIL OFL, font-display:swap, real fallbacks if the CDN is blocked. -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=IBM+Plex+Sans:wght@400;500;600&display=swap" />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=IBM+Plex+Sans:wght@400;600&display=swap" />
-  <style id="wfgallery-css">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=IBM+Plex+Sans:wght@400;600&display=swap" /></noscript>
+<style>
 /* =====================================================================
    THE GALLERY, v3 · chapter prototype
 
@@ -56,7 +42,7 @@
 
    Nothing here is deployed. learn.html is untouched.
    ===================================================================== */
-#wfgallery{
+:root{
   --paper:#faf6ef; --ink:#241a3e; --ink-dim:#6c6480;
   --violet:#4a3568; --violet-deep:#2e2145; --room:#171021; --room2:#241a3e;
   --gold:#d9a13f; --gold-soft:rgba(217,161,63,.16);
@@ -98,30 +84,35 @@
   --mono:var(--sans);
   --label:var(--v-label);
   --display:var(--sans);
-}#wfgallery *{box-sizing:border-box;margin:0;padding:0}#wfgallery{background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55}#wfgallery button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}#wfgallery a{color:inherit}#wfgallery img{max-width:100%;display:block}#wfgallery .visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}#wfgallery :focus-visible{outline:3px solid var(--gold);outline-offset:3px;border-radius:6px}#wfgallery .eyebrow{font-family:var(--sans);font-weight:600;font-size:.7rem;letter-spacing:var(--label);text-transform:uppercase;color:var(--ink-dim)}#wfgallery .eyebrow--light{color:var(--dim)}/* type tuning for the system stack: hierarchy comes from weight, tracking
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+a{color:inherit}
+img{max-width:100%;display:block}
+.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+:focus-visible{outline:3px solid var(--gold);outline-offset:3px;border-radius:6px}
+
+.eyebrow{font-family:var(--sans);font-weight:600;font-size:.7rem;letter-spacing:var(--label);text-transform:uppercase;color:var(--ink-dim)}
+.eyebrow--light{color:var(--dim)}
+
+/* type tuning for the system stack: hierarchy comes from weight, tracking
    and opacity now, not from a second typeface. Big titles get tight
    tracking; educational body copy keeps a roomy line height. */
-#wfgallery .portal h1,
-#wfgallery .roomtitle h2,
-#wfgallery .bigpanel h2,
-#wfgallery #flat h2,
-#wfgallery .lobby__sign h2,
-#wfgallery .detail__title{
-  font-family:var(--serif);font-weight:400;letter-spacing:-.012em}#wfgallery .portal h1 em,
-#wfgallery .roomtitle h2 em,
-#wfgallery .lobby__sign h2 em{font-style:italic}#wfgallery .piece__title,
-#wfgallery .detail__title,
-#wfgallery .quiz__q,
-#wfgallery .scholar__name,
-#wfgallery .flatcard h3,
-#wfgallery .dir__name,
-#wfgallery .hud__chapter{font-weight:600;letter-spacing:-.012em}#wfgallery .portal h1 em,
-#wfgallery .roomtitle h2 em,
-#wfgallery .bigpanel h2 em,
-#wfgallery #flat h2 em{font-style:normal}#wfgallery .piece__blurb,
-#wfgallery .detail__blurb,
-#wfgallery #flat p{line-height:1.55}/* ================= in-page context + entrance (the hybrid half) ====== */
-#wfgallery .ctx{max-width:860px;margin:0 auto;padding:56px 22px 0}#wfgallery .ctx__card{border:1px dashed rgba(74,53,104,.35);border-radius:16px;padding:22px 26px;color:var(--ink-dim);font-size:.92rem}#wfgallery .ctx__card b{color:var(--ink)}#wfgallery .entrance{max-width:1060px;margin:34px auto 90px;padding:0 22px}/* The entrance reads as a lit gallery wall rather than a violet card.
+.portal h1,.roomtitle h2,.bigpanel h2,#flat h2,.lobby__sign h2,.detail__title{
+  font-family:var(--serif);font-weight:400;letter-spacing:-.012em}
+.portal h1 em,.roomtitle h2 em,.lobby__sign h2 em{font-style:italic}
+.piece__title,.detail__title,.quiz__q,.scholar__name,.flatcard h3,.dir__name,.hud__chapter{font-weight:600;letter-spacing:-.012em}
+.portal h1 em,.roomtitle h2 em,.bigpanel h2 em,#flat h2 em{font-style:normal}
+.piece__blurb,.detail__blurb,#flat p{line-height:1.55}
+
+/* ================= in-page context + entrance (the hybrid half) ====== */
+.ctx{max-width:860px;margin:0 auto;padding:56px 22px 0}
+.ctx__card{border:1px dashed rgba(74,53,104,.35);border-radius:16px;padding:22px 26px;color:var(--ink-dim);font-size:.92rem}
+.ctx__card b{color:var(--ink)}
+
+.entrance{max-width:1060px;margin:34px auto 90px;padding:0 22px}
+/* The entrance reads as a lit gallery wall rather than a violet card.
    Three gold pools along the top are the same fixtures the rooms inside
    use, so the entrance previews the space instead of just announcing it.
    The hairline grid is the wall's module; the vignette and the floor fade
@@ -137,15 +128,23 @@
    white edges became the loudest thing in the composition and the eye
    read the EDGES instead of the pictures. On the page's own cream the
    metaphor is finally consistent, and the intro centres over it. */
-#wfgallery .portal{position:relative;overflow:visible;border-radius:0;
+.portal{position:relative;overflow:visible;border-radius:0;
   color:var(--ink);padding:clamp(20px,3vw,40px) 0 0;
-  background:none;box-shadow:none;text-align:center}#wfgallery .portal .eyebrow--light{color:var(--ink-dim)}#wfgallery .portal .eyebrow,
-#wfgallery .portal h1,
-#wfgallery .portal__lead,
-#wfgallery .portal__ctas{
-  margin-left:auto;margin-right:auto}#wfgallery .portal__ctas{justify-content:center}/* The gold fixtures, the wall module and the vignette all went with the
+  background:none;box-shadow:none;text-align:center}
+.portal .eyebrow--light{color:var(--ink-dim)}
+.portal .eyebrow,.portal h1,.portal__lead,.portal__ctas{
+  margin-left:auto;margin-right:auto}
+.portal__ctas{justify-content:center}
+
+/* The gold fixtures, the wall module and the vignette all went with the
    card. They were lighting a dark room; there is no dark room now. */
-#wfgallery .portal > *{position:relative;z-index:1}#wfgallery .portal h1{font-family:var(--serif);font-weight:600;font-size:clamp(2rem,5vw,3.4rem);line-height:1.08;margin:.5em 0 .35em}#wfgallery .portal h1 em{font-style:italic;color:var(--gold)}#wfgallery .portal__lead{max-width:56ch;color:var(--ink-dim);font-size:1.02rem}#wfgallery .portal__ctas{display:flex;flex-wrap:wrap;gap:14px;margin-top:28px;position:relative;z-index:1}/* =====================================================================
+.portal > *{position:relative;z-index:1}
+.portal h1{font-family:var(--serif);font-weight:600;font-size:clamp(2rem,5vw,3.4rem);line-height:1.08;margin:.5em 0 .35em}
+.portal h1 em{font-style:italic;color:var(--gold)}
+.portal__lead{max-width:56ch;color:var(--ink-dim);font-size:1.02rem}
+.portal__ctas{display:flex;flex-wrap:wrap;gap:14px;margin-top:28px;position:relative;z-index:1}
+
+/* =====================================================================
    THE WALL AT THE ENTRANCE
    Six works hung along one line, not six rows in a list. Widths and
    heights are irregular by design: a row of equal cards is the thing
@@ -153,10 +152,11 @@
    The line they hang from is the only rule on the card, and it runs the
    full width so the works read as ON a wall rather than in a container.
    ===================================================================== */
-#wfgallery .wall{margin-top:clamp(34px,5vw,54px);position:relative;
+.wall{margin-top:clamp(34px,5vw,54px);position:relative;
   /* the height of the band the works hang in; the floor line and every
      label baseline are derived from this one number */
-  --band:clamp(160px,19vw,244px)}/* --- the collage -----------------------------------------------------
+  --band:clamp(160px,19vw,244px)}
+/* --- the collage -----------------------------------------------------
    The six chapters used to stand in an even row on a floor line, which
    read as a product grid. They are now pinned up like a vision board:
    scattered, overlapping, each one a printed photograph with a white
@@ -170,26 +170,34 @@
    Overlap is what sells it: each print is positioned as a percentage of
    the board, and the widths are wide enough that neighbours collide. The
    z-order is authored so the pile has a believable top and bottom. */
-#wfgallery .wall__hang{
+.wall__hang{
   list-style:none;position:relative;display:block;
-  height:clamp(520px, 52vw, 745px);margin-top:8px}#wfgallery .wall__slot{
+  height:clamp(520px, 52vw, 745px);margin-top:8px}
+.wall__slot{
   position:absolute;left:var(--cx);top:var(--cy);width:var(--cw);
   transform:rotate(var(--cr));z-index:var(--cz,1);
-  transition:transform .45s cubic-bezier(.2,.8,.2,1), z-index 0s}/* one printed photograph: white stock, an even margin all round. The
+  transition:transform .45s cubic-bezier(.2,.8,.2,1), z-index 0s}
+
+/* one printed photograph: white stock, an even margin all round. The
    border width varies per print (--cb) — identical borders were half of
    why six scattered photographs still read as one template repeated. */
-#wfgallery .work{position:relative;display:block;width:100%;text-align:center;color:inherit;
+.work{position:relative;display:block;width:100%;text-align:center;color:inherit;
   background:#f7f2e8;padding:var(--cb,9px);border-radius:2px;
   box-shadow:0 18px 34px rgba(4,2,9,.5), 0 3px 8px rgba(4,2,9,.4);
-  transition:box-shadow .45s cubic-bezier(.2,.8,.2,1)}#wfgallery .work__frame{
+  transition:box-shadow .45s cubic-bezier(.2,.8,.2,1)}
+.work__frame{
   position:relative;display:block;overflow:hidden;border-radius:0;
-  aspect-ratio:var(--ca, 4 / 5);background:rgba(10,6,18,.5)}#wfgallery .work__frame img{width:100%;height:100%;object-fit:cover;display:block;
+  aspect-ratio:var(--ca, 4 / 5);background:rgba(10,6,18,.5)}
+.work__frame img{width:100%;height:100%;object-fit:cover;display:block;
   filter:saturate(.86) contrast(1.02);
-  transition:transform .7s cubic-bezier(.2,.8,.2,1), filter .5s ease}/* the gallery's own light, falling across the work */
-#wfgallery .work__wash{position:absolute;inset:0;pointer-events:none;
+  transition:transform .7s cubic-bezier(.2,.8,.2,1), filter .5s ease}
+/* the gallery's own light, falling across the work */
+.work__wash{position:absolute;inset:0;pointer-events:none;
   background:linear-gradient(170deg,rgba(255,247,230,.14),transparent 46%),
              linear-gradient(0deg,rgba(4,2,9,.5),transparent 58%);
-  transition:opacity .5s ease}/* --- border shapes ---------------------------------------------------
+  transition:opacity .5s ease}
+
+/* --- border shapes ---------------------------------------------------
    A vision board is not six of the same frame at six angles. Things get
    pinned up in whatever form they arrived in: a photo print, a polaroid,
    a picture torn out of a magazine, something cut into an arch, a round
@@ -198,37 +206,54 @@
    Every shape is applied to the SAME markup, so the six stay
    interchangeable and the chapter behind each one never depends on how
    it happens to be cut. */
-#wfgallery .work--polaroid{padding-bottom:calc(var(--cb,9px) * 3.2)}#wfgallery .work--arch .work__frame{border-radius:999px 999px 4px 4px}#wfgallery .work--circle,
-#wfgallery .work--circle .work__frame{border-radius:50%}#wfgallery .work--circle{padding:calc(var(--cb,9px) * 1.2)}/* Torn from a page: an uneven edge cut through the white stock itself.
+.work--polaroid{padding-bottom:calc(var(--cb,9px) * 3.2)}
+.work--arch .work__frame{border-radius:999px 999px 4px 4px}
+.work--circle,.work--circle .work__frame{border-radius:50%}
+.work--circle{padding:calc(var(--cb,9px) * 1.2)}
+/* Torn from a page: an uneven edge cut through the white stock itself.
    Three different tears, because one clip-path used six times reads as a
    repeated shape the moment two pieces sit next to each other — which is
    the same mistake as one frame at six angles, just subtler. */
-#wfgallery .work--torn{clip-path:polygon(
+.work--torn{clip-path:polygon(
   0% 2%, 12% 0%, 27% 3%, 41% 0.6%, 58% 3.4%, 73% 0.4%, 88% 2.6%, 100% 0.8%,
   99% 18%, 100% 39%, 98.6% 61%, 100% 82%, 99% 97%,
   86% 99.4%, 71% 97%, 55% 100%, 38% 97.4%, 22% 99.6%, 9% 97%, 0% 99%,
-  1.2% 78%, 0% 56%, 1.4% 34%, 0% 17%)}#wfgallery .work--torn2{clip-path:polygon(
+  1.2% 78%, 0% 56%, 1.4% 34%, 0% 17%)}
+.work--torn2{clip-path:polygon(
   0% 1%, 16% 3.2%, 31% 0.4%, 47% 2.8%, 63% 0.2%, 79% 3%, 93% 0.6%, 100% 2.4%,
   98.4% 22%, 100% 44%, 98.8% 66%, 100% 88%, 98.6% 99%,
   82% 97.2%, 66% 99.8%, 49% 97%, 33% 99.4%, 17% 96.8%, 0% 98.4%,
-  1.6% 74%, 0% 51%, 1.2% 28%, 0% 12%)}#wfgallery .work--torn3{clip-path:polygon(
+  1.6% 74%, 0% 51%, 1.2% 28%, 0% 12%)}
+.work--torn3{clip-path:polygon(
   0% 3%, 9% 0.4%, 24% 2.6%, 39% 0%, 55% 2.2%, 71% 0.8%, 86% 3.4%, 100% 1.2%,
   99% 26%, 100% 48%, 98.4% 70%, 100% 91%, 99.2% 98%,
   90% 99.8%, 74% 96.6%, 58% 99.2%, 42% 96.4%, 26% 99%, 11% 97.4%, 0% 99.6%,
-  1% 82%, 0% 60%, 1.6% 38%, 0% 20%)}/* stuck down with tape rather than mounted */
-#wfgallery .work--tape{border-radius:1px}#wfgallery .work--tape::before,
-#wfgallery .work--tape::after{content:"";position:absolute;
+  1% 82%, 0% 60%, 1.6% 38%, 0% 20%)}
+/* stuck down with tape rather than mounted */
+.work--tape{border-radius:1px}
+.work--tape::before,.work--tape::after{content:"";position:absolute;
   width:54px;height:19px;background:rgba(247,242,232,.42);
-  box-shadow:0 1px 2px rgba(4,2,9,.3);pointer-events:none;z-index:3}#wfgallery .work--tape::before{top:-9px;left:-14px;transform:rotate(-38deg)}#wfgallery .work--tape::after{bottom:-9px;right:-14px;transform:rotate(-38deg)}/* Stickers, not prints: no white mount, no shadow box, no pointer. A
+  box-shadow:0 1px 2px rgba(4,2,9,.3);pointer-events:none;z-index:3}
+.work--tape::before{top:-9px;left:-14px;transform:rotate(-38deg)}
+.work--tape::after{bottom:-9px;right:-14px;transform:rotate(-38deg)}
+
+/* Stickers, not prints: no white mount, no shadow box, no pointer. A
    sticker with a photo border around it stops reading as a sticker. */
-#wfgallery .wall__slot--decor{pointer-events:none}#wfgallery .wall__slot--decor:hover{transform:rotate(var(--cr))}/* raw cut-out stickers: no mount, no frame */
-#wfgallery .wall__slot--decor.is-sticker img{display:block;width:100%;height:auto;
-  filter:drop-shadow(0 10px 18px rgba(4,2,9,.45))}/* torn-out paper: the same stock and shadow as the six clickable prints,
+.wall__slot--decor{pointer-events:none}
+.wall__slot--decor:hover{transform:rotate(var(--cr))}
+/* raw cut-out stickers: no mount, no frame */
+.wall__slot--decor.is-sticker img{display:block;width:100%;height:auto;
+  filter:drop-shadow(0 10px 18px rgba(4,2,9,.45))}
+/* torn-out paper: the same stock and shadow as the six clickable prints,
    so the pile reads as one board rather than pictures floating over it */
-#wfgallery .decorpaper{display:block;background:#f7f2e8;padding:var(--cb,10px);border-radius:2px;
-  box-shadow:0 18px 34px rgba(4,2,9,.5), 0 3px 8px rgba(4,2,9,.4)}#wfgallery .decorpaper .work__frame{position:relative;display:block;overflow:hidden;
-  aspect-ratio:var(--ca, 4 / 5);background:rgba(10,6,18,.5)}#wfgallery .decorpaper .work__frame img{width:100%;height:100%;object-fit:cover;display:block;
-  filter:saturate(.9) contrast(1.02)}/* No caption under the print. A row of six identical white bottom margins
+.decorpaper{display:block;background:#f7f2e8;padding:var(--cb,10px);border-radius:2px;
+  box-shadow:0 18px 34px rgba(4,2,9,.5), 0 3px 8px rgba(4,2,9,.4)}
+.decorpaper .work__frame{position:relative;display:block;overflow:hidden;
+  aspect-ratio:var(--ca, 4 / 5);background:rgba(10,6,18,.5)}
+.decorpaper .work__frame img{width:100%;height:100%;object-fit:cover;display:block;
+  filter:saturate(.9) contrast(1.02)}
+
+/* No caption under the print. A row of six identical white bottom margins
    with centred type in each was the other half of the uniformity — it
    turned a pile of photographs back into a row of cards.
 
@@ -236,52 +261,83 @@
    photograph when you pick that one up. The button also carries a full
    aria-label, so a screen reader hears the chapter name and its meta
    whether or not this is showing. */
-#wfgallery .work__label{position:absolute;left:var(--cb,9px);right:var(--cb,9px);bottom:var(--cb,9px);
+.work__label{position:absolute;left:var(--cb,9px);right:var(--cb,9px);bottom:var(--cb,9px);
   padding:26px 8px 9px;pointer-events:none;opacity:0;
   background:linear-gradient(0deg, rgba(8,5,16,.9) 18%, rgba(8,5,16,0));
-  transition:opacity .32s ease}#wfgallery .work__name{display:block;font-family:var(--serif);font-size:.84rem;line-height:1.2;
-  text-wrap:balance;color:#f7f2e8}#wfgallery .work__meta{display:block;margin-top:2px;font-size:.56rem;letter-spacing:.07em;
-  text-transform:uppercase;color:rgba(247,242,232,.72)}#wfgallery .wall__slot:hover .work__label,
-#wfgallery .wall__slot:focus-within .work__label{opacity:1}/* Picking one up: it straightens, lifts, and comes to the top of the
-   pile. Rotating to 0 is what makes it feel handled rather than hovered. */
-#wfgallery .wall__slot:hover,
-#wfgallery .wall__slot:focus-within{
-  transform:rotate(0deg) translateY(-12px) scale(1.045);z-index:60}#wfgallery .work:hover,
-#wfgallery .work:focus-visible{
-  box-shadow:0 34px 62px rgba(4,2,9,.62), 0 4px 10px rgba(4,2,9,.45)}#wfgallery .work:hover .work__frame img,
-#wfgallery .work:focus-visible .work__frame img{
-  transform:scale(1.04);filter:saturate(1) contrast(1.04)}#wfgallery .work:hover .work__wash,
-#wfgallery .work:focus-visible .work__wash{opacity:.35}#wfgallery .work:hover .work__name,
-#wfgallery .work:focus-visible .work__name{color:#8a5e08}#wfgallery .work:focus-visible{outline:2px solid var(--gold);outline-offset:4px}/* Below the board's own width the pile stops being legible and starts
-   being a mess, so it unstacks into a plain two-column grid. */
+  transition:opacity .32s ease}
+.work__name{display:block;font-family:var(--serif);font-size:.84rem;line-height:1.2;
+  text-wrap:balance;color:#f7f2e8}
+.work__meta{display:block;margin-top:2px;font-size:.56rem;letter-spacing:.07em;
+  text-transform:uppercase;color:rgba(247,242,232,.72)}
+.wall__slot:hover .work__label,.wall__slot:focus-within .work__label{opacity:1}
 
-@media (max-width: 860px){#wfgallery .wall__hang{height:auto;display:grid;grid-template-columns:1fr 1fr;gap:16px}#wfgallery .wall__slot{position:static;width:auto;transform:none;z-index:auto}#wfgallery .wall__slot:hover,
-#wfgallery .wall__slot:focus-within{transform:translateY(-6px)}
-}#wfgallery .wall__how{margin-top:clamp(26px,3.4vw,44px);color:var(--ink-dim);
-  font-size:.84rem;line-height:1.7;display:flex;flex-direction:column;align-items:center}#wfgallery .wall__how-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.09em;
-  text-transform:uppercase;color:var(--ink-dim);margin:0 0 14px}/* the list is LEFT aligned inside a centred block: centring the rows
+/* Picking one up: it straightens, lifts, and comes to the top of the
+   pile. Rotating to 0 is what makes it feel handled rather than hovered. */
+.wall__slot:hover,.wall__slot:focus-within{
+  transform:rotate(0deg) translateY(-12px) scale(1.045);z-index:60}
+.work:hover,.work:focus-visible{
+  box-shadow:0 34px 62px rgba(4,2,9,.62), 0 4px 10px rgba(4,2,9,.45)}
+.work:hover .work__frame img,.work:focus-visible .work__frame img{
+  transform:scale(1.04);filter:saturate(1) contrast(1.04)}
+.work:hover .work__wash,.work:focus-visible .work__wash{opacity:.35}
+.work:hover .work__name,.work:focus-visible .work__name{color:#8a5e08}
+.work:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
+
+/* Below the board's own width the pile stops being legible and starts
+   being a mess, so it unstacks into a plain two-column grid. */
+@media (max-width: 860px){
+  .wall__hang{height:auto;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .wall__slot{position:static;width:auto;transform:none;z-index:auto}
+  .wall__slot:hover,.wall__slot:focus-within{transform:translateY(-6px)}
+}
+
+.wall__how{margin-top:clamp(26px,3.4vw,44px);color:var(--ink-dim);
+  font-size:.84rem;line-height:1.7;display:flex;flex-direction:column;align-items:center}
+.wall__how-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--ink-dim);margin:0 0 14px}
+/* the list is LEFT aligned inside a centred block: centring the rows
    themselves would ragged both edges and destroy the column the keycaps
    make, which is the thing that lets you scan it */
-#wfgallery .controls{list-style:none;display:grid;gap:11px;margin:0;text-align:left}#wfgallery .controls li{display:grid;grid-template-columns:auto 1fr;gap:13px;align-items:baseline;
-  color:var(--ink);font-size:.93rem}#wfgallery .controls .k{font-family:var(--mono);font-size:.68rem;letter-spacing:.055em;
+.controls{list-style:none;display:grid;gap:11px;margin:0;text-align:left}
+.controls li{display:grid;grid-template-columns:auto 1fr;gap:13px;align-items:baseline;
+  color:var(--ink);font-size:.93rem}
+.controls .k{font-family:var(--mono);font-size:.68rem;letter-spacing:.055em;
   color:#8a5e08;background:rgba(217,161,63,.13);
   border:1px solid rgba(217,161,63,.5);border-radius:6px;padding:3px 9px;
-  white-space:nowrap;text-align:center}#wfgallery .wall__how-calm{max-width:56ch;margin:18px 0 0;text-align:center}#wfgallery .wall__how-calm button{color:var(--ink);text-decoration:underline;text-underline-offset:3px}#wfgallery .wall__how-calm button:hover{color:#8a5e08}#wfgallery .wall__how kbd{font-family:var(--mono);font-size:.72em;letter-spacing:.04em;color:var(--gold);
-  border:1px solid rgba(217,161,63,.4);border-radius:5px;padding:1px 6px}#wfgallery .wall__how button{color:var(--ink);text-decoration:underline;text-underline-offset:3px}#wfgallery .wall__how button:hover{color:var(--gold)}/* Phones get two rows of three rather than six slivers, and the works sit
-   flat: a 14px lift reads as a wobble at this size, not as depth. */
+  white-space:nowrap;text-align:center}
+.wall__how-calm{max-width:56ch;margin:18px 0 0;text-align:center}
+.wall__how-calm button{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+.wall__how-calm button:hover{color:#8a5e08}
+.wall__how kbd{font-family:var(--mono);font-size:.72em;letter-spacing:.04em;color:var(--gold);
+  border:1px solid rgba(217,161,63,.4);border-radius:5px;padding:1px 6px}
+.wall__how button{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+.wall__how button:hover{color:var(--gold)}
 
-@media(max-width:760px){#wfgallery .wall{--band:clamp(96px,26vw,150px)}#wfgallery .wall__hang{flex-wrap:wrap;gap:18px 14px}#wfgallery .wall__slot{flex:0 0 calc(33.333% - 10px)}/* two rows of three: a single floor line drawn across the first row only
+/* Phones get two rows of three rather than six slivers, and the works sit
+   flat: a 14px lift reads as a wobble at this size, not as depth. */
+@media(max-width:760px){
+  .wall{--band:clamp(96px,26vw,150px)}
+  .wall__hang{flex-wrap:wrap;gap:18px 14px}
+  .wall__slot{flex:0 0 calc(33.333% - 10px)}
+  /* two rows of three: a single floor line drawn across the first row only
      would cut the second row in half, so the works sit on their own */
-#wfgallery .wall__hang::after{display:none}#wfgallery .work{grid-template-rows:var(--band) auto}#wfgallery .work__name{font-size:.82rem}
+  .wall__hang::after{display:none}
+  .work{grid-template-rows:var(--band) auto}
+  .work__name{font-size:.82rem}
 }
-@media(prefers-reduced-motion:reduce){#wfgallery .work__frame,
-#wfgallery .work__frame img,
-#wfgallery .work__wash,
-#wfgallery .work__name{transition:none}#wfgallery .work:hover .work__frame,
-#wfgallery .work:focus-visible .work__frame{transform:none}#wfgallery .work:hover .work__frame img,
-#wfgallery .work:focus-visible .work__frame img{transform:none}
-}#wfgallery .btn{display:inline-flex;align-items:center;gap:10px;border-radius:12px;padding:13px 26px;font-weight:600;
-  transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s}#wfgallery .btn--gold{background:var(--gold);color:#241a3e}#wfgallery .btn--gold:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(217,161,63,.35)}#wfgallery .btn--ghost{border:1px solid rgba(245,239,228,.35);color:var(--cream)}#wfgallery .btn--ghost:hover{border-color:var(--gold);color:var(--gold)}/* --- the flow button -------------------------------------------------
+@media(prefers-reduced-motion:reduce){
+  .work__frame,.work__frame img,.work__wash,.work__name{transition:none}
+  .work:hover .work__frame,.work:focus-visible .work__frame{transform:none}
+  .work:hover .work__frame img,.work:focus-visible .work__frame img{transform:none}
+}
+.btn{display:inline-flex;align-items:center;gap:10px;border-radius:12px;padding:13px 26px;font-weight:600;
+  transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s}
+.btn--gold{background:var(--gold);color:#241a3e}
+.btn--gold:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(217,161,63,.35)}
+.btn--ghost{border:1px solid rgba(245,239,228,.35);color:var(--cream)}
+.btn--ghost:hover{border-color:var(--gold);color:var(--gold)}
+
+/* --- the flow button -------------------------------------------------
    Ported from the React/Tailwind original: an outlined pill where a dot
    swells into a filled shape, the corner radius tightens, and an arrow
    hands off to a second arrow leaving the other side.
@@ -294,31 +350,37 @@
    this button's width changes with the viewport and a fixed circle leaves
    the corners unfilled at the widest sizes. */
 /* on cream now, so the resting text is ink and the fill still reverses it */
-#wfgallery .btn--flow{position:relative;overflow:hidden;gap:0;
+.btn--flow{position:relative;overflow:hidden;gap:0;
   border:1.5px solid rgba(36,26,62,.35);background:transparent;color:var(--ink);
   padding:13px 32px;border-radius:12px;
   transition:color .6s cubic-bezier(.23,1,.32,1),
              border-color .6s cubic-bezier(.23,1,.32,1),
-             border-radius .6s cubic-bezier(.23,1,.32,1)}#wfgallery .btn--flow:hover,
-#wfgallery .btn--flow:focus-visible{border-color:transparent;color:var(--paper);border-radius:8px}#wfgallery .btn--flow:active{transform:scale(.96)}#wfgallery .btn__text{position:relative;z-index:1;transform:translateX(-11px);
-  transition:transform .8s cubic-bezier(.23,1,.32,1)}#wfgallery .btn--flow:hover .btn__text,
-#wfgallery .btn--flow:focus-visible .btn__text{transform:translateX(11px)}#wfgallery .btn__arr{position:absolute;width:16px;height:16px;z-index:2;
+             border-radius .6s cubic-bezier(.23,1,.32,1)}
+.btn--flow:hover,.btn--flow:focus-visible{border-color:transparent;color:var(--paper);border-radius:8px}
+.btn--flow:active{transform:scale(.96)}
+.btn__text{position:relative;z-index:1;transform:translateX(-11px);
+  transition:transform .8s cubic-bezier(.23,1,.32,1)}
+.btn--flow:hover .btn__text,.btn--flow:focus-visible .btn__text{transform:translateX(11px)}
+.btn__arr{position:absolute;width:16px;height:16px;z-index:2;
   fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;
-  transition:left .8s cubic-bezier(.34,1.56,.64,1), right .8s cubic-bezier(.34,1.56,.64,1)}#wfgallery .btn__arr--in{left:-25%}#wfgallery .btn--flow:hover .btn__arr--in,
-#wfgallery .btn--flow:focus-visible .btn__arr--in{left:16px}#wfgallery .btn__arr--out{right:16px}#wfgallery .btn--flow:hover .btn__arr--out,
-#wfgallery .btn--flow:focus-visible .btn__arr--out{right:-25%}#wfgallery .btn__fill{position:absolute;top:50%;left:50%;width:16px;height:16px;border-radius:50%;
+  transition:left .8s cubic-bezier(.34,1.56,.64,1), right .8s cubic-bezier(.34,1.56,.64,1)}
+.btn__arr--in{left:-25%}
+.btn--flow:hover .btn__arr--in,.btn--flow:focus-visible .btn__arr--in{left:16px}
+.btn__arr--out{right:16px}
+.btn--flow:hover .btn__arr--out,.btn--flow:focus-visible .btn__arr--out{right:-25%}
+.btn__fill{position:absolute;top:50%;left:50%;width:16px;height:16px;border-radius:50%;
   transform:translate(-50%,-50%);background:var(--ink);opacity:0;z-index:0;
   transition:width .8s cubic-bezier(.19,1,.22,1), height .8s cubic-bezier(.19,1,.22,1),
-             opacity .8s cubic-bezier(.19,1,.22,1)}#wfgallery .btn--flow:hover .btn__fill,
-#wfgallery .btn--flow:focus-visible .btn__fill{
-  width:340px;height:340px;opacity:1}/* the swelling fill is the whole gesture, so reduced motion keeps the
+             opacity .8s cubic-bezier(.19,1,.22,1)}
+.btn--flow:hover .btn__fill,.btn--flow:focus-visible .btn__fill{
+  width:340px;height:340px;opacity:1}
+/* the swelling fill is the whole gesture, so reduced motion keeps the
    colour change and drops the travel rather than dropping the feedback */
+@media (prefers-reduced-motion: reduce){
+  .btn--flow,.btn__text,.btn__arr,.btn__fill{transition-duration:.01ms}
+}
 
-@media (prefers-reduced-motion: reduce){#wfgallery .btn--flow,
-#wfgallery .btn__text,
-#wfgallery .btn__arr,
-#wfgallery .btn__fill{transition-duration:.01ms}
-}/* --- the coin button -------------------------------------------------
+/* --- the coin button -------------------------------------------------
    Ported from the React original, with the parts that did not survive
    contact with this page changed:
 
@@ -333,16 +395,27 @@
      faces carry the Venus symbol and the double m rather than engraving.
    - Reduced motion skips the flip entirely and enters immediately, which
      is the whole reason this had to move off the calm button. */
-#wfgallery .btn--coin{position:relative;background:var(--gold);color:#241a3e;
-  transition:transform 60ms ease-in-out}#wfgallery .btn--coin:active{transform:rotate(3deg)}#wfgallery .btn--coin.is-flipping{pointer-events:none}#wfgallery .btn--coin.is-flipping .btn__text{opacity:0;transition:opacity 120ms linear 140ms}#wfgallery .coinwrap{position:absolute;left:0;right:0;bottom:0;height:1px;overflow:visible;
-  pointer-events:none}#wfgallery .coin{position:absolute;left:50%;bottom:6px;width:40px;height:40px;opacity:0;
+.btn--coin{position:relative;background:var(--gold);color:#241a3e;
+  transition:transform 60ms ease-in-out}
+.btn--coin:active{transform:rotate(3deg)}
+.btn--coin.is-flipping{pointer-events:none}
+.btn--coin.is-flipping .btn__text{opacity:0;transition:opacity 120ms linear 140ms}
+.coinwrap{position:absolute;left:0;right:0;bottom:0;height:1px;overflow:visible;
+  pointer-events:none}
+.coin{position:absolute;left:50%;bottom:6px;width:40px;height:40px;opacity:0;
   transform:translate(-50%, calc(var(--cy,0) * -1rem))
-            scale(var(--cs,.5)) rotate(calc(var(--crot,0) * 1deg))}#wfgallery .btn--coin.is-flipping .coin{opacity:1}#wfgallery .coin__face,
-#wfgallery .coin__edge{position:absolute;inset:0;border-radius:50%;
+            scale(var(--cs,.5)) rotate(calc(var(--crot,0) * 1deg))}
+.btn--coin.is-flipping .coin{opacity:1}
+.coin__face,.coin__edge{position:absolute;inset:0;border-radius:50%;
   display:grid;place-items:center;font-family:var(--serif);font-size:15px;
   color:#3a2a12;background:linear-gradient(150deg,#f0cd86,var(--gold) 46%,#a9762a);
-  box-shadow:inset 0 0 0 2px rgba(58,42,18,.35)}#wfgallery .coin__front{transform:translateY(calc(var(--fy,0) * 6px)) scaleY(var(--fs,1))}#wfgallery .coin__back{transform:translateY(calc(var(--by,0) * 6px)) scaleY(var(--bs,0))}#wfgallery .coin__edge{background:#a9762a;box-shadow:none;
-  transform:translateY(calc(var(--ey,0) * 6px)) scaleY(var(--es,0))}/* --- lifting the buttons off the paper -------------------------------
+  box-shadow:inset 0 0 0 2px rgba(58,42,18,.35)}
+.coin__front{transform:translateY(calc(var(--fy,0) * 6px)) scaleY(var(--fs,1))}
+.coin__back{transform:translateY(calc(var(--by,0) * 6px)) scaleY(var(--bs,0))}
+.coin__edge{background:#a9762a;box-shadow:none;
+  transform:translateY(calc(var(--ey,0) * 6px)) scaleY(var(--es,0))}
+
+/* --- lifting the buttons off the paper -------------------------------
    Two shadows rather than one: a tight contact shadow that anchors the
    button to the page, and a wider soft one that gives it height. A single
    blurred shadow reads as a glow, which is what "plain" usually turns
@@ -354,16 +427,36 @@
    the edge where the two meet.
 
    These come after every other .btn rule so they win without !important. */
-#wfgallery .btn{box-shadow:0 1px 2px rgba(36,26,62,.10), 0 5px 12px rgba(36,26,62,.10)}#wfgallery .btn:hover,
-#wfgallery .btn:focus-visible{
-  box-shadow:0 2px 4px rgba(36,26,62,.12), 0 12px 24px rgba(36,26,62,.17)}#wfgallery .btn--coin{box-shadow:0 1px 2px rgba(126,86,16,.24), 0 6px 16px rgba(217,161,63,.36)}#wfgallery .btn--coin:hover,
-#wfgallery .btn--coin:focus-visible{
-  box-shadow:0 2px 5px rgba(126,86,16,.28), 0 14px 30px rgba(217,161,63,.46)}/* mid-flip the button is being struck, so it sits back down */
-#wfgallery .btn--coin.is-flipping{box-shadow:0 1px 2px rgba(126,86,16,.22)}#wfgallery .dir{margin-top:8px}#wfgallery .dir__label{font-family:var(--mono);font-size:.7rem;letter-spacing:0.055em;text-transform:uppercase;color:var(--dim);margin-bottom:12px}#wfgallery .dir__list{list-style:none;display:grid;gap:8px}#wfgallery .dir__row{width:100%;display:flex;align-items:baseline;gap:12px;text-align:left;padding:10px 14px;border-radius:12px;
-  border:1px solid rgba(245,239,228,.12);transition:border-color .2s,background .2s}#wfgallery .dir__row:hover{border-color:rgba(217,161,63,.5);background:rgba(217,161,63,.07)}#wfgallery .dir__num{font-family:var(--mono);font-size:.72rem;color:var(--gold)}#wfgallery .dir__name{font-family:var(--serif);font-size:1.02rem}#wfgallery .dir__meta{margin-left:auto;font-family:var(--mono);font-size:.66rem;letter-spacing:0.055em;color:var(--dim);white-space:nowrap}#wfgallery .portal__fine{margin-top:26px;color:var(--dim);font-size:.82rem}#wfgallery .portal__fine button{text-decoration:underline;text-underline-offset:3px}#wfgallery .portal__fine button:hover{color:var(--gold)}/* ================= the gallery overlay =============================== */
-#wfgallery #gallery{position:fixed;inset:0;z-index:100;overflow:hidden;background:var(--room);color:var(--cream);display:none}#wfgallery #gallery.open{display:block}#wfgallery #bgGL{position:absolute;inset:0;width:100%;height:100%;display:block}#wfgallery #gallery .fallback-bg{position:absolute;inset:0;background:
+.btn{box-shadow:0 1px 2px rgba(36,26,62,.10), 0 5px 12px rgba(36,26,62,.10)}
+.btn:hover,.btn:focus-visible{
+  box-shadow:0 2px 4px rgba(36,26,62,.12), 0 12px 24px rgba(36,26,62,.17)}
+.btn--coin{box-shadow:0 1px 2px rgba(126,86,16,.24), 0 6px 16px rgba(217,161,63,.36)}
+.btn--coin:hover,.btn--coin:focus-visible{
+  box-shadow:0 2px 5px rgba(126,86,16,.28), 0 14px 30px rgba(217,161,63,.46)}
+/* mid-flip the button is being struck, so it sits back down */
+.btn--coin.is-flipping{box-shadow:0 1px 2px rgba(126,86,16,.22)}
+
+.dir{margin-top:8px}
+.dir__label{font-family:var(--mono);font-size:.7rem;letter-spacing:0.055em;text-transform:uppercase;color:var(--dim);margin-bottom:12px}
+.dir__list{list-style:none;display:grid;gap:8px}
+.dir__row{width:100%;display:flex;align-items:baseline;gap:12px;text-align:left;padding:10px 14px;border-radius:12px;
+  border:1px solid rgba(245,239,228,.12);transition:border-color .2s,background .2s}
+.dir__row:hover{border-color:rgba(217,161,63,.5);background:rgba(217,161,63,.07)}
+.dir__num{font-family:var(--mono);font-size:.72rem;color:var(--gold)}
+.dir__name{font-family:var(--serif);font-size:1.02rem}
+.dir__meta{margin-left:auto;font-family:var(--mono);font-size:.66rem;letter-spacing:0.055em;color:var(--dim);white-space:nowrap}
+.portal__fine{margin-top:26px;color:var(--dim);font-size:.82rem}
+.portal__fine button{text-decoration:underline;text-underline-offset:3px}
+.portal__fine button:hover{color:var(--gold)}
+
+/* ================= the gallery overlay =============================== */
+#gallery{position:fixed;inset:0;z-index:100;overflow:hidden;background:var(--room);color:var(--cream);display:none}
+#gallery.open{display:block}
+#bgGL{position:absolute;inset:0;width:100%;height:100%;display:block}
+#gallery .fallback-bg{position:absolute;inset:0;background:
   radial-gradient(70% 60% at 50% 115%, rgba(217,161,63,.14), transparent 60%),
-  linear-gradient(180deg, #3d2c60 0%, #241a3e 55%, #171021 100%)}/* =====================================================================
+  linear-gradient(180deg, #3d2c60 0%, #241a3e 55%, #171021 100%)}
+/* =====================================================================
    GALLERY SURFACE · the room is a finished wall, not a flat fill.
    Five layers, all environment-only and pointer-transparent, stacked
    between the shader and the artwork. Every intensity is a custom
@@ -371,7 +464,7 @@
    Text never sits on these layers: the art pieces are opaque cards, so
    the texture is automatically quietest exactly where paragraphs are.
    ===================================================================== */
-#wfgallery{
+:root{
   /* --- the atmosphere knobs --- */
   --grain-opacity:var(--v-grain,.055);      /* fine monochrome noise over the room      */
   --vignette-strength:.9;    /* how dark the outer edges fall off        */
@@ -391,25 +484,37 @@
   --wall-deep:  rgba(20,12,34,.55);
   --fibre-scale:230px;
   --grain-scale:150px;
-}#wfgallery .gtex{position:absolute;inset:0;z-index:5;pointer-events:none;overflow:hidden;
-  transition:opacity .5s ease}/* parallax offsets, written by the cursor loop. They live on #gallery so
+}
+.gtex{position:absolute;inset:0;z-index:5;pointer-events:none;overflow:hidden;
+  transition:opacity .5s ease}
+/* parallax offsets, written by the cursor loop. They live on #gallery so
    the texture layers AND the lobby architecture read the same numbers. */
 /* One smoothed pointer vector, written once per frame by the single
    animation loop. Every layer below derives its own magnitude from it,
    which is what produces real depth instead of one flat sheet sliding.
    Nothing else writes these, and no CSS transition touches them. */
-#wfgallery #gallery{--mx:0; --my:0; --gp-x:0px; --gp-y:0px}#wfgallery .gtex > *{position:absolute;inset:-3%}/* was -8%: max parallax travel on these layers is ~12-14px, so an 8%
+#gallery{--mx:0; --my:0; --gp-x:0px; --gp-y:0px}
+.gtex > *{position:absolute;inset:-3%}
+/* was -8%: max parallax travel on these layers is ~12-14px, so an 8%
    margin (~120px on a 1500px layer) was over 6x the actual travel
    distance. -3% (~45px) still covers it, smaller composited area. */
 /* the room, in depth order: colour, plaster, fibre, grain, distant
    linework, light, the pools, architecture, floor, air, then the grade */
-#wfgallery .gtex__fibre{z-index:3}#wfgallery .gtex__grain{z-index:4}#wfgallery .glines--far{z-index:5}#wfgallery .gtex__light{z-index:6}#wfgallery .gtex__spot{z-index:7}#wfgallery .gtex__arch{z-index:8}#wfgallery .gtex__floor{z-index:9}/* Layer 2 · plaster. Big, soft, non-repeating clouds at very low
+.gtex__fibre{z-index:3}
+.gtex__grain{z-index:4}   .glines--far{z-index:5} .gtex__light{z-index:6}
+.gtex__spot{z-index:7}    .gtex__arch{z-index:8}  .gtex__floor{z-index:9}
+
+/* Layer 2 · plaster. Big, soft, non-repeating clouds at very low
    contrast — the look of a hand-finished wall catching room light.
    Deepest layer, so it parallaxes least. */
+
 /* Layer 2b · the plaster itself. A generated low-frequency cloud tiled far
    larger than the viewport, so the wall has trowel variation and uneven
    colour instead of one smooth ramp — and no legible repeat. Not grunge:
    the amplitude is small enough that the artwork still dominates. */
+
+
+
 /* Layer 4 · woven fibre. A generated tile (see makeTextures) at a large
    scale so no repeat is legible. Masked to fade toward the centre, which
    is where the artwork hangs — strongest in the empty air around it. */
@@ -436,21 +541,27 @@
    Not a concern here: both the reduced-motion and touchmode rules take
    this layer out with display:none, so the `.gtex > *{transform:none}`
    overrides below never had to reach the inner node. */
-#wfgallery .gtex__fibre{
+.gtex__fibre{
   opacity:var(--gallery-fibre-opacity);
-  transform:translate3d(calc(var(--mx) * 11.44px),calc(var(--my) * 7.28px),0)}#wfgallery .gtex__fibre__tex{
+  transform:translate3d(calc(var(--mx) * 11.44px),calc(var(--my) * 7.28px),0)}
+.gtex__fibre__tex{
   position:absolute;inset:0;
   transform:scale(1.04);
   background-image:var(--fibre-url);background-size:var(--fibre-scale) var(--fibre-scale);
   -webkit-mask-image:radial-gradient(72% 62% at 50% 50%,transparent 8%,#000 78%);
-  mask-image:radial-gradient(72% 62% at 50% 50%,transparent 8%,#000 78%)}/* Layer 3 · fine grain. Deliberately PINNED: it does not parallax and is
+  mask-image:radial-gradient(72% 62% at 50% 50%,transparent 8%,#000 78%)}
+
+/* Layer 3 · fine grain. Deliberately PINNED: it does not parallax and is
    never redrawn, so it behaves like grain in the lens rather than dirt on
    the wall — the room slides underneath it while the grain holds still.
    Monochrome, fine, and far too faint to touch legibility. */
-#wfgallery .gtex__grain{
+.gtex__grain{
   inset:0;
   opacity:var(--grain-opacity);
-  background-image:var(--grain-url);background-size:var(--grain-scale) var(--grain-scale)}/* =====================================================================
+  background-image:var(--grain-url);background-size:var(--grain-scale) var(--grain-scale)}
+
+
+/* =====================================================================
    ORGANIC LINEWORK · a few long curatorial gestures across the room
    Two or three continuous paths that run off every edge, loop loosely,
    and pass behind the artwork. They are exhibition graphics, not a
@@ -459,11 +570,14 @@
    Two depths: --far sits inside the wall, behind every work; --near runs
    through the room in front of the artwork but under all interface.
    ===================================================================== */
-#wfgallery .glines{position:absolute;inset:-3%;pointer-events:none;overflow:visible;
+.glines{position:absolute;inset:-3%;pointer-events:none;overflow:visible;
   /* was -10%: --gl-par tops out at 26px (near layer), well under a 3% margin. */
-  transition:opacity .8s ease}#wfgallery .glines svg{width:100%;height:100%;display:block;overflow:visible}#wfgallery .glines path{fill:none;stroke-linecap:round;stroke-linejoin:round;
+  transition:opacity .8s ease}
+.glines svg{width:100%;height:100%;display:block;overflow:visible}
+.glines path{fill:none;stroke-linecap:round;stroke-linejoin:round;
   vector-effect:non-scaling-stroke;
-  transition:stroke .9s ease, opacity .9s ease, stroke-width .9s ease}/* The parallax pan and the slow drift used to sit on two NESTED nodes so
+  transition:stroke .9s ease, opacity .9s ease, stroke-width .9s ease}
+/* The parallax pan and the slow drift used to sit on two NESTED nodes so
    they would not fight over one `transform` property. Correct, but it cost
    a composited layer each: four layers of ~1.5 viewports for two sets of
    lines. GPU tile memory is what this gallery actually runs out of at a
@@ -476,7 +590,7 @@
    property. The multiplication order swaps from pan x drift to drift x pan,
    which for a 6px translate and a 0.14deg rotate is a sub-pixel difference,
    and both are applied about the same centre. */
-#wfgallery .glines__pan{
+.glines__pan{
   transform-origin:50% 50%;
   transform:translate3d(
     calc(var(--mx) * var(--gl-par, 12px) + var(--gl-pan, 0px)),
@@ -485,23 +599,31 @@
 @keyframes glineDrift{
   0%  {translate:-5px 3px; rotate:-.14deg; scale:1.005}
   100%{translate:6px -4px; rotate:.12deg;  scale:1}
-}/* The drawn state is the DEFAULT. The entrance reveal is a class the
+}
+/* The drawn state is the DEFAULT. The entrance reveal is a class the
    gallery adds on the way in and drops a few seconds later, so if the
    animation never runs — reduced motion, a paused tab, an old engine —
    the composition is simply there rather than invisible. */
-#wfgallery .glines path{stroke-dasharray:none;stroke-dashoffset:0}body.env-drawing #wfgallery .glines path{
+.glines path{stroke-dasharray:none;stroke-dashoffset:0}
+body.env-drawing .glines path{
   stroke-dasharray:var(--len,4200);
   animation:glineDraw 2.6s cubic-bezier(.4,0,.2,1) var(--dly,0s) forwards}
-@keyframes glineDraw{from{stroke-dashoffset:var(--len,4200)}to{stroke-dashoffset:0}}#wfgallery .glines--far{--gl-par:12px;--gl-dur:64s;opacity:var(--gl-o,1)}#wfgallery .glines--near{position:absolute;inset:-3%;z-index:30;pointer-events:none;
+@keyframes glineDraw{from{stroke-dashoffset:var(--len,4200)}to{stroke-dashoffset:0}}
+.glines--far{--gl-par:12px;--gl-dur:64s;opacity:var(--gl-o,1)}
+.glines--near{position:absolute;inset:-3%;z-index:30;pointer-events:none;
   --gl-par:26px;--gl-dur:44s;
-  opacity:calc(var(--gl-near-o,.62) * var(--gl-o,1))}/* nothing decorative runs while the tab is in the background */
-body.envpaused #wfgallery .glines__pan{animation-play-state:paused}/* was accidentally merged into .gtex__light below via a trailing comma
+  opacity:calc(var(--gl-near-o,.62) * var(--gl-o,1))}
+/* nothing decorative runs while the tab is in the background */
+body.envpaused .glines__pan{animation-play-state:paused}
+/* was accidentally merged into .gtex__light below via a trailing comma
    before a comment block, so this pause never actually applied — the
    drift animation ran even while the tab was backgrounded. */
 /* same idea, tied to the loop's own idle detection (loop(), ~2 settled
    frames) rather than tab visibility: this animation had no idle
    detection of its own before, unlike everything else in the gallery. */
-body.env-idle #wfgallery .glines__pan{animation-play-state:paused}/* ---- FIX A · promotion, but only while something is actually moving
+body.env-idle .glines__pan{animation-play-state:paused}
+
+/* ---- FIX A · promotion, but only while something is actually moving
    (revert: delete this whole @media block, nothing else references it) ---
    The note further down this file argues against will-change, and it is
    right about the version it was arguing against: an unconditional
@@ -523,22 +645,26 @@ body.env-idle #wfgallery .glines__pan{animation-play-state:paused}/* ---- FIX A 
    Purely a compositor hint: it changes nothing about what is drawn.
    Excluded: reduced motion and touchmode, where these layers are either
    pinned or gone, so a promise would be pure cost. */
+@media (prefers-reduced-motion: no-preference){
+  body:not(.env-idle):not(.touchmode) .gtex__fibre,
+  body:not(.env-idle):not(.touchmode) .gtex__light,
+  body:not(.env-idle):not(.touchmode) .gtex__arch,
+  body:not(.env-idle):not(.touchmode) .glines__pan,
+  body:not(.env-idle):not(.touchmode) .lobby__wall,
+  body:not(.env-idle):not(.touchmode) .lobby__floor{will-change:transform}
+}
 
-@media (prefers-reduced-motion: no-preference){body:not(.env-idle):not(.touchmode) #wfgallery .gtex__fibre,
-body:not(.env-idle):not(.touchmode) #wfgallery .gtex__light,
-body:not(.env-idle):not(.touchmode) #wfgallery .gtex__arch,
-body:not(.env-idle):not(.touchmode) #wfgallery .glines__pan,
-body:not(.env-idle):not(.touchmode) #wfgallery .lobby__wall,
-body:not(.env-idle):not(.touchmode) #wfgallery .lobby__floor{will-change:transform}
-}/* Layer 5 · gallery lighting. Broad diffused pools plus the edge
+/* Layer 5 · gallery lighting. Broad diffused pools plus the edge
    vignette. Moves most, so the light feels like it belongs to the room
    you are turning your head inside. */
-#wfgallery .gtex__light{
+.gtex__light{
   transform:translate3d(calc(var(--mx) * -14px),calc(var(--my) * -8px),0);
   background:
     radial-gradient(46% 34% at 50% -6%, rgba(255,246,228,calc(.13 * var(--gallery-light-intensity))), transparent 72%),
     radial-gradient(34% 30% at 12% 42%, rgba(178,150,224,calc(.10 * var(--gallery-light-intensity))), transparent 74%),
-    radial-gradient(30% 28% at 88% 56%, rgba(217,161,63,calc(.07 * var(--gallery-light-intensity))), transparent 74%)}/* Spotlight · a broad, very soft wash of warm light on the wall behind
+    radial-gradient(30% 28% at 88% 56%, rgba(217,161,63,calc(.07 * var(--gallery-light-intensity))), transparent 74%)}
+
+/* Spotlight · a broad, very soft wash of warm light on the wall behind
    whichever piece is active. Sits under the vignette so the edges still
    fall away, and it is a wash rather than a disc — the gradient runs all
    the way out to transparent so no circle is ever visible. */
@@ -547,7 +673,7 @@ body:not(.env-idle):not(.touchmode) #wfgallery .lobby__floor{will-change:transfo
    out to transparent, so no disc or halo edge is ever visible, and they
    glide because their positions are custom properties the camera loop
    writes rather than elements being re-laid-out. */
-#wfgallery .gtex__spot{inset:0;opacity:var(--spotlight-opacity);
+.gtex__spot{inset:0;opacity:var(--spotlight-opacity);
   transition:opacity .45s ease;
   background:
     radial-gradient(46% 40% at var(--spot-x2,20%) var(--spot-y2,50%),
@@ -557,11 +683,13 @@ body:not(.env-idle):not(.touchmode) #wfgallery .lobby__floor{will-change:transfo
       rgba(255,248,232,calc(.09 * var(--spot-k3,0))),
       transparent 72%),
     radial-gradient(64% 56% at var(--spotlight-x) var(--spotlight-y),
-      rgba(255,247,230,.19), var(--room-glow,rgba(217,161,63,.06)) 40%, transparent 76%)}/* Faint architecture. A floor that is a change of light rather than a
+      rgba(255,247,230,.19), var(--room-glow,rgba(217,161,63,.06)) 40%, transparent 76%)}
+
+/* Faint architecture. A floor that is a change of light rather than a
    drawn surface, low haze where wall meets floor, and upper corners that
    fall away. No benches, frames, columns or floorboards: the suggestion
    of a room, not a set. */
-#wfgallery .gtex__arch{inset:0;
+.gtex__arch{inset:0;
   transform:translate3d(0,calc(var(--my) * 5px),0);
   background:
     /* the horizon: a vertical-to-horizontal shift in the light */
@@ -574,10 +702,14 @@ body:not(.env-idle):not(.touchmode) #wfgallery .lobby__floor{will-change:transfo
       rgba(255,250,240,.11), transparent 70%),
     /* the upper corners draw back */
     radial-gradient(56% 40% at 0% 0%,   rgba(var(--v-vig-rgb),.11), transparent 72%),
-    radial-gradient(56% 40% at 100% 0%, rgba(var(--v-vig-rgb),.10), transparent 72%)}body.touchmode #wfgallery .glines--near{display:none}/* Vignette · one large, gradual falloff with a long transparent middle.
+    radial-gradient(56% 40% at 100% 0%, rgba(var(--v-vig-rgb),.10), transparent 72%)}
+
+body.touchmode .glines--near{display:none}
+
+/* Vignette · one large, gradual falloff with a long transparent middle.
    Kept as the topmost environment layer so it reads as room lighting
    rather than as a filter sitting on the artwork. */
-#wfgallery .gtex__vig{inset:0;transition:background .45s ease;
+.gtex__vig{inset:0;transition:background .45s ease;
   /* A wide clear centre, then a fall-off that is stronger at the top and
      the very corners than along the middle of the left and right edges —
      which is exactly where the neighbouring installations hang. The room
@@ -594,18 +726,23 @@ body:not(.env-idle):not(.touchmode) #wfgallery .lobby__floor{will-change:transfo
     linear-gradient(180deg,
       rgba(var(--v-vig-rgb),calc(.5 * var(--vignette-strength) * var(--vig-boost,1))) 0%,
       transparent 20%, transparent 74%,
-      rgba(var(--v-vig-rgb),calc(.42 * var(--vignette-strength) * var(--vig-boost,1))) 100%)}/* while a piece is lit, the rest of the room draws back a little further */
-#wfgallery #gallery[data-spot="on"]{--vig-boost:1.2}/* Floor · a slightly darker plaster band with light bouncing back up, so
+      rgba(var(--v-vig-rgb),calc(.42 * var(--vignette-strength) * var(--vig-boost,1))) 100%)}
+/* while a piece is lit, the rest of the room draws back a little further */
+#gallery[data-spot="on"]{--vig-boost:1.2}
+
+/* Floor · a slightly darker plaster band with light bouncing back up, so
    the room has a bottom and the pieces read as floating above something. */
-#wfgallery .gtex__floor{inset:auto -8% -8% -8%;height:34%;
+.gtex__floor{inset:auto -8% -8% -8%;height:34%;
   transform:translate3d(calc(var(--gp-x) * .2),calc(var(--gp-y) * .2),0);
   background:
     linear-gradient(180deg, transparent, var(--wall-deep)),
-    radial-gradient(60% 100% at 50% 100%, rgba(217,161,63,.05), transparent 70%)}/* A light room needs its undertones and its legacy interface palette
+    radial-gradient(60% 100% at 50% 100%, rgba(217,161,63,.05), transparent 70%)}
+
+/* A light room needs its undertones and its legacy interface palette
    re-pointed, and those two sets are per-CATEGORY rules on #gallery, so a
    token on <html> cannot reach them. This is the one version-scoped block
    in the stylesheet; it sets variables only, never new rules. */
-#wfgallery #gallery{
+#gallery{
   --dim:rgba(25,21,32,.56);
   --cream:#191520;
   --gold:#6d4a94;
@@ -623,17 +760,24 @@ body:not(.env-idle):not(.touchmode) #wfgallery .lobby__floor{will-change:transfo
   --panel-close:#191520;
   --panel-close-ink:#fffdf9;
   --violet:#5b3a80;
-}/* ---- category rooms: same museum, different galleries ----
+}
+
+/* ---- category rooms: same museum, different galleries ----
    The directory is the lobby: brightest and most open. The wave rooms are
    the darkened exhibition halls, so the vignette closes in there. */
 /* the directory is the lit room: its wall carries the pools all the time,
    where the wave rooms raise theirs only around the active piece */
-#wfgallery #gallery[data-cat="directory"]{--spotlight-opacity:1;--vignette-strength:calc(.58 * var(--v-vignette,1) / .72);--vignette-size:132%;
-  --vignette-edge-opacity:.6;--vignette-corner-opacity:.82}#wfgallery #gallery[data-cat="lenses"]{--wall-warm:rgba(238,222,196,.10);--wall-cool:rgba(168,146,212,.12);
-  --gallery-light-intensity:1.08;--vignette-strength:.9;--vignette-size:112%}#wfgallery #gallery[data-cat="waves"]{--wall-cool:rgba(138,116,186,.09);--wall-deep:rgba(16,9,28,.66);
-  --vignette-strength:1;--vignette-size:98%;--gallery-light-intensity:.95}#wfgallery #gallery[data-cat="people"]{--wall-warm:rgba(236,226,208,.08);--wall-cool:rgba(186,168,224,.13);
+#gallery[data-cat="directory"]{--spotlight-opacity:1;--vignette-strength:calc(.58 * var(--v-vignette,1) / .72);--vignette-size:132%;
+  --vignette-edge-opacity:.6;--vignette-corner-opacity:.82}
+#gallery[data-cat="lenses"]{--wall-warm:rgba(238,222,196,.10);--wall-cool:rgba(168,146,212,.12);
+  --gallery-light-intensity:1.08;--vignette-strength:.9;--vignette-size:112%}
+#gallery[data-cat="waves"]{--wall-cool:rgba(138,116,186,.09);--wall-deep:rgba(16,9,28,.66);
+  --vignette-strength:1;--vignette-size:98%;--gallery-light-intensity:.95}
+#gallery[data-cat="people"]{--wall-warm:rgba(236,226,208,.08);--wall-cool:rgba(186,168,224,.13);
   --wall-deep:rgba(24,16,40,.42);--vignette-strength:.82;--vignette-size:116%;
-  --gallery-light-intensity:1.12;--grain-opacity:.04}/* ---- CHOSEN DIRECTION · Museum Plaster (approved 2 Aug 2026) --------
+  --gallery-light-intensity:1.12;--grain-opacity:.04}
+
+/* ---- CHOSEN DIRECTION · Museum Plaster (approved 2 Aug 2026) --------
    Warm, architectural, minimal: a hand-finished wall catching room light,
    with grain and fibre pulled well back so the artwork stays the
    brightest thing on screen. The Archival Paper and Frosted Vision
@@ -642,58 +786,100 @@ body:not(.env-idle):not(.touchmode) #wfgallery .lobby__floor{will-change:transfo
    Note this is a plain #gallery rule, so it deliberately does NOT set
    --vignette-strength: that would tie with the [data-cat] rules on
    specificity, win on order, and flatten the lobby/hall difference. */
-#wfgallery #gallery{--wall-warm:rgba(236,216,182,.11);--wall-gold:rgba(201,155,56,.08);
-  --grain-opacity:.045;--gallery-fibre-opacity:.03;--fibre-scale:300px}/* reduced motion / no-texture fallback: keep the colour, drop the moving
-   parts entirely so the room is a calm flat wall */
+#gallery{--wall-warm:rgba(236,216,182,.11);--wall-gold:rgba(201,155,56,.08);
+  --grain-opacity:.045;--gallery-fibre-opacity:.03;--fibre-scale:300px}
 
-@media (prefers-reduced-motion: reduce){/* Only the MOVING parts go. The grain is static by construction, so it
+/* reduced motion / no-texture fallback: keep the colour, drop the moving
+   parts entirely so the room is a calm flat wall */
+@media (prefers-reduced-motion: reduce){
+  /* Only the MOVING parts go. The grain is static by construction, so it
      stays: it is what keeps the room from looking digitally flat, and a
      texture that never moves is not a motion problem. */
-#wfgallery .gtex > *{transform:none !important}#wfgallery .gtex__spot{transition:none}/* the linework remains as a quiet static composition: fully drawn,
+  .gtex > *{transform:none !important}
+  .gtex__spot{transition:none}
+  /* the linework remains as a quiet static composition: fully drawn,
      no reveal, no drift, no pointer parallax */
-#wfgallery .glines path{animation:none;stroke-dasharray:none;stroke-dashoffset:0}/* pan and drift now share one node, so both are cleared together —
+  .glines path{animation:none;stroke-dasharray:none;stroke-dashoffset:0}
+  /* pan and drift now share one node, so both are cleared together —
      including the individual properties the drift keyframes animate */
-#wfgallery .glines__pan{animation:none;transform:none;translate:none;rotate:none;scale:none}#wfgallery .gtex__fibre{display:none}
-}body.notex #wfgallery .gtex{display:none}/* Phones: same material, quieter. Lower contrast, no parallax (already
+  .glines__pan{animation:none;transform:none;translate:none;rotate:none;scale:none}
+  .gtex__fibre{display:none}
+}
+body.notex .gtex{display:none}
+/* Phones: same material, quieter. Lower contrast, no parallax (already
    pinned in JS), and the fibre layer drops out entirely — at this size it
    only costs fill rate without reading as texture. */
-body.touchmode #wfgallery .gtex{--grain-opacity:.035;--gallery-fibre-opacity:0;
-  --gallery-plaster-contrast:.8}/* Small screens: a vignette sized for a desktop canvas eats a phone's
+body.touchmode .gtex{--grain-opacity:.035;--gallery-fibre-opacity:0;
+  --gallery-plaster-contrast:.8}
+/* Small screens: a vignette sized for a desktop canvas eats a phone's
    edges, where the content already runs close to the bezel. Weaken it and
    push the falloff outward. Set on #gallery so it beats the category
    rules above, which also set these two. */
+@media (max-width:820px){
+  #gallery,#gallery[data-cat]{--vignette-strength:.62;--vignette-size:130%}
+  #gallery[data-spot="on"]{--vig-boost:1.08}
+}
+body.touchmode .gtex__fibre{display:none}
+body.touchmode .gtex > *{transform:none !important}
+body.touchmode #gallery{--mx:0 !important;--my:0 !important}
 
-@media (max-width:820px){#wfgallery #gallery,
-#wfgallery #gallery[data-cat]{--vignette-strength:.62;--vignette-size:130%}#wfgallery #gallery[data-spot="on"]{--vig-boost:1.08}
-}body.touchmode #wfgallery .gtex__fibre{display:none}body.touchmode #wfgallery .gtex > *{transform:none !important}body.touchmode #wfgallery #gallery{--mx:0 !important;--my:0 !important}/* ---- PROTOTYPE ONLY · art-direction switcher ---- */
+/* ---- PROTOTYPE ONLY · art-direction switcher ---- */
+
 /* ---- DEV ONLY · live tuner. Remove with killTuner() + this block. ---- */
+@media (max-width:820px){ .tuner{left:8px;right:8px;width:auto;max-height:56vh} }
+/* ---- end dev-only tuner ---- */
 
-@media (max-width:820px){#wfgallery .tuner{left:8px;right:8px;width:auto;max-height:56vh} }/* ---- end dev-only tuner ---- */
 /* headset pane: subtle rounded lens + vignette. Environment only; text
    inside pieces is never distorted. */
-#wfgallery .lensframe{position:absolute;inset:0;z-index:40;pointer-events:none}/* Pulled right back: the dedicated .gtex__vig layer now owns the vignette,
+.lensframe{position:absolute;inset:0;z-index:40;pointer-events:none}
+/* Pulled right back: the dedicated .gtex__vig layer now owns the vignette,
    and two overlapping falloffs read as a hard ring. What is left here is
    just the last few pixels of the pane edge. */
-#wfgallery .lensframe::before{content:"";position:absolute;inset:0;
-  background:radial-gradient(128% 114% at 50% 48%,transparent 76%,rgba(12,7,22,.16) 92%,rgba(10,6,20,.34) 100%)}#wfgallery .lensframe::after{content:"";position:absolute;inset:clamp(6px,1vw,12px);border-radius:clamp(16px,2.4vw,28px);
-  box-shadow:0 0 0 200vmax rgba(6,3,12,.9), inset 0 0 54px rgba(20,12,40,.45)}/* ---------- HUD ---------- */
-#wfgallery .hud{position:absolute;left:0;right:0;top:0;z-index:50;display:flex;align-items:center;gap:16px;
-  padding:calc(clamp(6px,1vw,12px) + 12px) clamp(18px,3vw,34px) 10px}#wfgallery .hud__mark{font-family:var(--mono);font-size:.7rem;letter-spacing:0.055em;color:var(--dim)}#wfgallery .hud__mid{margin:0 auto;text-align:center;min-width:0}#wfgallery .hud__chapter{font-family:var(--sans);font-weight:600;font-size:.7rem;letter-spacing:var(--label);
-  text-transform:uppercase;color:var(--v-ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#wfgallery .hud__prog{margin:6px auto 0;width:150px;height:2px;background:var(--v-edge);border-radius:2px;overflow:hidden}#wfgallery #gallery[data-cat="directory"] .hud__prog{display:none}#wfgallery .hud__prog i{display:block;height:100%;width:0;background:var(--gold);transition:width .5s cubic-bezier(.2,.8,.2,1)}#wfgallery .hud__count{font-family:var(--mono);font-size:.62rem;letter-spacing:0.055em;color:var(--dim);margin-top:5px}/* Gallery guide bar: typographic wall signage with hairline dividers,
+.lensframe::before{content:"";position:absolute;inset:0;
+  background:radial-gradient(128% 114% at 50% 48%,transparent 76%,rgba(12,7,22,.16) 92%,rgba(10,6,20,.34) 100%)}
+.lensframe::after{content:"";position:absolute;inset:clamp(6px,1vw,12px);border-radius:clamp(16px,2.4vw,28px);
+  box-shadow:0 0 0 200vmax rgba(6,3,12,.9), inset 0 0 54px rgba(20,12,40,.45)}
+
+/* ---------- HUD ---------- */
+.hud{position:absolute;left:0;right:0;top:0;z-index:50;display:flex;align-items:center;gap:16px;
+  padding:calc(clamp(6px,1vw,12px) + 12px) clamp(18px,3vw,34px) 10px}
+.hud__mark{font-family:var(--mono);font-size:.7rem;letter-spacing:0.055em;color:var(--dim)}
+.hud__mid{margin:0 auto;text-align:center;min-width:0}
+.hud__chapter{font-family:var(--sans);font-weight:600;font-size:.7rem;letter-spacing:var(--label);
+  text-transform:uppercase;color:var(--v-ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hud__prog{margin:6px auto 0;width:150px;height:2px;background:var(--v-edge);border-radius:2px;overflow:hidden}
+#gallery[data-cat="directory"] .hud__prog{display:none}
+.hud__prog i{display:block;height:100%;width:0;background:var(--gold);transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.hud__count{font-family:var(--mono);font-size:.62rem;letter-spacing:0.055em;color:var(--dim);margin-top:5px}
+/* Gallery guide bar: typographic wall signage with hairline dividers,
    not application pills. Exit stays the one boxed item so the way out is
    never ambiguous. */
-#wfgallery .hud__btns{display:flex;align-items:stretch;gap:0}#wfgallery .hudbtn{position:relative;font-family:var(--sans);font-size:.74rem;font-weight:500;letter-spacing:.01em;color:var(--v-ink-2);background:none;border:0;border-radius:0;
-  padding:8px 15px;transition:color .22s ease}#wfgallery .hudbtn + .hudbtn::before{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);
-  width:1px;height:13px;background:var(--v-edge)}/* the underline is the affordance, and it is always partly visible */
-#wfgallery .hudbtn::after{content:"";position:absolute;left:15px;right:15px;bottom:2px;height:1px;
-  background:currentColor;opacity:.22;transition:opacity .22s ease}#wfgallery .hudbtn:hover,
-#wfgallery .hudbtn:focus-visible{color:var(--gold)}#wfgallery .hudbtn:hover::after,
-#wfgallery .hudbtn:focus-visible::after{opacity:1}#wfgallery .hudbtn[aria-current="true"]{color:var(--cream)}#wfgallery .hudbtn[aria-current="true"]::after{opacity:.85;background:var(--gold)}#wfgallery .hudbtn--exit{margin-left:10px;color:var(--cream);
-  border:1px solid rgba(233,214,183,.42);padding:8px 14px}#wfgallery .hudbtn--exit::after{display:none}#wfgallery .hudbtn--exit:hover,
-#wfgallery .hudbtn--exit:focus-visible{border-color:var(--gold);color:var(--gold)}#wfgallery .hint{position:absolute;left:0;right:0;bottom:calc(clamp(6px,1vw,12px) + 12px);z-index:50;text-align:center;font-family:var(--sans);letter-spacing:0;
+.hud__btns{display:flex;align-items:stretch;gap:0}
+.hudbtn{position:relative;font-family:var(--sans);font-size:.74rem;font-weight:500;letter-spacing:.01em;color:var(--v-ink-2);background:none;border:0;border-radius:0;
+  padding:8px 15px;transition:color .22s ease}
+.hudbtn + .hudbtn::before{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);
+  width:1px;height:13px;background:var(--v-edge)}
+/* the underline is the affordance, and it is always partly visible */
+.hudbtn::after{content:"";position:absolute;left:15px;right:15px;bottom:2px;height:1px;
+  background:currentColor;opacity:.22;transition:opacity .22s ease}
+.hudbtn:hover,.hudbtn:focus-visible{color:var(--gold)}
+.hudbtn:hover::after,.hudbtn:focus-visible::after{opacity:1}
+.hudbtn[aria-current="true"]{color:var(--cream)}
+.hudbtn[aria-current="true"]::after{opacity:.85;background:var(--gold)}
+.hudbtn--exit{margin-left:10px;color:var(--cream);
+  border:1px solid rgba(233,214,183,.42);padding:8px 14px}
+.hudbtn--exit::after{display:none}
+.hudbtn--exit:hover,.hudbtn--exit:focus-visible{border-color:var(--gold);color:var(--gold)}
+.hint{position:absolute;left:0;right:0;bottom:calc(clamp(6px,1vw,12px) + 12px);z-index:50;text-align:center;font-family:var(--sans);letter-spacing:0;
   font-family:var(--mono);font-size:.64rem;letter-spacing:0.055em;color:var(--dim);pointer-events:none;
-  transition:opacity .6s}#wfgallery .hint.dim{opacity:0}/* ---------- rooms ---------- */
-#wfgallery #stage{position:absolute;inset:0;z-index:20;overflow:hidden}#wfgallery .room{position:absolute;inset:0;perspective:1300px;perspective-origin:50% 46%;display:none}#wfgallery .room.active{display:block}/* pointer-events dance: in a preserve-3d scene the world's own flat plane
+  transition:opacity .6s}
+.hint.dim{opacity:0}
+
+/* ---------- rooms ---------- */
+#stage{position:absolute;inset:0;z-index:20;overflow:hidden}
+.room{position:absolute;inset:0;perspective:1300px;perspective-origin:50% 46%;display:none}
+.room.active{display:block}
+/* pointer-events dance: in a preserve-3d scene the world's own flat plane
    (z = 0) hit-tests IN FRONT of pieces hanging at negative z, and it
    swallows every click. So the world ignores the pointer and each piece
    opts back in. */
@@ -705,65 +891,131 @@ body.touchmode #wfgallery .gtex{--grain-opacity:.035;--gallery-fibre-opacity:0;
    full-viewport layers makes that budget tighter, not looser. .world still
    carries a transform, so it is composited when it needs to be; the
    difference is that Chrome may now release it under pressure. */
-#wfgallery .world{position:absolute;inset:0;transform-style:preserve-3d;pointer-events:none}#wfgallery .world .piece,
-#wfgallery .world .stub{pointer-events:auto}/* the rail is a plain wrapper on desktop, but it MUST carry preserve-3d or
+.world{position:absolute;inset:0;transform-style:preserve-3d;pointer-events:none}
+.world .piece,.world .stub{pointer-events:auto}
+/* the rail is a plain wrapper on desktop, but it MUST carry preserve-3d or
    every piece's translateZ flattens onto its plane and the corridor
    collapses into one overlapping stack. (Touch mode restyles it into a
    scroll-snap row instead; see body.touchmode .rail below.) */
-#wfgallery .world .rail{position:absolute;inset:0;transform-style:preserve-3d;pointer-events:none}/* ---------- an art piece ---------- */
-#wfgallery .piece{position:absolute;left:50%;top:50%;width:min(520px,42vw);
+.world .rail{position:absolute;inset:0;transform-style:preserve-3d;pointer-events:none}
+
+/* ---------- an art piece ---------- */
+.piece{position:absolute;left:50%;top:50%;width:min(520px,42vw);
   transform:translate(-50%,-50%) translate3d(var(--px,0px),var(--py,0px),var(--pz,0px)) rotateY(var(--pry,0deg));
-  transition:opacity .3s linear}#wfgallery .frame{background:linear-gradient(175deg,#fbf7ef,#efe7d8);color:var(--ink);border-radius:14px;
+  transition:opacity .3s linear}
+.frame{background:linear-gradient(175deg,#fbf7ef,#efe7d8);color:var(--ink);border-radius:14px;
   padding:clamp(14px,1.6vw,22px);border:1px solid rgba(217,161,63,.5);
   box-shadow:0 24px 60px rgba(5,2,12,.55), inset 0 0 0 6px var(--room), inset 0 0 0 7px rgba(217,161,63,.35);
-  transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s}#wfgallery .piece[role="button"]{cursor:pointer}#wfgallery .piece[role="button"]:hover .frame,
-#wfgallery .piece[role="button"]:focus-visible .frame{
+  transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s}
+.piece[role="button"]{cursor:pointer}
+.piece[role="button"]:hover .frame,.piece[role="button"]:focus-visible .frame{
   transform:translateZ(0) scale(1.03);
-  box-shadow:0 30px 70px rgba(5,2,12,.6),0 0 44px rgba(217,161,63,.28), inset 0 0 0 6px var(--room), inset 0 0 0 7px var(--gold)}/* ---------- art-piece materials ----------
+  box-shadow:0 30px 70px rgba(5,2,12,.6),0 0 44px rgba(217,161,63,.28), inset 0 0 0 6px var(--room), inset 0 0 0 7px var(--gold)}
+
+/* ---------- art-piece materials ----------
    The pieces are cleaner than the room they hang in: only a very fine
    paper grain, never enough to touch legibility. Each category is a
    different stock, but all three share one material language. */
-#wfgallery .frame{position:relative;isolation:isolate}#wfgallery .frame::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:1;
-  background-image:var(--grain-url);background-size:110px 110px;opacity:.05}#wfgallery .frame > *{position:relative;z-index:2}/* Understanding feminism · warm archival paper, soft lavender edge */
-#wfgallery .room[data-type="lenses"] .frame{
+.frame{position:relative;isolation:isolate}
+.frame::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:1;
+  background-image:var(--grain-url);background-size:110px 110px;opacity:.05}
+.frame > *{position:relative;z-index:2}
+
+/* Understanding feminism · warm archival paper, soft lavender edge */
+.room[data-type="lenses"] .frame{
   background:linear-gradient(172deg,#fcf8f1,#f2ebdd);
   border-color:rgba(150,128,196,.5);
   box-shadow:0 22px 54px rgba(5,2,12,.5),0 0 0 1px rgba(186,166,224,.18),
-             inset 0 0 0 6px var(--room), inset 0 0 0 7px rgba(168,146,212,.42)}#wfgallery .room[data-type="lenses"] .frame::after{
-  background-image:var(--fibre-url);background-size:150px 150px;opacity:.07}/* History in four waves · museum card, deeper shadow, gold datum line */
-#wfgallery .room[data-type="corridor"] .frame,
-#wfgallery .room[data-type="orbit"] .frame,
-#wfgallery .room[data-type="field"] .frame,
-#wfgallery .room[data-type="feed"] .frame{
+             inset 0 0 0 6px var(--room), inset 0 0 0 7px rgba(168,146,212,.42)}
+.room[data-type="lenses"] .frame::after{
+  background-image:var(--fibre-url);background-size:150px 150px;opacity:.07}
+
+/* History in four waves · museum card, deeper shadow, gold datum line */
+.room[data-type="corridor"] .frame,.room[data-type="orbit"] .frame,
+.room[data-type="field"] .frame,.room[data-type="feed"] .frame{
   background:linear-gradient(175deg,#fbf7ef,#ede4d2);
-  box-shadow:0 30px 72px rgba(5,2,12,.6), inset 0 0 0 6px var(--room), inset 0 0 0 7px rgba(217,161,63,.4)}/* the chronological accent: a thin gold rule at the top of every card */
-#wfgallery .room[data-type="corridor"] .frame::before,
-#wfgallery .room[data-type="orbit"] .frame::before,
-#wfgallery .room[data-type="field"] .frame::before,
-#wfgallery .room[data-type="feed"] .frame::before{
+  box-shadow:0 30px 72px rgba(5,2,12,.6), inset 0 0 0 6px var(--room), inset 0 0 0 7px rgba(217,161,63,.4)}
+/* the chronological accent: a thin gold rule at the top of every card */
+.room[data-type="corridor"] .frame::before,.room[data-type="orbit"] .frame::before,
+.room[data-type="field"] .frame::before,.room[data-type="feed"] .frame::before{
   content:"";position:absolute;left:clamp(14px,1.6vw,22px);right:clamp(14px,1.6vw,22px);
   top:calc(clamp(14px,1.6vw,22px) - 7px);height:1px;z-index:2;
-  background:linear-gradient(90deg,var(--gold),rgba(217,161,63,.12))}/* People and resources · frosted portrait card, calm and well separated */
-#wfgallery .room[data-type="scholars"] .frame{
+  background:linear-gradient(90deg,var(--gold),rgba(217,161,63,.12))}
+
+/* People and resources · frosted portrait card, calm and well separated */
+.room[data-type="scholars"] .frame{
   background:linear-gradient(168deg,rgba(252,250,246,.97),rgba(238,233,244,.94));
   border-color:rgba(176,152,226,.46);
   box-shadow:0 20px 46px rgba(5,2,12,.42),0 0 0 1px rgba(255,255,255,.16),
-             inset 0 0 0 6px var(--room), inset 0 0 0 7px rgba(176,152,226,.36)}#wfgallery .room[data-type="scholars"] .frame::after{opacity:.03}/* ---------- the active piece lights its own patch of wall ----------
+             inset 0 0 0 6px var(--room), inset 0 0 0 7px rgba(176,152,226,.36)}
+.room[data-type="scholars"] .frame::after{opacity:.03}
+
+/* ---------- the active piece lights its own patch of wall ----------
    A soft warm pool behind the card only, so the piece you are reading
    sits in its own light instead of glowing like a neon sign. */
-#wfgallery .piece::before{content:"";position:absolute;inset:-14% -12%;z-index:-1;border-radius:28px;
+.piece::before{content:"";position:absolute;inset:-14% -12%;z-index:-1;border-radius:28px;
   opacity:0;transition:opacity .4s ease;pointer-events:none;
-  background:radial-gradient(60% 58% at 50% 50%,rgba(255,238,206,.20),rgba(217,161,63,.07) 52%,transparent 76%)}#wfgallery .piece[role="button"]:hover::before,
-#wfgallery .piece[role="button"]:focus-visible::before{opacity:1}#wfgallery .piece__img{border-radius:8px;overflow:hidden;margin-bottom:14px;aspect-ratio:16/9;background:var(--violet-deep)}#wfgallery .piece__img img{width:100%;height:100%;object-fit:cover}#wfgallery .piece__year{font-family:var(--mono);font-size:.7rem;letter-spacing:0.055em;color:var(--violet);display:block;margin-bottom:6px}#wfgallery .piece__title{font-family:var(--serif);font-weight:600;font-size:clamp(1.05rem,1.6vw,1.35rem);line-height:1.2}#wfgallery .piece__title em{font-style:italic}#wfgallery .piece__blurb{margin-top:8px;color:var(--ink-dim);font-size:.9rem}#wfgallery .piece__hint{margin-top:12px;font-family:var(--sans);font-size:.74rem;font-weight:600;color:var(--gold);opacity:.92}#wfgallery .piece--seen .piece__hint::after{content:" · seen ✓";color:var(--violet)}/* lenses: glyphs from the live page, redrawn small */
-#wfgallery .piece--lens{width:min(380px,30vw)}#wfgallery .lensviz{height:92px;display:grid;place-items:center;margin-bottom:10px;border-radius:8px;background:rgba(74,53,104,.08)}#wfgallery .lv-bar{width:96px;height:12px;border-radius:99px;background:var(--violet)}#wfgallery .lv-stack{display:grid;gap:6px}#wfgallery .lv-stack i{display:block;height:9px;border-radius:99px;background:var(--violet)}#wfgallery .lv-stack i:nth-child(1){width:110px}#wfgallery .lv-stack i:nth-child(2){width:72px;opacity:.75}#wfgallery .lv-stack i:nth-child(3){width:88px;opacity:.6}#wfgallery .lv-stack i:nth-child(4){width:52px;opacity:.45}#wfgallery .lv-knot{position:relative;width:100px;height:60px}#wfgallery .lv-knot i{position:absolute;left:0;right:0;top:50%;height:9px;border-radius:99px;background:var(--violet)}#wfgallery .lv-knot i:nth-child(1){transform:rotate(24deg)}#wfgallery .lv-knot i:nth-child(2){transform:rotate(-24deg);opacity:.75}#wfgallery .lv-knot i:nth-child(3){transform:rotate(0);opacity:.55}#wfgallery .lv-knot b{position:absolute;left:50%;top:50%;width:18px;height:18px;border-radius:50%;
-  transform:translate(-50%,-50%);background:var(--gold)}#wfgallery .lv-cap{font-family:var(--mono);font-size:.62rem;letter-spacing:0.055em;color:var(--ink-dim);margin-top:8px;text-align:center}/* quiz piece */
-#wfgallery .piece--quiz{width:min(560px,46vw)}#wfgallery .quiz__q{font-family:var(--serif);font-size:1.15rem;margin:4px 0 14px}#wfgallery .quiz__opts{display:grid;gap:8px}#wfgallery .quiz__opt{text-align:left;border:1px solid rgba(74,53,104,.3);border-radius:10px;padding:11px 14px;font-size:.9rem;
-  transition:border-color .2s,background .2s}#wfgallery .quiz__opt:hover{border-color:var(--violet);background:rgba(74,53,104,.06)}#wfgallery .quiz__opt.right{border-color:#3e7d4f;background:rgba(62,125,79,.12)}#wfgallery .quiz__opt.wrong{border-color:#a04545;background:rgba(160,69,69,.1)}#wfgallery .quiz__verdict{margin-top:12px;font-size:.9rem;min-height:1.4em}#wfgallery .quiz__verdict b{color:var(--violet)}/* room titles floating in space */
-#wfgallery .roomtitle{position:absolute;left:50%;top:50%;width:min(680px,80vw);text-align:center;pointer-events:none;
-  transform:translate(-50%,-50%) translate3d(var(--px,0px),var(--py,0px),var(--pz,0px))}#wfgallery .roomtitle .eyebrow{color:var(--gold);letter-spacing:0.055em}#wfgallery .roomtitle h2{font-family:var(--serif);font-weight:600;font-size:clamp(1.9rem,4.4vw,3.2rem);color:var(--cream);line-height:1.06;margin-top:10px}#wfgallery .roomtitle h2 em{font-style:italic;color:var(--gold)}#wfgallery .roomtitle p{color:var(--dim);margin-top:12px;font-size:.98rem}/* the scholars room is the busiest, so its heading block stays compact */
-#wfgallery .room[data-type="scholars"] .roomtitle{width:min(560px,72vw)}#wfgallery .room[data-type="scholars"] .roomtitle h2{font-size:clamp(1.5rem,3vw,2.2rem)}#wfgallery .room[data-type="scholars"] .roomtitle p{font-size:.88rem;margin-top:8px}/* scholars */
-#wfgallery .piece--scholar{width:min(230px,17vw)}#wfgallery .piece--scholar .frame{padding:12px}#wfgallery .piece--scholar:hover .frame,
-#wfgallery .piece--scholar:focus-visible .frame{transform:translateZ(0) scale(1.02)}#wfgallery .scholar__photo{aspect-ratio:3/2;border-radius:8px;overflow:hidden;background:var(--violet-deep);margin-bottom:10px}#wfgallery .scholar__photo img{width:100%;height:100%;object-fit:cover}#wfgallery .scholar__name{font-family:var(--serif);font-weight:600;font-size:1.05rem}#wfgallery .scholar__role{color:var(--ink-dim);font-size:.78rem;margin-top:4px}/* ---------- room 00 · THE EXHIBITION REEL --------------------------
+  background:radial-gradient(60% 58% at 50% 50%,rgba(255,238,206,.20),rgba(217,161,63,.07) 52%,transparent 76%)}
+.piece[role="button"]:hover::before,.piece[role="button"]:focus-visible::before{opacity:1}
+.piece__img{border-radius:8px;overflow:hidden;margin-bottom:14px;aspect-ratio:16/9;background:var(--violet-deep)}
+.piece__img img{width:100%;height:100%;object-fit:cover}
+.piece__year{font-family:var(--mono);font-size:.7rem;letter-spacing:0.055em;color:var(--violet);display:block;margin-bottom:6px}
+.piece__title{font-family:var(--serif);font-weight:600;font-size:clamp(1.05rem,1.6vw,1.35rem);line-height:1.2}
+.piece__title em{font-style:italic}
+.piece__blurb{margin-top:8px;color:var(--ink-dim);font-size:.9rem}
+.piece__hint{margin-top:12px;font-family:var(--sans);font-size:.74rem;font-weight:600;color:var(--gold);opacity:.92}
+.piece--seen .piece__hint::after{content:" · seen ✓";color:var(--violet)}
+
+/* lenses: glyphs from the live page, redrawn small */
+.piece--lens{width:min(380px,30vw)}
+.lensviz{height:92px;display:grid;place-items:center;margin-bottom:10px;border-radius:8px;background:rgba(74,53,104,.08)}
+.lv-bar{width:96px;height:12px;border-radius:99px;background:var(--violet)}
+.lv-stack{display:grid;gap:6px}
+.lv-stack i{display:block;height:9px;border-radius:99px;background:var(--violet)}
+.lv-stack i:nth-child(1){width:110px}.lv-stack i:nth-child(2){width:72px;opacity:.75}
+.lv-stack i:nth-child(3){width:88px;opacity:.6}.lv-stack i:nth-child(4){width:52px;opacity:.45}
+.lv-knot{position:relative;width:100px;height:60px}
+.lv-knot i{position:absolute;left:0;right:0;top:50%;height:9px;border-radius:99px;background:var(--violet)}
+.lv-knot i:nth-child(1){transform:rotate(24deg)}.lv-knot i:nth-child(2){transform:rotate(-24deg);opacity:.75}
+.lv-knot i:nth-child(3){transform:rotate(0);opacity:.55}
+.lv-knot b{position:absolute;left:50%;top:50%;width:18px;height:18px;border-radius:50%;
+  transform:translate(-50%,-50%);background:var(--gold)}
+.lv-cap{font-family:var(--mono);font-size:.62rem;letter-spacing:0.055em;color:var(--ink-dim);margin-top:8px;text-align:center}
+
+/* quiz piece */
+.piece--quiz{width:min(560px,46vw)}
+.quiz__q{font-family:var(--serif);font-size:1.15rem;margin:4px 0 14px}
+.quiz__opts{display:grid;gap:8px}
+.quiz__opt{text-align:left;border:1px solid rgba(74,53,104,.3);border-radius:10px;padding:11px 14px;font-size:.9rem;
+  transition:border-color .2s,background .2s}
+.quiz__opt:hover{border-color:var(--violet);background:rgba(74,53,104,.06)}
+.quiz__opt.right{border-color:#3e7d4f;background:rgba(62,125,79,.12)}
+.quiz__opt.wrong{border-color:#a04545;background:rgba(160,69,69,.1)}
+.quiz__verdict{margin-top:12px;font-size:.9rem;min-height:1.4em}
+.quiz__verdict b{color:var(--violet)}
+
+/* room titles floating in space */
+.roomtitle{position:absolute;left:50%;top:50%;width:min(680px,80vw);text-align:center;pointer-events:none;
+  transform:translate(-50%,-50%) translate3d(var(--px,0px),var(--py,0px),var(--pz,0px))}
+.roomtitle .eyebrow{color:var(--gold);letter-spacing:0.055em}
+.roomtitle h2{font-family:var(--serif);font-weight:600;font-size:clamp(1.9rem,4.4vw,3.2rem);color:var(--cream);line-height:1.06;margin-top:10px}
+.roomtitle h2 em{font-style:italic;color:var(--gold)}
+.roomtitle p{color:var(--dim);margin-top:12px;font-size:.98rem}
+/* the scholars room is the busiest, so its heading block stays compact */
+.room[data-type="scholars"] .roomtitle{width:min(560px,72vw)}
+.room[data-type="scholars"] .roomtitle h2{font-size:clamp(1.5rem,3vw,2.2rem)}
+.room[data-type="scholars"] .roomtitle p{font-size:.88rem;margin-top:8px}
+
+/* scholars */
+.piece--scholar{width:min(230px,17vw)}
+.piece--scholar .frame{padding:12px}
+.piece--scholar:hover .frame,.piece--scholar:focus-visible .frame{transform:translateZ(0) scale(1.02)}
+.scholar__photo{aspect-ratio:3/2;border-radius:8px;overflow:hidden;background:var(--violet-deep);margin-bottom:10px}
+.scholar__photo img{width:100%;height:100%;object-fit:cover}
+.scholar__name{font-family:var(--serif);font-weight:600;font-size:1.05rem}
+.scholar__role{color:var(--ink-dim);font-size:.78rem;margin-top:4px}
+
+/* ---------- room 00 · THE EXHIBITION REEL --------------------------
    Six room covers on one controlled horizontal reel. Exactly one is
    active and dominant; its neighbours are cropped by the viewport edges
    so the exhibition reads as continuing past the frame. This replaces
@@ -776,7 +1028,7 @@ body.touchmode #wfgallery .gtex{--grain-opacity:.035;--gallery-fibre-opacity:0;
                    ONLY, written by CSS/WAAPI. Never moved by the reel.
    Two writers, two elements, one transform-function order each.
    ------------------------------------------------------------------- */
-#wfgallery{
+:root{
   /* the identity palette — these were referenced everywhere but their
      definitions were lost when the wall CSS was replaced */
   --gallery-black:#08060d;
@@ -815,48 +1067,60 @@ body.touchmode #wfgallery .gtex{--grain-opacity:.035;--gallery-fibre-opacity:0;
   --return-ms:820;        /* return transition duration                */
   --portal-scale:1;       /* final portal scale on open                */
   --portal-crop:1.06;     /* media zoom through the portal             */
-}#wfgallery .dirroom{position:absolute;inset:0;pointer-events:none;overflow:hidden;
-  display:block;padding:0}/* --- the room the reel stands in --------------------------------- */
-#wfgallery .lobby{position:absolute;inset:0;pointer-events:none;overflow:hidden}#wfgallery .lobby__wall{position:absolute;inset:0;
+}
+.dirroom{position:absolute;inset:0;pointer-events:none;overflow:hidden;
+  display:block;padding:0}
+
+/* --- the room the reel stands in --------------------------------- */
+.lobby{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.lobby__wall{position:absolute;inset:0;
   transform:scale(1.06) translate3d(calc(var(--mx) * 10px),calc(var(--my) * 6px),0);
   background:
     /* the room tone: wide enough to wash the whole wall, including the
        edges either side of the cover, which is where it actually reads */
     radial-gradient(120% 66% at 50% -12%, rgba(247,238,222,.09), transparent 66%),
     linear-gradient(180deg, var(--gallery-wall) 0%, var(--gallery-edge) 74%, var(--gallery-black) 100%);
-  opacity:1;transition:background .8s ease}/* two directional pools, as if the room were lit from above and slightly
+  opacity:1;transition:background .8s ease}
+/* two directional pools, as if the room were lit from above and slightly
    off-axis, plus a fine plaster mottle that is not the same as the grain */
-#wfgallery .lobby__wall::before{content:"";position:absolute;inset:0;pointer-events:none;
+.lobby__wall::before{content:"";position:absolute;inset:0;pointer-events:none;
   background:
     radial-gradient(46% 40% at 26% 4%, rgba(255,247,232,.16), transparent 68%),
     radial-gradient(38% 34% at 78% 0%, rgba(255,243,222,.1), transparent 70%),
-    radial-gradient(70% 46% at 50% 108%, rgba(var(--v-vig-rgb),.5), transparent 72%)}/* The collection's colour washing the plaster. It lives on one layer so a
+    radial-gradient(70% 46% at 50% 108%, rgba(var(--v-vig-rgb),.5), transparent 72%)}
+/* The collection's colour washing the plaster. It lives on one layer so a
    light room turns it almost off with a single token (--v-tint) rather
    than needing a second stylesheet. */
-#wfgallery .lobby__wall::after{content:"";position:absolute;inset:0;
+.lobby__wall::after{content:"";position:absolute;inset:0;
   background:
     radial-gradient(150% 120% at 50% 42%, var(--room-glow,transparent), transparent 82%),
     radial-gradient(120% 90% at 50% 50%, var(--room-glow,transparent), transparent 76%);
   opacity:calc(.62 * var(--palette-mix,1) * var(--v-tint,1));
-  mix-blend-mode:screen;transition:background .8s ease}#wfgallery .lobby__floor{position:absolute;left:0;right:0;bottom:0;height:26%;
+  mix-blend-mode:screen;transition:background .8s ease}
+.lobby__floor{position:absolute;left:0;right:0;bottom:0;height:26%;
   transform:scale(1.04) translate3d(calc(var(--mx) * 13px),0,0);
   background:linear-gradient(180deg, transparent,
-    rgba(var(--v-vig-rgb),calc(.6 * var(--gallery-floor-darkness,.55))) 82%)}#wfgallery .lobby__floor::before{content:"";position:absolute;left:10%;right:10%;top:0;height:1px;
-  background:linear-gradient(90deg,transparent,var(--v-edge) 28%,var(--v-edge) 72%,transparent)}/* light bouncing back off the floor, tinted by the active room */
-#wfgallery .lobby__floor::after{content:"";position:absolute;left:12%;right:12%;top:0;height:62%;
+    rgba(var(--v-vig-rgb),calc(.6 * var(--gallery-floor-darkness,.55))) 82%)}
+.lobby__floor::before{content:"";position:absolute;left:10%;right:10%;top:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--v-edge) 28%,var(--v-edge) 72%,transparent)}
+/* light bouncing back off the floor, tinted by the active room */
+.lobby__floor::after{content:"";position:absolute;left:12%;right:12%;top:0;height:62%;
   background:radial-gradient(58% 100% at 50% 0%, var(--room-glow,transparent), transparent 74%);
-  opacity:calc(.32 * var(--v-tint,1))}/* the gradient is already soft */
+  opacity:calc(.32 * var(--v-tint,1))}   /* the gradient is already soft */
+
+
 /* --- the treated collage, printed on the wall itself ---------------
    It sits on .lobby, immediately above the wall gradient and below the
    floor and the artwork, because that is the surface a visitor is
    actually looking at. One static decoded bitmap; the only thing that
    ever changes is its opacity, and only when a strength is chosen. */
-#wfgallery .lobby__photo{position:absolute;inset:0;pointer-events:none;
+.lobby__photo{position:absolute;inset:0;pointer-events:none;
   opacity:var(--wall-photo-o,0);
   background-image:var(--wall-photo);
   background-size:cover;
   background-position:var(--wall-photo-pos,50% 30%);
-  background-repeat:no-repeat}/* =====================================================================
+  background-repeat:no-repeat}
+/* =====================================================================
    THE FILM BURN · age laid over the wall photograph
    It sits immediately ON TOP of .lobby__photo, inside the lobby, and that
    position is the whole point: .gtex is the generated wall at z-index 5,
@@ -879,32 +1143,45 @@ body.touchmode #wfgallery .gtex{--grain-opacity:.035;--gallery-fibre-opacity:0;
    a second PARALLAXING photo layer would have spent tile memory in the
    exact place this file keeps running out of it.
    ===================================================================== */
-#wfgallery .lobby__burn{position:absolute;inset:0;pointer-events:none;
+.lobby__burn{position:absolute;inset:0;pointer-events:none;
   background-image:var(--burn-photo,none);
   background-size:cover;
   background-position:var(--burn-pos,50% 40%);
   background-repeat:no-repeat;
   mix-blend-mode:multiply;
-  opacity:var(--burn-o,0)}/* --- quiet zones -------------------------------------------------
+  opacity:var(--burn-o,0)}
+
+/* --- quiet zones -------------------------------------------------
    The wall is washed out where a work hangs, so the collage never reads
    through the artwork or the editorial type. Same soft gradients as the
    gallery lighting, on the custom properties the loop already writes on
    an index change: no blur, no per-frame work, no rectangles. */
-#wfgallery .lobby__quiet{position:absolute;inset:0;pointer-events:none;
+.lobby__quiet{position:absolute;inset:0;pointer-events:none;
   background:
     radial-gradient(32% 36% at var(--spotlight-x,50%) var(--spotlight-y,50%),
       rgba(255,253,249,.8) 0%, rgba(255,253,249,.4) 46%, transparent 74%),
     radial-gradient(18% 26% at 11% 46%, rgba(255,253,249,.42), transparent 74%),
     radial-gradient(18% 26% at 89% 52%, rgba(255,253,249,.42), transparent 74%),
-    linear-gradient(180deg, transparent 66%, rgba(255,253,249,.5) 92%)}body.tier-reduced #wfgallery .lobby__photo{opacity:calc(var(--wall-photo-o,0) * .7)}/* --- the reel ----------------------------------------------------- */
-#wfgallery .reel{position:absolute;inset:0;pointer-events:auto;
+    linear-gradient(180deg, transparent 66%, rgba(255,253,249,.5) 92%)}
+body.tier-reduced .lobby__photo{opacity:calc(var(--wall-photo-o,0) * .7)}
+
+/* --- the reel ----------------------------------------------------- */
+.reel{position:absolute;inset:0;pointer-events:auto;
   perspective:1500px;perspective-origin:50% 48%;
-  touch-action:pan-y;cursor:grab;overflow:hidden}#wfgallery .reel.is-dragging{cursor:grabbing}#wfgallery .reel.is-locked{pointer-events:none}#wfgallery .reel__track{position:absolute;left:50%;top:50%;width:0;height:0;transform-style:preserve-3d}#wfgallery .reeltitle.is-hidden{opacity:0}/* never visibility: it snaps, and that snap was the flicker */
+  touch-action:pan-y;cursor:grab;overflow:hidden}
+.reel.is-dragging{cursor:grabbing}
+.reel.is-locked{pointer-events:none}
+.reel__track{position:absolute;left:50%;top:50%;width:0;height:0;transform-style:preserve-3d}
+.reeltitle.is-hidden{opacity:0}   /* never visibility: it snaps, and that snap was the flicker */
+
+
+
+
 /* --cwid / --chgt give every work its own dimensions, so the three
    installations differ in size and aspect instead of being one frame with
    the picture swapped. The margins use the same numbers, which is what
    keeps the piece centred on its own wall coordinate. */
-#wfgallery .cover{position:absolute;left:0;top:0;display:block;padding:0;border:0;background:none;
+.cover{position:absolute;left:0;top:0;display:block;padding:0;border:0;background:none;
   color:inherit;font:inherit;
   width:var(--cwpx, calc(var(--reel-w) * var(--cwid,1)));
   height:var(--chpx, calc(var(--reel-h) * var(--chgt,1)));
@@ -914,7 +1191,8 @@ body.touchmode #wfgallery .gtex{--grain-opacity:.035;--gallery-fibre-opacity:0;
   /* the reel loop writes exactly this, in exactly this order, always */
   transform:translate3d(var(--cx,0px),var(--cy,0px),var(--cz,0px))
             rotateY(var(--cry,0deg)) scale(calc(var(--cs,1) * var(--cw,1)));
-  opacity:var(--co,1)}/* No will-change here either. An earlier note in this file argued it
+  opacity:var(--co,1)}
+  /* No will-change here either. An earlier note in this file argued it
      prevented the artwork blanking while the shell stayed painted. A real
      GPU trace (M2, 1710x928 dpr2) showed that blanking is not a layer
      rebuild at all: it is `TileBasedLayerImpl::AppendQuads checkerboard`,
@@ -925,7 +1203,8 @@ body.touchmode #wfgallery .gtex{--grain-opacity:.035;--gallery-fibre-opacity:0;
      makes the eviction it was meant to prevent more likely, not less.
      The cover keeps its own transform and is still composited while it
      moves; Chrome is simply allowed to reclaim it when memory is short. */
-#wfgallery .cover:focus{outline:none}#wfgallery .cover__media{position:absolute;inset:0;overflow:hidden;border-radius:2px;
+.cover:focus{outline:none}
+.cover__media{position:absolute;inset:0;overflow:hidden;border-radius:2px;
   /* NO container-type. Size containment made every frame of the hang
      re-evaluate the container queries beneath it, because the size is
      exactly what the loop interpolates. The compact treatment is a class
@@ -952,7 +1231,8 @@ body.touchmode #wfgallery .gtex{--grain-opacity:.035;--gallery-fibre-opacity:0;
      this content can now paint into .cover's existing layer instead of
      reserving a surface of its own. */
   transform:scale(var(--mscale,1));
-  transition:transform .5s cubic-bezier(.2,.8,.2,1), box-shadow .5s ease}#wfgallery .cover__img{position:absolute;
+  transition:transform .5s cubic-bezier(.2,.8,.2,1), box-shadow .5s ease}
+.cover__img{position:absolute;
   /* Flattened out of a transformed child. --k (per-wave zoom margin) and
      --imgz (hover zoom) still ease smoothly on width/height/left/top,
      exactly as the old transform:scale() did. --artshift is different: it
@@ -980,24 +1260,31 @@ body.touchmode #wfgallery .gtex{--grain-opacity:.035;--gallery-fibre-opacity:0;
   background-size:cover;background-position:center;
   transition:width .7s cubic-bezier(.2,.8,.2,1), height .7s cubic-bezier(.2,.8,.2,1),
              left .7s cubic-bezier(.2,.8,.2,1), top .7s cubic-bezier(.2,.8,.2,1),
-             filter .5s ease}#wfgallery .cover__scrim{position:absolute;inset:0;pointer-events:none;opacity:var(--v-scrim,1);
+             filter .5s ease}
+.cover__scrim{position:absolute;inset:0;pointer-events:none;opacity:var(--v-scrim,1);
   background:linear-gradient(180deg, rgba(8,6,13,.34) 0%, rgba(8,6,13,.05) 32%,
-             rgba(8,6,13,.5) 72%, rgba(8,6,13,.88) 100%)}/* only the active cover accepts hover, and only its CHILD moves */
-#wfgallery .cover[data-active="true"]:hover .cover__media,
-#wfgallery .cover[data-active="true"]:focus-visible .cover__media{--mscale:1.012;
+             rgba(8,6,13,.5) 72%, rgba(8,6,13,.88) 100%)}
+/* only the active cover accepts hover, and only its CHILD moves */
+.cover[data-active="true"]:hover .cover__media,
+.cover[data-active="true"]:focus-visible .cover__media{--mscale:1.012;
   box-shadow:0 calc(38px * var(--v-shadow,1)) calc(92px * var(--v-shadow,1)) var(--v-shadow-a),
              0 calc(3px * var(--v-shadow,1)) calc(10px * var(--v-shadow,1)) var(--v-shadow-a),
-             inset 0 0 0 1px var(--gallery-gold)}#wfgallery .cover[data-active="true"]:hover .cover__img,
-#wfgallery .cover[data-active="true"]:focus-visible .cover__img{--imgz:1.04}/* a neighbour answers the pointer too — it is a work in the room, not a
+             inset 0 0 0 1px var(--gallery-gold)}
+.cover[data-active="true"]:hover .cover__img,
+.cover[data-active="true"]:focus-visible .cover__img{--imgz:1.04}
+/* a neighbour answers the pointer too — it is a work in the room, not a
    disabled control. It brightens and steps forward rather than scaling. */
-#wfgallery .cover[data-active="false"]:hover{opacity:1}#wfgallery .cover[data-active="false"]:hover .cover__media{--mscale:1.006;
+.cover[data-active="false"]:hover{opacity:1}
+.cover[data-active="false"]:hover .cover__media{--mscale:1.006;
   box-shadow:0 calc(34px * var(--v-shadow,1)) calc(80px * var(--v-shadow,1)) var(--v-shadow-a),
-             inset 0 0 0 1px var(--v-edge)}#wfgallery .reel.is-busy .cover__media{transition:none}/* no hover during transitions */
+             inset 0 0 0 1px var(--v-edge)}
+.reel.is-busy .cover__media{transition:none}   /* no hover during transitions */
+
 /* --- the wall label beside each work ------------------------------
    Small, printed on the plaster, never over the artwork. It sits on the
    side of the piece that faces the middle of the room, so a neighbour's
    label is always inside the viewport rather than pushed off the edge. */
-#wfgallery .wlabel{position:absolute;top:100%;left:0;width:100%;
+.wlabel{position:absolute;top:100%;left:0;width:100%;
   margin-top:clamp(10px,1.4vh,20px);text-align:left;pointer-events:none;
   font-family:var(--sans);color:var(--v-ink-2);
   /* No CSS transition here. This element lives inside a subtree whose
@@ -1005,80 +1292,134 @@ body.touchmode #wfgallery .gtex{--grain-opacity:.035;--gallery-fibre-opacity:0;
      room is moving, which re-snapshots a transition's start value on
      every one of those frames and leaves it frozen. The loop writes the
      value continuously instead — same rule as the covers themselves. */
-  opacity:var(--lo,1)}/* the label spans its own work exactly, so it can never reach past it.
+  opacity:var(--lo,1)}
+/* the label spans its own work exactly, so it can never reach past it.
    Which end it sets from is which end of the work the viewport shows:
    a piece cropped on the left prints its label right, and the reverse. */
-#wfgallery .wlabel[data-side="r"]{text-align:right}#wfgallery .wlabel[data-side="l"],
-#wfgallery .wlabel[data-side="c"]{text-align:left}#wfgallery .wlabel__n{display:block;font-size:var(--v-meta-size);font-weight:var(--v-meta-weight);
+.wlabel[data-side="r"]{text-align:right}
+.wlabel[data-side="l"],.wlabel[data-side="c"]{text-align:left}
+.wlabel__n{display:block;font-size:var(--v-meta-size);font-weight:var(--v-meta-weight);
   letter-spacing:var(--v-meta-tracking);text-transform:uppercase;
-  color:var(--v-accent-2,var(--gallery-gold))}#wfgallery .wlabel__t{display:block;margin-top:5px;font-family:var(--serif);
+  color:var(--v-accent-2,var(--gallery-gold))}
+.wlabel__t{display:block;margin-top:5px;font-family:var(--serif);
   font-weight:var(--v-display-weight);font-size:clamp(.95rem,1.35vw,1.24rem);
   font-variation-settings:'opsz' var(--v-display-opsz-sm,20);
-  line-height:1.16;letter-spacing:.002em;color:var(--v-ink)}#wfgallery .wlabel__m{display:block;margin-top:4px;font-size:var(--v-cap-size);
+  line-height:1.16;letter-spacing:.002em;color:var(--v-ink)}
+.wlabel__m{display:block;margin-top:4px;font-size:var(--v-cap-size);
   font-weight:400;letter-spacing:.004em;line-height:1.42;
-  color:var(--v-ink-3)}#wfgallery .reel.is-busy .wlabel{opacity:0}/* the lenses cover is set type, not a photograph */
+  color:var(--v-ink-3)}
+.reel.is-busy .wlabel{opacity:0}
+
+/* the lenses cover is set type, not a photograph */
 /* per-wave art direction: focal point, scale and grade all differ */
-#wfgallery .cover--w1 .cover__img{background-position:52% 42%;--k:1.1;
-  filter:sepia(.34) saturate(.9) contrast(1.1) brightness(.98)}#wfgallery .cover--w2 .cover__img{background-position:44% 30%;--k:1.02;
-  filter:sepia(.14) saturate(1.18) contrast(1.06) brightness(.95)}#wfgallery .cover--w3 .cover__img{background-position:58% 56%;--k:1.14;
-  filter:saturate(1.1) contrast(1.02)}#wfgallery .cover--w4 .cover__img{background-position:50% 26%;--k:1.06;
-  filter:saturate(1.06) contrast(1.08) brightness(.94)}/* the title does not sit in the same place on every poster */
+.cover--w1 .cover__img{background-position:52% 42%;--k:1.1;
+  filter:sepia(.34) saturate(.9) contrast(1.1) brightness(.98)}
+.cover--w2 .cover__img{background-position:44% 30%;--k:1.02;
+  filter:sepia(.14) saturate(1.18) contrast(1.06) brightness(.95)}
+.cover--w3 .cover__img{background-position:58% 56%;--k:1.14;
+  filter:saturate(1.1) contrast(1.02)}
+.cover--w4 .cover__img{background-position:50% 26%;--k:1.06;
+  filter:saturate(1.06) contrast(1.08) brightness(.94)}
+/* the title does not sit in the same place on every poster */
 /* a title printed on a photograph is measured against that photograph,
    so it can never spill onto the work hanging next to it */
-#wfgallery .reeltitle[class*="at-w"]{width:calc(var(--reel-w) * .8)}#wfgallery .reeltitle.at-w1{transform:translate(-50%,calc(-50% + var(--reel-h) * .26 + var(--title-y)));
-  text-align:center}#wfgallery .reeltitle.at-w2{transform:translate(calc(-50% - var(--reel-w) * .045),
+.reeltitle[class*="at-w"]{width:calc(var(--reel-w) * .8)}
+.reeltitle.at-w1{transform:translate(-50%,calc(-50% + var(--reel-h) * .26 + var(--title-y)));
+  text-align:center}
+.reeltitle.at-w2{transform:translate(calc(-50% - var(--reel-w) * .045),
   calc(-50% + var(--reel-h) * .12 + var(--title-y)));
-  text-align:left;width:calc(var(--reel-w) * .74)}#wfgallery .reeltitle.at-w3{transform:translate(calc(-50% + var(--reel-w) * .045),
+  text-align:left;width:calc(var(--reel-w) * .74)}
+.reeltitle.at-w3{transform:translate(calc(-50% + var(--reel-w) * .045),
   calc(-50% - var(--reel-h) * .20 + var(--title-y)));
-  text-align:right;width:calc(var(--reel-w) * .74)}#wfgallery .reeltitle.at-w4{transform:translate(-50%,calc(-50% - var(--reel-h) * .05 + var(--title-y)))}#wfgallery .reeltitle.at-w2 h2,
-#wfgallery .reeltitle.at-w3 h2{
-  font-size:calc(clamp(2.2rem,4.6vw,4.4rem) * var(--title-scale))}/* every wave title stands on its own photograph */
-#wfgallery .reeltitle[class*="at-w"] h2{color:var(--v-ink-on-art);
-  text-shadow:var(--v-shadow-on-art)}#wfgallery .reeltitle[class*="at-w"] p{color:var(--v-ink-on-art);opacity:.88;
-  text-shadow:var(--v-shadow-on-art)}#wfgallery .reeltitle.at-w2 p,
-#wfgallery .reeltitle.at-w3 p{margin-left:0;margin-right:0;max-width:34ch}#wfgallery .reeltitle.at-w3 p{margin-left:auto}/* each poster gets its own scrim shaped to where its title actually is */
-#wfgallery .cover--w2 .cover__scrim{background:linear-gradient(160deg,rgba(8,6,13,.72) 0%,
-  rgba(8,6,13,.26) 42%, rgba(8,6,13,.1) 66%, rgba(8,6,13,.6) 100%)}#wfgallery .cover--w3 .cover__scrim{background:linear-gradient(200deg,rgba(8,6,13,.7) 0%,
-  rgba(8,6,13,.22) 44%, rgba(8,6,13,.12) 68%, rgba(8,6,13,.58) 100%)}/* four thin marks implying the wave chapters on the collection cover */
+  text-align:right;width:calc(var(--reel-w) * .74)}
+.reeltitle.at-w4{transform:translate(-50%,calc(-50% - var(--reel-h) * .05 + var(--title-y)))}
+.reeltitle.at-w2 h2,.reeltitle.at-w3 h2{
+  font-size:calc(clamp(2.2rem,4.6vw,4.4rem) * var(--title-scale))}
+/* every wave title stands on its own photograph */
+.reeltitle[class*="at-w"] h2{color:var(--v-ink-on-art);
+  text-shadow:var(--v-shadow-on-art)}
+.reeltitle[class*="at-w"] p{color:var(--v-ink-on-art);opacity:.88;
+  text-shadow:var(--v-shadow-on-art)}
+.reeltitle.at-w2 p,.reeltitle.at-w3 p{margin-left:0;margin-right:0;max-width:34ch}
+.reeltitle.at-w3 p{margin-left:auto}
+/* each poster gets its own scrim shaped to where its title actually is */
+.cover--w2 .cover__scrim{background:linear-gradient(160deg,rgba(8,6,13,.72) 0%,
+  rgba(8,6,13,.26) 42%, rgba(8,6,13,.1) 66%, rgba(8,6,13,.6) 100%)}
+.cover--w3 .cover__scrim{background:linear-gradient(200deg,rgba(8,6,13,.7) 0%,
+  rgba(8,6,13,.22) 44%, rgba(8,6,13,.12) 68%, rgba(8,6,13,.58) 100%)}
+/* four thin marks implying the wave chapters on the collection cover */
+
+
 /* a lens work: its own typographic composition, one per lens */
-#wfgallery .cover--lens .cover__img{background:
+.cover--lens .cover__img{background:
   radial-gradient(88% 70% at 22% 8%, var(--room-glow,transparent), transparent 66%),
-  linear-gradient(166deg, var(--v-art-a) 0%, var(--v-art-b) 100%)}#wfgallery .cover--lens-1{--room-glow:rgba(126,110,170,.14)}#wfgallery .cover--lens-2{--room-glow:rgba(168,92,120,.14)}#wfgallery .cover--lens-3{--room-glow:rgba(112,96,206,.16)}#wfgallery .cover--lens .cover__scrim{background:linear-gradient(180deg,
-  rgba(8,6,13,.14) 0%, rgba(8,6,13,0) 40%, rgba(8,6,13,.34) 100%)}#wfgallery .lenswork{position:absolute;top:0;bottom:0;left:0;width:100%;
+  linear-gradient(166deg, var(--v-art-a) 0%, var(--v-art-b) 100%)}
+.cover--lens-1{--room-glow:rgba(126,110,170,.14)}
+.cover--lens-2{--room-glow:rgba(168,92,120,.14)}
+.cover--lens-3{--room-glow:rgba(112,96,206,.16)}
+.cover--lens .cover__scrim{background:linear-gradient(180deg,
+  rgba(8,6,13,.14) 0%, rgba(8,6,13,0) 40%, rgba(8,6,13,.34) 100%)}
+.lenswork{position:absolute;top:0;bottom:0;left:0;width:100%;
   display:flex;flex-direction:column;justify-content:center;
   align-items:flex-start;text-align:left;padding:0 8%;pointer-events:none;
   /* was transform:translateX(var(--artshift)) — its own transform, its own
      compositing layer, independent of the shell beneath it. margin-left on
      an explicitly-sized, un-transitioned box is the same pure shift with
      no separate layer to fall out of sync. */
-  margin-left:calc(var(--artshift,0px))}#wfgallery .lenswork__n{font-family:var(--sans);font-weight:var(--v-cap-weight);font-size:var(--v-cap-size);
+  margin-left:calc(var(--artshift,0px))}
+.lenswork__n{font-family:var(--sans);font-weight:var(--v-cap-weight);font-size:var(--v-cap-size);
   letter-spacing:var(--v-cap-tracking);text-transform:uppercase;color:var(--gallery-gold);
-  font-size:clamp(.42rem,2.3cqw,.7rem)}#wfgallery .lenswork__t{display:block;font-family:var(--serif);font-style:normal;
+  font-size:clamp(.42rem,2.3cqw,.7rem)}
+.lenswork__t{display:block;font-family:var(--serif);font-style:normal;
   font-weight:var(--v-display-weight);
   font-variation-settings:'opsz' var(--v-display-opsz,72);
   font-size:clamp(1rem,13.5cqw,5.2rem);line-height:var(--v-display-lh,.86);
-  letter-spacing:var(--v-display-tracking);color:var(--v-ink);margin:.16em 0 .5em}#wfgallery .lenswork__d{font-family:var(--sans);font-size:clamp(.58rem,3cqw,.94rem);
-  line-height:var(--v-body-lh);color:var(--v-ink-2);max-width:38ch}#wfgallery .lenswork__d em{font-style:italic;color:var(--v-ink)}/* a single scholar portrait as a dominant work */
-#wfgallery .cover--face .cover__img{filter:saturate(.96) contrast(1.04)}#wfgallery .cover--col-lenses .cover__scrim{background:linear-gradient(180deg,
-  rgba(8,6,13,.18) 0%, rgba(8,6,13,0) 34%, rgba(8,6,13,.12) 74%, rgba(8,6,13,.42) 100%)}#wfgallery .cover--col-lenses .cover__img{background:
+  letter-spacing:var(--v-display-tracking);color:var(--v-ink);margin:.16em 0 .5em}
+.lenswork__d{font-family:var(--sans);font-size:clamp(.58rem,3cqw,.94rem);
+  line-height:var(--v-body-lh);color:var(--v-ink-2);max-width:38ch}
+.lenswork__d em{font-style:italic;color:var(--v-ink)}
+/* a single scholar portrait as a dominant work */
+.cover--face .cover__img{filter:saturate(.96) contrast(1.04)}
+
+
+
+.cover--col-lenses .cover__scrim{background:linear-gradient(180deg,
+  rgba(8,6,13,.18) 0%, rgba(8,6,13,0) 34%, rgba(8,6,13,.12) 74%, rgba(8,6,13,.42) 100%)}
+.cover--col-lenses .cover__img{background:
   radial-gradient(92% 74% at 24% 6%, rgba(126,88,176,.16), transparent 66%),
-  linear-gradient(166deg, var(--v-art-a) 0%, var(--v-art-b) 100%)}#wfgallery .poster{position:absolute;top:0;bottom:0;left:0;width:100%;
+  linear-gradient(166deg, var(--v-art-a) 0%, var(--v-art-b) 100%)}
+
+
+
+
+
+
+.poster{position:absolute;top:0;bottom:0;left:0;width:100%;
   display:flex;flex-direction:column;justify-content:center;
   align-items:flex-start;text-align:left;padding:0 7%;pointer-events:none;
   /* was its own translateX transform / own compositing layer — see the
      matching note on .lenswork */
-  margin-left:calc(var(--artshift,0px))}#wfgallery .poster__k{font-family:var(--sans);font-weight:var(--v-cap-weight);font-size:var(--v-cap-size);
+  margin-left:calc(var(--artshift,0px))}
+.poster__k{font-family:var(--sans);font-weight:var(--v-cap-weight);font-size:var(--v-cap-size);
   letter-spacing:var(--v-cap-tracking);text-transform:uppercase;color:var(--gallery-gold);
-  font-size:clamp(.42rem,2.5cqw,.72rem)}#wfgallery .poster__big{display:block;font-family:var(--serif);font-style:normal;
+  font-size:clamp(.42rem,2.5cqw,.72rem)}
+.poster__big{display:block;font-family:var(--serif);font-style:normal;
   font-weight:var(--v-display-weight);
   font-variation-settings:'opsz' var(--v-display-opsz,72);
   /* the words are the composition: sized off the cover, not the page */
   font-size:clamp(1.1rem,19cqw,7.4rem);line-height:var(--v-display-lh,.82);
   letter-spacing:var(--v-display-tracking);
-  color:var(--v-ink);margin-top:.12em}#wfgallery .poster__rule{display:block;width:46%;height:1px;margin:1.1em 0 .85em;
-  background:linear-gradient(90deg,var(--gallery-gold),transparent)}#wfgallery .poster__c{font-family:var(--sans);font-weight:400;
+  color:var(--v-ink);margin-top:.12em}
+.poster__rule{display:block;width:46%;height:1px;margin:1.1em 0 .85em;
+  background:linear-gradient(90deg,var(--gallery-gold),transparent)}
+.poster__c{font-family:var(--sans);font-weight:400;
   font-size:clamp(.58rem,3.1cqw,.9rem);
-  line-height:var(--v-body-lh);color:var(--v-ink-2);max-width:36ch}/* the scholars cover is a restrained contact sheet */
+  line-height:var(--v-body-lh);color:var(--v-ink-2);max-width:36ch}
+
+
+
+
+/* the scholars cover is a restrained contact sheet */
 /* the lower band is deliberately left clear so the exhibition title can
    sit under the portraits instead of across their faces */
 /* A layered portrait composition rather than a six-cell grid: one
@@ -1087,139 +1428,227 @@ body.touchmode #wfgallery .gtex{--grain-opacity:.035;--gallery-fibre-opacity:0;
 /* was its own translateX transform / own compositing layer, holding the
    whole Scholars collage (all six contact-sheet tiles) — same fix as
    .lenswork and .poster below */
-#wfgallery .contact{position:absolute;top:0;bottom:0;left:0;width:100%;
-  margin-left:calc(var(--artshift,0px) * .55)}#wfgallery .contact i{position:absolute;background-size:cover;background-position:var(--p,center);
+.contact{position:absolute;top:0;bottom:0;left:0;width:100%;
+  margin-left:calc(var(--artshift,0px) * .55)}
+.contact i{position:absolute;background-size:cover;background-position:var(--p,center);
   box-shadow:0 calc(22px * var(--v-shadow,1)) calc(50px * var(--v-shadow,1)) var(--v-shadow-a),
-             inset 0 0 0 1px var(--v-edge)}/* the lower-right quadrant is deliberately left empty: that is where the
+             inset 0 0 0 1px var(--v-edge)}
+/* the lower-right quadrant is deliberately left empty: that is where the
    exhibition title sits, so it never lands across anyone's face */
-#wfgallery .contact i:nth-child(1){left:5%;top:8%;width:44%;height:42%;z-index:3}#wfgallery .contact i:nth-child(2){left:53%;top:20%;width:38%;height:38%;z-index:2;filter:brightness(.95)}#wfgallery .contact i:nth-child(3){left:12%;top:56%;width:38%;height:38%;z-index:2;filter:brightness(.9)}/* the other three are on the wall inside, not crushed onto the cover */
-#wfgallery .contact i:nth-child(n+4){display:none}/* A work hung small — a neighbour on the wall, or anything on a phone —
+.contact i:nth-child(1){left:5%;top:8%;width:44%;height:42%;z-index:3}
+.contact i:nth-child(2){left:53%;top:20%;width:38%;height:38%;z-index:2;filter:brightness(.95)}
+.contact i:nth-child(3){left:12%;top:56%;width:38%;height:38%;z-index:2;filter:brightness(.9)}
+/* the other three are on the wall inside, not crushed onto the cover */
+.contact i:nth-child(n+4){display:none}
+
+
+/* A work hung small — a neighbour on the wall, or anything on a phone —
    is not the same composition shrunk. It drops its supporting lines and
    keeps the one idea that reads at that size. */
-#wfgallery .cover.is-compact{
-}#wfgallery .cover.is-compact .poster__rule,
-#wfgallery .cover.is-compact .poster__c,
-#wfgallery .cover.is-compact .lenswork__d{display:none}#wfgallery .cover.is-compact .poster__big{font-size:clamp(1rem,4.4vw,2.4rem)}#wfgallery .cover.is-compact .lenswork__t{font-size:clamp(.9rem,3.1vw,1.7rem)}#wfgallery .cover.is-compact .poster,
-#wfgallery .cover.is-compact .lenswork{justify-content:center;padding:0 6%}#wfgallery .cover.is-compact .contact i:nth-child(1){left:4%;top:7%;width:44%;height:86%}#wfgallery .cover.is-compact .contact i:nth-child(2){left:52%;top:7%;width:44%;height:86%;filter:none}#wfgallery .cover.is-compact .contact i:nth-child(n+3){display:none}/* ---- the wall photograph: strength, and a crop per viewport ----
+.cover.is-compact{
+}
+.cover.is-compact .poster__rule,.cover.is-compact .poster__c,
+.cover.is-compact .lenswork__d{display:none}
+.cover.is-compact .poster__big{font-size:clamp(1rem,4.4vw,2.4rem)}
+.cover.is-compact .lenswork__t{font-size:clamp(.9rem,3.1vw,1.7rem)}
+.cover.is-compact .poster,.cover.is-compact .lenswork{justify-content:center;padding:0 6%}
+.cover.is-compact .contact i:nth-child(1){left:4%;top:7%;width:44%;height:86%}
+.cover.is-compact .contact i:nth-child(2){left:52%;top:7%;width:44%;height:86%;filter:none}
+.cover.is-compact .contact i:nth-child(n+3){display:none}
+
+
+/* ---- the wall photograph: strength, and a crop per viewport ----
    Three options so the right level can be chosen by eye. Balanced is the
    default. Switch with the control at the bottom of the room, the B key,
    or ?bg=subtle|balanced|expressive. */
-#wfgallery{
+:root{
   --wall-photo:none;
   --wall-photo-o:0;
   --wall-photo-pos:50% 30%;
-}#wfgallery{
+}
+:root{
   --wall-photo:url('img/env/wall-desktop.webp');
   --v-cloud:0;                    /* the photograph is the plaster now */
-}html[data-bg="subtle"] #wfgallery{ --wall-photo-o:.13 }html[data-bg="balanced"] #wfgallery{ --wall-photo-o:.20 }html[data-bg="expressive"] #wfgallery{ --wall-photo-o:.27 }/* ---- the film burn, over everything the wall photograph does ----
+}
+html[data-bg="subtle"]     { --wall-photo-o:.13 }
+html[data-bg="balanced"]   { --wall-photo-o:.20 }
+html[data-bg="expressive"] { --wall-photo-o:.27 }
+
+/* ---- the film burn, over everything the wall photograph does ----
    Its own asset and its own strength, on the same three-way control, so
    the two can be dialled independently: the wall photograph is the
    collage behind the work, this is the age on the plaster in front of
    it. Carried higher than the wall photo's numbers because it MULTIPLIES
    — a multiply at .2 reads far quieter than an overlay at .2. */
-#wfgallery{
+:root{
   --burn-photo:url('img/env/burn-desktop.webp');
   --burn-pos:50% 40%;
   --burn-o:.34;                   /* the default, if no tier is set */
-}html[data-bg="subtle"] #wfgallery{ --burn-o:.24 }html[data-bg="balanced"] #wfgallery{ --burn-o:.34 }html[data-bg="expressive"] #wfgallery{ --burn-o:.46 }/* tablet portrait: the profiles sit a little higher so the lower band
+}
+html[data-bg="subtle"]     { --burn-o:.24 }
+html[data-bg="balanced"]   { --burn-o:.34 }
+html[data-bg="expressive"] { --burn-o:.46 }
+/* tablet portrait: the profiles sit a little higher so the lower band
    stays clear behind the wall text */
-
-@media (max-width:1100px) and (orientation:portrait){#wfgallery{--wall-photo-pos:52% 22%}
-}/* phone: its own portrait crop, taken from the calmer right of the
+@media (max-width:1100px) and (orientation:portrait){
+  :root{--wall-photo-pos:52% 22%}
+}
+/* phone: its own portrait crop, taken from the calmer right of the
    collage, and quieter again so it never reaches the type */
-
-@media (max-width:820px){#wfgallery{--wall-photo:url('img/env/wall-mobile.webp')}#wfgallery{--wall-photo-pos:50% 26%}/* the burn gets a portrait crop too, rather than letting cover shave a
+@media (max-width:820px){
+  :root{--wall-photo:url('img/env/wall-mobile.webp')}
+  :root{--wall-photo-pos:50% 26%}
+  /* the burn gets a portrait crop too, rather than letting cover shave a
      landscape frame down to its middle third */
-#wfgallery{--burn-photo:url('img/env/burn-mobile.webp')}html[data-bg="subtle"] #wfgallery{ --burn-o:.18 }html[data-bg="balanced"] #wfgallery{ --burn-o:.26 }html[data-bg="expressive"] #wfgallery{ --burn-o:.34 }html[data-bg="subtle"] #wfgallery{ --wall-photo-o:.09 }html[data-bg="balanced"] #wfgallery{ --wall-photo-o:.14 }html[data-bg="expressive"] #wfgallery{ --wall-photo-o:.19 }
-}/* the reduced tier drops it further rather than dropping it entirely */
+  :root{--burn-photo:url('img/env/burn-mobile.webp')}
+  html[data-bg="subtle"]     { --burn-o:.18 }
+  html[data-bg="balanced"]   { --burn-o:.26 }
+  html[data-bg="expressive"] { --burn-o:.34 }
+  html[data-bg="subtle"]     { --wall-photo-o:.09 }
+  html[data-bg="balanced"]   { --wall-photo-o:.14 }
+  html[data-bg="expressive"] { --wall-photo-o:.19 }
+}
+/* the reduced tier drops it further rather than dropping it entirely */
+
 /* ---- quiet zones ----
    The wall is washed out where a work hangs, so the collage never reads
    through the artwork or the editorial type. These are the same soft
    gradients as the gallery lighting, on the same custom properties the
    loop already writes on an index change — no blur, no per-frame work,
    and no rectangles or cards. */
+
+
 /* --- viewfinder: four detached brackets, never a full border ------- */
 /* the brackets frame whichever work is in focus. On the top-level hang
    that work is not in the middle of the room, so the frame goes to it. */
-#wfgallery .vf{position:absolute;left:50%;top:50%;pointer-events:none;z-index:6;
+.vf{position:absolute;left:50%;top:50%;pointer-events:none;z-index:6;
   width:calc(var(--vf-w, var(--reel-w)) + var(--vf-offset) * 2);
   height:calc(var(--vf-h, var(--reel-h)) + var(--vf-offset) * 2);
   transform:translate(-50%,-50%)
             translate(var(--vf-x,0px),var(--vf-y,0px)) scale(var(--vf-s,1));
-  transition:transform .45s cubic-bezier(.2,.8,.2,1), opacity .35s ease}/* driven by the loop, not eased twice — the hang, and any deck that
+  transition:transform .45s cubic-bezier(.2,.8,.2,1), opacity .35s ease}
+/* driven by the loop, not eased twice — the hang, and any deck that
    tracks the frame to a staggered work */
-#wfgallery .reel.is-hang .vf,
-#wfgallery .reel.is-vftracked .vf{transition:none}#wfgallery .vf i{position:absolute;width:var(--vf-size);height:var(--vf-size);
+.reel.is-hang .vf,.reel.is-vftracked .vf{transition:none}
+.vf i{position:absolute;width:var(--vf-size);height:var(--vf-size);
   border:var(--v-vf-weight,1px) solid var(--v-vf,rgba(242,237,228,.72));
   /* a hair of shadow so the brackets survive over pale photographs */
   filter:drop-shadow(0 1px 3px rgba(4,2,9,.8));
-  transition:all .45s cubic-bezier(.2,.8,.2,1)}#wfgallery .vf i:nth-child(1){left:0;top:0;border-right:0;border-bottom:0}#wfgallery .vf i:nth-child(2){right:0;top:0;border-left:0;border-bottom:0}#wfgallery .vf i:nth-child(3){left:0;bottom:0;border-right:0;border-top:0}#wfgallery .vf i:nth-child(4){right:0;bottom:0;border-left:0;border-top:0}#wfgallery .reel.is-focus .vf{--vf-s:.985}#wfgallery .reel.is-focus .vf i{border-color:var(--gallery-gold)}#wfgallery .reel.is-busy .vf{--vf-s:.94;opacity:0}/* --- editorial title printed across the cover --------------------- */
-#wfgallery .reeltitle{position:absolute;left:50%;top:50%;z-index:7;pointer-events:none;
+  transition:all .45s cubic-bezier(.2,.8,.2,1)}
+.vf i:nth-child(1){left:0;top:0;border-right:0;border-bottom:0}
+.vf i:nth-child(2){right:0;top:0;border-left:0;border-bottom:0}
+.vf i:nth-child(3){left:0;bottom:0;border-right:0;border-top:0}
+.vf i:nth-child(4){right:0;bottom:0;border-left:0;border-top:0}
+.reel.is-focus .vf{--vf-s:.985}
+.reel.is-focus .vf i{border-color:var(--gallery-gold)}
+.reel.is-busy .vf{--vf-s:.94;opacity:0}
+
+/* --- editorial title printed across the cover --------------------- */
+.reeltitle{position:absolute;left:50%;top:50%;z-index:7;pointer-events:none;
   width:min(94vw, calc(var(--reel-w) + 18vw));text-align:center;
   transform:translate(-50%,calc(-50% + var(--reel-h) * .17 + var(--title-y)));
   /* clipped upward on open rather than faded */
   clip-path:inset(var(--title-clip,0%) 0 0 0);
-  transition:clip-path .45s cubic-bezier(.6,0,.2,1), opacity .3s ease}#wfgallery .reeltitle h2{font-family:var(--serif);font-weight:var(--v-display-weight);color:var(--v-ink);
+  transition:clip-path .45s cubic-bezier(.6,0,.2,1), opacity .3s ease}
+.reeltitle h2{font-family:var(--serif);font-weight:var(--v-display-weight);color:var(--v-ink);
   font-variation-settings:'opsz' var(--v-display-opsz,60);
   font-size:calc(clamp(2.6rem,6.2vw,6rem) * var(--title-scale) * var(--v-title-scale));
   line-height:var(--v-display-lh,.92);letter-spacing:var(--v-display-tracking);
   text-wrap:var(--v-title-wrap,balance);
-  text-shadow:var(--v-title-shadow)}#wfgallery .reeltitle p{margin-top:14px;font-family:var(--sans);font-weight:400;
+  text-shadow:var(--v-title-shadow)}
+.reeltitle p{margin-top:14px;font-family:var(--sans);font-weight:400;
   font-size:var(--v-body-size);line-height:var(--v-body-lh);
-  color:var(--v-ink-2);max-width:46ch;margin-left:auto;margin-right:auto}/* THE EXHIBITION TITLE at the top level is wall typography, not a slide
+  color:var(--v-ink-2);max-width:46ch;margin-left:auto;margin-right:auto}
+
+/* THE EXHIBITION TITLE at the top level is wall typography, not a slide
    heading: set low and left, printed on the plaster beside the work
    rather than dropped dead-centre across it. The active work's own small
    label is suppressed while this is showing, so nothing is said twice. */
-#wfgallery .reeltitle.is-wall{left:var(--tt-x,4vw);top:var(--tt-y,78vh);bottom:auto;
-  width:var(--tt-w,38vw);text-align:left;transform:none}#wfgallery .reeltitle.is-wall h2{
-  font-size:calc(clamp(1.7rem,3.2vw,2.7rem) * var(--v-title-scale))}#wfgallery .reeltitle.is-wall p{margin-top:10px;margin-left:0;margin-right:0;max-width:40ch;
-  font-size:calc(var(--v-body-size) * .95)}/* --- fixed metadata around the frame ------------------------------ */
-#wfgallery .reelmeta{position:absolute;z-index:7;pointer-events:none;font-family:var(--sans);
+.reeltitle.is-wall{left:var(--tt-x,4vw);top:var(--tt-y,78vh);bottom:auto;
+  width:var(--tt-w,38vw);text-align:left;transform:none}
+.reeltitle.is-wall h2{
+  font-size:calc(clamp(1.7rem,3.2vw,2.7rem) * var(--v-title-scale))}
+.reeltitle.is-wall p{margin-top:10px;margin-left:0;margin-right:0;max-width:40ch;
+  font-size:calc(var(--v-body-size) * .95)}
+
+/* --- fixed metadata around the frame ------------------------------ */
+.reelmeta{position:absolute;z-index:7;pointer-events:none;font-family:var(--sans);
   font-size:var(--v-meta-size);font-weight:var(--v-meta-weight);
   letter-spacing:var(--v-meta-tracking);text-transform:uppercase;
   color:var(--v-ink-3);
-  transition:opacity .3s ease}#wfgallery .reelmeta--tl{left:clamp(20px,3vw,44px);top:calc(clamp(6px,1vw,12px) + 96px)}#wfgallery .reelmeta--tr{right:clamp(14px,3vw,44px);top:calc(clamp(6px,1vw,12px) + 96px);text-align:right}#wfgallery .reelmeta--bl{left:auto;right:clamp(14px,3vw,44px);text-align:right;
-  bottom:calc(clamp(22px,3.4vh,42px) + 34px)}#wfgallery .reelmeta--br{right:clamp(14px,3vw,44px);bottom:clamp(22px,3.4vh,42px);text-align:right}#wfgallery .reelmeta b{display:block;color:var(--gallery-gold);font-weight:400}#wfgallery .reel.is-busy .reelmeta{opacity:0}/* =====================================================================
+  transition:opacity .3s ease}
+.reelmeta--tl{left:clamp(20px,3vw,44px);top:calc(clamp(6px,1vw,12px) + 96px)}
+.reelmeta--tr{right:clamp(14px,3vw,44px);top:calc(clamp(6px,1vw,12px) + 96px);text-align:right}
+.reelmeta--bl{left:auto;right:clamp(14px,3vw,44px);text-align:right;
+  bottom:calc(clamp(22px,3.4vh,42px) + 34px)}
+.reelmeta--br{right:clamp(14px,3vw,44px);bottom:clamp(22px,3.4vh,42px);text-align:right}
+.reelmeta b{display:block;color:var(--gallery-gold);font-weight:400}
+.reel.is-busy .reelmeta{opacity:0}
+
+/* =====================================================================
    THE SALON WALL · all six scholars, on the wall, at once
    A salon hang, not a staff directory: two loose levels, two anchor
    portraits, six different sizes, and enough plaster between them that
    no work touches another. Every name is printed BENEATH its portrait,
    so nothing is ever written across a face.
    ===================================================================== */
-#wfgallery .reel--salon{cursor:default;perspective:2400px}#wfgallery .reel--salon .reel__track{position:absolute;
+.reel--salon{cursor:default;perspective:2400px}
+.reel--salon .reel__track{position:absolute;
   left:clamp(20px,4vw,64px);right:clamp(20px,4vw,64px);
   top:clamp(112px,16vh,164px);bottom:clamp(74px,10vh,108px);
-  width:auto;height:auto}#wfgallery .cover--salon{position:absolute;left:var(--gx);top:var(--gy);
+  width:auto;height:auto}
+.cover--salon{position:absolute;left:var(--gx);top:var(--gy);
   width:var(--gw);height:var(--gh);margin:0;
   transform:translate3d(0,0,var(--cz,0px));
-  transition:transform .5s cubic-bezier(.2,.8,.2,1), opacity .4s ease}#wfgallery .cover--salon .cover__scrim{display:none}/* nothing darkens a portrait */
-#wfgallery .cover--salon .cover__media{border-radius:1px}#wfgallery .cover--salon .wlabel{width:min(28ch,122%);left:0;right:auto;text-align:left;
-  margin-top:clamp(8px,1.1vh,14px);opacity:1}#wfgallery .cover--salon[data-active="true"] .wlabel{opacity:1}#wfgallery .cover--salon[data-active="true"] .wlabel__t{color:var(--gallery-gold)}#wfgallery .cover--salon .wlabel__t{font-size:clamp(.82rem,1.02vw,.98rem)}#wfgallery .cover--salon .wlabel__m{font-size:calc(var(--v-cap-size) * .92);
+  transition:transform .5s cubic-bezier(.2,.8,.2,1), opacity .4s ease}
+.cover--salon .cover__scrim{display:none}   /* nothing darkens a portrait */
+.cover--salon .cover__media{border-radius:1px}
+.cover--salon .wlabel{width:min(28ch,122%);left:0;right:auto;text-align:left;
+  margin-top:clamp(8px,1.1vh,14px);opacity:1}
+.cover--salon[data-active="true"] .wlabel{opacity:1}
+.cover--salon[data-active="true"] .wlabel__t{color:var(--gallery-gold)}
+.cover--salon .wlabel__t{font-size:clamp(.82rem,1.02vw,.98rem)}
+.cover--salon .wlabel__m{font-size:calc(var(--v-cap-size) * .92);
   text-transform:none;letter-spacing:.005em;line-height:1.35;
-  font-family:var(--sans)}#wfgallery .cover--salon:hover .cover__media,
-#wfgallery .cover--salon[data-active="true"] .cover__media{--mscale:1;
+  font-family:var(--sans)}
+.cover--salon:hover .cover__media,
+.cover--salon[data-active="true"] .cover__media{--mscale:1;
   box-shadow:0 calc(36px * var(--v-shadow,1)) calc(84px * var(--v-shadow,1)) var(--v-shadow-a),
              0 calc(3px * var(--v-shadow,1)) calc(10px * var(--v-shadow,1)) var(--v-shadow-a),
-             inset 0 0 0 1px var(--gallery-gold)}/* the wall text panel stands in the empty part of the wall, bottom right,
+             inset 0 0 0 1px var(--gallery-gold)}
+/* the wall text panel stands in the empty part of the wall, bottom right,
    where the hang deliberately leaves room for it */
-#wfgallery .reeltitle.is-salon{left:auto;right:clamp(20px,4.4vw,72px);top:auto;
+.reeltitle.is-salon{left:auto;right:clamp(20px,4.4vw,72px);top:auto;
   bottom:clamp(74px,11vh,120px);width:min(34ch,30vw);
-  text-align:left;transform:none}#wfgallery .reeltitle.is-salon h2{font-size:calc(clamp(1.5rem,2.5vw,2.2rem) * var(--v-title-scale))}#wfgallery .reeltitle.is-salon p{margin-left:0;margin-right:0;max-width:32ch;
-  font-size:calc(var(--v-body-size) * .95)}/* --- moving through the room -------------------------------------
+  text-align:left;transform:none}
+.reeltitle.is-salon h2{font-size:calc(clamp(1.5rem,2.5vw,2.2rem) * var(--v-title-scale))}
+.reeltitle.is-salon p{margin-left:0;margin-right:0;max-width:32ch;
+  font-size:calc(var(--v-body-size) * .95)}
+
+/* --- moving through the room -------------------------------------
    No circular carousel buttons on the centre line. What is left is the
    kind of small directional sign a gallery actually puts at the edge of
    a wall: the NAME of the next installation, set in the label style, low
    at the room's edge. Keyboard and screen readers reach the same index. */
-#wfgallery .roomnav{position:absolute;top:calc(clamp(6px,1vw,12px) + 150px);z-index:30;pointer-events:auto;
+.roomnav{position:absolute;top:calc(clamp(6px,1vw,12px) + 150px);z-index:30;pointer-events:auto;
   max-width:26vw;text-align:left;font-family:var(--sans);
   font-size:var(--v-cap-size);font-weight:var(--v-cap-weight);
   letter-spacing:var(--v-cap-tracking);text-transform:uppercase;
   color:var(--v-ink-3);line-height:1.3;
-  transition:color .25s ease,opacity .3s ease}#wfgallery .roomnav b{display:block;font-weight:inherit;color:var(--v-ink-3)}#wfgallery .roomnav span{display:block;margin-top:3px;font-family:var(--serif);
+  transition:color .25s ease,opacity .3s ease}
+.roomnav b{display:block;font-weight:inherit;color:var(--v-ink-3)}
+.roomnav span{display:block;margin-top:3px;font-family:var(--serif);
   font-weight:var(--v-display-weight);font-size:clamp(.9rem,1.2vw,1.08rem);
-  letter-spacing:var(--v-display-tracking);text-transform:none;color:var(--v-ink-2)}#wfgallery .roomnav:hover,
-#wfgallery .roomnav:focus-visible{color:var(--gallery-gold)}#wfgallery .roomnav:hover span,
-#wfgallery .roomnav:focus-visible span{color:var(--gallery-gold)}#wfgallery .roomnav--prev{left:clamp(20px,3.4vw,52px)}#wfgallery .roomnav--next{right:clamp(20px,3.4vw,52px);text-align:right}#wfgallery .roomnav[hidden]{display:none}#wfgallery .reel.is-busy ~ .roomnav{opacity:0;pointer-events:none}/* =====================================================================
+  letter-spacing:var(--v-display-tracking);text-transform:none;color:var(--v-ink-2)}
+.roomnav:hover,.roomnav:focus-visible{color:var(--gallery-gold)}
+.roomnav:hover span,.roomnav:focus-visible span{color:var(--gallery-gold)}
+.roomnav--prev{left:clamp(20px,3.4vw,52px)}
+.roomnav--next{right:clamp(20px,3.4vw,52px);text-align:right}
+.roomnav[hidden]{display:none}
+.reel.is-busy ~ .roomnav{opacity:0;pointer-events:none}
+
+
+/* =====================================================================
    THE POINTER
    A small badge that names what the thing under it will do. Its state
    comes from rectangles cached while the room is SETTLED, not from
@@ -1228,7 +1657,7 @@ body.touchmode #wfgallery .gtex{--grain-opacity:.035;--gallery-fibre-opacity:0;
    what makes a cursor flicker at its edges. Position is interpolated
    inside the one render loop; there is no second loop.
    ===================================================================== */
-#wfgallery .vcur{position:fixed;left:0;top:0;z-index:96;pointer-events:none;
+.vcur{position:fixed;left:0;top:0;z-index:96;pointer-events:none;
   display:grid;place-items:center;opacity:0;
   width:var(--vc-size,13px);height:var(--vc-size,13px);border-radius:999px;
   margin:calc(var(--vc-size,13px) / -2) 0 0 calc(var(--vc-size,13px) / -2);
@@ -1238,149 +1667,337 @@ body.touchmode #wfgallery .gtex{--grain-opacity:.035;--gallery-fibre-opacity:0;
   transition:width .26s cubic-bezier(.2,.8,.2,1),
              height .26s cubic-bezier(.2,.8,.2,1),
              margin .26s cubic-bezier(.2,.8,.2,1),
-             opacity .2s ease, background-color .26s ease, border-color .26s ease}#wfgallery .vcur.on{opacity:1}#wfgallery .vcur.act{--vc-size:48px;--vc-fill:var(--gallery-gold);--vc-line:var(--gallery-gold);
-  --vc-ink:var(--gallery-wall-light)}#wfgallery .vcur.side{--vc-size:42px;--vc-fill:transparent;--vc-line:var(--v-ink-2)}#wfgallery .vcur__t{font-family:var(--sans);font-size:.5rem;font-weight:600;
+             opacity .2s ease, background-color .26s ease, border-color .26s ease}
+.vcur.on{opacity:1}
+.vcur.act{--vc-size:48px;--vc-fill:var(--gallery-gold);--vc-line:var(--gallery-gold);
+  --vc-ink:var(--gallery-wall-light)}
+.vcur.side{--vc-size:42px;--vc-fill:transparent;--vc-line:var(--v-ink-2)}
+.vcur__t{font-family:var(--sans);font-size:.5rem;font-weight:600;
   letter-spacing:.09em;text-transform:uppercase;line-height:1;
   opacity:0;transform:scale(.9);white-space:nowrap;
-  transition:opacity .2s ease .04s, transform .24s cubic-bezier(.2,.8,.2,1) .04s}#wfgallery .vcur.act .vcur__t,
-#wfgallery .vcur.side .vcur__t{opacity:1;transform:scale(1)}/* the native cursor steps aside only where the badge replaces it */
-body.hascur #wfgallery .reel,
-body.hascur #wfgallery .roomnav{cursor:none}body.touchmode #wfgallery .vcur{display:none}/* keyboard gets the same words the pointer would have shown */
-#wfgallery .focuscue{position:absolute;left:50%;bottom:8px;transform:translateX(-50%) translateY(4px);
+  transition:opacity .2s ease .04s, transform .24s cubic-bezier(.2,.8,.2,1) .04s}
+.vcur.act .vcur__t,.vcur.side .vcur__t{opacity:1;transform:scale(1)}
+/* the native cursor steps aside only where the badge replaces it */
+body.hascur .reel,body.hascur .roomnav{cursor:none}
+body.touchmode .vcur{display:none}
+/* keyboard gets the same words the pointer would have shown */
+.focuscue{position:absolute;left:50%;bottom:8px;transform:translateX(-50%) translateY(4px);
   z-index:6;pointer-events:none;opacity:0;
   padding:5px 11px;border-radius:999px;
   background:var(--gallery-gold);color:var(--gallery-wall-light);
   font-family:var(--sans);font-size:.52rem;font-weight:600;letter-spacing:.09em;
   text-transform:uppercase;
-  transition:opacity .2s ease, transform .24s cubic-bezier(.2,.8,.2,1)}#wfgallery .cover:focus-visible .focuscue{opacity:1;transform:translateX(-50%) translateY(0)}#wfgallery .cover:focus-visible .cover__media{box-shadow:0 0 0 2px var(--gallery-gold),
+  transition:opacity .2s ease, transform .24s cubic-bezier(.2,.8,.2,1)}
+.cover:focus-visible .focuscue{opacity:1;transform:translateX(-50%) translateY(0)}
+.cover:focus-visible .cover__media{box-shadow:0 0 0 2px var(--gallery-gold),
   0 calc(30px * var(--v-shadow,1)) calc(72px * var(--v-shadow,1)) var(--v-shadow-a)}
-@media (prefers-reduced-motion: reduce){#wfgallery .vcur{display:none} }/* ---- ?perf=1 diagnostic overlay + effect switches (dev only) ---- */
+@media (prefers-reduced-motion: reduce){ .vcur{display:none} }
+
+/* ---- ?perf=1 diagnostic overlay + effect switches (dev only) ---- */
 /* the switches: each one removes exactly one system */
 /* set by pruneBlankLayers() on a texture layer a version has turned all
    the way off. Such a layer still carries a transform, so the compositor
    still keeps a full-size tile for it — memory spent painting nothing. */
-#wfgallery #gtex > .is-blank{display:none}/* --- the shared-element portal ------------------------------------ */
+#gtex > .is-blank{display:none}
+
+/* --- the shared-element portal ------------------------------------ */
 /* a single fixed node that flies from the cover's measured bounds to
    the room's entrance. Bounds are read ONCE before it starts. */
 /* NOTE: must NOT be called .portal — the entrance card already owns that
    class and id. Reusing them made the entrance fixed and
    pointer-events:none, which silently killed every button on it. */
 /* stage 10 · a solid colour shutter rises across the lower photograph */
-#wfgallery .flyportal__shutter{position:absolute;left:0;right:0;bottom:0;height:0;
-  background:var(--v-shutter,#d8a833)}/* stages 14-15 · every collection work arrives behind its own colour mask,
+.flyportal__shutter{position:absolute;left:0;right:0;bottom:0;height:0;
+  background:var(--v-shutter,#d8a833)}
+/* stages 14-15 · every collection work arrives behind its own colour mask,
    which slides away on its own beat */
-#wfgallery .cover__mask{position:absolute;inset:0;z-index:4;pointer-events:none;
-  background:var(--v-mask,#d8a833);transform:translateY(0)}#wfgallery .cover__mask.gone{transform:translateY(-101%);
-  transition:transform .62s cubic-bezier(.62,.02,.24,1)}#wfgallery .flyportal{position:fixed;z-index:88;pointer-events:none;overflow:hidden;border-radius:3px;
-  will-change:transform,opacity;backface-visibility:hidden}#wfgallery .flyportal__img{position:absolute;inset:0;background-size:cover;background-position:center}/* ---------- wave-two orbit: the ring is a real 3D rig ---------- */
-#wfgallery .ring{position:absolute;left:50%;top:50%;width:0;height:0;transform-style:preserve-3d;
-  transform:translateZ(var(--ring-r,760px)) rotateY(var(--ring-a,0deg))}#wfgallery .ring .piece{transform:translate(-50%,-50%)
-  rotateY(var(--pry,0deg)) translateZ(var(--pz,0px)) translateY(var(--py,0px))}/* ---------- wave-three field: minimap ---------- */
-#wfgallery .minimap{position:absolute;left:50%;bottom:calc(clamp(6px,1vw,12px) + 46px);transform:translateX(-50%);z-index:45;
+.cover__mask{position:absolute;inset:0;z-index:4;pointer-events:none;
+  background:var(--v-mask,#d8a833);transform:translateY(0)}
+.cover__mask.gone{transform:translateY(-101%);
+  transition:transform .62s cubic-bezier(.62,.02,.24,1)}
+.flyportal{position:fixed;z-index:88;pointer-events:none;overflow:hidden;border-radius:3px;
+  will-change:transform,opacity;backface-visibility:hidden}
+.flyportal__img{position:absolute;inset:0;background-size:cover;background-position:center}
+
+/* ---------- wave-two orbit: the ring is a real 3D rig ---------- */
+.ring{position:absolute;left:50%;top:50%;width:0;height:0;transform-style:preserve-3d;
+  transform:translateZ(var(--ring-r,760px)) rotateY(var(--ring-a,0deg))}
+.ring .piece{transform:translate(-50%,-50%)
+  rotateY(var(--pry,0deg)) translateZ(var(--pz,0px)) translateY(var(--py,0px))}
+
+/* ---------- wave-three field: minimap ---------- */
+.minimap{position:absolute;left:50%;bottom:calc(clamp(6px,1vw,12px) + 46px);transform:translateX(-50%);z-index:45;
   display:flex;align-items:center;gap:7px;padding:7px 12px;border-radius:99px;
   background:rgba(23,16,33,.6);border:1px solid rgba(245,239,228,.16);
-  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}#wfgallery .minimap__dot{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.minimap__dot{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;
   font-family:var(--mono);font-size:.56rem;color:var(--dim);
-  border:1px solid rgba(245,239,228,.24);transition:background .25s,color .25s,border-color .25s}#wfgallery .minimap__dot[aria-current="true"]{background:var(--gold);color:#241a3e;border-color:var(--gold)}#wfgallery .minimap__dot.done{border-color:rgba(217,161,63,.6);color:var(--gold)}#wfgallery .piece__seq{position:absolute;top:-11px;left:-11px;width:26px;height:26px;border-radius:50%;z-index:2;
+  border:1px solid rgba(245,239,228,.24);transition:background .25s,color .25s,border-color .25s}
+.minimap__dot[aria-current="true"]{background:var(--gold);color:#241a3e;border-color:var(--gold)}
+.minimap__dot.done{border-color:rgba(217,161,63,.6);color:var(--gold)}
+.piece__seq{position:absolute;top:-11px;left:-11px;width:26px;height:26px;border-radius:50%;z-index:2;
   display:grid;place-items:center;background:var(--gold);color:#241a3e;
-  font-family:var(--mono);font-size:.62rem;font-weight:700;box-shadow:0 6px 16px rgba(5,2,12,.5)}/* stub room panel */
-#wfgallery .stub{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(620px,88vw);
+  font-family:var(--mono);font-size:.62rem;font-weight:700;box-shadow:0 6px 16px rgba(5,2,12,.5)}
+
+/* stub room panel */
+.stub{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(620px,88vw);
   background:rgba(36,26,62,.55);border:1px solid rgba(217,161,63,.35);border-radius:20px;
-  padding:clamp(24px,4vw,44px);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);text-align:center}#wfgallery .stub h2{font-family:var(--serif);font-size:clamp(1.6rem,3.4vw,2.4rem);margin:10px 0 4px}#wfgallery .stub .tag{color:var(--gold);font-style:italic;font-family:var(--serif)}#wfgallery .stub p{color:var(--dim);font-size:.94rem;margin-top:14px}#wfgallery .stub__row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:22px}/* ---------- focused detail view (glass) ---------- */
-#wfgallery .detail{position:absolute;inset:0;z-index:60;display:none;align-items:center;justify-content:center;padding:22px}#wfgallery .detail.open{display:flex}#wfgallery .detail__scrim{position:absolute;inset:0;background:rgba(10,6,20,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}#wfgallery .detail__panel{position:relative;width:min(640px,94vw);max-height:min(82vh,760px);overflow:auto;border-radius:20px;
+  padding:clamp(24px,4vw,44px);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);text-align:center}
+.stub h2{font-family:var(--serif);font-size:clamp(1.6rem,3.4vw,2.4rem);margin:10px 0 4px}
+.stub .tag{color:var(--gold);font-style:italic;font-family:var(--serif)}
+.stub p{color:var(--dim);font-size:.94rem;margin-top:14px}
+.stub__row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:22px}
+
+/* ---------- focused detail view (glass) ---------- */
+.detail{position:absolute;inset:0;z-index:60;display:none;align-items:center;justify-content:center;padding:22px}
+.detail.open{display:flex}
+.detail__scrim{position:absolute;inset:0;background:rgba(10,6,20,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.detail__panel{position:relative;width:min(640px,94vw);max-height:min(82vh,760px);overflow:auto;border-radius:20px;
   background:var(--panel-bg,linear-gradient(175deg,#fbf7ef,#f1e9da));color:var(--panel-ink,var(--ink));
   border:1px solid var(--panel-edge,rgba(217,161,63,.55));
   box-shadow:0 40px 120px var(--v-shadow-a);
-  padding:clamp(24px,4vw,40px)}#wfgallery .detail__year{font-family:var(--mono);font-size:.72rem;letter-spacing:0.055em;color:var(--violet)}#wfgallery .detail__title{font-family:var(--serif);font-weight:600;font-size:clamp(1.4rem,3vw,2rem);line-height:1.15;margin:8px 0 12px}#wfgallery .detail__img{border-radius:10px;overflow:hidden;margin:0 0 16px;max-height:280px}#wfgallery .detail__img img{width:100%;height:100%;object-fit:cover}#wfgallery .detail__blurb{font-size:1rem}#wfgallery .detail__why{margin-top:18px;border-left:3px solid var(--gold);padding:12px 16px;background:var(--gold-soft);border-radius:0 10px 10px 0}#wfgallery .detail__why b{display:block;font-family:var(--mono);font-size:.66rem;letter-spacing:0.055em;text-transform:uppercase;color:var(--violet);margin-bottom:6px}#wfgallery .detail__role{color:var(--ink-dim);margin-bottom:6px}/* the curatorial line: what this scholar's work is in, not a biography */
-#wfgallery .detail__niche{font-family:var(--sans);font-size:.86rem;color:var(--violet);
-  margin-bottom:10px}#wfgallery .detail__ext{display:inline-flex;align-items:center;gap:8px;margin-top:18px;font-weight:600;color:var(--violet);
-  text-decoration:underline;text-underline-offset:4px}#wfgallery .detail__close{position:sticky;float:right;top:0;margin:-6px -6px 0 12px;width:38px;height:38px;border-radius:50%;
+  padding:clamp(24px,4vw,40px)}
+.detail__year{font-family:var(--mono);font-size:.72rem;letter-spacing:0.055em;color:var(--violet)}
+.detail__title{font-family:var(--serif);font-weight:600;font-size:clamp(1.4rem,3vw,2rem);line-height:1.15;margin:8px 0 12px}
+.detail__img{border-radius:10px;overflow:hidden;margin:0 0 16px;max-height:280px}
+.detail__img img{width:100%;height:100%;object-fit:cover}
+.detail__blurb{font-size:1rem}
+.detail__why{margin-top:18px;border-left:3px solid var(--gold);padding:12px 16px;background:var(--gold-soft);border-radius:0 10px 10px 0}
+.detail__why b{display:block;font-family:var(--mono);font-size:.66rem;letter-spacing:0.055em;text-transform:uppercase;color:var(--violet);margin-bottom:6px}
+.detail__role{color:var(--ink-dim);margin-bottom:6px}
+/* the curatorial line: what this scholar's work is in, not a biography */
+.detail__niche{font-family:var(--sans);font-size:.86rem;color:var(--violet);
+  margin-bottom:10px}
+.detail__ext{display:inline-flex;align-items:center;gap:8px;margin-top:18px;font-weight:600;color:var(--violet);
+  text-decoration:underline;text-underline-offset:4px}
+.detail__close{position:sticky;float:right;top:0;margin:-6px -6px 0 12px;width:38px;height:38px;border-radius:50%;
   display:grid;place-items:center;background:var(--panel-close,var(--violet-deep));
-  color:var(--panel-close-ink,var(--cream));font-size:1rem}#wfgallery .detail__close:hover{background:var(--gallery-gold)}/* ---------- end-of-wave / directory panels ---------- */
-#wfgallery .panelwrap{position:absolute;inset:0;z-index:62;display:none;align-items:center;justify-content:center;padding:22px}#wfgallery .panelwrap.open{display:flex}#wfgallery .panelwrap .detail__scrim{z-index:0}#wfgallery .bigpanel{position:relative;width:min(560px,94vw);max-height:86vh;overflow:auto;border-radius:22px;text-align:center;
+  color:var(--panel-close-ink,var(--cream));font-size:1rem}
+.detail__close:hover{background:var(--gallery-gold)}
+
+/* ---------- end-of-wave / directory panels ---------- */
+.panelwrap{position:absolute;inset:0;z-index:62;display:none;align-items:center;justify-content:center;padding:22px}
+.panelwrap.open{display:flex}
+.panelwrap .detail__scrim{z-index:0}
+.bigpanel{position:relative;width:min(560px,94vw);max-height:86vh;overflow:auto;border-radius:22px;text-align:center;
   background:rgba(36,26,62,.78);border:1px solid rgba(217,161,63,.4);color:var(--cream);
   backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  padding:clamp(26px,4vw,46px);box-shadow:0 40px 120px rgba(0,0,0,.6)}#wfgallery .bigpanel h2{font-family:var(--serif);font-size:clamp(1.6rem,3.6vw,2.4rem);margin:8px 0 6px}#wfgallery .bigpanel h2 em{color:var(--gold);font-style:italic}#wfgallery .bigpanel p{color:var(--dim);font-size:.95rem}#wfgallery .bigpanel .stub__row{margin-top:24px}#wfgallery .bigpanel .dir__list{margin-top:20px;text-align:left}#wfgallery .bigpanel .dir__row{border-color:rgba(245,239,228,.14)}/* =================== calm view (flat, complete content) ============== */
-#wfgallery #flat{display:none;max-width:820px;margin:0 auto;padding:40px 22px 110px}body.flatmode #wfgallery #flat{display:block}body.flatmode #wfgallery .entrance,
-body.flatmode #wfgallery .ctx{display:none}#wfgallery #flat .flat__note{border:1px solid rgba(74,53,104,.25);background:#f4eee2;border-radius:14px;padding:16px 20px;
-  font-size:.9rem;color:var(--ink-dim);margin-bottom:44px}#wfgallery #flat section{margin-bottom:70px}#wfgallery #flat h2{font-family:var(--serif);font-weight:600;font-size:clamp(1.6rem,4vw,2.3rem);margin:10px 0 6px}#wfgallery #flat h2 em{font-style:italic}#wfgallery #flat .tag{font-family:var(--serif);font-style:italic;color:var(--violet)}#wfgallery #flat .lead{color:var(--ink-dim);margin-top:10px}#wfgallery .flatcard{border:1px solid rgba(74,53,104,.22);border-radius:14px;padding:20px 24px;margin-top:18px;background:#fffdf8}#wfgallery .flatcard .piece__year{margin-bottom:4px}#wfgallery .flatcard h3{font-family:var(--serif);font-weight:600;font-size:1.2rem}#wfgallery .flatcard p{margin-top:8px;font-size:.95rem}#wfgallery .flatcard details{margin-top:12px}#wfgallery .flatcard summary{cursor:pointer;font-family:var(--mono);font-size:.68rem;letter-spacing:0.055em;text-transform:uppercase;color:var(--violet)}#wfgallery .flatcard details div{margin-top:10px;border-left:3px solid var(--gold);padding:10px 14px;background:var(--gold-soft);border-radius:0 8px 8px 0;font-size:.92rem}#wfgallery .flatscholar{display:flex;gap:18px;align-items:center}#wfgallery .flatscholar img{width:84px;height:84px;border-radius:12px;object-fit:cover}/* the same curatorial line the wall label carries, so the two views say
+  padding:clamp(26px,4vw,46px);box-shadow:0 40px 120px rgba(0,0,0,.6)}
+.bigpanel h2{font-family:var(--serif);font-size:clamp(1.6rem,3.6vw,2.4rem);margin:8px 0 6px}
+.bigpanel h2 em{color:var(--gold);font-style:italic}
+.bigpanel p{color:var(--dim);font-size:.95rem}
+.bigpanel .stub__row{margin-top:24px}
+.bigpanel .dir__list{margin-top:20px;text-align:left}
+.bigpanel .dir__row{border-color:rgba(245,239,228,.14)}
+
+/* =================== calm view (flat, complete content) ============== */
+#flat{display:none;max-width:820px;margin:0 auto;padding:40px 22px 110px}
+body.flatmode #flat{display:block}
+body.flatmode .entrance,body.flatmode .ctx{display:none}
+#flat .flat__note{border:1px solid rgba(74,53,104,.25);background:#f4eee2;border-radius:14px;padding:16px 20px;
+  font-size:.9rem;color:var(--ink-dim);margin-bottom:44px}
+#flat section{margin-bottom:70px}
+#flat h2{font-family:var(--serif);font-weight:600;font-size:clamp(1.6rem,4vw,2.3rem);margin:10px 0 6px}
+#flat h2 em{font-style:italic}
+#flat .tag{font-family:var(--serif);font-style:italic;color:var(--violet)}
+#flat .lead{color:var(--ink-dim);margin-top:10px}
+.flatcard{border:1px solid rgba(74,53,104,.22);border-radius:14px;padding:20px 24px;margin-top:18px;background:#fffdf8}
+.flatcard .piece__year{margin-bottom:4px}
+.flatcard h3{font-family:var(--serif);font-weight:600;font-size:1.2rem}
+.flatcard p{margin-top:8px;font-size:.95rem}
+.flatcard details{margin-top:12px}
+.flatcard summary{cursor:pointer;font-family:var(--mono);font-size:.68rem;letter-spacing:0.055em;text-transform:uppercase;color:var(--violet)}
+.flatcard details div{margin-top:10px;border-left:3px solid var(--gold);padding:10px 14px;background:var(--gold-soft);border-radius:0 8px 8px 0;font-size:.92rem}
+.flatscholar{display:flex;gap:18px;align-items:center}
+.flatscholar img{width:84px;height:84px;border-radius:12px;object-fit:cover}
+/* the same curatorial line the wall label carries, so the two views say
    the same thing about each scholar */
-#wfgallery .flatscholar__niche{color:var(--violet);font-size:.88rem;margin-top:2px}#wfgallery .flat__back{position:fixed;right:18px;bottom:18px;z-index:20;background:var(--violet-deep);color:var(--cream);
-  border-radius:999px;padding:12px 22px;font-weight:600;box-shadow:0 14px 40px rgba(36,26,62,.4);display:none}body.flatmode #wfgallery .flat__back{display:block}/* =================== tablet: calmer depth, roomier zones ============= */
-body.tabletmode #wfgallery .room{perspective:2000px}/* ---- tablet: a shallower, tighter reel ---- */
-body.tabletmode #wfgallery{--reel-w:66vw;--reel-h:54vh;--reel-step:74vw;--reel-side-turn:10deg;
-  --edge-rotation:2.5deg;--edge-recession:18px;--cam-reserve:20px}body.tabletmode #wfgallery .reeltitle h2{font-size:calc(clamp(2rem,5vw,3.4rem) * var(--title-scale))}/* ---- mobile: one dominant cover, neighbours peeking, no cursor ---- */
-body.touchmode #wfgallery{--reel-w:74vw;--reel-h:46vh;--reel-step:80vw;--reel-side-turn:6deg;
-  --reel-side-scale:.9;--vf-offset:10px;--vf-size:18px;--lens-distortion:.03}body.touchmode #wfgallery .reel{perspective:900px;touch-action:pan-y pinch-zoom}body.touchmode #wfgallery .reeltitle{width:92vw;
-  transform:translate(-50%,calc(-50% + var(--reel-h) * .62 + var(--title-y)))}body.touchmode #wfgallery .reeltitle h2{font-size:calc(clamp(1.7rem,7vw,2.4rem) * var(--title-scale));
-  text-shadow:0 2px 18px rgba(4,2,9,.95)}body.touchmode #wfgallery .reeltitle p{font-size:.78rem;max-width:34ch}body.touchmode #wfgallery .hud{flex-wrap:nowrap;gap:6px;padding:10px 10px 8px}body.touchmode #wfgallery .hud__mark{display:none}body.touchmode #wfgallery .hud{justify-content:flex-end}body.touchmode #wfgallery .hud__mid{display:none}body.touchmode #wfgallery .hudbtn{font-size:.62rem;padding:5px 6px;letter-spacing:0}body.touchmode #wfgallery .hudbtn--exit{margin-left:3px;padding:5px 7px}/* metadata moves to two safe rows so nothing runs off the edge */
-body.touchmode #wfgallery .reelmeta{font-size:.5rem;letter-spacing:0.055em;max-width:46vw}body.touchmode #wfgallery .reelmeta--tr,
-body.touchmode #wfgallery .reelmeta--br{text-align:right}body.touchmode #wfgallery .reelmeta--bl,
-body.touchmode #wfgallery .reelmeta--br{bottom:14px}body.touchmode #wfgallery .reelmeta--tl,
-body.touchmode #wfgallery .reelmeta--tr{top:calc(clamp(6px,1vw,12px) + 62px)}body.touchmode #wfgallery .reelnav{width:38px;height:38px}body.touchmode #wfgallery .contact{bottom:22%}/* tablet · the wave posters keep the tall right bay; the lenses entry and
+.flatscholar__niche{color:var(--violet);font-size:.88rem;margin-top:2px}
+.flat__back{position:fixed;right:18px;bottom:18px;z-index:20;background:var(--violet-deep);color:var(--cream);
+  border-radius:999px;padding:12px 22px;font-weight:600;box-shadow:0 14px 40px rgba(36,26,62,.4);display:none}
+body.flatmode .flat__back{display:block}
+
+/* =================== tablet: calmer depth, roomier zones ============= */
+body.tabletmode .room{perspective:2000px}
+
+/* ---- tablet: a shallower, tighter reel ---- */
+body.tabletmode{--reel-w:66vw;--reel-h:54vh;--reel-step:74vw;--reel-side-turn:10deg;
+  --edge-rotation:2.5deg;--edge-recession:18px;--cam-reserve:20px}
+body.tabletmode .reeltitle h2{font-size:calc(clamp(2rem,5vw,3.4rem) * var(--title-scale))}
+/* ---- mobile: one dominant cover, neighbours peeking, no cursor ---- */
+body.touchmode{--reel-w:74vw;--reel-h:46vh;--reel-step:80vw;--reel-side-turn:6deg;
+  --reel-side-scale:.9;--vf-offset:10px;--vf-size:18px;--lens-distortion:.03}
+body.touchmode .reel{perspective:900px;touch-action:pan-y pinch-zoom}
+body.touchmode .reeltitle{width:92vw;
+  transform:translate(-50%,calc(-50% + var(--reel-h) * .62 + var(--title-y)))}
+body.touchmode .reeltitle h2{font-size:calc(clamp(1.7rem,7vw,2.4rem) * var(--title-scale));
+  text-shadow:0 2px 18px rgba(4,2,9,.95)}
+body.touchmode .reeltitle p{font-size:.78rem;max-width:34ch}
+
+body.touchmode .hud{flex-wrap:nowrap;gap:6px;padding:10px 10px 8px}
+body.touchmode .hud__mark{display:none}
+body.touchmode .hud{justify-content:flex-end}
+body.touchmode .hud__mid{display:none}
+body.touchmode .hudbtn{font-size:.62rem;padding:5px 6px;letter-spacing:0}
+body.touchmode .hudbtn--exit{margin-left:3px;padding:5px 7px}
+/* metadata moves to two safe rows so nothing runs off the edge */
+body.touchmode .reelmeta{font-size:.5rem;letter-spacing:0.055em;max-width:46vw}
+body.touchmode .reelmeta--tr,body.touchmode .reelmeta--br{text-align:right}
+body.touchmode .reelmeta--bl,body.touchmode .reelmeta--br{bottom:14px}
+body.touchmode .reelmeta--tl,body.touchmode .reelmeta--tr{top:calc(clamp(6px,1vw,12px) + 62px)}
+body.touchmode .reelnav{width:38px;height:38px}
+body.touchmode .contact{bottom:22%}
+/* tablet · the wave posters keep the tall right bay; the lenses entry and
    the portrait wall stack down the left. Depth rotation is dropped. */
-body.tabletmode #wfgallery .dirroom{position:absolute;inset:0;display:block;padding:0;overflow:hidden}/* ---- phone: the salon becomes a wall you scroll, two works across ----
+body.tabletmode .dirroom{position:absolute;inset:0;display:block;padding:0;overflow:hidden}
+
+
+
+
+
+/* ---- phone: the salon becomes a wall you scroll, two works across ----
    Six portraits cannot be read at 390px on one screen, so the wall keeps
    its irregularity in a different form: the anchor portrait spans both
    columns, the rest alternate, and every scholar stays reachable. */
-body.touchmode #wfgallery .reel--salon{overflow-y:auto;overflow-x:hidden;
-  -webkit-overflow-scrolling:touch;touch-action:pan-y;perspective:none}body.touchmode #wfgallery .reel--salon .reel__track{position:relative;
+body.touchmode .reel--salon{overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;touch-action:pan-y;perspective:none}
+body.touchmode .reel--salon .reel__track{position:relative;
   left:auto;right:auto;top:auto;bottom:auto;width:auto;height:auto;
   display:grid;grid-template-columns:1fr 1fr;
-  gap:82px 14px;padding:86px 16px 120px;transform:none;transform-style:flat}body.touchmode #wfgallery .cover--salon{position:relative;
-  left:auto;top:auto;width:auto;height:auto;aspect-ratio:.84;transform:none}body.touchmode #wfgallery .cover--salon:first-child{grid-column:1 / -1;aspect-ratio:1.24}body.touchmode #wfgallery .cover--salon .wlabel{width:100%}body.touchmode #wfgallery .reeltitle.is-salon{left:16px;right:16px;width:auto;
-  top:calc(clamp(6px,1vw,12px) + 58px);bottom:auto;z-index:8}body.touchmode #wfgallery .reeltitle.is-salon h2{font-size:1.15rem}body.touchmode #wfgallery .reeltitle.is-salon p{display:none}/* the exhibition title on the vertical hang: no lead paragraph, and the
+  gap:82px 14px;padding:86px 16px 120px;transform:none;transform-style:flat}
+body.touchmode .cover--salon{position:relative;
+  left:auto;top:auto;width:auto;height:auto;aspect-ratio:.84;transform:none}
+body.touchmode .cover--salon:first-child{grid-column:1 / -1;aspect-ratio:1.24}
+body.touchmode .cover--salon .wlabel{width:100%}
+body.touchmode .reeltitle.is-salon{left:16px;right:16px;width:auto;
+  top:calc(clamp(6px,1vw,12px) + 58px);bottom:auto;z-index:8}
+body.touchmode .reeltitle.is-salon h2{font-size:1.15rem}
+body.touchmode .reeltitle.is-salon p{display:none}
+/* the exhibition title on the vertical hang: no lead paragraph, and the
    heading sits in the gap the hang leaves for it */
 /* the phone rule that recentres .reeltitle over the artwork must not
    reach the wall and salon variants, which set their own place */
-body.touchmode #wfgallery .reeltitle.is-wall,
-body.touchmode #wfgallery .reeltitle.is-salon{transform:none}body.touchmode #wfgallery .reeltitle.is-wall{width:var(--tt-w,68vw)}body.touchmode #wfgallery .reeltitle.is-wall h2{font-size:1.6rem}body.touchmode #wfgallery .reeltitle.is-wall p{display:none}/* the phone has no room for a wall title as well as three works and
+body.touchmode .reeltitle.is-wall,
+body.touchmode .reeltitle.is-salon{transform:none}
+body.touchmode .reeltitle.is-wall{width:var(--tt-w,68vw)}
+body.touchmode .reeltitle.is-wall h2{font-size:1.6rem}
+body.touchmode .reeltitle.is-wall p{display:none}
+/* the phone has no room for a wall title as well as three works and
    their labels: the HUD already names the collection, and every work
    carries its own label, so the big title stands down here */
-body.touchmode #wfgallery .reeltitle.is-wall{display:none}/* corner metadata would land on the edge signs at this width. The HUD
+body.touchmode .reeltitle.is-wall{display:none}
+/* corner metadata would land on the edge signs at this width. The HUD
    carries the chapter, so the top corners step aside for the signs. */
-body.touchmode #wfgallery .reelmeta--tl,
-body.touchmode #wfgallery .reelmeta--tr,
-body.touchmode #wfgallery .reelmeta--br{display:none}body.touchmode #wfgallery .reelmeta--bl{bottom:clamp(22px,3.4vh,42px)}body.touchmode #wfgallery .reel--salon .reel__track{padding-top:118px}body.touchmode #wfgallery .roomnav{max-width:44vw;top:calc(clamp(6px,1vw,12px) + 60px)}body.touchmode #wfgallery .roomnav span{font-size:.82rem}body.touchmode #wfgallery .wlabel{margin-top:8px}body.touchmode #wfgallery .wlabel__t{font-size:.84rem}body.touchmode #wfgallery .wlabel__m{font-size:.58rem}/* tablet landscape: shallower curve, smaller camera budget */
-body.tabletmode #wfgallery{--edge-rotation:2.5deg;--edge-recession:18px;--cam-reserve:20px}/* tablet scholars: two calm columns, no rotation, generous gutters */
-body.tabletmode #wfgallery .room[data-type="scholars"] .world{position:static;transform:none !important;
-  padding:104px 0 84px;overflow-y:auto;height:100%}body.tabletmode #wfgallery .room[data-type="scholars"]{perspective:none;overflow-y:auto}body.tabletmode #wfgallery .room[data-type="scholars"] .roomtitle{position:static;transform:none;width:auto;
-  padding:0 clamp(20px,4vw,44px) 18px;text-align:left}/* position:static is load-bearing — without it the rail keeps the
-   `position:absolute; inset:0` from the 3D rules and covers the heading */
-body.tabletmode #wfgallery .room[data-type="scholars"] .rail{position:static;display:grid;grid-template-columns:1fr 1fr;
-  gap:24px;padding:0 clamp(20px,4vw,44px) 40px;overflow:visible}body.tabletmode #wfgallery .room[data-type="scholars"] .scholar__photo{aspect-ratio:16/9}body.tabletmode #wfgallery .room[data-type="scholars"] .piece--scholar{position:relative;left:auto;top:auto;
-  width:auto;transform:none !important;opacity:1 !important}/* =================== touch / small screens =========================== */
+body.touchmode .reelmeta--tl,body.touchmode .reelmeta--tr,
+body.touchmode .reelmeta--br{display:none}
+body.touchmode .reelmeta--bl{bottom:clamp(22px,3.4vh,42px)}
+body.touchmode .reel--salon .reel__track{padding-top:118px}
+body.touchmode .roomnav{max-width:44vw;top:calc(clamp(6px,1vw,12px) + 60px)}
+body.touchmode .roomnav span{font-size:.82rem}
+body.touchmode .wlabel{margin-top:8px}
+body.touchmode .wlabel__t{font-size:.84rem}
+body.touchmode .wlabel__m{font-size:.58rem}
 
-@media (pointer:coarse),(max-width:820px){#wfgallery .hint{display:none}
-}/* mobile directory: the three zones stack, still one screen's worth of
+/* tablet landscape: shallower curve, smaller camera budget */
+body.tabletmode{--edge-rotation:2.5deg;--edge-recession:18px;--cam-reserve:20px}
+
+
+
+/* tablet scholars: two calm columns, no rotation, generous gutters */
+body.tabletmode .room[data-type="scholars"] .world{position:static;transform:none !important;
+  padding:104px 0 84px;overflow-y:auto;height:100%}
+body.tabletmode .room[data-type="scholars"]{perspective:none;overflow-y:auto}
+body.tabletmode .room[data-type="scholars"] .roomtitle{position:static;transform:none;width:auto;
+  padding:0 clamp(20px,4vw,44px) 18px;text-align:left}
+/* position:static is load-bearing — without it the rail keeps the
+   `position:absolute; inset:0` from the 3D rules and covers the heading */
+body.tabletmode .room[data-type="scholars"] .rail{position:static;display:grid;grid-template-columns:1fr 1fr;
+  gap:24px;padding:0 clamp(20px,4vw,44px) 40px;overflow:visible}
+body.tabletmode .room[data-type="scholars"] .scholar__photo{aspect-ratio:16/9}
+body.tabletmode .room[data-type="scholars"] .piece--scholar{position:relative;left:auto;top:auto;
+  width:auto;transform:none !important;opacity:1 !important}
+
+/* =================== touch / small screens =========================== */
+@media (pointer:coarse),(max-width:820px){
+  .hint{display:none}
+}
+/* mobile directory: the three zones stack, still one screen's worth of
    scroll with all three headings reachable immediately */
 /* mobile · a guided vertical exhibition. Each installation is its own
    full-width section, walked through in order; the posters and portraits
    become swipeable strips rather than being squeezed into columns. */
-body.touchmode #wfgallery .dirroom{position:absolute;inset:0;display:block;padding:0;overflow:hidden}body.touchmode #wfgallery{--cam-reserve:0px;--gallery-safe-inline:16px;--lens-distortion:.03}body.touchmode #wfgallery .lobby__sign{margin-bottom:16px}body.touchmode #wfgallery .lobby__sign p{font-size:.7rem}body.touchmode #wfgallery .routeline{display:none}body.touchmode #wfgallery .lobby__floor{position:fixed;height:24%}/* swipeable strips: full-size exhibits, not shrunken ones */
-body.touchmode #wfgallery .waveart{width:66vw;max-width:290px}body.touchmode #wfgallery .portraits .faceart:nth-child(3n+2){margin-top:0}/* no hover on touch: the label copy is simply always open */
-body.touchmode #wfgallery .art__reveal{max-height:96px;opacity:1}body.touchmode #wfgallery .art__t{font-size:.8rem}body.touchmode #wfgallery .faceart .art__t{font-size:.72rem}body.touchmode #wfgallery .faceart .art__sub{font-size:.62rem}/* mobile scholars: single column, 18px gutters, whole names visible */
-body.touchmode #wfgallery .room[data-type="scholars"] .rail{display:grid;grid-template-columns:1fr;
-  gap:18px;overflow:visible;padding:6px 20px 40px;scroll-snap-type:none}body.touchmode #wfgallery .room[data-type="scholars"] .piece--scholar{flex:none;width:auto;max-width:none}body.touchmode #wfgallery .room[data-type="scholars"] .scholar__photo{aspect-ratio:16/9}body.touchmode #wfgallery .minimap{bottom:14px}/* mobile wave four: a vertical depth sequence, not a horizontal rail —
-   so it still feels different from waves one to three on a phone */
-body.touchmode #wfgallery .room[data-type="feed"] .world{padding:104px 0 40px}body.touchmode #wfgallery .room[data-type="feed"] .rail{flex-direction:column;overflow-x:hidden;overflow-y:auto;
-  scroll-snap-type:y mandatory;padding:8px 20px 40px;gap:18px;max-height:calc(100vh - 150px)}body.touchmode #wfgallery .room[data-type="feed"] .piece{flex:0 0 auto;width:100%;max-width:none}/* mobile wave three keeps its numbered path badges clear of the frame */
-body.touchmode #wfgallery .room[data-type="field"] .rail{padding-top:24px}body.touchmode #wfgallery .lensframe{display:none}body.touchmode #wfgallery .room{perspective:none;overflow-y:auto;-webkit-overflow-scrolling:touch}body.touchmode #wfgallery .world{position:static;transform:none !important;padding:110px 0 90px;
-  min-height:100%;display:flex;flex-direction:column;justify-content:center}body.touchmode #wfgallery .roomtitle{position:static;transform:none;width:auto;padding:0 22px 8px;text-align:left}/* corridors and lens rooms become one horizontal swipe rail */
-body.touchmode #wfgallery .rail{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;
-  padding:18px 10vw 34px;scrollbar-width:none;pointer-events:auto;position:static}body.touchmode #wfgallery .rail::-webkit-scrollbar{display:none}body.touchmode #wfgallery .piece{position:relative;left:auto;top:auto;transform:none !important;opacity:1 !important;
-  flex:0 0 82vw;max-width:420px;width:82vw;scroll-snap-align:center}body.touchmode #wfgallery .piece--scholar{flex-basis:64vw}body.touchmode #wfgallery .frame{box-shadow:0 18px 44px rgba(5,2,12,.5), inset 0 0 0 5px var(--room), inset 0 0 0 6px rgba(217,161,63,.35)}body.touchmode #wfgallery .swipehint{display:block;text-align:center;font-family:var(--mono);font-size:.62rem;
-  letter-spacing:0.055em;color:var(--dim);padding-bottom:14px}#wfgallery .swipehint{display:none}body.touchmode #wfgallery .hud{flex-wrap:wrap;row-gap:6px}body.touchmode #wfgallery .hud__mark{display:none}body.touchmode #wfgallery .hud__mid{order:3;flex-basis:100%;margin:0}body.touchmode #wfgallery .detail__panel{align-self:flex-end;width:100vw;max-width:none;border-radius:22px 22px 0 0;max-height:86vh}body.touchmode #wfgallery .detail{padding:0}/* =================== motion preferences ============================== */
+body.touchmode .dirroom{position:absolute;inset:0;display:block;padding:0;overflow:hidden}
 
-@media (prefers-reduced-motion: reduce){#wfgallery *{transition-duration:.01ms !important;animation:none !important}
-}#wfgallery noscript .flat__note{display:block}/* =====================================================================
+body.touchmode{--cam-reserve:0px;--gallery-safe-inline:16px;--lens-distortion:.03}
+
+
+body.touchmode .lobby__sign{margin-bottom:16px}
+body.touchmode .lobby__sign p{font-size:.7rem}
+body.touchmode .routeline{display:none}
+body.touchmode .lobby__floor{position:fixed;height:24%}
+/* swipeable strips: full-size exhibits, not shrunken ones */
+
+
+
+
+body.touchmode .waveart{width:66vw;max-width:290px}
+
+body.touchmode .portraits .faceart:nth-child(3n+2){margin-top:0}
+/* no hover on touch: the label copy is simply always open */
+body.touchmode .art__reveal{max-height:96px;opacity:1}
+body.touchmode .art__t{font-size:.8rem}
+body.touchmode .faceart .art__t{font-size:.72rem}
+body.touchmode .faceart .art__sub{font-size:.62rem}
+/* mobile scholars: single column, 18px gutters, whole names visible */
+body.touchmode .room[data-type="scholars"] .rail{display:grid;grid-template-columns:1fr;
+  gap:18px;overflow:visible;padding:6px 20px 40px;scroll-snap-type:none}
+body.touchmode .room[data-type="scholars"] .piece--scholar{flex:none;width:auto;max-width:none}
+body.touchmode .room[data-type="scholars"] .scholar__photo{aspect-ratio:16/9}
+body.touchmode .minimap{bottom:14px}
+/* mobile wave four: a vertical depth sequence, not a horizontal rail —
+   so it still feels different from waves one to three on a phone */
+body.touchmode .room[data-type="feed"] .world{padding:104px 0 40px}
+body.touchmode .room[data-type="feed"] .rail{flex-direction:column;overflow-x:hidden;overflow-y:auto;
+  scroll-snap-type:y mandatory;padding:8px 20px 40px;gap:18px;max-height:calc(100vh - 150px)}
+body.touchmode .room[data-type="feed"] .piece{flex:0 0 auto;width:100%;max-width:none}
+/* mobile wave three keeps its numbered path badges clear of the frame */
+body.touchmode .room[data-type="field"] .rail{padding-top:24px}
+body.touchmode .lensframe{display:none}
+body.touchmode .room{perspective:none;overflow-y:auto;-webkit-overflow-scrolling:touch}
+body.touchmode .world{position:static;transform:none !important;padding:110px 0 90px;
+  min-height:100%;display:flex;flex-direction:column;justify-content:center}
+body.touchmode .roomtitle{position:static;transform:none;width:auto;padding:0 22px 8px;text-align:left}
+/* corridors and lens rooms become one horizontal swipe rail */
+body.touchmode .rail{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;
+  padding:18px 10vw 34px;scrollbar-width:none;pointer-events:auto;position:static}
+body.touchmode .rail::-webkit-scrollbar{display:none}
+body.touchmode .piece{position:relative;left:auto;top:auto;transform:none !important;opacity:1 !important;
+  flex:0 0 82vw;max-width:420px;width:82vw;scroll-snap-align:center}
+body.touchmode .piece--scholar{flex-basis:64vw}
+body.touchmode .frame{box-shadow:0 18px 44px rgba(5,2,12,.5), inset 0 0 0 5px var(--room), inset 0 0 0 6px rgba(217,161,63,.35)}
+body.touchmode .swipehint{display:block;text-align:center;font-family:var(--mono);font-size:.62rem;
+  letter-spacing:0.055em;color:var(--dim);padding-bottom:14px}
+.swipehint{display:none}
+body.touchmode .hud{flex-wrap:wrap;row-gap:6px}
+body.touchmode .hud__mark{display:none}
+body.touchmode .hud__mid{order:3;flex-basis:100%;margin:0}
+body.touchmode .detail__panel{align-self:flex-end;width:100vw;max-width:none;border-radius:22px 22px 0 0;max-height:86vh}
+body.touchmode .detail{padding:0}
+
+/* =================== motion preferences ============================== */
+@media (prefers-reduced-motion: reduce){
+  *{transition-duration:.01ms !important;animation:none !important}
+}
+noscript .flat__note{display:block}
+
+/* =====================================================================
    THE WHITE CUBE
    The single art direction this gallery ships. These were applied at
    runtime by applyVersion() from a five-version table; they are now
    plain CSS, so nothing has to write 51 custom properties onto the
    document root before the first frame can be styled.
    ===================================================================== */
-#wfgallery{
+:root{
   --gallery-black:#e6dfd4;
   --gallery-cream:#191520;
   --gallery-edge:#efe9df;
@@ -1432,7 +2049,9 @@ body.touchmode #wfgallery .rail{display:flex;gap:16px;overflow-x:auto;scroll-sna
   --v-vf-weight:1px;
   --v-vig-rgb:118,104,120;
   --v-vignette:.16;
-}/* =====================================================================
+}
+
+/* =====================================================================
    QUALITY LEVELS · set by applyQuality() from what the device reports.
    "high" deliberately declares nothing: it is the design as authored, so
    a capable machine renders exactly what it renders today and these rules
@@ -1447,186 +2066,40 @@ body.touchmode #wfgallery .rail{display:flex;gap:16px;overflow-x:auto;scroll-sna
    Nothing here changes the hang, the perspective, the artwork, the
    typography or the linework.
    ===================================================================== */
-#wfgallery[data-q="med"]{
+:root[data-q="med"]{
   --v-shadow:.30;                 /* was .42 — same shape, shallower blur */
   --v-grain:.020;
   --gallery-fibre-opacity:.022;
-}#wfgallery[data-q="low"]{
+}
+:root[data-q="low"]{
   --v-shadow:.20;
   --v-grain:.014;
   --gallery-fibre-opacity:.016;
   --v-vignette:.13;
-}/* the slow linework drift is the only thing that composites forever with
+}
+/* the slow linework drift is the only thing that composites forever with
    nobody touching the page; on the weakest machines the composition stays,
    the drift stops */
-#wfgallery[data-q="low"] .glines__pan{animation:none}
-
-  </style>
-  <script>(function(){var d=document.documentElement;d.classList.add("js");setTimeout(function(){if(!d.classList.contains("reveal-ready"))d.classList.remove("js");},2500);})();</script>
+:root[data-q="low"] .glines__pan{animation:none}
+</style>
 </head>
 <body>
-  <script>document.body.classList.add("is-loading");</script>
-  <noscript><style>.preloader{display:none}</style></noscript>
-
-  <!-- Preloader: violet curtain with counter, lifts when the page is ready -->
-  <div class="preloader" id="preloader" aria-hidden="true">
-    <div class="preloader__inner">
-      <p class="preloader__mark">wearefeminismm</p>
-      <div class="preloader__bar"><div class="preloader__bar-fill" id="preBar"></div></div>
-      <p class="preloader__count"><span id="preCount">0</span>%</p>
-    </div>
-  </div>
-
-  <!-- Custom cursor (fine pointers only) -->
-  <div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
-  <div class="cursor-ring" id="cursorRing" aria-hidden="true"></div>
-
-  <!-- Global colour-morph backdrop: one living field that shifts colour
-       across the whole scroll (js/morph.js). Sits behind the fluid sim. -->
-  <div class="morph-bg" id="morph" aria-hidden="true"></div>
-
-  <!-- (Cursor-reactive fluid banner lives on Home only.) -->
-
-  <!-- page-wide scroll guide line -->
-  <div class="progress-line" aria-hidden="true">
-    <div class="progress-line__fill" id="plFill"></div>
-    <div class="progress-line__dot" id="plDot"></div>
-  </div>
-
-  <!-- ===== Nav ===== -->
-  <header class="nav" id="nav">
-    <a class="nav__logo" href="index.html" data-magnetic>wearefeminismm</a>
-    <nav class="nav__links" aria-label="Primary">
-      <a href="index.html">Home</a>
-      <a href="learn.html" aria-current="page">Learn</a>
-      <a href="community.html">Community</a>
-      <a href="voice.html">Your voice</a>
-    </nav>
-    <div class="nav__right">
-      <span class="nav__tools"><button class="nav__toggle" id="darkToggle" type="button" title="Dark mode" aria-label="Dark mode" aria-pressed="false" data-magnetic><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.5 6.5 0 0 0 9.8 9.8z"/></svg></button>
-      <button class="nav__toggle" id="a11yToggle" type="button" title="Accessible mode" aria-label="Accessible mode" aria-pressed="false" data-magnetic><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="7.3" r="1.4" fill="currentColor"/><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M7.6 10.2h8.8M12 10.6v4.2m0 0-1.9 3.2m1.9-3.2 1.9 3.2"/></svg></button></span>
-      <button class="nav__menu-btn" id="navBurger" type="button" aria-expanded="false" aria-controls="navMenu" data-magnetic>
-        <span class="nav__menu-word">Menu</span>
-        <span class="nav__menu-bars" aria-hidden="true"><span></span><span></span></span>
-      </button>
-    </div>
-  </header>
-
-  <!-- Overlay menu: a single panel that carries the whole site, the way in
-       and the way to reach us. Numbered rows so the order is legible. -->
-  <div class="menu" id="navMenu" hidden>
-    <div class="menu__scrim" data-menu-close></div>
-    <nav class="menu__panel" aria-label="Site">
-      <button class="menu__close" type="button" aria-label="Close menu" data-menu-close>&#10005;</button>
-      <ul class="menu__list">
-        <li><a class="menu__row" href="index.html">
-          <span class="menu__num" aria-hidden="true">01</span>
-          <span class="menu__label">Home</span>
-          <span class="menu__go" aria-hidden="true">&#8594;</span>
-        </a></li>
-        <li><a class="menu__row" href="learn.html" aria-current="page">
-          <span class="menu__num" aria-hidden="true">02</span>
-          <span class="menu__label">Learn</span>
-          <span class="menu__go" aria-hidden="true">&#8594;</span>
-        </a></li>
-        <li><a class="menu__row" href="community.html">
-          <span class="menu__num" aria-hidden="true">03</span>
-          <span class="menu__label">Community</span>
-          <span class="menu__go" aria-hidden="true">&#8594;</span>
-        </a></li>
-        <li><a class="menu__row" href="voice.html">
-          <span class="menu__num" aria-hidden="true">04</span>
-          <span class="menu__label">Your voice</span>
-          <span class="menu__go" aria-hidden="true">&#8594;</span>
-        </a></li>
-        <li><a class="menu__row" href="receipts.html">
-          <span class="menu__num" aria-hidden="true">05</span>
-          <span class="menu__label">Receipts</span>
-          <span class="menu__go" aria-hidden="true">&#8594;</span>
-        </a></li>
-      </ul>
-      <div class="menu__foot">
-        <a class="menu__ig" href="https://instagram.com/ourfeministspacee" target="_blank" rel="noopener">@ourfeministspacee</a>
-        <p class="menu__fine">Anonymous, always. You never have to share your name.</p>
-      </div>
-    </nav>
-  </div>
-
-  <!-- ===== Page intro =====
-       Custom hero for Learn, back by request: no photo here. A beam of
-       light refracting into three colour bands, literally "one word,
-       three lenses," and a nod to intersectionality. Pure CSS (js-free,
-       reduced-motion aware). -->
-  <section class="hero hero--refract" id="top" data-bg="#f2ecf7">
-    <div class="refract" aria-hidden="true">
-      <span class="refract__beam"></span>
-      <span class="refract__prism"></span>
-      <span class="refract__band refract__band--v"></span>
-      <span class="refract__band refract__band--m"></span>
-      <span class="refract__band refract__band--g"></span>
-    </div>
-    <p class="hero__eyebrow line-reveal"><span>Learn</span></p>
-    <h1 class="hero__title">
-      <span class="line-reveal"><span>One word,</span></span>
-      <span class="line-reveal"><span><em>three lenses.</em></span></span>
-    </h1>
-    <p class="hero__sub line-reveal"><span>Why this space exists, where feminism came from, and what it actually means, explained with respect for your intelligence.</span></p>
-    <div class="hero__ctas line-reveal"><span>
-      <a class="cta" href="#exhibition" data-magnetic>Start with the words <span class="cta__arrow">→</span></a>
-      <a class="cta cta--quiet" href="#exhibition" data-magnetic>Walk the timeline <span class="cta__arrow">→</span></a>
-    </span></div>
-  </section>
-
-  <!-- ===== Pulse sparkline: live Yes/No tally from the pre-survey ===== -->
-  <section class="sparkpulse" id="boring-pulse" data-bg="#efeaf5">
-    <div class="sparkcard">
-      <p class="eyebrow">Pulse · live from the pre-survey</p>
-      <h2 class="sparkcard__q">Do students find learning about feminism <em>boring?</em></h2>
-      <div class="sparkcard__top">
-        <div class="sparkcard__big"><span id="sparkPct">…</span><small> said Yes</small></div>
-        <div class="sparkcard__verdict" id="sparkVerdict"></div>
-      </div>
-      <svg class="sparkcard__chart" id="sparkSvg" viewBox="0 0 500 120" preserveAspectRatio="none" aria-hidden="true">
-        <path id="sparkPath" class="sparkline-path"></path>
-        <circle id="sparkDot" class="spark-end-dot" r="6"></circle>
-      </svg>
-
-      <!-- only shown if the live endpoint is unreachable, so the card never
-           sits on "Collecting responses…" with nothing in it -->
-      <div class="sparkfb" id="sparkFallback" hidden>
-        <p data-spark-msg role="status" aria-live="polite"></p>
-        <button class="dirbtn" type="button" data-spark-retry>Retry</button>
-      </div>
-
-      <div class="sparkcard__foot">
-        <div class="sparkcard__counts" id="sparkCounts">Collecting responses…</div>
-        <div class="sparkcard__qr">
-          <span class="sparkcard__qr-label">Voice your Opinion</span>
-          <img src="img/pulse-qr.png" alt="" width="235" height="320" loading="lazy" decoding="async" />
-          <a class="cta cta--quiet ext" href="https://qrto.org/eaBfI5" target="_blank" rel="noopener">Take the survey<span class="visually-hidden"> (opens in a new tab)</span></a>
-        </div>
-      </div>
-      <p class="sparkcard__mission">That number is the assignment. Everything on this page is the answer.</p>
-      <p class="sparkcard__receipt"><a class="receipt-link" href="receipts.html#method">How this number was collected →</a></p>
-    </div>
-  </section>
-
-  <!-- ===== The exhibition. Replaces the three-lens section, the
-       timeline and the resources list: same content, one source
-       object, walked instead of scrolled. Everything above this
-       line (nav, refract hero, pulse sparkline) is untouched.
-       The previous version of this page is kept whole at
-       learn-classic.html. ===== -->
-  <div id="wfgallery">
 <noscript>
   <div class="ctx"><div class="ctx__card">This prototype needs JavaScript for the 3D gallery.
-  The full written content lives on the <a href="learn-classic.html">full written page</a>.</div></div>
+  The full written content lives on the current <a href="learn.html">Learn page</a>.</div></div>
 </noscript>
 
-
+<!-- ============ context strip: where this sits on the real page ====== -->
+<div class="ctx">
+  <div class="ctx__card">
+    <b>Prototype context.</b> On the real Learn page everything above this line stays exactly as it is:
+    the refract hero, then the live pulse sparkline. The gallery begins where the sparkline ends.
+    44% of the students in our survey told us learning about feminism is boring. What follows is the counter-argument.
+  </div>
+</div>
 
 <!-- ============ the entrance (contained in the page, hybrid) ========= -->
-<section class="entrance" id="exhibition" aria-label="Gallery entrance">
+<section class="entrance" aria-label="Gallery entrance">
   <div class="portal" id="portal">
     <p class="eyebrow eyebrow--light">Part two · the history · now an exhibition</p>
     <h1>Enter <em>the gallery.</em></h1>
@@ -1786,10 +2259,8 @@ body.touchmode #wfgallery .rail{display:flex;gap:16px;overflow-x:auto;scroll-sna
     </div>
   </div>
 </div>
-  </div>
 
-  <script>
-
+<script>
 /* =====================================================================
    DATA · every word below is carried over verbatim from learn.html.
    One source object renders both the gallery rooms and the calm view,
@@ -5162,35 +5633,6 @@ if(QS.get('deck')) addEventListener('load',()=>{
    ?wall ?stage ?vswitch ?fonts ?flick ?rep ?nav ?tuner) removed for
    production: 614 lines of instrumentation that shipped to every
    visitor and parsed on every load. */
-
-  </script>
-
-  <!-- ===== Footer ===== -->
-  <footer class="footer" data-bg="#faf6ef" data-scene>
-    <p class="footer__mark">wearefeminismm</p>
-    <p class="footer__mission">Four waves, three lenses, six scholars. The boring version never covered any of it.</p>
-    <p class="footer__coming">Next: workshops · mentorship · resource hub</p>
-    <a class="footer__ig" href="https://instagram.com/ourfeministspacee" target="_blank" rel="noopener" data-magnetic>@ourfeministspacee on Instagram →</a>
-    <p class="footer__receipts"><a class="receipt-link" href="receipts.html">Receipts · sources, method, house rules →</a></p>
-    <p class="footer__fine">Made with care. Your words are anonymous, and you never have to share your name.</p>
-  </footer>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
-  <script src="js/scroll.js?v=79"></script>
-  <script src="js/morph.js?v=80"></script>
-  <script src="js/journey.js?v=80"></script>
-  <script src="js/polish.js?v=82"></script>
-  <script src="js/main.js?v=88"></script>
-  <script src="js/timeline.js?v=5"></script>
-  <!-- thread.js is Learn-only: here it draws the timeline's gold spine
-       through every .th-anchor (the perf pass dropped it site-wide on the
-       one-anchor-per-page rationale, which missed this page's splice). -->
-  <script src="js/thread.js?v=118"></script>
-  <script src="js/spark.js?v=91"></script>
-  <script src="js/theme.js?v=2"></script>
-  <script src="js/nav.js?v=4"></script>
-  <script src="js/transition.js?v=1"></script>
+</script>
 </body>
 </html>

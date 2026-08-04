@@ -26,7 +26,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=221" />
+  <link rel="stylesheet" href="css/styles.css?v=222" />
   <script>(function(){var d=document.documentElement;d.classList.add("js");setTimeout(function(){if(!d.classList.contains("reveal-ready"))d.classList.remove("js");},2500);})();</script>
 </head>
 <body>
@@ -220,6 +220,16 @@
       <p class="popculture__foot reveal">A new piece lands every week. Got one that deserves this spot? <a class="piece__suggest" href="voice.html#wall">Put it on the wall →</a></p>
       <p class="piece__credits reveal">Photo: Maya Angelou reciting "On the Pulse of Morning" at the 1993 presidential inauguration. White House Photograph Office, public domain, via Wikimedia Commons.</p>
     </div>
+
+    <!-- Stickers. They live HERE and nowhere else: this is the one dark
+         section on the page and already its loudest moment, so it can carry
+         them without arguing with the hero. They sit in the margins beside
+         .popculture__inner (max 940px) and are hidden below 1120px, where
+         there is no margin left to sit in. The fist is decorative; the patch
+         is real text, so it is not hidden from screen readers. -->
+    <img class="sticker sticker--fist" src="img/stickers/fist-venus.svg" alt=""
+         width="240" height="340" loading="lazy" decoding="async" aria-hidden="true" />
+    <p class="sticker sticker--patch"><span>Never apologize for being a <em>powerful woman</em></span></p>
   </section>
 
   <!-- ===== About: where this comes from (provenance first, founder second) ===== -->

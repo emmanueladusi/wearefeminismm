@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Raised fist inside the Venus symbol.
+
+     Drawn from scratch rather than traced: the symbol is movement
+     iconography going back decades, but the distressed illustration it came
+     from was somebody's commercial artwork. This is built the way the rest
+     of the site is built — geometric, on a module, in the site's own gold
+     and cream — so it sits on the Pop culture section as though it belongs
+     there rather than being pasted on.
+
+     The hand is ONE silhouette with the finger grooves cut out through a
+     mask, not a stack of separate bars. Bars read as a barcode; a solid
+     mass with short grooves reads as a fist, because the outer edge of the
+     hand stays unbroken and only the knuckles are articulated. The grooves
+     are real holes, so they stay transparent on any background.
+
+     No white die-cut outline — on cream or violet that reads as an image
+     that failed to load. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 340" width="240" height="340"
+     role="img" aria-label="A raised fist inside the Venus symbol">
+  <defs>
+    <mask id="fistMask">
+      <rect x="0" y="0" width="240" height="340" fill="#000"/>
+      <!-- The hand as a drawn silhouette. Rectangles could not carry this:
+           a fist is read from its OUTLINE — the thumb bulge on one side, the
+           knuckle curve across the top, the taper into the wrist — and a
+           stack of boxes has none of those, which is why it kept reading as
+           a mitten. -->
+      <g fill="#fff">
+        <path d="M100 178 L100 146
+                 C100 140 94 138 88 134
+                 C76 127 68 117 70 105
+                 C72 92 84 86 96 88
+                 C88 80 86 66 96 58
+                 C106 50 122 48 134 50
+                 C150 53 162 62 162 78
+                 L162 120
+                 C162 134 154 143 144 146
+                 L144 178 Z"/>
+      </g>
+      <!-- Knuckle grooves, cut out through the right edge so the fingers end
+           in articulated tips. The lowest one frees the thumb. -->
+      <g fill="#000">
+        <rect x="108" y="72" width="70" height="6" rx="3"/>
+        <rect x="112" y="92" width="66" height="6" rx="3"/>
+        <rect x="70"  y="104" width="66" height="6" rx="3" transform="rotate(6 103 107)"/>
+      </g>
+    </mask>
+  </defs>
+  <circle cx="120" cy="110" r="88" fill="none" stroke="#d9a13f" stroke-width="20"/>
+  <g fill="#d9a13f">
+    <rect x="108" y="196" width="24" height="126" rx="6"/>
+    <rect x="64"  y="250" width="112" height="24" rx="6"/>
+  </g>
+  <rect x="0" y="0" width="240" height="340" fill="#faf6ef" mask="url(#fistMask)"/>
+</svg>

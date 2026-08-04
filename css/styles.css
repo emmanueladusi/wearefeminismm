@@ -3264,6 +3264,52 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
   font-size: 1.05rem;
   line-height: 1.6;
 }
+/* ---------- Stickers (Pop culture section only) ----------
+   Two rules keep these from becoming clip art. They never rotate more than
+   3deg — past that a sticker stops looking placed and starts looking
+   dropped — and they live strictly in the margin beside the 940px content
+   column, so they decorate the section without ever crowding the reading.
+   Below 1120px that margin is gone, and so are they. */
+.sticker { display: none; }
+@media (min-width: 1120px) {
+  .popculture .sticker {
+    display: block;
+    position: absolute;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .sticker--fist {
+    width: clamp(96px, 8.5vw, 138px);
+    height: auto;
+    top: clamp(48px, 7vw, 96px);
+    right: clamp(8px, 3vw, 62px);
+    transform: rotate(-3deg);
+    opacity: 0.95;
+  }
+  /* a die-cut paper patch: cream stock, ink text, a gold keyline. Set in the
+     site's own faces — the handwriting on the original was a third type
+     voice and was the thing that read most like clip art. */
+  .sticker--patch {
+    margin: 0;
+    left: clamp(6px, 2.2vw, 44px);
+    bottom: clamp(56px, 8vw, 120px);
+    width: clamp(150px, 14vw, 196px);
+    transform: rotate(2.5deg);
+    background: var(--paper, #faf6ef);
+    color: #2b1f42;
+    border: 1.5px solid var(--gold);
+    border-radius: 999px;
+    padding: 1.05rem 1.15rem;
+    text-align: center;
+    font-family: var(--serif);
+    font-size: clamp(0.9rem, 1.05vw, 1.02rem);
+    line-height: 1.28;
+    letter-spacing: -0.01em;
+    box-shadow: 0 14px 34px rgba(8, 5, 16, 0.42);
+  }
+  .sticker--patch em { font-style: italic; color: #9a6a12; }
+}
+
 /* the piece of the week — one featured work, swapped by hand each week */
 /* text on the left, photo on the right, no box around the pair — the two
    simply sit side by side on the section */
