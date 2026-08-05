@@ -2402,7 +2402,7 @@ function openGallery(chapterId){
   }
   S.lastFocus = document.activeElement;
   if (!S.open){
-    ensureTextures();       // idle callback may not have run yet; see boot
+    POWER.armProbe();       // the opening transition is not typical use
     g.classList.add('open'); S.open=true;
     document.documentElement.style.overflow='hidden';
     startBG();
@@ -2429,6 +2429,7 @@ function exitGallery(){
   (S.lastFocus||$('#enterBtn')).focus({preventScroll:true});
 }
 function setChapter(id){
+  POWER.armProbe();   // a room rebuild is not typical use either
   const c = CHAPTERS.find(x=>x.id===id) || CHAPTERS[0];
   S.chapter=c; S.pieces=[]; S.activeIdx=0; S.cam.z=0; S.cam.tz=0; S.endOffered=false;
   closePanels();
@@ -4845,7 +4846,10 @@ addEventListener('keydown',e=>{
     if(!e.metaKey&&!e.ctrlKey&&!/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)){
       e.preventDefault(); setChapter('directory'); return; }
   }
-  if(e.key==='d'||e.key==='D'){                    // the diagnostic readout
+  /* D or H toggles the readout. Two keys on purpose: D is where you reach
+     for it, H is where you reach to get rid of it — and a panel opened by
+     ?perf=1 has to be dismissable by someone who never learned either. */
+  if(e.key==='d'||e.key==='D'||e.key==='h'||e.key==='H'){
     if(!e.metaKey&&!e.ctrlKey&&!/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)){
       e.preventDefault(); togglePerfPanel(); return; }
   }
@@ -5352,7 +5356,12 @@ const PERF = {
    An explicit choice always wins and is remembered.
    ===================================================================== */
 const POWER = {
-  KEY:'wf-gallery-power', source:'default', probeResult:null,
+  /* v2: the previous key may hold an 'on' written by the old probe,
+     which judged the machine on the entrance transition and could
+     latch a capable computer into power saver permanently. Retiring
+     the key is the only way to un-stick a browser that already has
+     it; an explicit choice made from here on is stored under v2. */
+  KEY:'wf-gallery-power2', source:'default', probeResult:null,
   /* whether power saver should also drop to the smaller texture set. On
      for every device-capability reason and for an explicit choice; off
      when the only reason was prefers-reduced-motion. See IMG(). */
@@ -5417,23 +5426,50 @@ const POWER = {
        the room's own covers are rebuilt on every room change anyway. */
     try{ buildDirLists(); }catch(e){}
   },
-  /* the probe: real frames, once, shortly after the room opens */
-  probeDone:false, _samples:[],
+  /* ---- the probe -----------------------------------------------------
+     REWRITTEN 4 Aug 2026, because the first version was wrong in two ways
+     that compounded into a visible fault.
+
+     (1) It sampled the wrong frames. loop() only runs while the gallery is
+     OPEN, so the first frames it ever sees are the frames right after the
+     entrance click — the portal fly, the mask reveals, the room build, the
+     shader's first draw. That is the single heaviest sequence in the whole
+     experience and the least representative of using the room. The 1.2s
+     warm-up guard did nothing about it, because it counted from page load
+     and you have to scroll and click before the loop starts at all. So the
+     probe was, by construction, always judging the machine on its worst
+     three seconds.
+
+     (2) It acted immediately. Tripping mid-session yanks five
+     full-viewport layers, the film burn, the near linework and the pointer
+     parallax out from under a transition that is still playing. Whatever
+     the measurement said, that is a visible pop — and it persisted, so
+     every later visit also started in a room that looked different without
+     the visitor ever having asked for it.
+
+     Now: it ignores a warm-up window after the room opens or changes, it
+     ignores frames drawn while a transition is in flight, it needs a
+     longer sample, and — the important part — it NEVER changes anything in
+     the session it measured. It records the verdict, and the next load
+     starts light. A mode change you can watch happen is a bug; a mode that
+     is simply already right when you arrive is the feature. */
+  probeDone:false, _samples:[], _skip:0,
+  armProbe(){ this._skip = 90; },     // opening + room changes are not typical use
   sample(dt){
     if (this.probeDone) return;
-    if (performance.now() - PERF.started < 1200) return;   // ignore warm-up
+    if (this._skip > 0){ this._skip--; return; }
+    if (REEL.busy) return;            // a transition is not a frame rate
     this._samples.push(dt);
-    if (this._samples.length < 90) return;
+    if (this._samples.length < 150) return;
     this.probeDone = true;
     const slow = this._samples.filter(v => v > 32).length;
     const pct  = slow / this._samples.length;
     const med  = [...this._samples].sort((a,b)=>a-b)[Math.floor(this._samples.length/2)];
+    const trip = pct >= .30 && !document.body.classList.contains('powersave');
     this.probeResult = {frames:this._samples.length, pctOver32:+(pct*100).toFixed(1),
-                        median:+med.toFixed(1)};
-    if (pct >= .25 && !document.body.classList.contains('powersave')){
-      this.save('on');                  // next load starts light
-      this.apply(true, 'measured: '+Math.round(pct*100)+'% of frames over 32ms');
-    }
+                        median:+med.toFixed(1),
+                        verdict: trip ? 'slow — power saver on next load' : 'fine'};
+    if (trip) this.save('on');        // takes effect NEXT load, never this one
   }
 };
 
@@ -5472,7 +5508,8 @@ function renderPerfPanel(){
     +   '<button type="button" id="perfReset">Reset counters</button>'
     + '</div>'
     + '<p class="perfpanel__hint">Walk a couple of rooms, then Copy and paste it back. '
-    +   'Toggling power saver records both, so one paste is enough.</p>';
+    +   'Toggling power saver records both, so one paste is enough.<br>'
+    +   'Press <b>H</b> to hide this panel (<b>D</b> brings it back).</p>';
   $('#perfCopy').onclick = () => {
     const txt = JSON.stringify(PERF.dump(), null, 1);
     const done = () => { $('#perfCopy').textContent = 'Copied'; };
@@ -5523,18 +5560,33 @@ buildFlat(); // pre-built so screen readers can reach all content from the start
    cannot be made cheap — but nothing they produce is visible at boot.
    Both tiles are read only by .gtex__grain / .gtex__fibre / .frame::after,
    and all three live inside #gallery, which is display:none until the
-   visitor enters. So this came off the boot critical path entirely: it
-   runs when the machine is idle, and openGallery() forces it first if the
-   visitor beat the idle callback to it. Identical tiles either way — the
-   generator is unchanged, only when it is called. */
+   visitor enters. So this came off the boot critical path entirely.
+
+   REGRESSION FIXED 4 Aug 2026: the first version had openGallery() call
+   this SYNCHRONOUSLY if the idle callback had not landed yet — which put
+   two blocking PNG encodes at the exact moment of the click, inside the
+   entrance transition, and turned a smooth opening into a hitch. Moving
+   work off the boot path is worthless if it lands on the animation path
+   instead.
+
+   So there is no forcing call any more. It runs on idle, and if idle is
+   only reached mid-transition (requestIdleCallback fires on its timeout
+   whether or not the machine is actually idle) it puts itself back and
+   waits. Worst case the two tiles arrive a beat late, which is invisible:
+   they are monochrome noise at 0.026 and 0.03 opacity. */
 let _texDone = false;
+function scheduleTextures(delay){
+  (window.requestIdleCallback || (f => setTimeout(f, delay || 150)))(
+    () => ensureTextures(), {timeout: 1500});
+}
 function ensureTextures(){
   if (_texDone) return;
+  /* never generate while anything is in flight — see above */
+  if (S.open && GALLERY.busy()){ scheduleTextures(260); return; }
   _texDone = true;
   makeTextures();
 }
-(window.requestIdleCallback || (f => setTimeout(f, 200)))(
-  () => ensureTextures(), {timeout: 3000});
+scheduleTextures();
 
 /* =====================================================================
    DEV-ONLY · live tuner.  Press T inside the gallery to show or hide it.
