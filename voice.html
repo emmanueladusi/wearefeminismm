@@ -23,8 +23,8 @@
   <meta name="twitter:image" content="https://emmanueladusi.github.io/wearefeminismm/img/og-image.png" />
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-  <link rel="stylesheet" href="css/styles.css?v=257" />
-  <link rel="stylesheet" href="css/preso.css?v=8" />
+  <link rel="stylesheet" href="css/styles.css?v=258" />
+  <link rel="stylesheet" href="css/preso.css?v=9" />
   <script>(function(){var d=document.documentElement;d.classList.add("js");setTimeout(function(){if(!d.classList.contains("reveal-ready"))d.classList.remove("js");},2500);})();</script>
 </head>
 <body class="page-flat">
@@ -156,7 +156,7 @@
 
   <!-- ===== The research, compressed from six pinned scenes to two blocks.
        The findings lead; where it was presented is a single line. ===== -->
-<section class="preso" id="preso" data-bg="#faf6ef">
+<section class="preso" id="preso" data-bg="#e2dbd8">
     <div class="preso__stage">
 
       <!-- SCENE · kinetic title -->
@@ -223,12 +223,15 @@
       <div class="hud">
         <span id="presoIdx">01 / 06</span>
         <span class="hud__bar"><span class="hud__fill" id="presoFill"></span></span>
+        <!-- WCAG 2.0 A, 2.2.2 Pause Stop Hide: this advances on its own for
+             about twenty seconds, so it has to be stoppable. -->
+        <button class="hud__skip hud__play" id="presoPlay" type="button" aria-label="Play last year's recap">Play</button>
         <button class="hud__skip" id="presoSkip" type="button" aria-label="Skip last year's recap and jump to the year machine">Skip last year's recap ↓</button>
       </div>
     </div>
   </section>
 
-  <section class="ym" id="yearmachine" aria-label="The year machine" data-bg="#241a3d">
+  <section class="ym" id="yearmachine" aria-label="The year machine" data-bg="#32221d">
     <div class="ym__inner">
       <p class="eyebrow eyebrow--light">Activity · about two minutes</p>
       <h2 class="ym__title">What if <em>you</em> were there?</h2>
@@ -278,7 +281,7 @@
   <!-- ===== Private Reflection Wall.
        Named for what it actually is. Until a shared, moderated wall exists,
        nothing here implies anyone else can read or reply to a reflection. -->
-  <section class="wall-section" id="wall" data-bg="#1a1330">
+  <section class="wall-section" id="wall" data-bg="#281b17">
     <canvas class="wall-canvas" id="wallCanvas" aria-hidden="true"></canvas>
     <div class="wall-section__inner">
       <p class="eyebrow eyebrow--light">Write · private to this device</p>
@@ -340,7 +343,7 @@
   </main>
 
   <!-- ===== Footer ===== -->
-  <footer class="footer" data-bg="#faf6ef" data-scene>
+  <footer class="footer" data-bg="#e2dbd8" data-scene>
     <p class="footer__mark">wearefeminismm</p>
     <p class="footer__mission">You traveled back to 1912. The wall is still listening.</p>
     <p class="footer__coming">Next: workshops · mentorship · resource hub</p>
@@ -356,7 +359,7 @@
   <script src="js/polish.js?v=82"></script>
   <script src="js/aiglow.js?v=78"></script>
   <script src="js/main.js?v=88"></script>
-  <script src="js/preso.js?v=6"></script>
+  <script src="js/preso.js?v=7"></script>
   <script src="js/inkgarden.js?v=1"></script>
   <script src="js/yearmachine.js?v=5"></script>
   <script src="js/wall3d.js?v=79"></script>

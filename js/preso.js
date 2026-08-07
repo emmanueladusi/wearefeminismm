@@ -1,14 +1,21 @@
-/* PRESO — scroll-driven kinetic-typography slideshow on Home.
+/* PRESO — the recap, as a piece of film.
    ------------------------------------------------------------------
-   The .preso section is tall (one viewport of scroll per scene) with a
-   position:sticky stage, so it pins while you scroll through it. This
-   script maps scroll progress → the active scene, so the story can't be
-   scrolled past and missed, and the viewer sets the pace. No timers.
+   It used to be scroll-driven: the section was one viewport tall PER
+   scene, pinned, and your scroll position picked the scene. That made
+   the recap unskippable by design -- six screens of scrolling before
+   the page would move on -- which is exactly the thing people leave
+   over. It is now one screen tall and plays itself, so scrolling past
+   costs a single swipe and nobody is held.
 
-   Each time a new scene becomes active its entrance animation is
-   re-triggered (reflow), so scrolling back up replays it too. Runs on a
-   rAF-throttled scroll listener; degrades cleanly (sticky + scene 1 show
-   even if this never runs). Photos: edit the PHOTOS map below. */
+   It behaves like a video: it starts when it comes into view, pauses
+   when it leaves, and there is a play/pause control. That control is
+   not a nicety -- WCAG 2.0 A (2.2.2 Pause, Stop, Hide) requires one
+   for anything that moves on its own for more than five seconds
+   alongside other content, and this runs about twenty.
+
+   Reduced motion and accessible mode: nothing auto-starts. The first
+   scene sits there and the control reads Play, so the recap is
+   reachable but never imposed. */
 
 (function () {
   const root = document.getElementById("preso");
@@ -16,7 +23,6 @@
   const scenes = Array.from(root.querySelectorAll(".scene"));
   if (!scenes.length) return;
 
-  root.style.setProperty("--scenes", scenes.length); // one viewport per scene
 
   /* ---------- photos (swap these for real shots) ---------- */
   const PHOTOS = {
@@ -54,65 +60,143 @@
     probe.src = src;
   });
 
-  /* ---------- scene selection by scroll ---------- */
-  const hudIdx = root.querySelector("#presoIdx");
-  const hudFill = root.querySelector("#presoFill");
-  const pad = (n) => String(n + 1).padStart(2, "0");
-  let cur = -1;
+  /* ---------- playback ---------- */
 
-  function activate(i) {
+  const hudIdx  = root.querySelector("#presoIdx");
+  const hudFill = root.querySelector("#presoFill");
+  const playBtn = root.querySelector("#presoPlay");
+  const pad = (n) => String(n + 1).padStart(2, "0");
+
+  const HOLD = 3400;          // ms a scene is held before the next one
+  const reduce = () =>
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+    document.documentElement.hasAttribute("data-a11y");
+
+  let cur = -1, timer = null, playing = false, ended = false, inView = false;
+
+  function show(i) {
     if (i === cur) return;
     cur = i;
-    scenes.forEach((s, k) => {
+    scenes.forEach((sc, k) => {
       if (k === i) {
-        // re-trigger the entrance animation so every arrival plays it
-        s.classList.remove("is-on"); void s.offsetWidth; s.classList.add("is-on");
+        // re-trigger the entrance so every arrival plays it
+        sc.classList.remove("is-on"); void sc.offsetWidth; sc.classList.add("is-on");
       } else {
-        s.classList.remove("is-on");
+        sc.classList.remove("is-on");
       }
     });
     if (hudIdx) hudIdx.textContent = pad(i) + " / " + pad(scenes.length - 1);
+    if (hudFill) {
+      // The bar fills across the scene it is on, so it reads as time passing
+      // rather than as a counter ticking over.
+      hudFill.style.transition = "none";
+      hudFill.style.width = ((i / scenes.length) * 100).toFixed(1) + "%";
+      void hudFill.offsetWidth;
+      if (playing) {
+        hudFill.style.transition = "width " + HOLD + "ms linear";
+        hudFill.style.width = (((i + 1) / scenes.length) * 100).toFixed(1) + "%";
+      }
+    }
   }
 
-  function measure() {
-    const rect = root.getBoundingClientRect();
-    const total = root.offsetHeight - window.innerHeight;      // scrollable distance while pinned
-    const scrolled = Math.min(Math.max(-rect.top, 0), Math.max(total, 1));
-    const p = total > 0 ? scrolled / total : 0;
-    const idx = Math.min(scenes.length - 1, Math.floor(p * scenes.length));
-    activate(idx);
-    if (hudFill) hudFill.style.width = (p * 100).toFixed(1) + "%";
+  function label(state) {
+    if (!playBtn) return;
+    playBtn.textContent = state;
+    playBtn.setAttribute("aria-label",
+      state === "Pause" ? "Pause last year's recap" : "Play last year's recap");
   }
 
-  let ticking = false;
-  function schedule() {
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(() => { measure(); ticking = false; });
+  function tick() {
+    timer = setTimeout(() => {
+      if (cur >= scenes.length - 1) { finish(); return; }
+      show(cur + 1);
+      tick();
+    }, HOLD);
   }
-  window.addEventListener("scroll", schedule, { passive: true });
-  window.addEventListener("resize", schedule);
-  // Lenis scrolls natively, so the window 'scroll' event already fires;
-  // this is just a belt-and-suspenders hook if a Lenis instance is exposed.
-  if (window.lenis && typeof window.lenis.on === "function") window.lenis.on("scroll", schedule);
 
-  // "Skip last year's recap" — the HUD button jumps straight past the
-  // pinned slideshow to the wall, for anyone who doesn't want the recap.
-  const skip = document.getElementById("presoSkip");
-  // land on the year machine, not past it: skipping the recap used to skip
-  // Act two as well, which is the one part of the page about the visitor
-  const wall = document.getElementById("yearmachine") || document.getElementById("wall");
-  if (skip && wall) {
-    skip.addEventListener("click", () => {
-      const reduce =
-        window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
-        document.documentElement.hasAttribute("data-a11y");
-      const l = window.__lenis;
-      if (l && !reduce) l.scrollTo(wall, { offset: 0 });
-      else wall.scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
-      skip.blur();
+  // Arming the bar is separate from changing scene, because a replay resumes
+  // on the scene it is already showing: show() returns early when the index has
+  // not moved, so the bar would never start.
+  function armBar() {
+    if (!hudFill || !playing) return;
+    hudFill.style.transition = "none";
+    hudFill.style.width = ((cur / scenes.length) * 100).toFixed(1) + "%";
+    void hudFill.offsetWidth;
+    hudFill.style.transition = "width " + HOLD + "ms linear";
+    hudFill.style.width = (((cur + 1) / scenes.length) * 100).toFixed(1) + "%";
+  }
+
+  function play() {
+    if (playing) return;
+    if (ended) { ended = false; cur = -1; }
+    playing = true;
+    label("Pause");
+    if (cur < 0) show(0);
+    armBar();
+    tick();
+  }
+
+  function pause() {
+    if (!playing) return;
+    playing = false;
+    clearTimeout(timer); timer = null;
+    label(ended ? "Replay" : "Play");
+    if (hudFill) {                      // freeze the bar where it actually is
+      const w = getComputedStyle(hudFill).width;
+      hudFill.style.transition = "none";
+      hudFill.style.width = w;
+    }
+  }
+
+  function finish() {
+    ended = true;
+    pause();
+    label("Replay");
+    if (hudFill) { hudFill.style.transition = "none"; hudFill.style.width = "100%"; }
+  }
+
+  show(0);
+  label("Play");
+
+  // One handler. Two of them racing on the same click meant the second read
+  // state the first had already flipped.
+  let userPaused = false;
+  if (playBtn) {
+    playBtn.addEventListener("click", () => {
+      if (playing) { userPaused = true; pause(); }
+      else { userPaused = false; play(); }
     });
   }
 
-  measure(); // set the opening state
+  // Like a video: it runs while it is on screen and stops when it is not, so
+  // it is never playing to an empty room or burning cycles below the fold.
+
+  // Visibility by measurement, not by IntersectionObserver. Every other
+  // scroll-aware module here works this way, and it is the one that can
+  // actually be tested: the observer proved impossible to verify, returning a
+  // callback on one run of the same page and none on the next.
+  function visible() {
+    const r = root.getBoundingClientRect();
+    const shown = Math.min(r.bottom, innerHeight) - Math.max(r.top, 0);
+    return shown > 0 && shown / Math.min(r.height, innerHeight) >= 0.55;
+  }
+
+  let ticking = false;
+  function check() {
+    ticking = false;
+    const now = visible();
+    if (now === inView) return;
+    inView = now;
+    if (inView && !userPaused && !ended && !reduce()) play();
+    else if (!inView) pause();
+  }
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(check);
+  }
+  addEventListener("scroll", onScroll, { passive: true });
+  addEventListener("resize", onScroll);
+  check();
+
 })();

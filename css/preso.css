@@ -17,13 +17,16 @@
 .preso {
   position: relative;
   /* one viewport of scroll per scene (js reads --scenes too) */
-  height: calc(var(--scenes, 6) * 100svh);
+  /* One screen, not one per scene. It used to be six viewports tall and
+     pinned, so getting past the recap cost six screens of scrolling. It
+     plays itself now, so it only needs the room to be seen in. */
+  height: 100svh;
   background: var(--paper);
   --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 /* the pinned stage: holds the frame still while you scroll the section */
 .preso__stage {
-  position: sticky; top: 0;
+  position: relative;
   height: 100svh;
   overflow: hidden;
   color: var(--ink);
@@ -221,3 +224,15 @@
   .preso .is-on.s3 .strip { clip-path: inset(0 0 0 0); }
   .preso .is-on.sm .sm__photo { clip-path: inset(0 0 0 0); }
 }
+
+/* The play/pause control sits beside the skip pill and shares its shape, but
+   it is the one the guideline actually requires, so it reads as the primary of
+   the two: filled rather than outlined. */
+.preso .hud__play {
+  min-width: 5.5em;
+  text-align: center;
+  border-color: var(--ink-dim);
+  margin-right: 8px;
+}
+.preso .hud__play:hover, .preso .hud__play:focus-visible { color: var(--gold); border-color: var(--gold); }
+@media (max-width: 560px) { .preso .hud__play { min-width: 4.5em; } }

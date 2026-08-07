@@ -9,23 +9,23 @@
    ===================================================== */
 
 :root {
-  --paper: #faf6ef;
-  --paper-soft: #f3ecdf;
-  --ink: #2c2140;
-  --ink-dim: rgba(44, 33, 64, 0.74);   /* 6.21:1 on --paper. Was 0.66 / 4.84, which cleared AA by
-                                          0.34 and carried most of the body copy on the site. */
-  --violet: #4a3568;
-  --violet-deep: #2e2145;
-  /* --lilac was cut: a third accent competing with gold for the same
-     emphasis job, at low contrast on the violet ground. Selection and
-     highlight surfaces now use --gold-soft, which is the interaction accent
-     they belonged to. */
-  --gold: #d9a13f;
-  --gold-soft: rgba(217, 161, 63, 0.16);
-  --gold-ink: #8a5e10;        /* gold as TEXT on light: 5.3:1 on paper. --gold itself is 2.1:1 */
-  --cream-on-dark: rgba(250, 246, 239, 0.92);
-  --dim-on-dark: rgba(250, 246, 239, 0.62);   /* 6.79:1 on #1e1533, was 0.55 / 5.65 */
-  --line: rgba(44, 33, 64, 0.14);
+  /* Umber and pink. The old suffragette violet + gold gave way to a warm
+     neutral ground with a single hot accent: the artwork and the photography
+     are the loudest things on this site now, and a warm neutral hosts them
+     instead of competing. The accent keeps gold's old rule -- it means you can
+     click this, and nothing else. */
+  --paper: #e2dbd8;
+  --paper-soft: #d4ccc8;
+  --ink: #452f28;
+  --ink-dim: #452f28;   /* 9.09:1 on --paper */
+  --violet: #78514f;
+  --violet-deep: #452f28;
+  --gold: #ea7393;
+  --gold-soft: rgba(234, 115, 147, 0.16);
+  --gold-ink: #93485d;        /* the accent as TEXT: 4.62:1. The raw accent is 2.08:1 */
+  --cream-on-dark: #f2efed;
+  --dim-on-dark: #f2efed;
+  --line: rgba(69, 47, 40, 0.18);
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   --serif: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -128,10 +128,10 @@ em { font-style: italic; }
 .sig-tip {
   position: fixed; z-index: 9999;
   transform: translate(-50%, -100%);
-  background: var(--ink); color: #faf6ef;
+  background: var(--ink); color: #e2dbd8;
   font-family: var(--sans); font-size: 0.8rem; letter-spacing: 0.01em;
   padding: 7px 13px; border-radius: 999px; white-space: nowrap;
-  box-shadow: 0 8px 24px rgba(44, 33, 64, 0.28);
+  box-shadow: 0 8px 24px rgba(69, 47, 40, 0.28);
   opacity: 0; pointer-events: none;
   transition: opacity 0.25s ease, transform 0.25s ease;
 }
@@ -942,7 +942,10 @@ html[data-a11y] .pathway__arrow { transition: none !important; }
   font-weight: 700;
   font-size: 0.95rem;
   background: var(--gold);
-  color: var(--violet-deep);
+  /* Not --violet-deep. On the old gold that pairing was fine; on the new accent
+     it measured 4.36:1, just under the 4.5:1 AA needs. This is the ink taken
+     further down, which clears it at 5.54:1 and still reads as the same brown. */
+  color: #2f1f1a;
   border: none;
   border-radius: var(--r-pill);
   padding: 13px 28px;
@@ -1657,7 +1660,7 @@ body.is-loading .h7__desc, body.is-loading .h7__ctas { animation-play-state: pau
   flex-direction: column;
   padding: 1.4rem;
   will-change: transform;
-  box-shadow: 0 18px 50px rgba(44, 33, 64, 0.16);
+  box-shadow: 0 18px 50px rgba(69, 47, 40, 0.16);
 }
 
 /* COVER (shown first, at rest) — the ornate card-back ARTWORK, full-bleed.
@@ -1697,7 +1700,7 @@ body.is-loading .h7__desc, body.is-loading .h7__ctas { animation-play-state: pau
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  box-shadow: 0 8px 24px rgba(44, 33, 64, 0.18);
+  box-shadow: 0 8px 24px rgba(69, 47, 40, 0.18);
 }
 
 .ec-card-panel h3 { color: var(--accent); }
@@ -1895,7 +1898,7 @@ body.is-loading .h7__desc, body.is-loading .h7__ctas { animation-play-state: pau
 }
 
 .thread__bead {
-  fill: #d9a13f;
+  fill: #ea7393;
   opacity: 0;
   transition: opacity 0.3s;
 }
@@ -1934,12 +1937,12 @@ body.is-loading .h7__desc, body.is-loading .h7__ctas { animation-play-state: pau
      94vw beat the padded box on small screens and left a 1px sideways
      wiggle on the whole page */
   max-width: min(94vw, 100%);
-  background: #fffdfa;
+  background: #efeae8;
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
   padding: 34px 34px 28px;
-  box-shadow: 0 24px 55px -18px rgba(44, 33, 64, 0.22),
-              0 2px 8px rgba(44, 33, 64, 0.05);
+  box-shadow: 0 24px 55px -18px rgba(69, 47, 40, 0.22),
+              0 2px 8px rgba(69, 47, 40, 0.05);
 }
 .sparkcard .eyebrow { margin-bottom: 12px; }
 .sparkcard__q {
@@ -2086,9 +2089,9 @@ body.is-loading .h7__desc, body.is-loading .h7__ctas { animation-play-state: pau
 /* card */
 .bias-card {
   position: relative; isolation: isolate;
-  background: #fffdfa; border: 1px solid var(--line); border-radius: var(--r-lg);
+  background: #efeae8; border: 1px solid var(--line); border-radius: var(--r-lg);
   padding: 26px 26px 22px; text-align: left; outline: none;
-  box-shadow: 0 22px 50px -20px rgba(44, 33, 64, 0.22), 0 2px 8px rgba(44, 33, 64, 0.05);
+  box-shadow: 0 22px 50px -20px rgba(69, 47, 40, 0.22), 0 2px 8px rgba(69, 47, 40, 0.05);
   transition: box-shadow 0.4s var(--ease), border-color 0.4s var(--ease);
 }
 .bias-card__head { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
@@ -2106,7 +2109,7 @@ body.is-loading .h7__desc, body.is-loading .h7__ctas { animation-play-state: pau
 }
 .bias-card__bar {
   margin-top: 20px; height: 4px; border-radius: var(--r-pill);
-  background: rgba(44, 33, 64, 0.1); overflow: hidden;
+  background: rgba(69, 47, 40, 0.1); overflow: hidden;
 }
 .bias-card__fill {
   display: block; height: 100%; width: 100%; border-radius: inherit;
@@ -2159,7 +2162,7 @@ body.is-loading .h7__desc, body.is-loading .h7__ctas { animation-play-state: pau
   width: 100%; text-align: left; margin: 14px 0 8px;
 }
 .bias-review {
-  background: #fffdfa; border: 1px solid var(--line); border-left-width: 3px;
+  background: #efeae8; border: 1px solid var(--line); border-left-width: 3px;
   border-radius: var(--r); padding: 16px 18px;
 }
 .bias-review.is-good { border-left-color: #58b389; }
@@ -2218,9 +2221,9 @@ body.is-loading .h7__desc, body.is-loading .h7__ctas { animation-play-state: pau
 /* card */
 .quiz-card {
   position: relative; isolation: isolate;
-  background: #fffdfa; border: 1px solid var(--line); border-radius: var(--r-lg);
+  background: #efeae8; border: 1px solid var(--line); border-radius: var(--r-lg);
   padding: 28px 26px 24px; text-align: left; outline: none;
-  box-shadow: 0 22px 50px -20px rgba(44, 33, 64, 0.22), 0 2px 8px rgba(44, 33, 64, 0.05);
+  box-shadow: 0 22px 50px -20px rgba(69, 47, 40, 0.22), 0 2px 8px rgba(69, 47, 40, 0.05);
 }
 .quiz-card__topic {
   font-family: var(--mono); font-size: 0.68rem; text-transform: uppercase;
@@ -2275,7 +2278,7 @@ body.is-loading .h7__desc, body.is-loading .h7__ctas { animation-play-state: pau
   width: 100%; text-align: left; margin: 14px 0 8px;
 }
 .quiz-review {
-  background: #fffdfa; border: 1px solid var(--line); border-left-width: 3px;
+  background: #efeae8; border: 1px solid var(--line); border-left-width: 3px;
   border-radius: var(--r); padding: 16px 18px;
 }
 .quiz-review.is-good { border-left-color: #58b389; }
@@ -2303,7 +2306,7 @@ body.is-loading .h7__desc, body.is-loading .h7__ctas { animation-play-state: pau
 .quiz__streak[hidden] { display: none; }
 .quiz__streak b { color: var(--gold); }
 .quiz__momentum {
-  height: 5px; border-radius: var(--r-pill); background: rgba(44, 33, 64, 0.1);
+  height: 5px; border-radius: var(--r-pill); background: rgba(69, 47, 40, 0.1);
   overflow: hidden; margin-top: -4px;
 }
 .quiz__momentum span {
@@ -2356,7 +2359,7 @@ body.is-loading .h7__desc, body.is-loading .h7__ctas { animation-play-state: pau
   background: var(--gold-soft); border-radius: var(--r-pill); padding: 3px 10px;
 }
 .myth__streak[hidden] { display: none; }
-.myth__momentum { height: 5px; border-radius: var(--r-pill); background: rgba(44, 33, 64, 0.1); overflow: hidden; }
+.myth__momentum { height: 5px; border-radius: var(--r-pill); background: rgba(69, 47, 40, 0.1); overflow: hidden; }
 .myth__momentum span {
   display: block; height: 100%; width: 0; border-radius: inherit;
   background: linear-gradient(90deg, var(--violet), var(--gold)); transition: width 0.5s var(--ease);
@@ -2367,17 +2370,17 @@ body.is-loading .h7__desc, body.is-loading .h7__ctas { animation-play-state: pau
 .myth-card {
   position: absolute; inset: 0; isolation: isolate;
   display: flex; flex-direction: column; justify-content: center; gap: 16px;
-  background: #fffdfa; border: 1px solid var(--line); border-radius: var(--r-lg);
+  background: #efeae8; border: 1px solid var(--line); border-radius: var(--r-lg);
   padding: 30px 30px; text-align: left; cursor: grab; touch-action: none;
-  box-shadow: 0 26px 60px -22px rgba(44, 33, 64, 0.28), 0 2px 8px rgba(44, 33, 64, 0.05);
+  box-shadow: 0 26px 60px -22px rgba(69, 47, 40, 0.28), 0 2px 8px rgba(69, 47, 40, 0.05);
   transition: transform 0.35s var(--ease), box-shadow 0.4s var(--ease), border-color 0.4s var(--ease), opacity 0.5s var(--ease);
   outline: none;
 }
-.myth-card:focus-visible { border-color: var(--violet); box-shadow: 0 0 0 3px var(--gold-soft), 0 26px 60px -22px rgba(44,33,64,0.28); }
+.myth-card:focus-visible { border-color: var(--violet); box-shadow: 0 0 0 3px var(--gold-soft), 0 26px 60px -22px rgba(69,47,40,0.28); }
 .myth-card.is-dragging { transition: box-shadow 0.4s var(--ease); cursor: grabbing; }
 .myth-card--peek {
   transform: translateY(14px) scale(0.955); opacity: 0.6; cursor: default;
-  box-shadow: 0 18px 40px -24px rgba(44, 33, 64, 0.22);
+  box-shadow: 0 18px 40px -24px rgba(69, 47, 40, 0.22);
 }
 .myth-card__kind {
   font-family: var(--mono); font-size: 0.68rem; text-transform: uppercase;
@@ -2416,7 +2419,7 @@ body.is-loading .h7__desc, body.is-loading .h7__ctas { animation-play-state: pau
 .myth__btn {
   flex: 1; font-family: var(--sans); font-weight: 700; font-size: 1rem;
   border-radius: var(--r); padding: 15px 18px; cursor: pointer; border: 1px solid var(--line);
-  background: #fffdfa; color: var(--ink);
+  background: #efeae8; color: var(--ink);
   transition: transform 0.2s var(--ease), box-shadow 0.25s, background 0.25s, color 0.25s, border-color 0.25s;
 }
 .myth__btn:hover { transform: translateY(-2px); }
@@ -2440,7 +2443,7 @@ body.is-loading .h7__desc, body.is-loading .h7__ctas { animation-play-state: pau
   width: 100%; text-align: left; margin: 14px 0 8px;
 }
 .myth-review {
-  background: #fffdfa; border: 1px solid var(--line); border-left-width: 3px;
+  background: #efeae8; border: 1px solid var(--line); border-left-width: 3px;
   border-radius: var(--r); padding: 16px 18px;
 }
 .myth-review.is-good { border-left-color: #58b389; }
@@ -2555,8 +2558,8 @@ body.is-loading .h7__desc, body.is-loading .h7__ctas { animation-play-state: pau
    reads as noise. The whole group is held at RIG.grid (0.55) by the
    timeline, so these alphas are roughly half again fainter in practice.
    The sheet must stay a surface you notice only after the wordmark. */
-.brandmark--axis .bmc-sheet line { stroke: rgba(44, 33, 64, 0.17); stroke-dasharray: none; }
-.brandmark--axis .bmc-sheet--major line { stroke: rgba(44, 33, 64, 0.28); stroke-dasharray: none; }
+.brandmark--axis .bmc-sheet line { stroke: rgba(69, 47, 40, 0.17); stroke-dasharray: none; }
+.brandmark--axis .bmc-sheet--major line { stroke: rgba(69, 47, 40, 0.28); stroke-dasharray: none; }
 /* the type metrics carry the amber of the rest of the construction rig */
 .brandmark--axis .bmc-metric line { stroke: rgba(207, 140, 48, 0.62); stroke-dasharray: 16 11; }
 
@@ -2585,7 +2588,7 @@ html[data-theme="dark"] .brandmark--axis .bmc-metric line { stroke: rgba(250, 24
    Two glyphs out of fourteen lose their anchors and nobody can tell. */
 .brandmark--axis .bmc-glyph--sig .bmc-node { display: none; }
 
-html[data-theme="dark"] .brandmark--axis .bmc-node { fill: #faf6ef; }
+html[data-theme="dark"] .brandmark--axis .bmc-node { fill: #e2dbd8; }
 html[data-theme="dark"] .brandmark--axis .bmc-circ { stroke: rgba(250, 246, 239, 0.34); }
 html[data-theme="dark"] .brandmark--axis .bmc-grid line { stroke: rgba(250, 246, 239, 0.07); }
 
@@ -2600,11 +2603,11 @@ html[data-theme="dark"] .brandmark--axis .bmc-grid line { stroke: rgba(250, 246,
 }
 
 .bmc-svg { display: block; width: 100%; height: auto; overflow: visible; }
-.bmc-grid line { stroke: rgba(44, 33, 64, 0.07); stroke-width: 1; stroke-dasharray: 6 10; }
+.bmc-grid line { stroke: rgba(69, 47, 40, 0.07); stroke-width: 1; stroke-dasharray: 6 10; }
 .bmc-fill { stroke: none; }
-.bmc-stroke { fill: none; stroke: rgba(44, 33, 64, 0.5); stroke-linecap: round; stroke-linejoin: round; }
-.bmc-box { fill: none; stroke: rgba(207, 140, 48, 0.6); stroke-dasharray: 7 7; }
-.bmc-circ { fill: none; stroke: rgba(44, 33, 64, 0.32); stroke-dasharray: 7 8; }
+.bmc-stroke { fill: none; stroke: rgba(69, 47, 40, 0.5); stroke-linecap: round; stroke-linejoin: round; }
+.bmc-box { fill: none; stroke: rgba(161, 126, 126, 0.6); stroke-dasharray: 7 7; }
+.bmc-circ { fill: none; stroke: rgba(69, 47, 40, 0.32); stroke-dasharray: 7 8; }
 
 /* ===== Brandmark word-cycle + gold sweep (js/brandmarkCycle.js) =====
    After the construction reveal, the baked-SVG wordmark hands off to this
@@ -2672,8 +2675,8 @@ html[data-theme="dark"] .brandmark--axis .bmc-grid line { stroke: rgba(250, 246,
 }
 @media (prefers-reduced-motion: reduce) { .bwc { display: none !important; } }
 .bmc-handle { stroke: rgba(207, 140, 48, 0.5); stroke-dasharray: 4 5; }
-.bmc-node { fill: #cf8c30; }
-.bmc-dot { fill: #cf8c30; }
+.bmc-node { fill: #a17e7e; }
+.bmc-dot { fill: #a17e7e; }
 
 /* =====================================================
    LEARN — "one word, three lenses" + THE WAVES ocean.
@@ -2750,7 +2753,7 @@ html[data-theme="dark"] .brandmark--axis .bmc-grid line { stroke: rgba(250, 246,
 .lens__def {
   font-size: 1rem;
   line-height: 1.55;
-  color: #f3ede2;
+  color: #d7cfcb;
   margin: 0;
 }
 .lens__def em { font-style: normal; color: var(--gold); font-weight: 600; }
@@ -3337,7 +3340,7 @@ html[data-a11y] .cover-stack > .popculture { position: static !important; }
 }
 
 .popculture {
-  background-color: #1e1533;   /* solid, so the morph backdrop can't wash the text */
+  background-color: #281b17;   /* solid, so the morph backdrop can't wash the text */
   padding: var(--section-y) 0;
   position: relative;
   overflow: hidden;
@@ -3426,7 +3429,7 @@ html[data-a11y] .cover-stack > .popculture { position: static !important; }
    is irregular without being random per load. One static masked rectangle: no
    blur, no animation, nothing to recompute on scroll.
 
-   In dark mode the two grounds are #191331 and #1e1533, so this is nearly
+   In dark mode the two grounds are #211713 and #281b17, so this is nearly
    invisible by design; it is a light-theme flourish and it degrades to the
    old straight seam wherever mask-image is unsupported. */
 .popculture__tear {
@@ -3528,7 +3531,7 @@ html[data-a11y] .cover-stack > .popculture { position: static !important; }
 }
 /* ---------- The wall label ----------
    Printed matter, not an object. No fill, no box, no rounded corners: it sits
-   directly on #1e1533 like everything else, and the only edges it has are the
+   directly on #281b17 like everything else, and the only edges it has are the
    two hairlines bracketing the metadata. It holds a 288px measure the way a
    printed card holds a column, and it overhangs the picture's left edge by
    32px, so both hairlines visibly cross onto the photograph. The text stays
@@ -3718,7 +3721,7 @@ html[data-a11y] .piece__photo:hover { transform: none !important; box-shadow: no
    the text. In dark mode the global section-transparency rule lets it ride
    the dark backdrop instead, which reads the same. */
 .ym {
-  background-color: #241a3d;
+  background-color: #32221d;
   padding: var(--section-y) 0;
   position: relative;
 }
@@ -3778,7 +3781,7 @@ html[data-a11y] .piece__photo:hover { transform: none !important; box-shadow: no
 .ym__go {
   border: 0; cursor: pointer;
   background: var(--gold);
-  color: #241a3d;
+  color: #32221d;
   font-weight: 700;
   font-size: 1rem;
   border-radius: var(--r-pill);
@@ -3923,7 +3926,7 @@ body.ym-lock { overflow: hidden; }
 
 /* ===== Resources: Black Canadian feminist scholars ===== */
 .resources {
-  background-color: #f2ecf7;   /* solid, so the morph backdrop can't wash the text */
+  background-color: #ded5d1;   /* solid, so the morph backdrop can't wash the text */
   /* extra top breather so the scholars header doesn't crowd the end of the
      "what is feminism" ocean animation directly above it */
   padding: clamp(220px, 30vw, 400px) var(--gutter) var(--section-y);
@@ -3958,17 +3961,17 @@ body.ym-lock { overflow: hidden; }
   text-align: center;
   text-decoration: none;
   color: inherit;
-  background: #fffdfa;
+  background: #efeae8;
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
   padding: 36px 24px 30px;
-  box-shadow: 0 18px 42px -24px rgba(44, 33, 64, 0.28);
+  box-shadow: 0 18px 42px -24px rgba(69, 47, 40, 0.28);
   transition: transform 0.32s var(--ease), box-shadow 0.32s var(--ease);
 }
 .resource:hover,
 .resource:focus-visible {
   transform: translateY(-5px);
-  box-shadow: 0 26px 56px -22px rgba(44, 33, 64, 0.42);
+  box-shadow: 0 26px 56px -22px rgba(69, 47, 40, 0.42);
   outline: none;
 }
 /* avatar — works as a monogram placeholder OR a real <img class="resource__photo"> */
@@ -3980,7 +3983,7 @@ body.ym-lock { overflow: hidden; }
   object-fit: cover;
   overflow: hidden;
   margin-bottom: 20px;
-  background: linear-gradient(150deg, var(--violet), #c76a9e);
+  background: linear-gradient(150deg, var(--violet), #ea7393);
   box-shadow: 0 12px 28px -12px rgba(74, 53, 104, 0.55);
 }
 
@@ -4032,7 +4035,7 @@ body.ym-lock { overflow: hidden; }
 
 .gtamap__arc {
   fill: none;
-  stroke: #d9a13f;
+  stroke: #ea7393;
   stroke-width: 2.6;
   stroke-linecap: round;
   filter: drop-shadow(0 0 5px rgba(217, 161, 63, 0.8));
@@ -4080,7 +4083,7 @@ body.ym-lock { overflow: hidden; }
 .pin:hover .pin__mark,
 .pin:focus .pin__mark { filter: drop-shadow(0 0 9px rgba(255, 224, 150, 0.95)); }
 .pin__label rect { fill: rgba(12, 8, 24, 0.88); stroke: rgba(250, 246, 239, 0.18); }
-.pin__label text { fill: #f3ede2; font-family: var(--mono); font-size: 11px; letter-spacing: 0.02em; }
+.pin__label text { fill: #d7cfcb; font-family: var(--mono); font-size: 11px; letter-spacing: 0.02em; }
 @media (max-width: 620px) { .pin__label text { font-size: 15px; } }
 
 .involve-grid {
@@ -4626,20 +4629,18 @@ body.uwscrub-on .seascape::after { content: none; }
 
 /* ---------- Dark mode ---------- */
 html[data-theme="dark"] {
-  /* Was #14101f / #1c1630: a near-black with almost no relation to the brand
-     violet, so dark mode read as generic premium-dark while the light theme
-     carried all the personality. Pulled toward --ink (#2c2140) so the dark
-     ground is recognisably the same palette. Cream still sits at 14.1:1 on
-     it and gold at 7.7:1, so nothing gets less readable. */
-  --paper: #191331;
-  --paper-soft: #241c40;
-  --ink: rgba(250, 246, 239, 0.92);
-  --ink-dim: rgba(250, 246, 239, 0.66);   /* 7.5:1 on the new ground, was 0.56 */
-  --violet: #b9a3e6;
+  /* The same palette after dark: the ground is --ink taken most of the way to
+     black, so the room is recognisably the same brown rather than a generic
+     near-black. The accent is already bright enough to carry text here. */
+  --paper: #211713;
+  --paper-soft: #382f2b;
+  --ink: rgba(226, 219, 216, 0.94);
+  --ink-dim: rgba(226, 219, 216, 0.7);
+  --violet: #a88f8d;
 
-  --line: rgba(250, 246, 239, 0.15);
-  --gold-soft: rgba(217, 161, 63, 0.22);
-  --gold-ink: var(--gold);   /* on dark the bright gold is the readable one (8.3:1) */
+  --line: rgba(226, 219, 216, 0.16);
+  --gold-soft: rgba(234, 115, 147, 0.22);
+  --gold-ink: var(--gold);   /* 6.16:1 on the dark ground */
 }
 html[data-theme="dark"] body { background: var(--paper); }
 /* the colour-morph backdrop becomes a calm deep-violet field, overriding the
@@ -4657,8 +4658,8 @@ html[data-theme="dark"] #morph {
    moving field rather than a colour.
    Nothing dynamic is lost. The dark #morph is a static !important gradient, so
    morph.js is already overridden here; the field was decorative, not live.
-   Sections now resolve their normal `background: var(--paper)` to #191331,
-   while .popculture (#1e1533) and .ym (#241a3d) keep their deeper rooms, so
+   Sections now resolve their normal `background: var(--paper)` to #211713,
+   while .popculture (#281b17) and .ym (#32221d) keep their deeper rooms, so
    the page has three tones instead of one. */
 html[data-theme="dark"] .resources { background-color: var(--paper-soft); }
 /* the violet glow the backdrop used to cast across everything, kept where it
@@ -4737,7 +4738,7 @@ html[data-a11y] [tabindex]:focus-visible, html[data-a11y] textarea:focus-visible
    word-cycle handoff layer, and the gold sweep all sit in the same amber
    family. The signature doubled-m keeps the slightly deeper brand gold so
    Emmanuel's mark still reads against the brighter body. */
-html[data-theme="dark"] .bmc-glyph:not(.bmc-glyph--sig) .bmc-fill { fill: #eab84f !important; }
+html[data-theme="dark"] .bmc-glyph:not(.bmc-glyph--sig) .bmc-fill { fill: #e2dbd8 !important; }
 html[data-theme="dark"] .bmc-glyph:not(.bmc-glyph--sig) .bmc-stroke { stroke: rgba(234, 184, 79, 0.5) !important; }
 /* the live word-cycle layer (Poppins) is plum by default (tuned for light
    paper); on dark that plum vanishes, so paint the whole handoff gold too —
@@ -4745,7 +4746,7 @@ html[data-theme="dark"] .bmc-glyph:not(.bmc-glyph--sig) .bmc-stroke { stroke: rg
 html[data-theme="dark"] .bwc-composed,
 html[data-theme="dark"] .bwc-final,
 html[data-theme="dark"] .bwc-suffix,
-html[data-theme="dark"] .bwc-reel > span { color: #eab84f; }
+html[data-theme="dark"] .bwc-reel > span { color: #e2dbd8; }
 
 /* =====================================================
    The timeline — "one thread, four waves, 178 years".
@@ -4838,7 +4839,7 @@ html[data-theme="dark"] .bwc-reel > span { color: #eab84f; }
   opacity: 0; pointer-events: none;
   transition: opacity 0.45s var(--ease), transform 0.45s var(--ease);
   z-index: 5;
-  box-shadow: 0 18px 44px rgba(44, 33, 64, 0.32);
+  box-shadow: 0 18px 44px rgba(69, 47, 40, 0.32);
 }
 .tline .roll__item:hover .roll__art { opacity: 1; transform: translateY(-50%) scale(1) rotate(0deg); }
 @media (hover: none), (max-width: 720px) { .tline .roll__art { display: none; } }
@@ -4870,7 +4871,7 @@ html[data-theme="dark"] .bwc-reel > span { color: #eab84f; }
   position: relative; z-index: 2;
   width: 100vw; height: 100svh;
   border-radius: var(--r-lg); overflow: hidden;
-  box-shadow: 0 30px 80px rgba(44, 33, 64, 0.35);
+  box-shadow: 0 30px 80px rgba(69, 47, 40, 0.35);
   transform: scale(0.4);          /* pre-JS approximation of the card state */
   transform-origin: center;
   will-change: transform;
@@ -4994,13 +4995,13 @@ html[data-theme="dark"] .bwc-reel > span { color: #eab84f; }
   background: var(--tl-card, #fff);
   border: 1px solid var(--line); border-radius: var(--r-lg);
   padding: clamp(18px, 2.6vw, 28px);
-  box-shadow: 0 10px 34px rgba(44, 33, 64, 0.08);
+  box-shadow: 0 10px 34px rgba(69, 47, 40, 0.08);
   opacity: 0; transform: translateY(34px);
   transition: opacity 0.7s var(--ease), transform 0.7s var(--ease), box-shadow 0.4s var(--ease);
   cursor: pointer;
 }
 .tline .node.lit .node__card { opacity: 1; transform: translateY(0); }
-.tline .node__card:hover { box-shadow: 0 16px 44px rgba(44, 33, 64, 0.14); }
+.tline .node__card:hover { box-shadow: 0 16px 44px rgba(69, 47, 40, 0.14); }
 .tline .node:nth-child(odd)  .node__card { grid-column: 1; margin-right: clamp(8px, 2vw, 22px); }
 .tline .node:nth-child(even) .node__card { grid-column: 3; margin-left: clamp(8px, 2vw, 22px); }
 .tline .node__year {
@@ -5546,7 +5547,7 @@ html[data-a11y] .post--new { animation: none !important; }
 /* tracked labels on dark need MORE tracking, not less: gold on violet at 11.5px */
 .eyebrow--light { letter-spacing: 0.24em; }
 
-/* .piece__credits measured 3.59:1 against #1e1533 and failed AA outright */
+/* .piece__credits measured 3.59:1 against #281b17 and failed AA outright */
 .piece__credits { line-height: 1.7; color: rgba(250, 246, 239, 0.62); }
 
 /* the darkest panel on the site was also the one running tightest */
@@ -5621,7 +5622,7 @@ body.nav-open .menu__scrim { opacity: 1; }
   background: var(--paper);
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
-  box-shadow: 0 30px 70px -28px rgba(44, 33, 64, 0.45);
+  box-shadow: 0 30px 70px -28px rgba(69, 47, 40, 0.45);
   transform: translateY(-10px);
   opacity: 0;
   transition: opacity 0.32s var(--ease), transform 0.32s var(--ease);
@@ -6429,7 +6430,7 @@ html[data-a11y] .stat-pop { transform: none !important; opacity: 1 !important; }
     background: var(--paper);
     border-radius: 12px 12px 0 0;
     /* the shadow only appears where a row overlaps the one before */
-    box-shadow: 0 -14px 30px -22px rgba(44, 33, 64, 0.5);
+    box-shadow: 0 -14px 30px -22px rgba(69, 47, 40, 0.5);
     transition: box-shadow 0.4s var(--ease);
   }
   .paths__item:nth-child(1) { --s: 0; }
@@ -6497,8 +6498,8 @@ html[data-a11y] .paths__list { padding-bottom: 0; }
   background: #fff;
   border-radius: 2px;
   box-shadow:
-    0 1px 2px rgba(44, 33, 64, 0.10),
-    0 18px 44px -12px rgba(44, 33, 64, 0.26);
+    0 1px 2px rgba(69, 47, 40, 0.10),
+    0 18px 44px -12px rgba(69, 47, 40, 0.26);
   overflow: hidden;
   z-index: 1;
 }
@@ -6663,9 +6664,9 @@ html[data-theme="dark"] .ss-thread path,
 html[data-theme="dark"] .ss-thread-line { opacity: 0.3; }
 
 /* The one section that is dark in BOTH themes. The light-theme violet is a
-   dark colour, so on #1e1533 the line all but vanished; this is the violet the
+   dark colour, so on #281b17 the line all but vanished; this is the violet the
    dark theme uses, which is the one that reads on that ground. */
-#popculture .ss-thread-line { stroke: #b9a3e6; opacity: 0.24; }
+#popculture .ss-thread-line { stroke: #c9a39f; opacity: 0.24; }
 
 /* Narrower screens, narrower line: the same weight reads much heavier when it
    crosses a 390px viewport instead of a 1400px one. */
@@ -6717,7 +6718,7 @@ html[data-a11y] .ss-thread, html[data-a11y] .ss-slice { display: none !important
   padding: 12px 18px;
   border-radius: var(--r);
   background: var(--violet-deep);
-  color: #faf6ef;
+  color: #e2dbd8;
   font-weight: 700;
   text-decoration: none;
   transition: transform 0.18s var(--ease);

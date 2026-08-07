@@ -101,8 +101,8 @@
 
     var defs = make("defs", {});
     var grad = make("linearGradient", { id: "bmcFill", x1: "0", y1: "0", x2: "0", y2: "1" });
-    grad.appendChild(make("stop", { offset: "0", "stop-color": "#3a2c52" }));
-    grad.appendChild(make("stop", { offset: "1", "stop-color": "#241830" }));
+    grad.appendChild(make("stop", { offset: "0", "stop-color": "#4e362d" }));
+    grad.appendChild(make("stop", { offset: "1", "stop-color": "#2f1f1a" }));
     defs.appendChild(grad);
     svg.appendChild(defs);
 
