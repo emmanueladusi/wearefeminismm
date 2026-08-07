@@ -61,6 +61,14 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+/* [hidden] is a promise the browser keeps with display:none, and any author
+   rule that sets display on the same element quietly breaks it. The pulse
+   card's fallback panel was the casualty: .sparkfb sets display:flex, so the
+   panel rendered permanently -- an empty box with a Retry button in it and no
+   message, whatever the attribute said. Everything on this site toggles the
+   hidden property from script, so enforcing it costs nothing. */
+[hidden] { display: none !important; }
+
 /* native smooth scrolling removed — Lenis (js/scroll.js) drives the glide */
 html { scroll-behavior: auto; }
 
