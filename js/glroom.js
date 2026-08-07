@@ -371,7 +371,11 @@
     [ENV.lightCv, ENV.archCv, ENV.floorCv, ENV.vigCv].forEach(function (cv) {
       cv.width = Math.round(bw / 2); cv.height = Math.round(bh / 2);
     });
+    if (ENV.lobbyCv) { ENV.lobbyCv.width = Math.round(bw / 2); ENV.lobbyCv.height = Math.round(bh / 2);
+      if (ENV.lobby) ENV.lobby.uniforms.r.value.set(bw, bh); }
     ENV.repaint();
+    if (ENV.lobbyMesh && ENV.lobbyMesh.visible)
+      ENV.paintLobby(document.querySelector('.lobby'));
   };
 
   /* Per frame: the cursor pair, and the clock. Each layer applies its own
@@ -383,6 +387,7 @@
     ENV.fibre.uniforms.off.value.set(mx * 11.44, my * 7.28);
     ENV.light.uniforms.off.value.set(mx * -14, my * -8);
     ENV.arch.uniforms.off.value.set(0, my * 5);
+    if (ENV.lobby) ENV.lobby.uniforms.off.value.set(mx * 10, my * 6);
     ENV.far.uniforms.off.value.set(mx * 12, my * 12 * 0.55);
     ENV.near.uniforms.off.value.set(mx * 26, my * 26 * 0.55);
   };
@@ -391,6 +396,80 @@
     ENV.spot.uniforms.p.value.set(x, y);
     ENV.spot.uniforms.k.value = on ? 1 : 0;
   };
+  /* ---- the directory's lobby, painted from its own DOM ---------------
+     The lobby is the directory's backdrop: the wall wash, the wall
+     photograph at its curated opacity, the film burn multiplied over it,
+     and the quiet pools. In the DOM it sits INSIDE the room, above the
+     environment and behind the covers — so on the GPU it takes the same
+     seat: one painted layer between the vignette and the covers, with the
+     wall's own 10px/6px cursor drift as a uniform. Repainted on build,
+     retint and resize only. */
+  ENV.lobbyCv = null; ENV.lobbyMesh = null;
+
+  ENV.buildLobby = function () {
+    if (ENV.lobbyMesh || !ENV.ok) return;
+    var THREE = window.THREE;
+    ENV.lobbyCv = document.createElement('canvas');
+    ENV.lobby = paintedMat(THREE, ENV.lobbyCv, true);
+    ENV.lobbyMesh = envLayer(THREE, ENV.lobby, -15);
+    ENV.lobbyMesh.visible = false;
+  };
+  ENV.paintLobby = function (lobbyEl) {
+    if (!ENV.lobbyMesh) ENV.buildLobby();
+    if (!ENV.lobbyMesh) return;
+    var cv = ENV.lobbyCv;
+    var c = cv.getContext('2d'), W = cv.width, H = cv.height;
+    c.clearRect(0, 0, W, H);
+    var cs = getComputedStyle(document.documentElement);
+    var wall = (cs.getPropertyValue('--gallery-wall') || '#241834').trim();
+    var edge = (cs.getPropertyValue('--gallery-edge') || wall).trim();
+    var black = (cs.getPropertyValue('--gallery-black') || '#08060d').trim();
+    /* the wall wash */
+    var lg = c.createLinearGradient(0, 0, 0, H);
+    lg.addColorStop(0, wall); lg.addColorStop(0.74, edge); lg.addColorStop(1, black);
+    c.fillStyle = lg; c.fillRect(0, 0, W, H);
+    var rg = c.createRadialGradient(W * 0.5, -H * 0.12, 0, W * 0.5, -H * 0.12, W * 0.66);
+    rg.addColorStop(0, 'rgba(247,238,222,.09)'); rg.addColorStop(1, 'rgba(247,238,222,0)');
+    c.fillStyle = rg; c.fillRect(0, 0, W, H);
+    var done = function () { ENV.lobby.uniforms.map.value.needsUpdate = true; };
+    /* the photograph, then the burn multiplied over it, then the quiet */
+    var photo = lobbyEl && lobbyEl.querySelector('.lobby__photo');
+    var burn = lobbyEl && lobbyEl.querySelector('.lobby__burn');
+    var quiet = function () {
+      var q1 = c.createRadialGradient(W * 0.5, H * 0.5, 0, W * 0.5, H * 0.5, W * 0.32);
+      q1.addColorStop(0, 'rgba(255,253,249,.8)'); q1.addColorStop(0.46, 'rgba(255,253,249,.4)');
+      q1.addColorStop(0.74, 'rgba(255,253,249,0)');
+      c.fillStyle = q1; c.fillRect(0, 0, W, H);
+      [[0.11, 0.46], [0.89, 0.52]].forEach(function (pXY) {
+        var q = c.createRadialGradient(W * pXY[0], H * pXY[1], 0, W * pXY[0], H * pXY[1], W * 0.18);
+        q.addColorStop(0, 'rgba(255,253,249,.42)'); q.addColorStop(0.74, 'rgba(255,253,249,0)');
+        c.fillStyle = q; c.fillRect(0, 0, W, H);
+      });
+      var q2 = c.createLinearGradient(0, 0, 0, H);
+      q2.addColorStop(0.66, 'rgba(255,253,249,0)'); q2.addColorStop(0.92, 'rgba(255,253,249,.5)');
+      c.fillStyle = q2; c.fillRect(0, 0, W, H);
+      done();
+    };
+    var drawLayer = function (el, blend, after) {
+      if (!el) { after(); return; }
+      var ecs = getComputedStyle(el);
+      var u = bgUrl(ecs), o = parseFloat(ecs.opacity);
+      if (!u || !o) { after(); return; }
+      var im = new Image();
+      im.onload = function () {
+        c.save(); c.globalAlpha = o;
+        c.globalCompositeOperation = blend || 'source-over';
+        drawCoverInto(c, W, H, im, ecs);
+        c.restore(); done(); after();
+      };
+      im.onerror = after;
+      im.src = u;
+    };
+    drawLayer(photo, null, function () { drawLayer(burn, 'multiply', quiet); });
+    done();
+  };
+  ENV.showLobby = function (on) { if (ENV.lobbyMesh) ENV.lobbyMesh.visible = !!on; };
+
   GL.env = ENV;
 
   /* ---- capability gate -------------------------------------------- */
@@ -830,12 +909,20 @@
     /* The environment is drawn even when no room is mounted — it IS the
        room's wall, and the directory stands in front of it too. */
     ENV.frame(st.lookX || 0, st.lookY || 0, st.now || performance.now());
-    if (!GL.active) { GL.renderer.render(GL.scene, GL.camera); return; }
     var TUNE = st.tune || { camRotY: 3.5, camRotX: 2, camTX: 20, camTY: 14 };
     var lookY = -st.lookX * TUNE.camRotY * Math.PI / 180;
     var lookX = -st.lookY * TUNE.camRotX * Math.PI / 180;
     GL.world.rotation.set(-lookX, -lookY, 0, 'YXZ');
     GL.world.position.set(st.worldX || 0, -(st.worldY || 0), st.worldZ || 0);
+    /* the reel's hover/focus lift, eased the way the DOM's transition did */
+    if (GL.reelOn) {
+      for (var ri = 0; ri < GL.reelItems.length; ri++) {
+        var rit = GL.reelItems[ri];
+        var wantR = (ri === GL._hover || rit.focus) ? 1 : 0;
+        rit.hover += (wantR - rit.hover) * 0.18;
+      }
+    }
+    if (!GL.active) { GL.renderer.render(GL.scene, GL.camera); return; }
 
     /* the orbit room turns the ring, not the visitor */
     if (GL._kind === 'orbit') {
@@ -869,17 +956,27 @@
      existing listener (openDetail, answerQuiz, setReel) still runs.
      ================================================================= */
   GL.pointerMove = function (x, y) {
-    if (!GL.ok || !GL.active) return -1;
+    if (!GL.ok || (!GL.active && !GL.reelOn)) return -1;
     GL._ndc.set((x / window.innerWidth) * 2 - 1, -(y / window.innerHeight) * 2 + 1);
     GL._ray.setFromCamera(GL._ndc, GL.camera);
     var meshes = [];
     for (var i = 0; i < GL.items.length; i++) if (GL.items[i].op > 0.25) meshes.push(GL.items[i].mesh);
+    for (var r = 0; r < GL.reelItems.length; r++)
+      if (GL.reelItems[r].mat.uniforms.opacity.value > 0.25) meshes.push(GL.reelItems[r].mesh);
     var hit = GL._ray.intersectObjects(meshes, false);
-    GL._hover = hit.length ? hit[0].object.userData.glIndex : -1;
+    GL._hover = -1; GL._hoverKind = null;
+    if (hit.length) {
+      var u = hit[0].object.userData;
+      if (u.reelIndex != null) { GL._hover = u.reelIndex; GL._hoverKind = 'reel'; }
+      else { GL._hover = u.glIndex; GL._hoverKind = 'room'; }
+    }
     return GL._hover;
   };
   GL.hoveredEl = function () {
-    return GL._hover >= 0 && GL.items[GL._hover] ? GL.items[GL._hover].el : null;
+    if (GL._hover < 0) return null;
+    if (GL._hoverKind === 'reel')
+      return GL.reelItems[GL._hover] ? GL.reelItems[GL._hover].el : null;
+    return GL.items[GL._hover] ? GL.items[GL._hover].el : null;
   };
   /* Where a work actually is ON SCREEN. The wall spotlight aims at the
      piece it is lighting, and it used to read that from the element's
@@ -898,6 +995,341 @@
     var el = GL.hoveredEl();
     if (el) { el.click(); return true; }
     return false;
+  };
+
+  /* =================================================================
+     THE REEL · the directory's covers, on the GPU
+
+     This is the screen that was actually reported as laggy, and its cost
+     is the worst of all of them: layoutReel interpolates each cover's
+     WIDTH and HEIGHT every frame of the hang morph, and a resize forces
+     layout plus a full re-raster of a ~50vw cover with a 72px blur.
+
+     Same contract as the rooms, applied one level up: layoutReel KEEPS
+     ALL OF ITS MATH — the hang tables, the velocity warp, the field
+     offsets, the vertical deck — and only the write at the end changes.
+     With the reel on the GPU, reelSet() receives the numbers layoutReel
+     just computed and applies them as mesh transforms and uniforms; with
+     it off, layoutReel writes styles exactly as it always did. There is
+     no second copy of the choreography to drift out of step.
+
+     The salon wall is deliberately left DOM: nothing on it moves per
+     frame, so it was never the problem, and its portraits step forward
+     with WAAPI transitions this renderer has no business replaying.
+
+     Textures are painted FROM THE DOM covers — background images, poster
+     text, the contact sheet — with each child's own offset box and
+     computed style, so Janelle-style copy edits and palette changes show
+     up here without a second source.
+     ================================================================= */
+  GL.reelOn = false;
+  GL.reelItems = [];
+
+  function bgUrl(cs) {
+    var m = String(cs.backgroundImage || '').match(/url\(["']?([^"')]+)["']?\)/);
+    return m ? m[1] : null;
+  }
+  function bgGrad(cs) {
+    var m = String(cs.backgroundImage || '').match(/linear-gradient\((\d+)deg\s*,\s*(rgb[^)]*\))\s*,\s*(rgb[^)]*\))/);
+    if (!m) return null;
+    return { angle: +m[1], a: m[2], b: m[3] };
+  }
+  function drawCoverInto(c, W, H, img, cs) {
+    var r = Math.max(W / img.naturalWidth, H / img.naturalHeight);
+    var dw = img.naturalWidth * r, dh = img.naturalHeight * r;
+    var pos = (cs.backgroundPosition || '50% 50%').split(' ');
+    var fx = parsePos(pos[0]), fy = parsePos(pos[1] || pos[0]);
+    c.drawImage(img, (W - dw) * fx, (H - dh) * fy, dw, dh);
+  }
+  /* Paint one cover from its own DOM. The cover has real layout even
+     while invisible (opacity:0 keeps layout), so every child's offset box
+     and computed style is readable and the texture stays faithful to the
+     markup. All images are PRELOADED first and the paint happens once, in
+     DOM order — grounds, then the poster/contact content, then the scrim
+     over everything, exactly as the stylesheet stacks it. */
+  function paintCover(el, done) {
+    var W = Math.max(64, el.offsetWidth), H = Math.max(64, el.offsetHeight);
+    var sscale = Math.min(2, 1600 / W);            /* cap texture size */
+    var cv = document.createElement('canvas');
+    cv.width = Math.round(W * sscale); cv.height = Math.round(H * sscale);
+    var c = cv.getContext('2d'); c.scale(sscale, sscale);
+    var media = el.querySelector('.cover__media') || el;
+
+    function box(n) {                       /* offset box relative to el */
+      var x = 0, y = 0, o = n;
+      while (o && o !== el) { x += o.offsetLeft; y += o.offsetTop; o = o.offsetParent; }
+      return { x: x, y: y, w: n.offsetWidth, h: n.offsetHeight };
+    }
+
+    /* gather every layer first: node, kind, box, computed style, url */
+    var jobs = [], urls = {};
+    function want(n, full) {
+      if (!n) return;
+      var cs2 = getComputedStyle(n);
+      var u = bgUrl(cs2);
+      var hasPaint = u || cs2.backgroundImage !== 'none' ||
+        (cs2.backgroundColor && cs2.backgroundColor !== 'rgba(0, 0, 0, 0)');
+      if (!hasPaint) return;
+      var b = full ? { x: 0, y: 0, w: W, h: H } : box(n);
+      if (!b.w || !b.h) return;
+      var job = { kind: u ? 'img' : 'cssbg', cs: cs2, url: u, box: b,
+                  blend: cs2.mixBlendMode !== 'normal' ? cs2.mixBlendMode : null,
+                  alpha: parseFloat(cs2.opacity) };
+      if (!u) {
+        /* Gradient grounds are STACKS here (a radial wash over a linear
+           ramp on the lenses poster), and parsing CSS gradients by hand is
+           a losing game. The browser already knows how to paint them: a
+           foreignObject snapshot of just the computed background, at the
+           box's own size, rasterized through an SVG data URI. Nothing
+           external is referenced, so the canvas is not tainted. */
+        var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + Math.ceil(b.w) +
+          '" height="' + Math.ceil(b.h) + '"><foreignObject width="100%" height="100%">' +
+          '<div xmlns="http://www.w3.org/1999/xhtml" style="width:' + b.w + 'px;height:' + b.h +
+          'px;background-color:' + cs2.backgroundColor +
+          ';background-image:' + cs2.backgroundImage.replace(/"/g, "'") +
+          ';background-size:' + cs2.backgroundSize +
+          ';background-position:' + cs2.backgroundPosition + ';"></div>' +
+          '</foreignObject></svg>';
+        job.url = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+      }
+      jobs.push(job);
+      urls[job.url] = true;
+    }
+    want(el.querySelector('.cover__img'), true);
+    var posterish = media.querySelectorAll('.poster, .lenswork');
+    for (var pi = 0; pi < posterish.length; pi++) want(posterish[pi], false);
+    var pins = media.querySelectorAll('.contact i');
+    for (var k = 0; k < pins.length; k++) want(pins[k], false);
+
+    var texts = media.querySelectorAll('.poster > *, .lenswork > *');
+    /* innerText is EMPTY for visibility:hidden subtrees — and the media is
+       hidden exactly while GL paints for it. Walk the nodes instead, and
+       keep <br> as the line break innerText would have given us. */
+    function lineText(n) {
+      var out = '';
+      for (var ch = n.firstChild; ch; ch = ch.nextSibling) {
+        if (ch.nodeType === 3) out += ch.nodeValue;
+        else if (ch.nodeName === 'BR') out += '\n';
+        else if (ch.nodeType === 1) out += lineText(ch);
+      }
+      return out.replace(/[ \t]+/g, ' ').trim();
+    }
+
+    function paintAll(imgs) {
+      c.clearRect(0, 0, W, H);
+      c.fillStyle = '#190f27'; c.fillRect(0, 0, W, H);
+      for (var j = 0; j < jobs.length; j++) {
+        var jb = jobs[j];
+        c.save();
+        c.globalAlpha = isNaN(jb.alpha) ? 1 : jb.alpha;
+        if (jb.blend) c.globalCompositeOperation = jb.blend;
+        c.beginPath(); c.rect(jb.box.x, jb.box.y, jb.box.w, jb.box.h); c.clip();
+        if (jb.kind === 'cssbg') {
+          if (imgs[jb.url])
+            c.drawImage(imgs[jb.url], jb.box.x, jb.box.y, jb.box.w, jb.box.h);
+        } else if (imgs[jb.url]) {
+          var im = imgs[jb.url];
+          var r = Math.max(jb.box.w / im.naturalWidth, jb.box.h / im.naturalHeight);
+          var dw = im.naturalWidth * r, dh = im.naturalHeight * r;
+          var pos = (jb.cs.backgroundPosition || '50% 50%').split(' ');
+          var fx = parsePos(pos[0]), fy = parsePos(pos[1] || pos[0]);
+          c.drawImage(im, jb.box.x + (jb.box.w - dw) * fx, jb.box.y + (jb.box.h - dh) * fy, dw, dh);
+        }
+        c.restore();
+        /* the contact pins carry a hairline mount */
+        if (jb.kind === 'img' && jb.box.w < W * 0.8) {
+          c.strokeStyle = 'rgba(242,237,228,.18)'; c.lineWidth = 2;
+          c.strokeRect(jb.box.x, jb.box.y, jb.box.w, jb.box.h);
+        }
+      }
+      /* the type, from each element's own box and computed face */
+      for (var t = 0; t < texts.length; t++) {
+        var n = texts[t], cs3 = getComputedStyle(n);
+        var b2 = box(n);
+        var text = lineText(n);
+        if (!text) {
+          if (cs3.backgroundColor && cs3.backgroundColor !== 'rgba(0, 0, 0, 0)' && b2.w) {
+            c.fillStyle = cs3.backgroundColor;
+            c.fillRect(b2.x, b2.y, b2.w, Math.max(1, b2.h));
+          }
+          continue;
+        }
+        c.fillStyle = cs3.color;
+        c.font = cs3.fontStyle + ' ' + cs3.fontWeight + ' ' + cs3.fontSize + ' ' + cs3.fontFamily;
+        var lh = parseFloat(cs3.lineHeight) || parseFloat(cs3.fontSize) * 1.2;
+        var tr = parseFloat(cs3.letterSpacing) || 0;
+        /* canvas has no line-wrapping, the stylesheet does: split on the
+           <br>s first, then wrap each run to the element's own box */
+        var runs = text.split('\n'), ls = [];
+        for (var ri = 0; ri < runs.length; ri++) {
+          var words = runs[ri].split(' '), cur = '';
+          for (var wi = 0; wi < words.length; wi++) {
+            var tryLine = cur ? cur + ' ' + words[wi] : words[wi];
+            if (c.measureText(tryLine).width > b2.w && cur) { ls.push(cur); cur = words[wi]; }
+            else cur = tryLine;
+          }
+          if (cur) ls.push(cur);
+        }
+        for (var li = 0; li < ls.length; li++) {
+          var line = cs3.textTransform === 'uppercase' ? ls[li].toUpperCase() : ls[li];
+          tracked(c, line, b2.x, b2.y + parseFloat(cs3.fontSize) * 0.86 + li * lh, tr);
+        }
+      }
+      /* the scrim, over everything, as .cover__scrim stacks it */
+      var sg = c.createLinearGradient(0, 0, 0, H);
+      sg.addColorStop(0, 'rgba(8,6,13,.34)'); sg.addColorStop(0.32, 'rgba(8,6,13,.05)');
+      sg.addColorStop(0.72, 'rgba(8,6,13,.5)'); sg.addColorStop(1, 'rgba(8,6,13,.88)');
+      c.fillStyle = sg; c.fillRect(0, 0, W, H);
+      done();
+    }
+
+    /* preload, then one ordered paint; a quick ground stands in meanwhile */
+    c.fillStyle = '#190f27'; c.fillRect(0, 0, W, H);
+    var list = Object.keys(urls), left = list.length, loaded = {};
+    if (!left) { paintAll(loaded); }
+    else list.forEach(function (u) {
+      var im = new Image();
+      im.onload = function () { loaded[u] = im; if (--left === 0) paintAll(loaded); };
+      im.onerror = function () { if (--left === 0) paintAll(loaded); };
+      im.src = u;
+    });
+    return { canvas: cv, w: W, h: H };
+  }
+
+  function paintReelLabel(el) {
+    var lab = el.querySelector('.wlabel');
+    var W = 760, H = 190, sc = 2;
+    var cv = document.createElement('canvas');
+    cv.width = W * sc; cv.height = H * sc;
+    var c = cv.getContext('2d'); c.scale(sc, sc);
+    if (lab) {
+      var n = txt(lab, '.wlabel__n'), t = txt(lab, '.wlabel__t'), m = txt(lab, '.wlabel__m');
+      c.fillStyle = tok('--gold', '#d9a13f');
+      c.font = '500 21px ' + tok('--sans', 'sans-serif');
+      tracked(c, n, 0, 26, 21 * 0.11);
+      c.fillStyle = tok('--cream', '#f5efe4');
+      c.font = '600 42px ' + tok('--serif', 'Georgia, serif');
+      c.fillText(t, 0, 84);
+      c.fillStyle = 'rgba(233,226,244,.6)';
+      c.font = '500 22px ' + tok('--sans', 'sans-serif');
+      tracked(c, m.toUpperCase(), 0, 136, 22 * 0.09);
+    }
+    var tx2 = new window.THREE.CanvasTexture(cv);
+    tx2.colorSpace = window.THREE.SRGBColorSpace;
+    return { tex: tx2, w: W, h: H };
+  }
+
+  function reelCoverMaterial(THREE, tex, texAspect) {
+    return new THREE.ShaderMaterial({
+      transparent: true,
+      uniforms: { map: { value: tex }, opacity: { value: 1 },
+                  planeAspect: { value: 1 }, texAspect: { value: texAspect },
+                  shift: { value: 0 } },
+      vertexShader: 'varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }',
+      fragmentShader:
+        'precision mediump float;varying vec2 vUv;' +
+        'uniform sampler2D map;uniform float opacity,planeAspect,texAspect,shift;' +
+        'void main(){' +
+        'float uw=min(1.,planeAspect/texAspect);' +
+        'float vw=min(1.,texAspect/planeAspect);' +
+        'vec2 uv2=vec2(.5+(vUv.x-.5)*uw+shift*uw,.5+(vUv.y-.5)*vw);' +
+        'gl_FragColor=vec4(texture2D(map,uv2).rgb,opacity);}'
+    });
+  }
+
+  GL.buildReel = function (reelEl, covers) {
+    if (!GL.ok) return false;
+    var THREE = window.THREE;
+    GL.clearReel();
+    for (var i = 0; i < covers.length; i++) (function (el, i) {
+      /* paintCover completes synchronously when every image was already
+         cached, which is before `tex` exists — hence the guard */
+      var painted = paintCover(el, function () { if (tex) tex.needsUpdate = true; });
+      var tex = new THREE.CanvasTexture(painted.canvas);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.anisotropy = Math.min(8, GL.renderer.capabilities.getMaxAnisotropy());
+      tex.generateMipmaps = true;
+      tex.minFilter = THREE.LinearMipmapLinearFilter;
+      var mat = reelCoverMaterial(THREE, tex, painted.w / painted.h);
+      var mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), mat);
+      var sh = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 1.5),
+        new THREE.MeshBasicMaterial({ map: shadowTex(THREE), transparent: true, depthWrite: false }));
+      sh.position.z = -30;
+      var lab = paintReelLabel(el);
+      var labMesh = new THREE.Mesh(new THREE.PlaneGeometry(lab.w, lab.h),
+        new THREE.MeshBasicMaterial({ map: lab.tex, transparent: true, depthWrite: false, opacity: 0 }));
+      var g = new THREE.Group();
+      g.add(sh); g.add(mesh); g.add(labMesh);
+      GL.world.add(g);
+      mesh.userData.reelIndex = i;
+      el.addEventListener('focus', onReelFocus, true);
+      el.addEventListener('blur', onReelBlur, true);
+      GL.reelItems.push({ el: el, mesh: mesh, group: g, shadow: sh, lab: labMesh,
+                          mat: mat, baseW: painted.w, baseH: painted.h, hover: 0, focus: false });
+    })(covers[i].elm || covers[i], i);
+    GL.reelOn = GL.reelItems.length > 0;
+    if (GL.reelOn) {
+      reelEl.classList.add('gl-covers');
+      /* the lobby joins the canvas, or the covers hang behind an opaque
+         DOM backdrop and are never seen */
+      var room = reelEl.closest('.room');
+      if (room) room.classList.add('gl-lobby');
+      ENV.paintLobby(document.querySelector('.lobby'));
+      ENV.showLobby(true);
+      try { GL.renderer.compile(GL.scene, GL.camera); } catch (e) {}
+    }
+    return GL.reelOn;
+  };
+  function onReelFocus(e) {
+    for (var i = 0; i < GL.reelItems.length; i++)
+      GL.reelItems[i].focus = GL.reelItems[i].el === e.currentTarget;
+  }
+  function onReelBlur() {
+    for (var i = 0; i < GL.reelItems.length; i++) GL.reelItems[i].focus = false;
+  }
+
+  /* the write layoutReel makes instead of styles — same numbers, no DOM */
+  GL.reelSet = function (i, v) {
+    var it = GL.reelItems[i]; if (!it) return;
+    var d2r = Math.PI / 180;
+    it.group.position.set(v.cx, -v.cy, v.cz);
+    it.group.rotation.set(-(v.crx || 0) * d2r, -(v.cry || 0) * d2r, 0, 'YXZ');
+    var w = v.wpx != null ? v.wpx : it.baseW * v.scale;
+    var h = v.hpx != null ? v.hpx : it.baseH * v.scale;
+    var lift = 1 + it.hover * 0.012;             /* the DOM's --mscale 1.012 */
+    it.mesh.scale.set(w * lift, h * lift, 1);
+    it.mat.uniforms.planeAspect.value = w / h;
+    it.mat.uniforms.opacity.value = v.op;
+    it.mat.uniforms.shift.value = w ? -(v.shift || 0) / w : 0;
+    it.shadow.scale.set(w * 1.1, h * 1.1, 1);
+    it.shadow.position.set(v.shdx || 0, -h * 0.06, -30);
+    it.shadow.material.opacity = 0.5 * (v.shd == null ? 1 : v.shd) * v.op;
+    var ls = Math.min(0.5, w * 0.92 / 760);
+    it.lab.scale.setScalar(ls);
+    it.lab.position.set(-w / 2 + 760 * ls / 2, -h / 2 - 40 - 95 * ls * 0.5, 4);
+    it.lab.material.opacity = v.lo == null ? 0 : v.lo;
+  };
+
+  GL.clearReel = function () {
+    for (var i = 0; i < GL.reelItems.length; i++) {
+      var it = GL.reelItems[i];
+      it.el.removeEventListener('focus', onReelFocus, true);
+      it.el.removeEventListener('blur', onReelBlur, true);
+      it.mesh.geometry.dispose();
+      if (it.mesh.material.map) it.mesh.material.map.dispose();
+      it.mesh.material.dispose();
+      it.shadow.geometry.dispose(); it.shadow.material.dispose();
+      if (it.lab.material.map) it.lab.material.map.dispose();
+      it.lab.geometry.dispose(); it.lab.material.dispose();
+      GL.world.remove(it.group);
+    }
+    GL.reelItems.length = 0;
+    GL.reelOn = false;
+    ENV.showLobby(false);
+    var r = document.getElementById('reel');
+    if (r) r.classList.remove('gl-covers');
+    var rm = document.querySelector('.room.gl-lobby');
+    if (rm) rm.classList.remove('gl-lobby');
   };
 
   /* =================================================================

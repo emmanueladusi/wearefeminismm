@@ -31,7 +31,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=IBM+Plex+Sans:wght@400;600&display=swap" />
   <!-- the GPU room renderer, deferred (see Gallery.html) -->
   <script defer src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
-  <script defer src="js/glroom.js?v=1"></script>
+  <script defer src="js/glroom.js?v=4"></script>
   <style id="wfgallery-css">
 /* =====================================================================
    THE GALLERY, v3 · chapter prototype
@@ -771,7 +771,17 @@ body.touchmode #wfgallery .lobby__floor{
 body.glroom #wfgallery #gtex,
 body.glroom #wfgallery .glines,
 body.glroom #wfgallery #bgGL,
-body.glroom #wfgallery .fallback-bg{display:none !important}body.glroom #wfgallery #roomGL{display:block}/* When GL draws the room, the DOM room stops being painted but must NOT
+body.glroom #wfgallery .fallback-bg{display:none !important}/* The reel's covers while the GPU draws them: same recipe as the rooms.
+   opacity, not visibility, because the covers must stay focusable and
+   they keep their LAYOUT — the GL textures are painted from each child's
+   own offset box, and the transitions measure these boxes the moment the
+   reel is handed back to the DOM. transform:none collapses the composited
+   layer per cover; hiding the media stops the bitmap painting; !important
+   outranks the inline styles layoutReel wrote before GL took over. */
+#wfgallery .reel.gl-covers .cover{opacity:0 !important;transform:none !important;
+  pointer-events:none !important;transition:none !important}#wfgallery .reel.gl-covers .cover .cover__media{box-shadow:none !important;visibility:hidden}/* the lobby backdrop is painted into the canvas while the covers are —
+   left visible it is an opaque wall in FRONT of them */
+#wfgallery .room.gl-lobby .lobby{visibility:hidden}body.glroom #wfgallery #roomGL{display:block}/* When GL draws the room, the DOM room stops being painted but must NOT
    stop existing: opacity:0 keeps every piece focusable and readable to a
    screen reader, which visibility:hidden and display:none would not. The
    camera loop also stops writing its transforms while this is on, so the
@@ -2205,6 +2215,32 @@ const GLR = {
   },
   clear(){ this.on = false; if (this.ready) { try{ window.GLRoom.clear(); }catch(e){} } }
 };
+/* The reel's GL lifecycle. Sync builds the GPU covers only when the
+   directory is standing still — never mid-transition, because the
+   shared-element portal and the mask reveals animate the REAL covers,
+   and they measure real boxes. Suspend is the hand-back: it clears the
+   meshes and runs one style pass of layoutReel so every cover is
+   standing exactly where the GPU had it before anything measures. */
+const GLREEL = () => GLR.ready && !!(window.GLRoom && window.GLRoom.reelOn);
+function glReelSync(){
+  if (!GLR.want || !GLR.boot()) return;
+  const dir = S.open && S.chapter && S.chapter.type==='directory'
+              && !inSalon() && !REEL.busy && REEL.covers.length;
+  if (dir){
+    window.GLRoom.buildReel($('#reel'), REEL.covers);
+    layoutReel();                  // first GPU pass, so nothing pops
+  } else window.GLRoom.clearReel();
+}
+/* transitions come AFTER the entry masks and portals have finished, so
+   the sync is scheduled a beat behind busy=false rather than on it */
+let _glReelT = null;
+function glReelSyncSoon(){ clearTimeout(_glReelT); _glReelT = setTimeout(glReelSync, 700); }
+function glReelSuspend(){
+  if (!GLREEL()) return;
+  window.GLRoom.clearReel();
+  REEL.covers.forEach(cv=>{ cv._w = {}; });   // force a full style rewrite
+  layoutReel();                                // real boxes for the portal
+}
 const SP = 780;                       // corridor spacing (px of depth per piece)
 const STEP = {corridor:SP, orbit:1, field:1, feed:1};   // camera units per piece
 const $ = s => document.querySelector(s);
@@ -2272,6 +2308,7 @@ addEventListener('resize', ()=>{
   if (S.open && GLR.on && S.chapter && S.chapter.type!=='directory'){
     GLR.build($('#stage .room'), S.chapter.type, S.pieces);
   }
+  if (S.open && S.chapter && S.chapter.type==='directory') glReelSync();
 },{passive:true});
 
 /* =====================================================================
@@ -2547,6 +2584,7 @@ function openGallery(chapterId){
 }
 function exitGallery(){
   GLR.clear();                       // textures are GPU memory; never leak a room
+  if (GLR.ready) window.GLRoom.clearReel();
   $('#gallery').classList.remove('open'); S.open=false;
   document.documentElement.style.overflow='';
   stopBG(); cancelAnimationFrame(S.raf); S.raf=null;
@@ -2640,8 +2678,13 @@ function setChapter(id){
      out: paintPiece measures each card, and LAYOUT's custom properties
      have to have resolved. The directory keeps the DOM reel for now —
      its covers are their own animation system (see layoutReel). */
-  if (c.type !== 'directory') GLR.build(room, c.type, S.pieces);
-  else GLR.clear();
+  if (c.type !== 'directory'){
+    GLR.build(room, c.type, S.pieces);
+    if (GLR.ready) window.GLRoom.clearReel();   // cover textures are GPU memory
+  } else {
+    GLR.clear();
+    glReelSync();                               // no-op while a transition runs
+  }
 
   updateHUD();
   $('#hint').textContent = HINTS[c.type] || HINTS.still;
@@ -3202,7 +3245,7 @@ function initPointer(){
        same question, and the ANSWER IS A REAL ELEMENT — which is what lets
        the cursor badge, the wall spotlight and the click below all keep
        working against the markup instead of against the renderer. */
-    if (GLR.on){
+    if (GLR.on || GLREEL()){
       const before = window.GLRoom._hover;
       const idx = window.GLRoom.pointerMove(e.clientX, e.clientY);
       if (idx !== before){
@@ -3217,7 +3260,7 @@ function initPointer(){
   /* A click on the canvas is forwarded to the card it landed on, so
      wireOpen / answerQuiz / markViewed run exactly as they always have. */
   g.addEventListener('click', e=>{
-    if (!GLR.on) return;
+    if (!GLR.on && !GLREEL()) return;
     if (e.target && e.target.id !== 'roomGL' && !e.target.closest('#stage')) return;
     if (window.GLRoom.click()) { e.preventDefault(); e.stopPropagation(); }
   });
@@ -3561,6 +3604,30 @@ function layoutReel(){
        them dirtied a subtree. Values are rounded to a device pixel so a
        settled work never sits on a fractional boundary and shimmers. */
     const px = v => Math.round(v*2)/2;
+    /* THE REEL ON THE GPU · everything above this line still ran — the
+       hang interpolation, the warp, the field offsets — because those ARE
+       the choreography and they live here alone. Only the write changes:
+       with the covers on the GPU the numbers go to reelSet() as mesh
+       transforms and uniforms, and the style/layout/raster cost below —
+       including the per-frame WIDTH AND HEIGHT interpolation, the single
+       most expensive thing this gallery did — simply never happens. */
+    if (GLREEL()){
+      window.GLRoom.reelSet(i, {
+        cx:cx, cy:cy, cz:cz, cry:cry, crx:crx, scale:scale, op:op,
+        wpx:wpx, hpx:hpx, shift:shift,
+        shd: top ? 1 - Math.min(.62, Math.abs(hang[i].z)/460) : 1,
+        shdx: top ? -hang[i].ry*.9 : 0,
+        lo: top ? Math.max(0, Math.min(1,(ad-.55)/.45)) * .9
+                : inSalon() ? 1 : .9
+      });
+      const activeG = ad < .5;
+      if ((el2.dataset.active==='true') !== activeG){
+        el2.dataset.active = activeG ? 'true':'false';
+        el2.setAttribute('aria-selected', activeG?'true':'false');
+        el2.tabIndex = activeG ? 0 : -1;
+      }
+      continue;
+    }
     const tf = 'translate3d('+px(cx)+'px,'+px(cy)+'px,'+px(cz)+'px) rotateY('+
                cry.toFixed(2)+'deg) rotateX('+crx.toFixed(2)+'deg) scale('+
                scale.toFixed(4)+')';
@@ -3800,6 +3867,12 @@ function setWallVar(name, value){
    ones whose value actually changed.
    --------------------------------------------------------------------- */
 function lightTheWall(hang, j){
+  /* with the environment in the canvas, the pool is a uniform */
+  if (GLREEL()){
+    const a = hang[j];
+    window.GLRoom.env.aim(a.cx, .5 + a.cy, true);
+    return;
+  }
   /* 1% steps: a light pool is a soft wash metres across, it does not need
      sub-percent precision. Written on the two elements that READ these —
      see setSpotVar(). This runs on every frame of travel; from #gallery it
@@ -4111,6 +4184,7 @@ function activateReelItem(i){
               colour mask, masks sliding away on separate beats
    ===================================================================== */
 function openCollection(kind, i){
+  glReelSuspend();                 // the portal measures the REAL cover
   const reel=$('#reel'), cover=REEL.covers[i]; if(!cover) return;
   REEL.busy = true; reel.classList.add('is-busy','is-locked');
   GALLERY.wake('transition');
@@ -4194,6 +4268,7 @@ function openCollection(kind, i){
   setTimeout(()=>{
     killPortal(); media.style.visibility=''; clearStuckOpacity();
     REEL.busy=false;
+    glReelSyncSoon();              // after the masks have finished arriving
     const r2=$('#reel'); r2?.classList.remove('is-busy','is-locked');
     REEL.covers[Math.round(REEL.pos)]?.focus({preventScroll:true});
   }, T*1.12);
@@ -4231,6 +4306,7 @@ function navBack(){
 
 function openRoomFromReel(i, chapterId, after){
   if (REEL.busy) return;
+  glReelSuspend();                 // the portal measures the REAL cover
   const it = REEL.rooms[i]; if(!it) return;
   const c = CHAPTERS.find(x=>x.id===chapterId) || it;
   const reel = $('#reel'); const cover = REEL.covers[i]; if(!cover) return;
@@ -4340,6 +4416,7 @@ function returnToReel(){
     setChapter('directory');
     if(back){ REEL.pos = REEL.target = back.index; layoutReel(); paintReelChrome(true); }
     REEL.busy = false;
+    glReelSync();
     return;
   }
   // fold the room away, then rebuild the reel underneath it
@@ -4376,6 +4453,7 @@ function returnToReel(){
     setTimeout(()=>{
       reel?.classList.remove('is-busy','is-locked');
       REEL.busy = false;
+      glReelSyncSoon();            // after the covers have slid back in
       back.focus?.focus?.({preventScroll:true});
     }, dur*0.66);
   }, dur*0.42);
@@ -4843,8 +4921,10 @@ function loop(now){
      goes to the renderer instead. */
   const GLON = GLR.on;
   const setWorld = (tf, x, y, z) => {
-    if (GLON){ S.glWorld.x = x; S.glWorld.y = y; S.glWorld.z = z; }
-    else world.style.transform = tf;
+    /* the vector is stored unconditionally: the reel renderer reads it on
+       the directory screen, where no ROOM is mounted and GLON is false */
+    S.glWorld.x = x; S.glWorld.y = y; S.glWorld.z = z;
+    if (!GLON) world.style.transform = tf;
   };
   // Camera. NOTE the sign on Y: rotateY(-x) is what brings the side you
   // are looking toward round to face you. It was positive before, which
