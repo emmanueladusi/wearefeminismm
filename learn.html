@@ -31,7 +31,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=IBM+Plex+Sans:wght@400;600&display=swap" />
   <!-- the GPU room renderer, deferred (see Gallery.html) -->
   <script defer src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
-  <script defer src="js/glroom.js?v=7"></script>
+  <script defer src="js/glroom.js?v=8"></script>
   <style id="wfgallery-css">
 /* =====================================================================
    THE GALLERY, v3 · chapter prototype
@@ -757,21 +757,24 @@ body.touchmode #wfgallery .lobby__floor{
    element, so width:auto resolves to its INTRINSIC size — the drawing
    buffer, which is viewport x dpr — and the box came out at 2880x1800 on
    a 1440x900 screen, i.e. the room drawn into the top-left quarter of a
-   canvas four times too big. The insets position it; these size it. */
+   canvas four times too big. The insets position it; these size it.
+
+   z-index 22, and the number is load-bearing: above #stage (20) so the
+   covers hang in FRONT of the lobby's opaque backdrop, below the near
+   linework (30) so the one gesture that crosses in front of the art
+   still does, below the HUD (50) and every panel.
+
+   The DOM environment is NOT hidden any more. A canvas reproduction of
+   it was tried — every layer painted from its own computed style — and
+   Emmanuel could still see it wasn't his gallery. He was right: the
+   environment is art direction, and its ONLY per-frame costs (the
+   parallax property writes) were already paid down by earlier passes.
+   The lag was the artwork re-rasterizing, and the artwork is what stays
+   on the GPU. The canvas clears to transparent and the real wall shows
+   through, identical because it is not a copy of the thing — it IS the
+   thing. */
 #wfgallery #roomGL{position:absolute;inset:0;width:100%;height:100%;
-  z-index:19;display:none;pointer-events:none}/* Once the room renderer owns the wall, the DOM environment must go —
-   not because it looks wrong, but because it is ELEVEN fullscreen layers
-   the compositor blended over the canvas on every frame, six of them
-   re-transforming on every cursor move. That was the cost the standalone
-   prototype did not have, and the reason travel and the cursor still felt
-   heavy after the artwork moved to the GPU. #bgGL goes too: its shader is
-   drawn in the same canvas now, which also takes the page from two WebGL
-   contexts down to one. All of it comes straight back the moment GL is
-   not driving — it is still what touch, reduced motion and no-WebGL see. */
-body.glroom #wfgallery #gtex,
-body.glroom #wfgallery .glines,
-body.glroom #wfgallery #bgGL,
-body.glroom #wfgallery .fallback-bg{display:none !important}/* The reel's covers while the GPU draws them: same recipe as the rooms.
+  z-index:22;display:none;pointer-events:none}/* The reel's covers while the GPU draws them: same recipe as the rooms.
    opacity, not visibility, because the covers must stay focusable and
    they keep their LAYOUT — the GL textures are painted from each child's
    own offset box, and the transitions measure these boxes the moment the
@@ -779,9 +782,7 @@ body.glroom #wfgallery .fallback-bg{display:none !important}/* The reel's covers
    layer per cover; hiding the media stops the bitmap painting; !important
    outranks the inline styles layoutReel wrote before GL took over. */
 #wfgallery .reel.gl-covers .cover{opacity:0 !important;transform:none !important;
-  pointer-events:none !important;transition:none !important}#wfgallery .reel.gl-covers .cover .cover__media{box-shadow:none !important;visibility:hidden}/* the lobby backdrop is painted into the canvas while the covers are —
-   left visible it is an opaque wall in FRONT of them */
-#wfgallery .room.gl-lobby .lobby{visibility:hidden}body.glroom #wfgallery #roomGL{display:block}/* When GL draws the room, the DOM room stops being painted but must NOT
+  pointer-events:none !important;transition:none !important}#wfgallery .reel.gl-covers .cover .cover__media{box-shadow:none !important;visibility:hidden}body.glroom #wfgallery #roomGL{display:block}/* When GL draws the room, the DOM room stops being painted but must NOT
    stop existing: opacity:0 keeps every piece focusable and readable to a
    screen reader, which visibility:hidden and display:none would not. The
    camera loop also stops writing its transforms while this is on, so the
@@ -3867,12 +3868,6 @@ function setWallVar(name, value){
    ones whose value actually changed.
    --------------------------------------------------------------------- */
 function lightTheWall(hang, j){
-  /* with the environment in the canvas, the pool is a uniform */
-  if (GLREEL()){
-    const a = hang[j];
-    window.GLRoom.env.aim(a.cx, .5 + a.cy, true);
-    return;
-  }
   /* 1% steps: a light pool is a soft wash metres across, it does not need
      sub-percent precision. Written on the two elements that READ these —
      see setSpotVar(). This runs on every frame of travel; from #gallery it
@@ -5208,11 +5203,6 @@ function surfaceParallax(){
   // one smoothed -1..1 pair; every layer applies its own magnitude in CSS.
   // On the wall layers, not #gallery: the covers do not read these.
   const mx=+S.look.x.toFixed(4), my=+S.look.y.toFixed(4);
-  /* With the environment in the canvas these become two uniform writes
-     instead of a custom-property write on six elements per cursor frame,
-     which is the difference between the cursor feeling attached to the
-     room and feeling like it is dragging it. */
-  if(GLR.ready) return;
   if(mx!==S.mxLast || my!==S.myLast){
     setWallVar('--mx',mx); setWallVar('--my',my);
     S.mxLast=mx; S.myLast=my;
@@ -5226,9 +5216,17 @@ function surfaceParallax(){
    custom properties, so the wall wash follows the work a visitor is
    actually looking at. Off means "no piece attended to", same as before. */
 function glAimSpot(idx){
-  if (idx==null || idx<0){ window.GLRoom.env.aim(0,0,false); return; }
+  /* same two custom properties aimSpotlight writes, but the position is
+     projected from the mesh — the element stopped moving when GL took
+     the camera, so its bounding box is the wrong answer */
+  const g=$('#gallery'); if(!g) return;
+  if (idx==null || idx<0){ g.dataset.spot='off'; setSpotVar('--spotlight-opacity','0'); return; }
   const p = window.GLRoom.screenPos(idx);
-  if (p) window.GLRoom.env.aim(p.x, p.y, true);
+  if (!p) return;
+  setSpotVar('--spotlight-x',(p.x*100).toFixed(1)+'%');
+  setSpotVar('--spotlight-y',(p.y*100).toFixed(1)+'%');
+  setSpotVar('--spotlight-opacity','1');
+  g.dataset.spot='on';
 }
 
 /* Gallery spotlight · aims the wall wash at whichever piece is live.

@@ -763,7 +763,13 @@
     GL._ray = new THREE.Raycaster();
     GL._ndc = new THREE.Vector2(-2, -2);
     GL.ok = true;
-    try { ENV.build(); } catch (e) { ENV.ok = false; }
+    /* ENV stays dormant. A full canvas reproduction of the environment
+       was built and verified here, and it was still visibly not the real
+       thing — the environment is art direction, not geometry, and the
+       browser already paints it perfectly as DOM. The canvas clears to
+       transparent, the artwork renders over the REAL wall, and ENV's
+       machinery is kept only for the day a room needs a layer the DOM
+       cannot afford. */
     GL.resize();
     return true;
   };
@@ -893,9 +899,7 @@
      ================================================================= */
   GL.frame = function (st) {
     if (!GL.ok) return;
-    /* The environment is drawn even when no room is mounted — it IS the
-       room's wall, and the directory stands in front of it too. */
-    ENV.frame(st.lookX || 0, st.lookY || 0, st.now || performance.now());
+    if (ENV.ok) ENV.frame(st.lookX || 0, st.lookY || 0, st.now || performance.now());
     var TUNE = st.tune || { camRotY: 3.5, camRotX: 2, camTX: 20, camTY: 14 };
     var lookY = -st.lookX * TUNE.camRotY * Math.PI / 180;
     var lookX = -st.lookY * TUNE.camRotX * Math.PI / 180;
@@ -1270,12 +1274,6 @@
     GL.reelOn = GL.reelItems.length > 0;
     if (GL.reelOn) {
       reelEl.classList.add('gl-covers');
-      /* the lobby joins the canvas, or the covers hang behind an opaque
-         DOM backdrop and are never seen */
-      var room = reelEl.closest('.room');
-      if (room) room.classList.add('gl-lobby');
-      ENV.paintLobby(document.querySelector('.lobby'));
-      ENV.showLobby(true);
       try { GL.renderer.compile(GL.scene, GL.camera); } catch (e) {}
     }
     return GL.reelOn;
@@ -1325,11 +1323,9 @@
     }
     GL.reelItems.length = 0;
     GL.reelOn = false;
-    ENV.showLobby(false);
+    if (ENV.ok) ENV.showLobby(false);
     var r = document.getElementById('reel');
     if (r) r.classList.remove('gl-covers');
-    var rm = document.querySelector('.room.gl-lobby');
-    if (rm) rm.classList.remove('gl-lobby');
   };
 
   /* =================================================================
