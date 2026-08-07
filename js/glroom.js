@@ -77,6 +77,18 @@
      so a palette change, a room retint or an edit to the linework paths
      still shows up here with no second source to keep in step.
      ================================================================= */
+  /* Token reads MUST NOT come from documentElement: in learn.html the
+     build rewrites the gallery's :root tokens onto the #wfgallery wrapper
+     (see build_learn.py), so on the live page documentElement returns ''
+     for every one of them and the renderer falls back to its hardcoded
+     plum — a dark room inside a White Cube identity. #gallery inherits
+     from the wrapper and also carries the per-category overrides, so it
+     is the one element that answers correctly in BOTH documents. */
+  function galleryStyle() {
+    var g = document.getElementById('gallery');
+    return getComputedStyle(g || document.documentElement);
+  }
+
   var ENV = { layers: [], ok: false, _t0: 0 };
 
   var FS_VERT = 'varying vec2 vUv; void main(){ vUv=uv; gl_Position=vec4(position.xy,0.9999,1.0); }';
@@ -157,7 +169,7 @@
     envLayer(THREE, ENV.wall, -100);
 
     /* ---- 2/3 · fibre and grain, from the tiles the page generated ---- */
-    var cs = getComputedStyle(document.documentElement);
+    var cs = galleryStyle();
     var fCv = tileCanvas(cs.getPropertyValue('--fibre-url'), 256);
     var gCv = tileCanvas(cs.getPropertyValue('--grain-url'), 128);
     ENV.fibreTex = texFromCanvas(THREE, fCv, true); fCv._tex = ENV.fibreTex;
@@ -252,7 +264,7 @@
      never per frame, which is the whole point. */
   ENV.repaint = function () {
     if (!ENV.ok) return;
-    var cs = getComputedStyle(document.documentElement);
+    var cs = galleryStyle();
     var g = document.getElementById('gallery');
     var gs = g ? getComputedStyle(g) : cs;
     var top = rgbOf(cs.getPropertyValue('--gallery-wall'), [0.30, 0.21, 0.46]);
@@ -298,7 +310,7 @@
   };
 
   ENV.paintPools = function (gs) {
-    var vig = (getComputedStyle(document.documentElement).getPropertyValue('--v-vig-rgb') || '8,6,13').trim();
+    var vig = (galleryStyle().getPropertyValue('--v-vig-rgb') || '8,6,13').trim();
     var num = function (n, d) { var v = parseFloat(gs.getPropertyValue(n)); return isNaN(v) ? d : v; };
     var li = num('--gallery-light-intensity', 1.12);
     var vs = num('--vignette-strength', 0.9);
@@ -334,7 +346,7 @@
     // floor
     var c3 = ENV.floorCv.getContext('2d'); W = ENV.floorCv.width; H = ENV.floorCv.height;
     c3.clearRect(0, 0, W, H);
-    var deep = (getComputedStyle(document.documentElement).getPropertyValue('--wall-deep') || 'rgba(20,12,34,.55)').trim();
+    var deep = (galleryStyle().getPropertyValue('--wall-deep') || 'rgba(20,12,34,.55)').trim();
     var top2 = H * 0.66;
     var fg = c3.createLinearGradient(0, top2, 0, H);
     fg.addColorStop(0, 'rgba(20,12,34,0)'); fg.addColorStop(1, deep);
@@ -420,7 +432,7 @@
     var cv = ENV.lobbyCv;
     var c = cv.getContext('2d'), W = cv.width, H = cv.height;
     c.clearRect(0, 0, W, H);
-    var cs = getComputedStyle(document.documentElement);
+    var cs = galleryStyle();
     var wall = (cs.getPropertyValue('--gallery-wall') || '#241834').trim();
     var edge = (cs.getPropertyValue('--gallery-edge') || wall).trim();
     var black = (cs.getPropertyValue('--gallery-black') || '#08060d').trim();
@@ -534,7 +546,7 @@
 
   /* Read the live tokens so a palette change repaints the cards too. */
   function tok(name, fb) {
-    var v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    var v = galleryStyle().getPropertyValue(name).trim();
     return v || fb;
   }
 
@@ -1100,6 +1112,14 @@
     for (var pi = 0; pi < posterish.length; pi++) want(posterish[pi], false);
     var pins = media.querySelectorAll('.contact i');
     for (var k = 0; k < pins.length; k++) want(pins[k], false);
+    /* the scrim is a job like any other — rasterized from its own computed
+       gradient AT ITS OWN OPACITY (var(--v-scrim)), because a light
+       identity runs it far weaker than the dark one, and hardcoding the
+       dark version buried the poster captions in murk. It paints LAST,
+       after the type, exactly as the source order stacks it. */
+    var scrimJobStart = jobs.length;
+    want(media.querySelector('.cover__scrim'), true);
+    var scrimJobs = jobs.splice(scrimJobStart);
 
     var texts = media.querySelectorAll('.poster > *, .lenswork > *');
     /* innerText is EMPTY for visibility:hidden subtrees — and the media is
@@ -1175,16 +1195,21 @@
           tracked(c, line, b2.x, b2.y + parseFloat(cs3.fontSize) * 0.86 + li * lh, tr);
         }
       }
-      /* the scrim, over everything, as .cover__scrim stacks it */
-      var sg = c.createLinearGradient(0, 0, 0, H);
-      sg.addColorStop(0, 'rgba(8,6,13,.34)'); sg.addColorStop(0.32, 'rgba(8,6,13,.05)');
-      sg.addColorStop(0.72, 'rgba(8,6,13,.5)'); sg.addColorStop(1, 'rgba(8,6,13,.88)');
-      c.fillStyle = sg; c.fillRect(0, 0, W, H);
+      /* the scrim, over everything, as the source order stacks it */
+      for (var sj = 0; sj < scrimJobs.length; sj++) {
+        var sb = scrimJobs[sj];
+        if (!imgs[sb.url]) continue;
+        c.save();
+        c.globalAlpha = isNaN(sb.alpha) ? 1 : sb.alpha;
+        c.drawImage(imgs[sb.url], sb.box.x, sb.box.y, sb.box.w, sb.box.h);
+        c.restore();
+      }
       done();
     }
 
     /* preload, then one ordered paint; a quick ground stands in meanwhile */
     c.fillStyle = '#190f27'; c.fillRect(0, 0, W, H);
+    for (var sk = 0; sk < scrimJobs.length; sk++) urls[scrimJobs[sk].url] = true;
     var list = Object.keys(urls), left = list.length, loaded = {};
     if (!left) { paintAll(loaded); }
     else list.forEach(function (u) {
