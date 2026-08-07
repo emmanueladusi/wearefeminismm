@@ -233,7 +233,7 @@
 
   window.__brandmarkCycle = {
     start: function () {
-      LOG("start() called by the reveal's onComplete");
+      LOG("start() called");   // by the reveal's onComplete, or by a replay tap
       build();
       token++;
       var mine = token;
@@ -301,4 +301,32 @@
       if (widths.length) setStep(0, false);
     }
   };
+
+  /* ---- replay on tap ----
+     The roll is the thesis of the whole site: the "we" in wearefeminismm is
+     also "i" and "you". It used to play once, in about a second, before
+     anyone had read a word, and then never again. Now the wordmark is a thing
+     you can poke.
+
+     Pointer only, and deliberately so. This is decorative, so keyboard and
+     screen-reader users lose nothing by not having it, whereas giving the
+     <h1> role="button" to make it focusable would cost the page its main
+     heading. reset() before start() because start() alone re-enters from
+     whatever state the last run rested in.
+
+     Reduced motion never reaches here (the module returns at the top), and
+     the site's own accessible mode opts out below. */
+  if (!document.documentElement.hasAttribute("data-a11y") &&
+      section.hasAttribute("data-hero")) {
+    var lastReplay = 0;
+    host.addEventListener("click", function () {
+      var now = (window.performance && performance.now) ? performance.now() : Date.now();
+      if (now - lastReplay < 500) return;     // ignore mashing; one roll at a time
+      lastReplay = now;
+      LOG("replay: tapped the wordmark");
+      window.__brandmarkCycle.reset();
+      window.__brandmarkCycle.start();
+    });
+    host.classList.add("brandmark__word--replay");
+  }
 })();

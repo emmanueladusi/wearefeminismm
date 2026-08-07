@@ -23,7 +23,7 @@
   <meta name="twitter:image" content="https://emmanueladusi.github.io/wearefeminismm/img/og-image.png" />
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-  <link rel="stylesheet" href="css/styles.css?v=221" />
+  <link rel="stylesheet" href="css/styles.css?v=257" />
   <!-- webfonts the gallery needs; the rest of Learn is unaffected -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -145,7 +145,11 @@
 #wfgallery .portal__ctas{
   margin-left:auto;margin-right:auto}#wfgallery .portal__ctas{justify-content:center}/* The gold fixtures, the wall module and the vignette all went with the
    card. They were lighting a dark room; there is no dark room now. */
-#wfgallery .portal > *{position:relative;z-index:1}#wfgallery .portal h1{font-family:var(--serif);font-weight:600;font-size:clamp(2rem,5vw,3.4rem);line-height:1.08;margin:.5em 0 .35em}#wfgallery .portal h1 em{font-style:italic;color:var(--gold)}#wfgallery .portal__lead{max-width:56ch;color:var(--ink-dim);font-size:1.02rem}#wfgallery .portal__ctas{display:flex;flex-wrap:wrap;gap:14px;margin-top:28px;position:relative;z-index:1}/* =====================================================================
+#wfgallery .portal > *{position:relative;z-index:1}#wfgallery .portal h1{font-family:var(--serif);font-weight:600;font-size:clamp(2rem,5vw,3.4rem);line-height:1.08;margin:.5em 0 .35em}/* --gold-ink, not --gold: the raw gold is 2.1:1 on the paper ground and this
+   heading sits on paper, so it measured 2.14:1 against the 3:1 WCAG 2.0 AA
+   asks of large text. --gold-ink is 5.3:1 on cream and flips back to the
+   bright gold on the dark theme, where that one is the readable one. */
+#wfgallery .portal h1 em{font-style:italic;color:#8a5e10}#wfgallery .portal__lead{max-width:56ch;color:var(--ink-dim);font-size:1.02rem}#wfgallery .portal__ctas{display:flex;flex-wrap:wrap;gap:14px;margin-top:28px;position:relative;z-index:1}/* =====================================================================
    THE WALL AT THE ENTRANCE
    Six works hung along one line, not six rows in a list. Widths and
    heights are irregular by design: a row of equal cards is the thing
@@ -1563,6 +1567,8 @@ body.powersave #wfgallery .roomnav{cursor:auto}/* the toggle, and the notice tha
 </head>
 <body>
   <script>document.body.classList.add("is-loading");</script>
+  <!-- WCAG 2.0 A, 2.4.1 Bypass Blocks: first thing in the tab order. -->
+  <a class="skip-link" href="#main">Skip to content</a>
   <noscript><style>.preloader{display:none}</style></noscript>
 
   <!-- Preloader: violet curtain with counter, lifts when the page is ready -->
@@ -1636,11 +1642,6 @@ body.powersave #wfgallery .roomnav{cursor:auto}/* the toggle, and the notice tha
           <span class="menu__label">Your voice</span>
           <span class="menu__go" aria-hidden="true">&#8594;</span>
         </a></li>
-        <li><a class="menu__row" href="receipts.html">
-          <span class="menu__num" aria-hidden="true">05</span>
-          <span class="menu__label">Receipts</span>
-          <span class="menu__go" aria-hidden="true">&#8594;</span>
-        </a></li>
       </ul>
       <div class="menu__foot">
         <a class="menu__ig" href="https://instagram.com/ourfeministspacee" target="_blank" rel="noopener">@ourfeministspacee</a>
@@ -1649,29 +1650,37 @@ body.powersave #wfgallery .roomnav{cursor:auto}/* the toggle, and the notice tha
     </nav>
   </div>
 
+  <main id="main">
+
   <!-- ===== Page intro =====
-       Custom hero for Learn, back by request: no photo here. A beam of
-       light refracting into three colour bands, literally "one word,
-       three lenses," and a nod to intersectionality. Pure CSS (js-free,
-       reduced-motion aware). -->
-  <section class="hero hero--refract" id="top" data-bg="#f2ecf7">
-    <div class="refract" aria-hidden="true">
-      <span class="refract__beam"></span>
-      <span class="refract__prism"></span>
-      <span class="refract__band refract__band--v"></span>
-      <span class="refract__band refract__band--m"></span>
-      <span class="refract__band refract__band--g"></span>
+       The collage arrives, then leaves. It fills the screen and assembles
+       itself out of cut shards, pulls back into a hung print, takes its label,
+       and recedes into the pulse section below. Driven by js/learnHero.js;
+       the artwork is at full strength throughout, which the version before
+       this was not: it ran at 0.52 opacity, multiplied into the paper and
+       masked off the left third, so what survived was a stain.
+
+       The tall section is the scroll runway for that sequence. Its child is
+       what stays on screen. -->
+  <section class="lh-stage" id="top" data-bg="#f2ecf7">
+    <div class="lh-sticky">
+      <!-- Rights held, so no credit line. -->
+      <div class="lh-plate">
+        <img class="lh-img" src="img/art/learn-hero.jpg"
+             alt="Collage of two figures facing each other across a sunflower, assembled from cut photographs, beads, fabric, botanical prints and machine parts"
+             width="750" height="500" fetchpriority="high" decoding="async" />
+        <div class="lh-tiles" aria-hidden="true"></div>
+        <div class="lh-edge" aria-hidden="true"></div>
+      </div>
+
+      <!-- The page's h1, positioned as the label under a piece on a wall. -->
+      <div class="lh-cap">
+        <p class="lh-cap__eyebrow">Learn</p>
+        <h1 class="lh-cap__title">Learn through <em>experience.</em></h1>
+      </div>
+
+      <p class="lh-cue" aria-hidden="true">Scroll</p>
     </div>
-    <p class="hero__eyebrow line-reveal"><span>Learn</span></p>
-    <h1 class="hero__title">
-      <span class="line-reveal"><span>One word,</span></span>
-      <span class="line-reveal"><span><em>three lenses.</em></span></span>
-    </h1>
-    <p class="hero__sub line-reveal"><span>Why this space exists, where feminism came from, and what it actually means, explained with respect for your intelligence.</span></p>
-    <div class="hero__ctas line-reveal"><span>
-      <a class="cta" href="#exhibition" data-magnetic>Start with the words <span class="cta__arrow">→</span></a>
-      <a class="cta cta--quiet" href="#exhibition" data-magnetic>Walk the timeline <span class="cta__arrow">→</span></a>
-    </span></div>
   </section>
 
   <!-- ===== Pulse sparkline: live Yes/No tally from the pre-survey ===== -->
@@ -1704,7 +1713,6 @@ body.powersave #wfgallery .roomnav{cursor:auto}/* the toggle, and the notice tha
         </div>
       </div>
       <p class="sparkcard__mission">That number is the assignment. Everything on this page is the answer.</p>
-      <p class="sparkcard__receipt"><a class="receipt-link" href="receipts.html#method">How this number was collected →</a></p>
     </div>
   </section>
 
@@ -2110,7 +2118,6 @@ const $ = s => document.querySelector(s);
 const SMALL_SET = new Set([
   'img/board/third-world-womens-alliance.jpg','img/board/womens-liberation.jpg',
   'img/board/feminism-poster.jpg','img/board/profiles.jpg',
-  'img/stickers/fist-roundel.png','img/stickers/never-apologize.png',
   'img/waves/wave-01.jpg','img/waves/wave-02.jpg','img/waves/wave-03.jpg',
   'img/waves/wave-04.jpg','img/card-faces.jpg','img/scholars/njoki-wane.jpg'
 ]);
@@ -2288,8 +2295,6 @@ function buildDirLists(){
       x:'2%',  y:'62%', w:'29%', r:'1.7deg',  z:10, a:'3 / 2', b:'11px', s:'torn'  },
     { t:'paper', src:'img/board/profiles.jpg',
       x:'56%', y:'64%', w:'28%', r:'-1.6deg', z:11, a:'5 / 3', b:'9px',  s:'torn2' },
-    { t:'sticker', src:'img/stickers/fist-roundel.png',    x:'37%', y:'40%', w:'12%', r:'-7deg', z:14 },
-    { t:'sticker', src:'img/stickers/never-apologize.png', x:'86%', y:'26%', w:'13%', r:'6deg',  z:14 },
   ];
   DECOR.forEach(d=>{
     const li = el('li','wall__slot wall__slot--decor');
@@ -5720,7 +5725,6 @@ if(QS.get('deck')) addEventListener('load',()=>{
     <p class="footer__mission">Four waves, three lenses, six scholars. The boring version never covered any of it.</p>
     <p class="footer__coming">Next: workshops · mentorship · resource hub</p>
     <a class="footer__ig" href="https://instagram.com/ourfeministspacee" target="_blank" rel="noopener" data-magnetic>@ourfeministspacee on Instagram →</a>
-    <p class="footer__receipts"><a class="receipt-link" href="receipts.html">Receipts · sources, method, house rules →</a></p>
     <p class="footer__fine">Made with care. Your words are anonymous, and you never have to share your name.</p>
   </footer>
 
@@ -5737,6 +5741,7 @@ if(QS.get('deck')) addEventListener('load',()=>{
        through every .th-anchor (the perf pass dropped it site-wide on the
        one-anchor-per-page rationale, which missed this page's splice). -->
   <script src="js/thread.js?v=118"></script>
+  <script src="js/learnHero.js?v=1"></script>
   <script src="js/spark.js?v=91"></script>
   <script src="js/theme.js?v=2"></script>
   <script src="js/nav.js?v=4"></script>

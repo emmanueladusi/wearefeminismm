@@ -26,11 +26,13 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=222" />
+  <link rel="stylesheet" href="css/styles.css?v=257" />
   <script>(function(){var d=document.documentElement;d.classList.add("js");setTimeout(function(){if(!d.classList.contains("reveal-ready"))d.classList.remove("js");},2500);})();</script>
 </head>
 <body>
   <script>document.body.classList.add("is-loading");</script>
+  <!-- WCAG 2.0 A, 2.4.1 Bypass Blocks: first thing in the tab order. -->
+  <a class="skip-link" href="#main">Skip to content</a>
   <noscript><style>.preloader{display:none}</style></noscript>
 
   <!-- Preloader: violet curtain with counter, lifts when the page is ready -->
@@ -51,6 +53,16 @@
   <div class="morph-bg" id="morph" aria-hidden="true"></div>
 
   <!-- (Reactive fluid hero removed — calmer, more resource-like, and faster.) -->
+
+  <!-- One line drawn down the whole page by the scroll (js/scrollStroke.js).
+       The path is generated at runtime rather than pasted: it has to span a
+       document whose height depends on the viewport, the theme and how the
+       copy wraps. Sits above the sections and below the nav, because .about
+       paints an opaque paper background and would otherwise cut the line in
+       half for a whole screen. -->
+  <svg class="ss-thread" id="ssThread" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none">
+    <path id="ssPath" />
+  </svg>
 
   <!-- page-wide scroll guide line -->
   <div class="progress-line" aria-hidden="true">
@@ -104,11 +116,6 @@
           <span class="menu__label">Your voice</span>
           <span class="menu__go" aria-hidden="true">&#8594;</span>
         </a></li>
-        <li><a class="menu__row" href="receipts.html">
-          <span class="menu__num" aria-hidden="true">05</span>
-          <span class="menu__label">Receipts</span>
-          <span class="menu__go" aria-hidden="true">&#8594;</span>
-        </a></li>
       </ul>
       <div class="menu__foot">
         <a class="menu__ig" href="https://instagram.com/ourfeministspacee" target="_blank" rel="noopener">@ourfeministspacee</a>
@@ -116,6 +123,8 @@
       </div>
     </nav>
   </div>
+
+  <main id="main">
 
   <!-- ===== Hero: the "wearefeminismm" wordmark builds itself in, then the
        word-cycle runs (weare → iam → youare + gold sweep), then the caption
@@ -132,7 +141,7 @@
   <section class="brandmark brandmark--hero brandmark--axis" id="brandmark" data-hero data-hero-rig data-bg="#faf6ef">
     <h1 class="brandmark__word" id="brandmarkWord" aria-label="wearefeminismm"></h1>
     <div class="brandmark__lede">
-      <p class="brandmark__cap"><span>A space for students, especially girls and Black girls, to learn about feminism, share real experiences, and stand behind each other. Anonymous, always.</span></p>
+      <p class="brandmark__cap"><span>I asked students how feminism should be taught. A lot of them told me it sounded like homework. So I made this instead, for students, especially girls and Black girls. Nothing to sign up for, no name to give.</span></p>
       <div class="brandmark__ctas">
         <span>
           <a href="learn.html" class="cta" data-magnetic>Start learning <span class="cta__arrow">→</span></a>
@@ -150,8 +159,13 @@
   <!-- (The wordmark reveal now opens the page as the hero — see top.) -->
 
   <!-- ===== Pathways ===== -->
-  <section class="paths" id="paths" data-bg="#faf6ef" data-scene>
-    <p class="eyebrow reveal">The whole site in three moves</p>
+  <!-- No data-scene: journey.js's depth cross-dissolve (recede to 0.93 scale
+       and fade to 0.62 as a section passes the viewport centre) is off on the
+       home page. The colour morph, the progress line and the kinetic
+       headlines all still run; only the per-section scale/fade is gone.
+       learn.html and voice.html still opt in. -->
+  <section class="paths" id="paths" data-bg="#faf6ef" data-thread-start>
+    <p class="eyebrow reveal">Start wherever you want</p>
     <!-- an ordered list, so the "three moves" sequence is carried by the
          markup and the big numerals can be decorative (aria-hidden) instead
          of muddying every link's accessible name -->
@@ -161,7 +175,7 @@
           <span class="pathway__num" aria-hidden="true">01</span>
           <div class="pathway__body">
             <h2>Learn</h2>
-            <p>Feminism, Black feminism, intersectionality, explained with respect for your intelligence.</p>
+            <p>Feminism, Black feminism, intersectionality. Written the way I wish someone had explained it to me.</p>
           </div>
           <span class="pathway__arrow" aria-hidden="true">→</span>
         </a>
@@ -181,7 +195,7 @@
           <span class="pathway__num" aria-hidden="true">03</span>
           <div class="pathway__body">
             <h2>Find <em>your</em> people</h2>
-            <p>Workshops, events, and the community building this across the GTA. You don't have to do any of it alone.</p>
+            <p>Workshops, events, and the people building this around Toronto. You don't have to do any of it alone.</p>
           </div>
           <span class="pathway__arrow" aria-hidden="true">→</span>
         </a>
@@ -191,79 +205,125 @@
   </section>
 
 
-  <!-- ===== Pop culture: the piece of the week (one featured work, swapped weekly) ===== -->
-<section class="popculture" id="popculture" data-bg="#1e1533">
+  <!-- ===== Pop culture: the piece of the week (one featured work, swapped weekly) =====
+       .cover-stack wraps BOTH this section and #about, and that is load-bearing:
+       it is the sticky containing block, so the gallery can hold while #about
+       climbs over it and then release once #about has passed. A wrapper around
+       the gallery alone does not work, however much padding you give it: the
+       box cannot escape a containing block that ends where it ends.
+       See "The gallery holds" in styles.css. -->
+  <div class="cover-stack">
+<section class="popculture" id="popculture" data-bg="#1e1533" data-thread-through>
+    <!-- the torn edge where the paper meets the gallery (css: .popculture__tear) -->
+    <div class="popculture__tear" aria-hidden="true"></div>
     <div class="popculture__inner">
       <p class="eyebrow eyebrow--light reveal">In the culture</p>
       <h2 class="popculture__title reveal">This week's <em>piece.</em></h2>
-      <p class="popculture__lead reveal">Feminism doesn't only live in essays and history books. Every week, one piece earns this spot: a poem, a song, a speech, a scene. Sit with it for a minute and see what it stirs.</p>
+      <p class="popculture__lead reveal">Feminism doesn't only live in essays and history books. Every week I put one thing here: a poem, a song, a speech, a scene. Sit with it for a minute and see what it stirs.</p>
+      <!-- The catalog line. It is deliberately not a back catalogue: saying how
+           short the list is admits the site is young and promises it keeps
+           going, which is more honest than a grid of filler entries. -->
+      <p class="popculture__index reveal">The list so far: 001.</p>
 
-      <article class="piece reveal">
-        <div class="piece__photo">
+      <!-- ========== SWAP THIS BLOCK EACH WEEK ==========
+           Everything piece-specific lives between here and the closing
+           </article>. Nine things change: the photo src + alt, the credit
+           line further down, and the seven bits of text in the label and the
+           note. No CSS edit is ever needed to swap a piece.
+           Order matters to the layout: photo, then label, then prose. The
+           label reads its "arrive 150ms late" cue off the photo being a
+           previous sibling (.piece__photo.is-visible ~ .plaque). -->
+      <article class="piece">
+        <!-- data-ink: js/inkpiece.js hangs a dither canvas over this tile, so
+             the photograph assembles out of ink as the section arrives and
+             then hands off to the real image. The <img> is the content and
+             stands alone without JS, under reduced motion, and in accessible
+             mode. -->
+        <div class="piece__photo reveal" data-ink>
           <img src="img/pieces/maya-angelou.jpg" alt="Maya Angelou reciting a poem at a podium during the 1993 presidential inauguration" loading="lazy" decoding="async" />
         </div>
-        <div class="piece__body">
-          <p class="piece__meta">Piece 001 · Poem, 1978</p>
+
+        <!-- The wall label: printed matter on the wall, not an object on top
+             of it. No fill and no box, so its only edges are the two hairlines
+             bracketing the metadata. It is set small on purpose. A gallery
+             label never competes with the work. -->
+        <div class="plaque">
+          <p class="plaque__acc">001</p>
           <h3 class="piece__name">Still I Rise</h3>
           <p class="piece__author">Maya Angelou</p>
-          <blockquote class="piece__quote">
+          <dl class="plaque__facts">
+            <div class="plaque__fact"><dt>Year</dt><dd>1978</dd></div>
+            <div class="plaque__fact"><dt>Medium</dt><dd>Poem, 43 lines</dd></div>
+            <div class="plaque__fact"><dt>Estimated reading</dt><dd>2 minutes</dd></div>
+          </dl>
+        </div>
+
+        <!-- What you read after you have looked. Sits below the picture, at a
+             normal reading size, so the arrival stays the picture. -->
+        <div class="piece__prose">
+          <blockquote class="piece__quote reveal">
             <p>"But still, like dust, I'll rise."</p>
           </blockquote>
-          <p class="piece__note">Angelou answers centuries of being written down and written off with pure confidence. She lists everything the world did to keep her there, then rises anyway, in rhythm, like the outcome was never in question. No pleading, no permission. It reads like a dare, and she wins.</p>
-          <div class="piece__links">
+          <p class="piece__label reveal">Curator's note</p>
+          <p class="piece__note reveal">Angelou answers centuries of being written down and written off with pure confidence. She lists everything the world did to keep her there, then rises anyway, in rhythm, like the outcome was never in question. No pleading, no permission. It reads like a dare, and she wins.</p>
+          <div class="piece__links reveal">
             <a class="piece__link" href="https://www.poetryfoundation.org/poems/46446/still-i-rise" target="_blank" rel="noopener" data-magnetic>Read the full poem <span class="cta__arrow">→</span></a>
             <a class="piece__link" href="https://www.youtube.com/watch?v=JqOqo50LSZ0" target="_blank" rel="noopener" data-magnetic>Hear her read it <span class="cta__arrow">→</span></a>
           </div>
         </div>
       </article>
+      <!-- ========== END SWAP BLOCK ========== -->
 
-      <p class="popculture__foot reveal">A new piece lands every week. Got one that deserves this spot? <a class="piece__suggest" href="voice.html#wall">Put it on the wall →</a></p>
+      <p class="popculture__foot reveal">002 goes up next week. If you know something that belongs here, tell me. <a class="piece__suggest" href="voice.html#wall">Put it on the wall →</a></p>
       <p class="piece__credits reveal">Photo: Maya Angelou reciting "On the Pulse of Morning" at the 1993 presidential inauguration. White House Photograph Office, public domain, via Wikimedia Commons.</p>
     </div>
-
-    <!-- Stickers. They live HERE and nowhere else: this is the one dark
-         section on the page and already its loudest moment, so it can carry
-         them without arguing with the hero. They sit in the margins beside
-         .popculture__inner (max 940px) and are hidden below 1120px, where
-         there is no margin left to sit in. The fist is decorative; the patch
-         is real text, so it is not hidden from screen readers. -->
-    <img class="sticker sticker--fist" src="img/stickers/fist-venus.svg" alt=""
-         width="240" height="340" loading="lazy" decoding="async" aria-hidden="true" />
-    <p class="sticker sticker--patch"><span>Never apologize for being a <em>powerful woman</em></span></p>
   </section>
 
   <!-- ===== About: where this comes from (provenance first, founder second) ===== -->
-  <section class="about" id="about" data-bg="#faf6ef" data-scene>
+  <section class="about" id="about" data-bg="#faf6ef" data-thread-through>
     <div class="about__inner">
       <p class="eyebrow reveal">Where this comes from</p>
-      <h2 class="about__title reveal">This started as <em>research.</em></h2>
+      <h2 class="about__title reveal">What they <em>told me.</em></h2>
+
       <div class="about__grid">
         <div class="about__body">
-          <p class="reveal">In 2025, a youth-led research project with the TDSB asked students how feminism should be taught. It was a small qualitative study: <strong>three interviews, chosen by convenience sampling</strong>, so it points at something rather than proving it. What it pointed at was consistent. Every participant said feminism belongs in the curriculum, and most of the misunderstanding traced back to never being taught it. A separate open survey running since then puts a number on the rest, and <a href="learn.html#boring-pulse" class="about__stat" data-magnetic>44% say learning about it is boring&nbsp;→</a></p>
-          <p class="reveal">wearefeminis<span class="about__mm">mm</span> is what those findings were built into. The same ideas, told in a way that actually holds your attention. If that 44% comes out lower for the people who spend time here, the site is doing its job. <a href="receipts.html#method" class="receipt-link">How both were measured →</a></p>
-          <p class="reveal">It's led by Emmanuel Adusi, the student researcher behind the project. The double m is his signature, E<strong>mm</strong>anuel, stitched into the site's name. This fall he starts Honours Mathematics at the University of Waterloo.</p>
+          <p class="reveal">In 2025 I ran a youth-led research project with the TDSB. I sat down with students and asked them how feminism should be taught. It barely comes up at home. People think it just means being nice to girls. At school the small differences still add up, and everyone notices, and nobody says anything.</p>
+          <p class="reveal">A later survey put a number on it: <a href="learn.html#boring-pulse" class="about__stat" data-magnetic>44% say learning about it is boring&nbsp;→</a></p>
+          <p class="reveal">I built this site out of that. If that 44% runs lower for the people who spend time here, it is doing its job.</p>
+          <p class="reveal">The double m is my signature, E<strong>mm</strong>anuel. This fall I start Honours Mathematics at the University of Waterloo.</p>
         </div>
         <aside class="about__connect reveal">
+          <!-- The copy beside this is first person, so the face is what tells
+               you who "I" is. A candid frame from the same day rather than the
+               LinkedIn headshot it replaced: the suit made the page look like
+               a company had shipped it. -->
+          <figure class="about__portrait about__portrait--doc">
+            <img src="img/preso/stage.sm.jpg" alt="Emmanuel Adusi speaking at a podium" width="800" height="533" loading="lazy" decoding="async" />
+            <figcaption>Emmanuel Adusi, halfway through a sentence.</figcaption>
+          </figure>
           <p class="about__connect-label">Get in touch</p>
           <a class="cta ext" href="https://www.linkedin.com/in/emmanuel-adusi-/" target="_blank" rel="noopener" data-magnetic>Connect on LinkedIn <span class="visually-hidden">(opens in a new tab)</span></a>
           <a class="about__email" href="mailto:wearefeminismm@gmail.com" data-magnetic>wearefeminismm@gmail.com</a>
-          <figure class="about__qr">
-            <img src="img/linkedin-qr.png" alt="QR code that links to Emmanuel Adusi's LinkedIn profile" width="740" height="740" loading="lazy" decoding="async" />
-            <figcaption>Scan to connect, or use the link above.</figcaption>
-          </figure>
         </aside>
       </div>
     </div>
   </section>
+  </div><!-- /.cover-stack -->
+
+
+  </main>
 
   <!-- ===== Footer ===== -->
-  <footer class="footer" data-bg="#faf6ef" data-scene>
+  <footer class="footer" data-bg="#faf6ef">
     <p class="footer__mark">wearefeminismm</p>
-    <p class="footer__mission">Students told us learning feminism was boring. This site is the rebuttal.</p>
+    <p class="footer__mission">Students told me learning feminism was boring. This is my rebuttal.</p>
     <p class="footer__coming">Next: workshops · mentorship · resource hub</p>
     <a class="footer__ig" href="https://instagram.com/ourfeministspacee" target="_blank" rel="noopener" data-magnetic>@ourfeministspacee on Instagram →</a>
-    <p class="footer__receipts"><a class="receipt-link" href="receipts.html">Receipts · sources, method, house rules →</a></p>
     <p class="footer__fine">Made with care. Your words are anonymous, and you never have to share your name.</p>
+    <!-- The honest bit. A site that pretends to a big audience it does not
+         have reads like a brochure; saying the true thing reads like a person. -->
+    <p class="footer__quiet">Not many people read this far down. If you did, thank you, genuinely.</p>
+    <p class="footer__build">Eleventh version of this page. There will be a twelfth.</p>
   </footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -275,11 +335,14 @@
   <script src="js/pin.js?v=78"></script>
   <script src="js/brandmarkData.js?v=80"></script>
   <script src="js/heroReveal.js?v=114"></script>
-  <script src="js/brandmarkCycle.js?v=903"></script>
+  <script src="js/brandmarkCycle.js?v=905"></script>
   <script src="js/signature.js?v=1"></script>
   <script src="js/polish.js?v=82"></script>
   <script src="js/main.js?v=88"></script>
   <script src="js/homescroll.js?v=1"></script>
+  <script src="js/inkpiece.js?v=1"></script>
+  <script src="js/cover.js?v=1"></script>
+  <script src="js/scrollStroke.js?v=1"></script>
   <script src="js/theme.js?v=2"></script>
   <script src="js/nav.js?v=4"></script>
   <script src="js/transition.js?v=1"></script>

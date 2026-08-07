@@ -177,12 +177,22 @@ def main():
     # --- head: the gallery's webfonts, which learn.html does not load -------
     fonts = '\n'.join(re.findall(
         r'<link[^>]*fonts\.(?:googleapis|gstatic)\.com[^>]*>', gal))
-    learn = learn.replace(
-        '<link rel="stylesheet" href="css/styles.css?v=220" />',
-        '<link rel="stylesheet" href="css/styles.css?v=221" />\n'
-        '  <!-- webfonts the gallery needs; the rest of Learn is unaffected -->\n  '
+    # Match the stylesheet link by pattern, not by a hardcoded ?v=220. The
+    # literal version used to be baked in here, so the moment anyone
+    # cache-bumped learn-classic.html this replace() matched nothing, returned
+    # the string untouched, and the build silently shipped a learn.html with
+    # no #wfgallery-css block at all: a completely unstyled gallery, and no
+    # error to tell you. Keep whatever version the source carries.
+    link_re = re.compile(r'<link rel="stylesheet" href="css/styles\.css\?v=\d+" />')
+    if not link_re.search(learn):
+        sys.exit('build_learn: could not find the styles.css link in '
+                 'learn-classic.html; refusing to write an unstyled gallery.')
+    learn = link_re.sub(
+        lambda m: m.group(0) +
+        '\n  <!-- webfonts the gallery needs; the rest of Learn is unaffected -->\n  '
         + fonts +
-        '\n  <style id="wfgallery-css">\n' + scoped + '\n  </style>')
+        '\n  <style id="wfgallery-css">\n' + scoped + '\n  </style>',
+        learn, count=1)
 
     # The entrance becomes the anchor the hero's two CTAs used to point at.
     # Both #whatis and #timeline are gone, so without this they scroll nowhere.

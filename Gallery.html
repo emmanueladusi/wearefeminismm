@@ -140,7 +140,11 @@ img{max-width:100%;display:block}
    card. They were lighting a dark room; there is no dark room now. */
 .portal > *{position:relative;z-index:1}
 .portal h1{font-family:var(--serif);font-weight:600;font-size:clamp(2rem,5vw,3.4rem);line-height:1.08;margin:.5em 0 .35em}
-.portal h1 em{font-style:italic;color:var(--gold)}
+/* --gold-ink, not --gold: the raw gold is 2.1:1 on the paper ground and this
+   heading sits on paper, so it measured 2.14:1 against the 3:1 WCAG 2.0 AA
+   asks of large text. --gold-ink is 5.3:1 on cream and flips back to the
+   bright gold on the dark theme, where that one is the readable one. */
+.portal h1 em{font-style:italic;color:#8a5e10}
 .portal__lead{max-width:56ch;color:var(--ink-dim);font-size:1.02rem}
 .portal__ctas{display:flex;flex-wrap:wrap;gap:14px;margin-top:28px;position:relative;z-index:1}
 
@@ -2600,7 +2604,6 @@ const $ = s => document.querySelector(s);
 const SMALL_SET = new Set([
   'img/board/third-world-womens-alliance.jpg','img/board/womens-liberation.jpg',
   'img/board/feminism-poster.jpg','img/board/profiles.jpg',
-  'img/stickers/fist-roundel.png','img/stickers/never-apologize.png',
   'img/waves/wave-01.jpg','img/waves/wave-02.jpg','img/waves/wave-03.jpg',
   'img/waves/wave-04.jpg','img/card-faces.jpg','img/scholars/njoki-wane.jpg'
 ]);
@@ -2778,8 +2781,6 @@ function buildDirLists(){
       x:'2%',  y:'62%', w:'29%', r:'1.7deg',  z:10, a:'3 / 2', b:'11px', s:'torn'  },
     { t:'paper', src:'img/board/profiles.jpg',
       x:'56%', y:'64%', w:'28%', r:'-1.6deg', z:11, a:'5 / 3', b:'9px',  s:'torn2' },
-    { t:'sticker', src:'img/stickers/fist-roundel.png',    x:'37%', y:'40%', w:'12%', r:'-7deg', z:14 },
-    { t:'sticker', src:'img/stickers/never-apologize.png', x:'86%', y:'26%', w:'13%', r:'6deg',  z:14 },
   ];
   DECOR.forEach(d=>{
     const li = el('li','wall__slot wall__slot--decor');

@@ -12,15 +12,19 @@
   --paper: #faf6ef;
   --paper-soft: #f3ecdf;
   --ink: #2c2140;
-  --ink-dim: rgba(44, 33, 64, 0.66);   /* 4.82:1 on --paper; 0.62 measured 4.27 and failed AA */
+  --ink-dim: rgba(44, 33, 64, 0.74);   /* 6.21:1 on --paper. Was 0.66 / 4.84, which cleared AA by
+                                          0.34 and carried most of the body copy on the site. */
   --violet: #4a3568;
   --violet-deep: #2e2145;
-  --lilac: #e8e0f2;
+  /* --lilac was cut: a third accent competing with gold for the same
+     emphasis job, at low contrast on the violet ground. Selection and
+     highlight surfaces now use --gold-soft, which is the interaction accent
+     they belonged to. */
   --gold: #d9a13f;
   --gold-soft: rgba(217, 161, 63, 0.16);
   --gold-ink: #8a5e10;        /* gold as TEXT on light: 5.3:1 on paper. --gold itself is 2.1:1 */
   --cream-on-dark: rgba(250, 246, 239, 0.92);
-  --dim-on-dark: rgba(250, 246, 239, 0.55);
+  --dim-on-dark: rgba(250, 246, 239, 0.62);   /* 6.79:1 on #1e1533, was 0.55 / 5.65 */
   --line: rgba(44, 33, 64, 0.14);
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   --serif: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -88,7 +92,19 @@ h1, h2, h3, h4, .footer__mark, .ec-heading, .brandmark__word--plain {
    face in an 81.9px line box. */
 .footer__mark, .ec-heading, .pathway__body h2, .piece__name { line-height: 1.1; }
 
-em { font-style: italic; color: var(--violet); }
+/* Base link colour. There was none: every link on the site was coloured by its
+   own class, so any link that missed one fell through to the browser default
+   blue, which on the dark ground is unreadable (community.html's "our
+   Instagram" was doing exactly that). Type selector, so specificity 0,0,1 and
+   every existing class rule still wins. --gold-ink flips per theme: 5.3:1 on
+   cream, 7.7:1 on the dark ground. */
+a { color: var(--gold-ink); }
+
+/* Italic alone carries the emphasis. This used to also recolour to --violet,
+   which put a third accent (a soft periwinkle in dark mode) in competition
+   with gold for the same job, at low contrast on the violet ground. Section
+   titles still get one coloured emphasis word each; running copy does not. */
+em { font-style: italic; }
 
 /* mono eyebrow labels */
 .eyebrow {
@@ -97,11 +113,14 @@ em { font-style: italic; color: var(--violet); }
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.22em;
-  color: var(--gold-ink);
+  /* Structure, not action. Eyebrows appear in every section on every page; in
+     gold they were the single biggest reason gold stopped meaning anything.
+     Gold is now reserved for things you can click, plus the signature m. */
+  color: var(--ink-dim);
   margin-bottom: 28px;
 }
 
-.eyebrow--light { color: var(--gold); }   /* on dark: 8.3:1, bright gold is correct here */
+.eyebrow--light { color: var(--dim-on-dark); }
 
 /* the signature m — the doubled m in "wearefeminismm" is Emmanuel (js/signature.js) */
 .bmc-glyph--sig .bmc-fill { fill: var(--gold) !important; }
@@ -220,54 +239,25 @@ html {
    are JS-driven, so this only quiets the ~48 ambient sea-life layers. */
 #ask.is-idle, #ask.is-idle * { animation-play-state: paused !important; }
 
-/* ===== Learn hero: refraction =====
-   A beam of light splitting into three colour bands (violet · magenta ·
-   gold) behind the "one word, three lenses" title. Pure CSS — the drift
-   runs on the compositor, so it stays smooth and needs no JS. */
-.hero--refract .refract {
-  position: absolute; inset: 0; overflow: hidden; z-index: 0; pointer-events: none;
-}
-.refract__band {
-  position: absolute; left: 6%; top: 50%;
-  width: 82%; height: clamp(70px, 13vh, 150px);
-  border-radius: 50%;
-  transform-origin: 0% 50%;
-  filter: blur(34px);
-  mix-blend-mode: multiply;
-  will-change: transform, opacity;
-}
-.refract__band--v { background: radial-gradient(closest-side, var(--violet), transparent 78%); animation: refractV 13s var(--ease) infinite alternate; }
-.refract__band--m { background: radial-gradient(closest-side, #a8459e, transparent 78%); animation: refractM 15s var(--ease) infinite alternate; }
-.refract__band--g { background: radial-gradient(closest-side, var(--gold), transparent 78%); animation: refractG 11s var(--ease) infinite alternate; }
-@keyframes refractV { from { transform: translateY(-50%) rotate(-18deg); opacity: 0.42; } to { transform: translateY(-50%) rotate(-11deg); opacity: 0.6; } }
-@keyframes refractM { from { transform: translateY(-50%) rotate(-5deg); opacity: 0.5; } to { transform: translateY(-50%) rotate(1deg); opacity: 0.64; } }
-@keyframes refractG { from { transform: translateY(-50%) rotate(6deg); opacity: 0.4; } to { transform: translateY(-50%) rotate(13deg); opacity: 0.58; } }
+/* ===== Learn hero: the collage, as atmosphere =====
+   Full bleed behind the type, not a plate under it. The artwork's ground is
+   white, so multiply drops that ground out entirely and only the figures tint
+   the page: at low opacity they read as something the paper was printed over
+   rather than a photograph pasted on. That is also why the source being
+   750x500 stops mattering. Stretched across the viewport it is soft, and soft
+   is the point.
 
-/* the white beam feeding the prism, and the bright split point */
-.refract__beam {
-  position: absolute; left: -14%; top: 16%;
-  width: 42%; height: clamp(28px, 6vh, 66px);
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8));
-  transform-origin: 100% 50%; transform: rotate(27deg);
-  filter: blur(9px); opacity: 0.5;
-}
-.refract__prism {
-  position: absolute; left: 6%; top: 50%; width: 130px; height: 130px;
-  transform: translate(-50%, -50%);
-  background: radial-gradient(closest-side, rgba(255, 255, 255, 0.92), rgba(232, 224, 242, 0.45), transparent 70%);
-  filter: blur(5px);
-  animation: prismPulse 6.5s var(--ease) infinite alternate;
-}
-@keyframes prismPulse {
-  from { opacity: 0.6; transform: translate(-50%, -50%) scale(0.9); }
-  to { opacity: 0.92; transform: translate(-50%, -50%) scale(1.08); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .refract__band, .refract__prism { animation: none; }
-  .refract__band--v { transform: translateY(-50%) rotate(-15deg); opacity: 0.5; }
-  .refract__band--m { transform: translateY(-50%) rotate(-3deg); opacity: 0.55; }
-  .refract__band--g { transform: translateY(-50%) rotate(9deg); opacity: 0.5; }
-}
+   Multiply carries both themes. On paper the figures tint warm; on the dark
+   ground they fall below it and read as silhouettes, so no second treatment
+   and no white rectangle in dark mode.
+
+   Masked top and bottom so it never butts a hard line against the nav or the
+   section below, and kept faint enough that the headline never needs a scrim.
+   One static image, no blur, no animation. */
+/* Type large and low, picture carrying on underneath. Every reference you
+   sent puts the display type near the bottom of the frame and lets the image
+   run past it; that, plus no boundary at the join, is the "blends into the
+   rest of the site" quality. */
 
 /* ===== hero-07: image-led editorial hero (Learn / Community / Voice) =====
    Ported from the hero-07 React component the user supplied, in this
@@ -503,7 +493,7 @@ body.morph-on .footer { background-color: transparent; }
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.22em;
-  color: var(--gold-ink);
+  color: var(--ink-dim);
   margin-bottom: 34px;
 }
 
@@ -522,26 +512,9 @@ body.morph-on .footer { background-color: transparent; }
   margin-bottom: 44px;
 }
 
-/* orchestrated line reveals: mask + rise, staggered via CSS vars set inline or nth */
-.line-reveal { display: block; overflow: hidden; }
-
-.line-reveal > span {
-  display: inline-block;
-  transform: translateY(115%);
-  animation: line-up 1s var(--ease) forwards;
-}
-
-.hero__eyebrow.line-reveal > span { animation-delay: 0.15s; }
-.hero__title .line-reveal:nth-child(1) > span { animation-delay: 0.3s; }
-.hero__title .line-reveal:nth-child(2) > span { animation-delay: 0.42s; }
-.hero__title .line-reveal:nth-child(3) > span { animation-delay: 0.54s; }
-.hero__sub.line-reveal > span { animation-delay: 0.75s; }
-.hero__ctas.line-reveal > span { animation-delay: 0.9s; }
-
-@keyframes line-up {
-  to { transform: translateY(0); }
-}
-
+/* The .line-reveal rise (translateY(115%) on a stagger) lived here. Nothing
+   carries the class any more, so the rules are gone rather than left as a
+   decoy. */
 .hero__ctas > span { display: flex; gap: 28px; flex-wrap: wrap; }
 
 .cta {
@@ -1080,7 +1053,7 @@ html[data-a11y] .pathway__arrow { transition: none !important; }
   font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: var(--gold);
+  color: var(--dim-on-dark);
 }
 
 .reply-form { display: flex; gap: 8px; margin-top: 14px; }
@@ -1156,7 +1129,7 @@ html[data-a11y] .pathway__arrow { transition: none !important; }
 .pulse__option:hover { border-color: var(--violet); transform: translateY(-3px); }
 
 .pulse__option.is-picked {
-  background: var(--lilac);
+  background: var(--gold-soft);
   border-color: var(--violet);
 }
 
@@ -1290,11 +1263,31 @@ html[data-a11y] .pathway__arrow { transition: none !important; }
 
 .footer__fine { font-size: 0.8rem; color: var(--ink-dim); }
 
+/* The last two lines of the page. Quiet on purpose: they are an aside to
+   whoever actually got here, not a closing statement to an audience. */
+.footer__quiet {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 0.94rem;
+  color: var(--ink-dim);
+  max-width: 40ch;
+  margin: 22px auto 0;
+  line-height: 1.6;
+}
+.footer__build {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--ink-dim);
+  opacity: 0.62;
+  margin: 26px 0 0;
+}
+
 /* ===== Reduced motion ===== */
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
   .reveal { opacity: 1; transform: none; }
-  .line-reveal > span { transform: none; animation: none; }
   .marquee__inner { transform: none !important; }
   .pulse__bar-fill { transition: none; }
   .progress-line { display: none; }
@@ -1403,7 +1396,6 @@ body.page-exit .pt__mark { animation: pt-mark 0.28s ease-out 0.24s forwards; }
 body.is-loading { overflow: hidden; }
 
 /* hold the hero reveal until the curtain lifts */
-body.is-loading .line-reveal > span { animation-play-state: paused; }
 body.is-loading .h7__media, body.is-loading .h7__tag, body.is-loading .h7__title,
 body.is-loading .h7__desc, body.is-loading .h7__ctas { animation-play-state: paused; }
 
@@ -1694,7 +1686,10 @@ body.is-loading .h7__desc, body.is-loading .h7__ctas { animation-play-state: pau
 }
 
 .ec-card-panel {
-  background: rgba(250, 246, 239, 0.9);
+  /* Nearly opaque. At 0.9 the card photo showed through enough to pull the
+     text on it under 4.5:1; the panel is what guarantees the contrast, so it
+     has to actually cover. */
+  background: rgba(250, 246, 239, 0.96);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   border-radius: var(--r);
@@ -1727,7 +1722,9 @@ body.is-loading .h7__desc, body.is-loading .h7__ctas { animation-play-state: pau
 .ec-card-panel ul a:focus-visible { color: var(--gold-ink); }
 
 .ec-card-panel ul li.soon {
-  opacity: 0.6;
+  /* Dimming by opacity dims the contrast with it. At 0.6 these read 3.75:1
+     against the 4.5:1 WCAG 2.0 AA wants of body text. */
+  opacity: 0.82;
   display: flex;
   align-items: baseline;
   gap: 6px;
@@ -1737,7 +1734,7 @@ body.is-loading .h7__desc, body.is-loading .h7__ctas { animation-play-state: pau
   font-size: 0.62rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  opacity: 0.75;
+  opacity: 0.9;
 }
 
 .ec-card h3 {
@@ -2248,7 +2245,7 @@ body.is-loading .h7__desc, body.is-loading .h7__ctas { animation-play-state: pau
 .quiz__opt-key {
   flex: none; width: 28px; height: 28px; border-radius: var(--r-sm); display: grid; place-items: center;
   font-family: var(--mono); font-size: 0.8rem; font-weight: 700; color: var(--violet);
-  background: var(--lilac); transition: background 0.25s, color 0.25s;
+  background: var(--gold-soft); transition: background 0.25s, color 0.25s;
 }
 .quiz__opt-text { line-height: 1.4; }
 .quiz__opt.is-correct {
@@ -2493,9 +2490,16 @@ body.is-loading .h7__desc, body.is-loading .h7__ctas { animation-play-state: pau
   line-height: 1.6;
 }
 .brandmark__ctas > span { display: flex; gap: clamp(20px, 3vw, 40px); flex-wrap: wrap; justify-content: center; }
-/* the caption + ctas arrive as the wordmark's ink materialises */
-.brandmark--hero .brandmark__cap.line-reveal > span { animation-delay: 1.6s; }
-.brandmark--hero .brandmark__ctas.line-reveal > span { animation-delay: 1.85s; }
+/* Two rules lived here claiming "the caption + ctas arrive as the wordmark's
+   ink materialises", staggered at 1.6s and 1.85s. They never fired: the class
+   .line-reveal appears nowhere in index.html or in js/, so neither selector
+   has ever matched and the hero lede has always simply been present. Removed
+   rather than left as a decoy, because reading them is how you conclude the
+   hero has a staggered fly-in that it does not have. */
+
+/* the wordmark replays its weare -> iam -> youare roll when you tap it
+   (js/brandmarkCycle.js); the pointer is the only hint it needs */
+.brandmark__word--replay { cursor: pointer; }
 /* Wordmark construction reveal (js/heroReveal.js + js/brandmarkData.js):
    every letter is built live from its real vector anchor points — amber
    square NODES on on-curve points, amber DOTS on bézier handles, dashed
@@ -3149,6 +3153,62 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
 
 /* ===== Pop culture · feminism's soundtrack (Learn) ===== */
 /* =====================================================
+   The gallery holds while the next section rises over it
+   =====================================================
+   #popculture holds with its BOTTOM edge against the bottom of the screen
+   while #about climbs over it, then releases once #about has passed.
+
+   .cover-stack wraps BOTH sections, and that is the whole trick. A sticky box
+   cannot be shifted outside its containing block, so a wrapper around the
+   gallery alone gives it nowhere to go and produces no hold at all, no matter
+   how much padding you add. Wrapping both makes the containing block extend
+   past the gallery for the length of #about, which is exactly how long the
+   hold should last.
+
+   The offset is --hold, set once by js/cover.js to (viewportHeight minus the
+   section's own height). CSS cannot express "100vh minus my own height", and
+   `bottom: 0` does not do it either: a bottom inset holds an element as you
+   scroll UP toward it, not as you scroll down past it.
+
+   One sticky element. No scroll listener, no rAF, nothing per frame. Gated on
+   html.js, and --hold has no fallback on purpose: with no script the variable
+   is invalid, `top` computes to auto, sticky does nothing, and the two
+   sections simply stack. */
+.js .cover-stack > .popculture {
+  position: sticky;
+  top: var(--hold);
+  z-index: 0;
+}
+/* #about arrives as a panel, not as an edge-to-edge cut. Without this the
+   cover is mechanically correct and visually invisible: a square full-bleed
+   section sliding over another one just reads as the colour changing. The
+   rounded top and the lifted shadow are what make it read as a sheet moving
+   across the gallery, and they borrow the panel language the pathway rows
+   already use in dark mode. One static shadow, never animated. */
+.js .cover-stack > #about {
+  position: relative;
+  z-index: 2;
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  box-shadow: 0 -18px 44px rgba(8, 5, 16, 0.42);
+}
+/* The cover only works if the covering section is opaque. In light mode .about
+   already is (var(--paper)); in dark mode the global
+   html[data-theme="dark"] section rule forces every section transparent so the
+   morph field shows through, which would make #about a window onto the poem it
+   is supposed to be hiding. The footer needs it too, for the same reason: the
+   gallery is still held behind it until #about has fully passed.
+   The trade is real: the colour morph no longer plays behind these two. */
+html[data-theme="dark"] #about,
+html[data-theme="dark"] .footer { background-color: var(--paper) !important; }
+
+/* Reduced motion and accessible mode get plain stacked sections: the cover is
+   a scroll-position effect, and that is what these modes opt out of. */
+@media (prefers-reduced-motion: reduce) {
+  .js .cover-stack > .popculture { position: static; }
+}
+html[data-a11y] .cover-stack > .popculture { position: static !important; }
+
+/* =====================================================
    About — the student behind the site
    ===================================================== */
 .about {
@@ -3165,9 +3225,13 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
   color: var(--ink);
   margin: 0 0 clamp(32px, 5vw, 56px);
 }
+/* Card left, copy right. The narrow column leads and the prose runs beside it.
+   Done with `order` rather than by moving the markup, so the reading order a
+   screen reader gets stays copy-then-contact: the story is still the content
+   and the card is still the aside, whichever side it is drawn on. */
 .about__grid {
   display: grid;
-  grid-template-columns: 1.6fr 1fr;
+  grid-template-columns: 1fr 1.6fr;
   gap: clamp(32px, 6vw, 80px);
   align-items: start;
 }
@@ -3194,6 +3258,7 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
 
 /* connect card: LinkedIn + email + the QR */
 .about__connect {
+  order: -1;                          /* draws first; markup order is unchanged */
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
   padding: clamp(22px, 3vw, 32px);
@@ -3210,7 +3275,9 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.2em;
-  color: var(--gold);
+  /* it labels the link below it, it is not the link. --gold was also the
+     bright gold here, sitting at 2.1:1 on the cream card. */
+  color: var(--ink-dim);
 }
 .about__email {
   font-size: 0.95rem;
@@ -3235,9 +3302,38 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
   color: var(--ink-dim);
   max-width: 26ch;
 }
+/* founder portrait, leading the connect card. Slightly larger than the QR it
+   replaced: a face needs the room, a code did not. No top margin — it sits
+   flush with the top of the card, and the flex gap handles the rest. */
+.about__portrait { margin: 0; }
+.about__portrait img {
+  width: clamp(160px, 22vw, 210px);
+  height: auto;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  display: block;
+  border-radius: var(--r);
+  border: 1px solid var(--line);
+}
+.about__portrait figcaption {
+  margin-top: 10px;
+  font-size: 0.86rem;
+  line-height: 1.4;
+  color: var(--ink-dim);
+}
+/* --doc: a candid landscape frame rather than a headshot. It fills the card
+   width and keeps its own proportions, so it reads as a photograph somebody
+   took instead of a portrait slot somebody filled. Declared after the base
+   rule above, which it ties with on specificity. */
+.about__portrait--doc img {
+  width: 100%;
+  aspect-ratio: 3 / 2;
+}
 @media (max-width: 900px) {
   .about__grid { grid-template-columns: 1fr; }
-  .about__connect { position: static; }
+  /* stacked, the side-by-side reason for the swap is gone and leading with a
+     contact card would push the story below the fold, so hand the order back */
+  .about__connect { position: static; order: 0; }
 }
 
 .popculture {
@@ -3246,7 +3342,41 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
   position: relative;
   overflow: hidden;
 }
-.popculture__inner { max-width: 940px; margin: 0 auto; padding: 0 var(--gutter); }
+/* ---------- Wall texture ----------
+   Two layers on one pseudo-element, both static: a soft vignette so the room
+   has lighting rather than an even flood, and a 140px noise tile for the tooth
+   of the wall. The tile is rasterised once at 140px and repeated by the
+   compositor, so this costs one paint and never repaints: no animation loop,
+   no blur, nothing that a school Chromebook has to keep re-resolving. Pitched
+   so you only notice it if you go looking. */
+/* Back under the content at z-index 0. It was at 5, above everything, only
+   because the label used to paint an opaque rectangle that had to pick up the
+   same tooth as the wall around it. The label has no fill now, so there is
+   nothing left to match, and sitting on top was actively costing the section
+   the thing it needs most: the vignette was dimming the photograph, which is
+   supposed to be the brightest element here. Under the content, the texture
+   is on the wall and the picture hangs in front of it. */
+.popculture::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(ellipse 82% 68% at 50% 44%, rgba(0, 0, 0, 0) 52%, rgba(0, 0, 0, 0.3) 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.42'/%3E%3C/svg%3E");
+  background-size: 100% 100%, 140px 140px;
+  background-repeat: no-repeat, repeat;
+  opacity: 0.55;
+}
+/* the content sits above the texture; the stickers already claim z-index 1 */
+.popculture__inner {
+  max-width: 940px;
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+  position: relative;
+  z-index: 2;
+}
 .popculture__title {
   font-family: var(--serif);
   font-weight: 700;
@@ -3256,7 +3386,14 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
   letter-spacing: -0.01em;
   margin: 0.5rem 0 0;
 }
+/* One coloured emphasis word per section title, and nothing else on the page
+   borrows it. With the eyebrows and metadata now neutral, this is the gold
+   moment in the section rather than one of six.
+   Two tokens, not one: .popculture is dark in BOTH themes so it needs the
+   bright gold (7.5:1), while .about is cream in light and needs --gold-ink,
+   which flips to bright gold only when the ground goes dark. */
 .popculture__title em { font-style: italic; color: var(--gold); }
+.about__title em { font-style: italic; color: var(--gold-ink); }
 .popculture__lead {
   color: var(--dim-on-dark);
   max-width: 48ch;
@@ -3264,101 +3401,220 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
   font-size: 1.05rem;
   line-height: 1.6;
 }
-/* ---------- Stickers (Pop culture section only) ----------
-   Two rules keep these from becoming clip art. They never rotate more than
-   3deg — past that a sticker stops looking placed and starts looking
-   dropped — and they live strictly in the margin beside the 940px content
-   column, so they decorate the section without ever crowding the reading.
-   Below 1120px that margin is gone, and so are they. */
-.sticker { display: none; }
-@media (min-width: 1120px) {
-  .popculture .sticker {
-    display: block;
-    position: absolute;
-    pointer-events: none;
-    z-index: 1;
-  }
-  .sticker--fist {
-    width: clamp(96px, 8.5vw, 138px);
-    height: auto;
-    top: clamp(48px, 7vw, 96px);
-    right: clamp(8px, 3vw, 62px);
-    transform: rotate(-3deg);
-    opacity: 0.95;
-  }
-  /* a die-cut paper patch: cream stock, ink text, a gold keyline. Set in the
-     site's own faces — the handwriting on the original was a third type
-     voice and was the thing that read most like clip art. */
-  .sticker--patch {
-    margin: 0;
-    left: clamp(6px, 2.2vw, 44px);
-    bottom: clamp(56px, 8vw, 120px);
-    width: clamp(150px, 14vw, 196px);
-    transform: rotate(2.5deg);
-    background: var(--paper, #faf6ef);
-    color: #2b1f42;
-    border: 1.5px solid var(--gold);
-    border-radius: 999px;
-    padding: 1.05rem 1.15rem;
-    text-align: center;
-    font-family: var(--serif);
-    font-size: clamp(0.9rem, 1.05vw, 1.02rem);
-    line-height: 1.28;
-    letter-spacing: -0.01em;
-    box-shadow: 0 14px 34px rgba(8, 5, 16, 0.42);
-  }
-  .sticker--patch em { font-style: italic; color: #9a6a12; }
+/* the catalog line: a ledger entry, set in the mono face so it reads as a
+   record of what exists rather than a claim about what is coming */
+.popculture__index {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--dim-on-dark);       /* a ledger line, not an action */
+  margin: 1.6rem 0 0;
+}
+/* ---------- The gallery's top edge ----------
+   The one hard colour change on the page was a dead-straight seam where the
+   paper sections meet the gallery. This tears it: a strip of paper sits over
+   the top of the dark section and its lower edge is a rough ink boundary,
+   with droplets punched clean through it, so the dark reads as splattering up
+   into the light rather than starting at a ruled line.
+
+   Built as a <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 100" preserveAspectRatio="none"><path d="M0,0 H1440 V62 L30,62 L67,47 L105,53 L124,76 L162,69 L195,59 L209,68 L244,50 L273,15 L308,66 L340,72 L372,59 L398,21 L431,72 L445,63 L465,61 L479,65 L499,59 L518,54 L553,71 L591,14 L613,14 L632,65 L667,53 L688,71 L704,72 L730,58 L756,67 L787,61 L822,52 L852,68 L870,42 L892,69 L907,58 L936,59 L972,72 L987,67 L1010,71 L1029,67 L1044,67 L1065,51 L1083,46 L1117,49 L1142,68 L1178,62 L1210,67 L1224,67 L1243,73 L1264,66 L1294,65 L1331,26 L1367,51 L1399,58 L1434,63 L1440,47 L0,47 Z" fill="#fff"/><g fill="#000"><ellipse cx="1038" cy="32" rx="5.0" ry="5.5"/><ellipse cx="808" cy="14" rx="2.5" ry="3.0"/><ellipse cx="720" cy="35" rx="3.5" ry="3.3"/><ellipse cx="256" cy="17" rx="2.0" ry="2.0"/><ellipse cx="1102" cy="29" rx="3.5" ry="4.0"/><ellipse cx="338" cy="25" rx="3.0" ry="2.5"/><ellipse cx="586" cy="17" rx="3.5" ry="4.2"/><ellipse cx="496" cy="32" rx="2.0" ry="2.0"/><ellipse cx="1006" cy="10" rx="3.0" ry="3.5"/><ellipse cx="1278" cy="23" rx="3.5" ry="3.2"/><ellipse cx="457" cy="23" rx="2.0" ry="2.0"/><ellipse cx="1060" cy="7" rx="2.5" ry="2.4"/><ellipse cx="919" cy="37" rx="3.5" ry="2.5"/><ellipse cx="576" cy="31" rx="5.0" ry="4.2"/><ellipse cx="1171" cy="37" rx="2.0" ry="1.5"/><ellipse cx="1007" cy="25" rx="2.0" ry="2.2"/><ellipse cx="751" cy="33" rx="3.0" ry="2.8"/><ellipse cx="909" cy="6" rx="3.5" ry="3.3"/><ellipse cx="789" cy="29" rx="2.0" ry="1.5"/><ellipse cx="924" cy="29" rx="3.5" ry="4.1"/><ellipse cx="1366" cy="26" rx="3.5" ry="2.8"/><ellipse cx="1080" cy="27" rx="2.5" ry="1.8"/><ellipse cx="978" cy="18" rx="1.5" ry="1.9"/><ellipse cx="856" cy="7" rx="3.0" ry="3.0"/><ellipse cx="812" cy="29" rx="2.0" ry="1.6"/><ellipse cx="1144" cy="17" rx="1.5" ry="1.5"/></g></svg>, not an image, so the strip is a real CSS colour: it stays
+   var(--paper) and keeps matching whatever the section above is in either
+   theme. A baked-in fill would have needed one SVG per theme.
+
+   The shape is a seeded generation (build note: python, seed 20260805), so it
+   is irregular without being random per load. One static masked rectangle: no
+   blur, no animation, nothing to recompute on scroll.
+
+   In dark mode the two grounds are #191331 and #1e1533, so this is nearly
+   invisible by design; it is a light-theme flourish and it degrades to the
+   old straight seam wherever mask-image is unsupported. */
+.popculture__tear {
+  position: absolute;
+  top: -1px; left: 0; right: 0;
+  height: clamp(46px, 6.5vw, 86px);
+  background: var(--paper);
+  z-index: 1;                     /* over the section ground, under .popculture__inner (2) */
+  pointer-events: none;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%201440%20120%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20d%3D%22M0%2C0%20H1440%20V83.0%20L14.4%2C83.0%20L23.0%2C78.5%20L31.5%2C81.8%20L46.1%2C83.8%20L56.3%2C82.1%20L67.6%2C78.4%20L76.9%2C80.1%20L87.0%2C80.5%20L94.9%2C81.0%20L109.8%2C80.8%20L115.1%2C76.1%20L127.1%2C78.5%20L134.8%2C73.9%20L143.6%2C78.0%20L156.9%2C74.4%20L171.7%2C74.7%20L179.1%2C77.3%20L188.9%2C73.7%20L194.3%2C76.7%20L207.4%2C78.4%20L213.0%2C79.6%20L215.0%2C24.7%20L218.8%2C79.8%20L233.1%2C81.2%20L257.3%2C81.7%20L269.0%2C77.7%20L275.6%2C82.8%20L289.8%2C80.2%20L300.4%2C74.5%20L314.9%2C77.3%20L327.8%2C74.6%20L334.5%2C76.8%20L342.1%2C80.3%20L348.1%2C77.6%20L354.2%2C81.3%20L357.6%2C16.2%20L364.1%2C79.2%20L372.7%2C78.5%20L418.6%2C80.0%20L427.9%2C89.4%20L440.7%2C85.1%20L450.5%2C87.2%20L456.7%2C84.4%20L469.3%2C83.0%20L477.3%2C82.8%20L480.2%2C15.6%20L485.6%2C82.5%20L494.6%2C82.1%20L497.4%2C39.1%20L502.6%2C79.8%20L510.1%2C84.2%20L515.9%2C78.8%20L524.9%2C78.4%20L537.0%2C81.7%20L549.2%2C76.8%20L561.3%2C73.5%20L571.9%2C73.0%20L579.7%2C71.5%20L587.5%2C76.6%20L594.1%2C72.3%20L605.0%2C75.9%20L606.5%2C37.1%20L609.4%2C77.7%20L617.8%2C73.5%20L632.1%2C77.4%20L639.8%2C72.3%20L645.4%2C69.2%20L651.1%2C75.7%20L657.2%2C73.6%20L696.5%2C72.5%20L702.0%2C64.4%20L716.2%2C66.1%20L726.4%2C69.2%20L737.6%2C69.7%20L744.4%2C67.6%20L752.7%2C67.1%20L758.6%2C67.9%20L771.9%2C64.8%20L778.7%2C68.7%20L786.3%2C69.7%20L795.8%2C71.3%20L802.9%2C67.1%20L845.4%2C67.4%20L857.2%2C73.5%20L869.2%2C78.0%20L875.5%2C75.4%20L888.7%2C77.1%20L902.7%2C69.7%20L909.7%2C72.8%20L918.2%2C70.8%20L924.6%2C72.0%20L936.8%2C66.3%20L947.1%2C70.5%20L957.0%2C71.5%20L967.5%2C68.0%20L977.4%2C68.7%20L991.5%2C62.5%20L1014.8%2C62.1%20L1019.9%2C67.0%20L1028.0%2C70.4%20L1043.0%2C68.7%20L1057.1%2C65.0%20L1066.8%2C64.2%20L1077.1%2C70.6%20L1084.3%2C71.1%20L1095.8%2C63.5%20L1103.4%2C62.2%20L1118.0%2C65.8%20L1132.9%2C68.5%20L1143.6%2C59.5%20L1154.4%2C67.6%20L1199.5%2C67.1%20L1213.7%2C70.6%20L1225.5%2C74.4%20L1234.9%2C74.2%20L1248.0%2C76.8%20L1262.2%2C75.7%20L1271.9%2C80.6%20L1304.9%2C81.1%20L1319.9%2C78.6%20L1334.8%2C76.2%20L1341.5%2C82.7%20L1347.7%2C76.5%20L1359.0%2C81.4%20L1366.5%2C76.3%20L1378.5%2C76.8%20L1388.4%2C79.7%20L1400.8%2C79.4%20L1413.8%2C83.4%20L1421.4%2C77.8%20L1431.5%2C81.6%20L1440.0%2C80.5%20L0%2C80.5%20Z%22%20fill%3D%22white%22%2F%3E%3Cg%20fill%3D%22black%22%3E%3Cellipse%20cx%3D%221011.7%22%20cy%3D%2233.8%22%20rx%3D%222.2%22%20ry%3D%222.6%22%2F%3E%3Cellipse%20cx%3D%22202.8%22%20cy%3D%2238.6%22%20rx%3D%227.0%22%20ry%3D%226.2%22%2F%3E%3Cellipse%20cx%3D%22222.2%22%20cy%3D%2259.8%22%20rx%3D%227.0%22%20ry%3D%227.7%22%2F%3E%3Cellipse%20cx%3D%221015.2%22%20cy%3D%2242.6%22%20rx%3D%223.4%22%20ry%3D%224.1%22%2F%3E%3Cellipse%20cx%3D%22268.6%22%20cy%3D%2240.1%22%20rx%3D%221.6%22%20ry%3D%221.5%22%2F%3E%3Cellipse%20cx%3D%22933.9%22%20cy%3D%2260.1%22%20rx%3D%225.5%22%20ry%3D%225.3%22%2F%3E%3Cellipse%20cx%3D%221329.1%22%20cy%3D%2246.4%22%20rx%3D%223.4%22%20ry%3D%223.5%22%2F%3E%3Cellipse%20cx%3D%2229.4%22%20cy%3D%2260.1%22%20rx%3D%221.6%22%20ry%3D%221.6%22%2F%3E%3Cellipse%20cx%3D%22168.7%22%20cy%3D%2235.7%22%20rx%3D%222.8%22%20ry%3D%222.8%22%2F%3E%3Cellipse%20cx%3D%22233.0%22%20cy%3D%2244.1%22%20rx%3D%222.2%22%20ry%3D%222.3%22%2F%3E%3Cellipse%20cx%3D%221354.8%22%20cy%3D%2241.1%22%20rx%3D%225.5%22%20ry%3D%227.0%22%2F%3E%3Cellipse%20cx%3D%22195.2%22%20cy%3D%2251.7%22%20rx%3D%227.0%22%20ry%3D%227.9%22%2F%3E%3Cellipse%20cx%3D%2218.8%22%20cy%3D%2265.2%22%20rx%3D%227.0%22%20ry%3D%228.1%22%2F%3E%3Cellipse%20cx%3D%221111.4%22%20cy%3D%2240.9%22%20rx%3D%223.4%22%20ry%3D%224.4%22%2F%3E%3Cellipse%20cx%3D%221301.0%22%20cy%3D%2260.8%22%20rx%3D%225.5%22%20ry%3D%225.5%22%2F%3E%3Cellipse%20cx%3D%221114.0%22%20cy%3D%2222.0%22%20rx%3D%224.2%22%20ry%3D%225.4%22%2F%3E%3Cellipse%20cx%3D%22381.2%22%20cy%3D%2251.2%22%20rx%3D%225.5%22%20ry%3D%225.7%22%2F%3E%3Cellipse%20cx%3D%22242.3%22%20cy%3D%2251.4%22%20rx%3D%221.6%22%20ry%3D%222.0%22%2F%3E%3Cellipse%20cx%3D%22934.8%22%20cy%3D%2235.1%22%20rx%3D%221.6%22%20ry%3D%221.5%22%2F%3E%3Cellipse%20cx%3D%22719.6%22%20cy%3D%2252.2%22%20rx%3D%222.2%22%20ry%3D%222.1%22%2F%3E%3Cellipse%20cx%3D%22216.8%22%20cy%3D%2258.5%22%20rx%3D%222.2%22%20ry%3D%222.8%22%2F%3E%3Cellipse%20cx%3D%2276.6%22%20cy%3D%2270.8%22%20rx%3D%221.6%22%20ry%3D%221.9%22%2F%3E%3Cellipse%20cx%3D%2256.5%22%20cy%3D%2268.3%22%20rx%3D%221.6%22%20ry%3D%221.9%22%2F%3E%3Cellipse%20cx%3D%22776.8%22%20cy%3D%2255.9%22%20rx%3D%227.0%22%20ry%3D%228.6%22%2F%3E%3Cellipse%20cx%3D%22240.1%22%20cy%3D%2238.3%22%20rx%3D%222.8%22%20ry%3D%223.4%22%2F%3E%3Cellipse%20cx%3D%22419.3%22%20cy%3D%2250.0%22%20rx%3D%224.2%22%20ry%3D%225.4%22%2F%3E%3Cellipse%20cx%3D%22548.4%22%20cy%3D%2263.7%22%20rx%3D%222.8%22%20ry%3D%223.6%22%2F%3E%3Cellipse%20cx%3D%221199.2%22%20cy%3D%2234.3%22%20rx%3D%224.2%22%20ry%3D%225.0%22%2F%3E%3Cellipse%20cx%3D%22217.8%22%20cy%3D%2262.9%22%20rx%3D%221.6%22%20ry%3D%221.9%22%2F%3E%3Cellipse%20cx%3D%22271.1%22%20cy%3D%2248.6%22%20rx%3D%222.2%22%20ry%3D%222.6%22%2F%3E%3Cellipse%20cx%3D%22755.0%22%20cy%3D%2244.8%22%20rx%3D%224.2%22%20ry%3D%224.9%22%2F%3E%3Cellipse%20cx%3D%22290.3%22%20cy%3D%2268.7%22%20rx%3D%222.2%22%20ry%3D%222.4%22%2F%3E%3Cellipse%20cx%3D%221083.4%22%20cy%3D%2248.1%22%20rx%3D%227.0%22%20ry%3D%228.1%22%2F%3E%3Cellipse%20cx%3D%221057.6%22%20cy%3D%2253.7%22%20rx%3D%227.0%22%20ry%3D%227.5%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+          mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%201440%20120%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20d%3D%22M0%2C0%20H1440%20V83.0%20L14.4%2C83.0%20L23.0%2C78.5%20L31.5%2C81.8%20L46.1%2C83.8%20L56.3%2C82.1%20L67.6%2C78.4%20L76.9%2C80.1%20L87.0%2C80.5%20L94.9%2C81.0%20L109.8%2C80.8%20L115.1%2C76.1%20L127.1%2C78.5%20L134.8%2C73.9%20L143.6%2C78.0%20L156.9%2C74.4%20L171.7%2C74.7%20L179.1%2C77.3%20L188.9%2C73.7%20L194.3%2C76.7%20L207.4%2C78.4%20L213.0%2C79.6%20L215.0%2C24.7%20L218.8%2C79.8%20L233.1%2C81.2%20L257.3%2C81.7%20L269.0%2C77.7%20L275.6%2C82.8%20L289.8%2C80.2%20L300.4%2C74.5%20L314.9%2C77.3%20L327.8%2C74.6%20L334.5%2C76.8%20L342.1%2C80.3%20L348.1%2C77.6%20L354.2%2C81.3%20L357.6%2C16.2%20L364.1%2C79.2%20L372.7%2C78.5%20L418.6%2C80.0%20L427.9%2C89.4%20L440.7%2C85.1%20L450.5%2C87.2%20L456.7%2C84.4%20L469.3%2C83.0%20L477.3%2C82.8%20L480.2%2C15.6%20L485.6%2C82.5%20L494.6%2C82.1%20L497.4%2C39.1%20L502.6%2C79.8%20L510.1%2C84.2%20L515.9%2C78.8%20L524.9%2C78.4%20L537.0%2C81.7%20L549.2%2C76.8%20L561.3%2C73.5%20L571.9%2C73.0%20L579.7%2C71.5%20L587.5%2C76.6%20L594.1%2C72.3%20L605.0%2C75.9%20L606.5%2C37.1%20L609.4%2C77.7%20L617.8%2C73.5%20L632.1%2C77.4%20L639.8%2C72.3%20L645.4%2C69.2%20L651.1%2C75.7%20L657.2%2C73.6%20L696.5%2C72.5%20L702.0%2C64.4%20L716.2%2C66.1%20L726.4%2C69.2%20L737.6%2C69.7%20L744.4%2C67.6%20L752.7%2C67.1%20L758.6%2C67.9%20L771.9%2C64.8%20L778.7%2C68.7%20L786.3%2C69.7%20L795.8%2C71.3%20L802.9%2C67.1%20L845.4%2C67.4%20L857.2%2C73.5%20L869.2%2C78.0%20L875.5%2C75.4%20L888.7%2C77.1%20L902.7%2C69.7%20L909.7%2C72.8%20L918.2%2C70.8%20L924.6%2C72.0%20L936.8%2C66.3%20L947.1%2C70.5%20L957.0%2C71.5%20L967.5%2C68.0%20L977.4%2C68.7%20L991.5%2C62.5%20L1014.8%2C62.1%20L1019.9%2C67.0%20L1028.0%2C70.4%20L1043.0%2C68.7%20L1057.1%2C65.0%20L1066.8%2C64.2%20L1077.1%2C70.6%20L1084.3%2C71.1%20L1095.8%2C63.5%20L1103.4%2C62.2%20L1118.0%2C65.8%20L1132.9%2C68.5%20L1143.6%2C59.5%20L1154.4%2C67.6%20L1199.5%2C67.1%20L1213.7%2C70.6%20L1225.5%2C74.4%20L1234.9%2C74.2%20L1248.0%2C76.8%20L1262.2%2C75.7%20L1271.9%2C80.6%20L1304.9%2C81.1%20L1319.9%2C78.6%20L1334.8%2C76.2%20L1341.5%2C82.7%20L1347.7%2C76.5%20L1359.0%2C81.4%20L1366.5%2C76.3%20L1378.5%2C76.8%20L1388.4%2C79.7%20L1400.8%2C79.4%20L1413.8%2C83.4%20L1421.4%2C77.8%20L1431.5%2C81.6%20L1440.0%2C80.5%20L0%2C80.5%20Z%22%20fill%3D%22white%22%2F%3E%3Cg%20fill%3D%22black%22%3E%3Cellipse%20cx%3D%221011.7%22%20cy%3D%2233.8%22%20rx%3D%222.2%22%20ry%3D%222.6%22%2F%3E%3Cellipse%20cx%3D%22202.8%22%20cy%3D%2238.6%22%20rx%3D%227.0%22%20ry%3D%226.2%22%2F%3E%3Cellipse%20cx%3D%22222.2%22%20cy%3D%2259.8%22%20rx%3D%227.0%22%20ry%3D%227.7%22%2F%3E%3Cellipse%20cx%3D%221015.2%22%20cy%3D%2242.6%22%20rx%3D%223.4%22%20ry%3D%224.1%22%2F%3E%3Cellipse%20cx%3D%22268.6%22%20cy%3D%2240.1%22%20rx%3D%221.6%22%20ry%3D%221.5%22%2F%3E%3Cellipse%20cx%3D%22933.9%22%20cy%3D%2260.1%22%20rx%3D%225.5%22%20ry%3D%225.3%22%2F%3E%3Cellipse%20cx%3D%221329.1%22%20cy%3D%2246.4%22%20rx%3D%223.4%22%20ry%3D%223.5%22%2F%3E%3Cellipse%20cx%3D%2229.4%22%20cy%3D%2260.1%22%20rx%3D%221.6%22%20ry%3D%221.6%22%2F%3E%3Cellipse%20cx%3D%22168.7%22%20cy%3D%2235.7%22%20rx%3D%222.8%22%20ry%3D%222.8%22%2F%3E%3Cellipse%20cx%3D%22233.0%22%20cy%3D%2244.1%22%20rx%3D%222.2%22%20ry%3D%222.3%22%2F%3E%3Cellipse%20cx%3D%221354.8%22%20cy%3D%2241.1%22%20rx%3D%225.5%22%20ry%3D%227.0%22%2F%3E%3Cellipse%20cx%3D%22195.2%22%20cy%3D%2251.7%22%20rx%3D%227.0%22%20ry%3D%227.9%22%2F%3E%3Cellipse%20cx%3D%2218.8%22%20cy%3D%2265.2%22%20rx%3D%227.0%22%20ry%3D%228.1%22%2F%3E%3Cellipse%20cx%3D%221111.4%22%20cy%3D%2240.9%22%20rx%3D%223.4%22%20ry%3D%224.4%22%2F%3E%3Cellipse%20cx%3D%221301.0%22%20cy%3D%2260.8%22%20rx%3D%225.5%22%20ry%3D%225.5%22%2F%3E%3Cellipse%20cx%3D%221114.0%22%20cy%3D%2222.0%22%20rx%3D%224.2%22%20ry%3D%225.4%22%2F%3E%3Cellipse%20cx%3D%22381.2%22%20cy%3D%2251.2%22%20rx%3D%225.5%22%20ry%3D%225.7%22%2F%3E%3Cellipse%20cx%3D%22242.3%22%20cy%3D%2251.4%22%20rx%3D%221.6%22%20ry%3D%222.0%22%2F%3E%3Cellipse%20cx%3D%22934.8%22%20cy%3D%2235.1%22%20rx%3D%221.6%22%20ry%3D%221.5%22%2F%3E%3Cellipse%20cx%3D%22719.6%22%20cy%3D%2252.2%22%20rx%3D%222.2%22%20ry%3D%222.1%22%2F%3E%3Cellipse%20cx%3D%22216.8%22%20cy%3D%2258.5%22%20rx%3D%222.2%22%20ry%3D%222.8%22%2F%3E%3Cellipse%20cx%3D%2276.6%22%20cy%3D%2270.8%22%20rx%3D%221.6%22%20ry%3D%221.9%22%2F%3E%3Cellipse%20cx%3D%2256.5%22%20cy%3D%2268.3%22%20rx%3D%221.6%22%20ry%3D%221.9%22%2F%3E%3Cellipse%20cx%3D%22776.8%22%20cy%3D%2255.9%22%20rx%3D%227.0%22%20ry%3D%228.6%22%2F%3E%3Cellipse%20cx%3D%22240.1%22%20cy%3D%2238.3%22%20rx%3D%222.8%22%20ry%3D%223.4%22%2F%3E%3Cellipse%20cx%3D%22419.3%22%20cy%3D%2250.0%22%20rx%3D%224.2%22%20ry%3D%225.4%22%2F%3E%3Cellipse%20cx%3D%22548.4%22%20cy%3D%2263.7%22%20rx%3D%222.8%22%20ry%3D%223.6%22%2F%3E%3Cellipse%20cx%3D%221199.2%22%20cy%3D%2234.3%22%20rx%3D%224.2%22%20ry%3D%225.0%22%2F%3E%3Cellipse%20cx%3D%22217.8%22%20cy%3D%2262.9%22%20rx%3D%221.6%22%20ry%3D%221.9%22%2F%3E%3Cellipse%20cx%3D%22271.1%22%20cy%3D%2248.6%22%20rx%3D%222.2%22%20ry%3D%222.6%22%2F%3E%3Cellipse%20cx%3D%22755.0%22%20cy%3D%2244.8%22%20rx%3D%224.2%22%20ry%3D%224.9%22%2F%3E%3Cellipse%20cx%3D%22290.3%22%20cy%3D%2268.7%22%20rx%3D%222.2%22%20ry%3D%222.4%22%2F%3E%3Cellipse%20cx%3D%221083.4%22%20cy%3D%2248.1%22%20rx%3D%227.0%22%20ry%3D%228.1%22%2F%3E%3Cellipse%20cx%3D%221057.6%22%20cy%3D%2253.7%22%20rx%3D%227.0%22%20ry%3D%227.5%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+  -webkit-mask-size: 100% 100%;
+          mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+          mask-repeat: no-repeat;
 }
 
+
 /* the piece of the week — one featured work, swapped by hand each week */
-/* text on the left, photo on the right, no box around the pair — the two
-   simply sit side by side on the section */
+/* Two planes, not one. The picture hangs on the right; the label card sits in
+   front of it and juts across its left edge, the way a wall card is mounted
+   just over the frame. The card is what does the overlapping, and it is meant
+   to look like printed matter stuck on the wall, not an object resting on it.
+   Three weights, pushed apart on purpose: the picture is the only large bright
+   thing, the label is small and precise, and the rest is empty wall. */
 .piece {
-  margin: clamp(30px, 4vw, 48px) 0 0;
+  margin: clamp(34px, 4.5vw, 56px) 0 0;
   display: grid;
-  grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
-  gap: clamp(26px, 4vw, 56px);
-  align-items: center;
+  /* 256px label gutter, picture takes the rest (about 66% of the 748px
+     content column at desktop, comfortably over the half it needs) */
+  grid-template-columns: 256px minmax(0, 1fr);
+  grid-template-areas:
+    "label picture"
+    "prose prose";
+  align-items: end;
 }
-.piece__body { order: -1; }
 .piece__photo {
-  border-radius: 14px;
+  grid-area: picture;
+  border-radius: 4px;              /* 14px read as a UI card; 4px reads as a print */
   overflow: hidden;
   background: rgba(255, 255, 255, 0.06);
   aspect-ratio: 4 / 5;
+  position: relative;              /* anchors the ink layer (js/inkpiece.js) */
+  transition: transform 300ms var(--ease), box-shadow 300ms var(--ease);
+}
+/* 3px lift, no scale. A zoom crops the work; a lift moves the frame. */
+.piece__photo:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.5);
+}
+.piece__prose {
+  grid-area: prose;
+  margin-top: clamp(44px, 6vw, 76px);
+  max-width: 58ch;
+}
+/* The ink layer: a dither canvas over the photograph that resolves into it as
+   the section arrives, then hands off and is taken out of the paint entirely.
+   JS owns .ink opacity and visibility; everything here is static. */
+.ink {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* No transition: opacity is driven per frame off scroll position, and a
+     transition on top of that would fight the curve and lag the hand-off.
+     will-change is set by JS only while the ink is actually moving — left on,
+     it would hold a compositing layer for a tile that has already handed off. */
+}
+.ink__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+/* Vignette, as a static gradient rather than a per-pixel pass — it costs
+   nothing and fades out with the ink it belongs to. */
+.ink__vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at 50% 42%,
+    rgba(10, 6, 20, 0) 42%,
+    rgba(10, 6, 20, 0.38) 100%
+  );
+}
+/* js/inkpiece.js never builds the layer under reduced motion, so this only
+   catches the case where the setting changes after the page has loaded. */
+@media (prefers-reduced-motion: reduce) {
+  .ink { display: none; }
 }
 .piece__photo img {
   width: 100%; height: 100%;
-  object-fit: cover; object-position: 38% 18%;   /* favour her face at the podium */
+  /* pushed right of centre so her face clears the seam where the label column
+     crosses the picture */
+  object-fit: cover; object-position: 56% 16%;
   display: block;
-  filter: grayscale(0.25) contrast(1.04);
-  transition: transform 0.55s var(--ease);
+  /* grayscale(0.25) was pulling the picture darker than the wall it hangs on.
+     It is meant to be the brightest thing in the section, so it gets a small
+     lift instead of a knock-down. */
+  filter: contrast(1.06) brightness(1.04);
 }
-.piece:hover .piece__photo img { transform: scale(1.04); }
-.piece__meta {
-  color: var(--gold);
-  font-size: 0.78rem;
-  letter-spacing: 0.14em;
+/* ---------- The wall label ----------
+   Printed matter, not an object. No fill, no box, no rounded corners: it sits
+   directly on #1e1533 like everything else, and the only edges it has are the
+   two hairlines bracketing the metadata. It holds a 288px measure the way a
+   printed card holds a column, and it overhangs the picture's left edge by
+   32px, so both hairlines visibly cross onto the photograph. The text stays
+   inside the measure and never sits on the image. */
+.plaque {
+  grid-area: label;
+  position: relative;
+  z-index: 2;                       /* over the picture, for the 32px overhang */
+  width: 288px;                     /* 32px wider than its 256px column */
+  margin-right: -32px;
+  margin-bottom: clamp(34px, 4.5vw, 62px);
+  padding: 0;
+  background: none;
+  border: 0;
+}
+.plaque__acc {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  color: var(--dim-on-dark);       /* an accession number is filing, not emphasis */
+  margin: 0 0 10px;
+}
+/* the two rules, and nothing down the sides */
+.plaque__facts {
+  margin: 14px 0 0;
+  padding: 11px 0;
+  /* neutral rules: a hairline is structure, and two gold ones in the corner of
+     the frame were pulling against the picture */
+  border-top: 1px solid rgba(250, 246, 239, 0.22);
+  border-bottom: 1px solid rgba(250, 246, 239, 0.22);
+  display: grid;
+  gap: 5px;
+}
+.plaque__fact {
+  display: grid;
+  grid-template-columns: 7.4rem minmax(0, 1fr);
+  gap: 10px;
+  align-items: baseline;
+}
+.plaque__fact dt {
+  font-family: var(--mono);
+  font-size: 0.58rem;
   text-transform: uppercase;
-  margin: 0 0 0.6rem;
+  letter-spacing: 0.14em;
+  line-height: 1.7;
+  color: rgba(250, 246, 239, 0.62);
 }
+.plaque__fact dd {
+  margin: 0;
+  font-size: 0.76rem;
+  line-height: 1.7;
+  color: rgba(250, 246, 239, 0.9);
+}
+/* the label that stops the curator's note from starting mid-air */
+.piece__label {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--dim-on-dark);       /* a label, not a link */
+  margin: clamp(20px, 2.4vw, 28px) 0 0.55rem;
+}
+/* 0.9rem against the curator's note's 0.95rem. A wall label never outsizes
+   the work, and inside the label the hierarchy is carried by weight and style
+   rather than by scale: bold roman title, italic artist, mono facts. */
 .piece__name {
   font-family: var(--serif);
   font-weight: 700;
   color: var(--cream-on-dark);
-  font-size: clamp(1.7rem, 3.6vw, 2.5rem);
-  line-height: 1.05;
+  font-size: 0.9rem;
+  line-height: 1.35;
+  letter-spacing: 0.01em;
   margin: 0;
 }
 .piece__author {
-  color: var(--dim-on-dark);
+  color: rgba(250, 246, 239, 0.72);
   font-family: var(--serif);
   font-style: italic;
-  font-size: 1.05rem;
-  margin: 0.35rem 0 0;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  margin: 3px 0 0;
 }
 .piece__quote {
-  margin: clamp(16px, 2vw, 24px) 0 0;
+  margin: 0;
   padding: 0.15rem 0 0.15rem 1rem;
   border-left: 2px solid var(--gold);
 }
@@ -3374,12 +3630,58 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
   color: var(--dim-on-dark);
   font-size: 0.95rem;
   line-height: 1.6;
-  margin: clamp(14px, 1.8vw, 20px) 0 0;
+  margin: 0;                        /* .piece__label above it owns the gap now */
 }
 .piece__links {
   display: flex; flex-wrap: wrap;
   gap: 0.6rem 1.6rem;
   margin-top: clamp(16px, 2vw, 24px);
+}
+/* ---------- The label arrives 150ms after the picture ----------
+   Not part of the generic .reveal pass, because js/main.js stamps an inline
+   transition-delay:0s on every .reveal whose parent is not a list, which would
+   overwrite any delay set here. Instead the label reads the picture's own
+   .is-visible off the sibling combinator, so the picture lands and the label
+   is printed onto the wall after it. Guarded on html.js so it is simply
+   visible if the script never runs. */
+.js .plaque {
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 320ms var(--ease) 150ms, transform 320ms var(--ease) 150ms;
+}
+.js .piece__photo.is-visible ~ .plaque {
+  opacity: 1;
+  transform: translateY(0);
+}
+/* Both reduced-motion and the site's accessible mode get the static
+   composition. Killing transitions is not enough on its own: with no
+   transition the hover lift would still apply, it would just snap. So the
+   lift and its shadow are switched off outright, and the label is simply
+   printed rather than waiting on the picture. */
+@media (prefers-reduced-motion: reduce) {
+  .js .plaque { opacity: 1; transform: none; }
+  .piece__photo:hover { transform: none; box-shadow: none; }
+}
+html[data-a11y] .plaque { opacity: 1 !important; transform: none !important; }
+html[data-a11y] .piece__photo:hover { transform: none !important; box-shadow: none !important; }
+
+/* Below 900px the label's 288px measure plus a picture worth looking at no
+   longer both fit across, so the overhang stops and the label sits under the
+   picture as a printed card pinned beneath it. */
+@media (max-width: 900px) {
+  .piece {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "picture" "label" "prose";
+    align-items: start;
+  }
+  .piece__photo { aspect-ratio: 4 / 3; }
+  .plaque {
+    width: min(288px, 100%);
+    margin-right: 0;
+    margin-bottom: 0;
+    margin-top: clamp(22px, 4vw, 30px);
+  }
+  .piece__prose { margin-top: clamp(32px, 5vw, 48px); }
 }
 .piece__link {
   color: var(--gold);
@@ -3407,12 +3709,9 @@ body.ask-fullscreen .askwaves { inset: 0; border-radius: 0; }
   margin: clamp(16px, 2vw, 22px) 0 0;
   max-width: 52ch;
 }
-/* the piece stays side-by-side at every width: the photo column just gets
-   narrower instead of stacking on top of the text */
-@media (max-width: 760px) {
-  .piece { grid-template-columns: minmax(110px, 2fr) minmax(0, 3fr); align-items: start; }
-  .piece__photo { aspect-ratio: 4 / 5; }
-}
+/* (The old max-width:760px rule that kept .piece side by side at every width
+   lived here. The overlapping wall card replaced it; the responsive ladder now
+   sits with the rest of the .piece rules above.) */
 
 /* ===== The year machine (learn.html, js/yearmachine.js) =====
    Solid deep-violet panel (like .popculture) so the morph field can't wash
@@ -4327,17 +4626,22 @@ body.uwscrub-on .seascape::after { content: none; }
 
 /* ---------- Dark mode ---------- */
 html[data-theme="dark"] {
-  --paper: #14101f;
-  --paper-soft: #1c1630;
+  /* Was #14101f / #1c1630: a near-black with almost no relation to the brand
+     violet, so dark mode read as generic premium-dark while the light theme
+     carried all the personality. Pulled toward --ink (#2c2140) so the dark
+     ground is recognisably the same palette. Cream still sits at 14.1:1 on
+     it and gold at 7.7:1, so nothing gets less readable. */
+  --paper: #191331;
+  --paper-soft: #241c40;
   --ink: rgba(250, 246, 239, 0.92);
-  --ink-dim: rgba(250, 246, 239, 0.56);
+  --ink-dim: rgba(250, 246, 239, 0.66);   /* 7.5:1 on the new ground, was 0.56 */
   --violet: #b9a3e6;
-  --lilac: #241c3a;
+
   --line: rgba(250, 246, 239, 0.15);
   --gold-soft: rgba(217, 161, 63, 0.22);
   --gold-ink: var(--gold);   /* on dark the bright gold is the readable one (8.3:1) */
 }
-html[data-theme="dark"] body { background: #14101f; }
+html[data-theme="dark"] body { background: var(--paper); }
 /* the colour-morph backdrop becomes a calm deep-violet field, overriding the
    light colour morph.js writes inline each frame */
 html[data-theme="dark"] #morph {
@@ -4345,9 +4649,23 @@ html[data-theme="dark"] #morph {
     radial-gradient(120% 80% at 50% -12%, rgba(96, 62, 150, 0.34), transparent 60%),
     #110d1b !important;
 }
-/* every section rides that dark backdrop (drop solid light panels) */
-html[data-theme="dark"] section,
-html[data-theme="dark"] .footer { background-color: transparent !important; }
+/* Sections keep their own ground in dark mode.
+   This used to be `background-color: transparent !important` on every section
+   and the footer, which is why dark mode had no wall: the whole page was one
+   flat #110d1b gradient and every section looked identical. It also made the
+   gallery unpanelable, because a card has nothing to match when the wall is a
+   moving field rather than a colour.
+   Nothing dynamic is lost. The dark #morph is a static !important gradient, so
+   morph.js is already overridden here; the field was decorative, not live.
+   Sections now resolve their normal `background: var(--paper)` to #191331,
+   while .popculture (#1e1533) and .ym (#241a3d) keep their deeper rooms, so
+   the page has three tones instead of one. */
+html[data-theme="dark"] .resources { background-color: var(--paper-soft); }
+/* the violet glow the backdrop used to cast across everything, kept where it
+   is actually seen: behind the wordmark at the top of the page */
+html[data-theme="dark"] .brandmark--hero {
+  background-image: radial-gradient(120% 80% at 50% -12%, rgba(96, 62, 150, 0.34), transparent 60%);
+}
 html[data-theme="dark"] .nav { background: rgba(18, 14, 28, 0.72); border-bottom-color: var(--line); }
 /* light glass panels -> dark glass so dark text doesn't land on light */
 html[data-theme="dark"] .sparkcard,
@@ -4375,8 +4693,6 @@ html[data-theme="dark"] .ec-card-panel h3 {
 /* any element still carrying a near-white inline/hardcoded panel goes dark-glass */
 html[data-theme="dark"] .post, html[data-theme="dark"] .quiz-card, html[data-theme="dark"] .bias-post,
 html[data-theme="dark"] .myth-card { background: rgba(255, 255, 255, 0.06) !important; color: var(--ink) !important; }
-/* the light hero refract/prism art dims a touch on dark */
-html[data-theme="dark"] .refract { opacity: 0.5; }
 
 /* ---------- Accessible mode ---------- */
 html[data-a11y] {
@@ -4401,7 +4717,8 @@ html[data-a11y] .cursor-dot, html[data-a11y] .cursor-ring,
 html[data-a11y] .progress-line,
 html[data-a11y] .ocean__life, html[data-a11y] .seascape,
 html[data-a11y] .gtamap-canvas, html[data-a11y] .wall-canvas,
-html[data-a11y] .refract, html[data-a11y] .brandmark__word .bmc-grid { display: none !important; }
+html[data-a11y] .ink,
+html[data-a11y] .brandmark__word .bmc-grid { display: none !important; }
 /* the thread stays visible in accessible mode, just fully drawn + static
    (no scroll-driven drawing, no moving bead) instead of vanishing */
 html[data-a11y] .thread__path, html[data-a11y] .thread__glow { stroke-dashoffset: 0 !important; }
@@ -4688,7 +5005,7 @@ html[data-theme="dark"] .bwc-reel > span { color: #eab84f; }
 .tline .node:nth-child(even) .node__card { grid-column: 3; margin-left: clamp(8px, 2vw, 22px); }
 .tline .node__year {
   font-family: var(--mono); font-weight: 700; font-size: 0.78rem;
-  letter-spacing: 0.2em; color: var(--gold); display: block; margin-bottom: 8px;
+  letter-spacing: 0.2em; color: var(--ink-dim); display: block; margin-bottom: 8px;
 }
 .tline .node__title { font-size: clamp(1.1rem, 1.9vw, 1.4rem); line-height: 1.2; }
 .tline .node__blurb { margin-top: 8px; color: var(--ink-dim); font-size: 0.95rem; }
@@ -4702,7 +5019,7 @@ html[data-theme="dark"] .bwc-reel > span { color: #eab84f; }
 }
 .tline .node__why b {
   font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.2em;
-  text-transform: uppercase; color: var(--gold); display: block; margin-bottom: 5px;
+  text-transform: uppercase; color: var(--ink-dim); display: block; margin-bottom: 5px;
 }
 .tline .node__hint {
   margin-top: 12px; font-family: var(--mono); font-size: 0.68rem;
@@ -4725,7 +5042,7 @@ html[data-theme="dark"] .bwc-reel > span { color: #eab84f; }
 .tline .node--bridge .node__hint { color: var(--dim-on-dark); }
 .tline .bridge-label {
   font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.24em;
-  text-transform: uppercase; color: var(--gold); margin-bottom: 10px; display: block;
+  text-transform: uppercase; color: var(--ink-dim); margin-bottom: 10px; display: block;
 }
 /* phones hold the page further from the eye — the mono micro-labels need a
    couple more pixels to stay legible */
@@ -4739,7 +5056,6 @@ html[data-theme="dark"] .bwc-reel > span { color: #eab84f; }
    the blur keeps the same visual softness at a fraction of the paint cost. */
 @media (max-width: 760px) {
   .edge-glow__bloom { filter: blur(18px) saturate(1.55); }
-  .refract__band { filter: blur(16px); }
 }
 
 /* ---------- quick check ---------- */
@@ -4983,190 +5299,47 @@ html[data-a11y] .tline[data-stage="on"] .chapter.is-active { animation: none !im
    on, with its source attached. Deliberately calm: no
    WebGL, no takeovers, just paper and citations.
    ===================================================== */
-.rc {
-  padding: clamp(90px, 11vw, 150px) var(--gutter) var(--section-y);
-  max-width: 1180px;
-  margin: 0 auto;
-  scroll-margin-top: 90px;   /* anchor links clear the fixed nav */
-}
 
-.rc + .rc { padding-top: 0; }
 
-.rc__head { max-width: 47ch; margin-bottom: clamp(38px, 5vw, 64px); }
 
-.rc__title {
-  font-size: clamp(1.9rem, 4.4vw, 3.1rem);
-  line-height: 1.06;
-  margin: 10px 0 18px;
-}
 
-.rc__lead { font-size: clamp(1rem, 1.5vw, 1.12rem); color: var(--ink-dim); max-width: 48ch; }
 
 /* --- the standing note: what a receipt is, and what it isn't --- */
-.rc__note {
-  border-left: 3px solid var(--gold);
-  background: var(--gold-soft);
-  border-radius: 0 var(--r) var(--r) 0;
-  padding: 18px 22px;
-  margin: 26px 0 0;
-  font-size: 0.95rem;
-  max-width: 47ch;
-}
 
-.rc__note strong { color: var(--violet); }
 
 /* --- a study / source block --- */
-.rc__block {
-  border-top: 1px solid var(--line);
-  padding: clamp(26px, 3.4vw, 40px) 0;
-  display: grid;
-  grid-template-columns: minmax(150px, 0.9fr) minmax(0, 2.6fr);
-  gap: clamp(18px, 4vw, 54px);
-  align-items: start;
-}
 
-.rc__label {
-  font-family: var(--mono);
-  font-size: 0.68rem;
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  color: var(--ink-dim);
-  padding-top: 6px;
-}
 
-.rc__label b { display: block; color: var(--gold); font-size: 1.5rem; letter-spacing: 0; margin-bottom: 6px; }
 
-.rc__body h3 {
-  font-size: clamp(1.15rem, 2vw, 1.5rem);
-  margin-bottom: 10px;
-  line-height: 1.2;
-}
 
-.rc__body p { margin-bottom: 12px; max-width: 48ch; }
-.rc__body p:last-child { margin-bottom: 0; }
 
-.rc__facts { list-style: none; margin: 14px 0 16px; max-width: 48ch; }
 
-.rc__facts li {
-  position: relative;
-  padding-left: 22px;
-  margin-bottom: 9px;
-  font-size: 0.96rem;
-}
 
-.rc__facts li::before {
-  content: "";
-  position: absolute;
-  left: 2px; top: 0.62em;
-  width: 8px; height: 2px;
-  background: var(--gold);
-}
 
 /* the citation line under a claim */
-.rc__cite {
-  font-family: var(--mono);
-  font-size: 0.74rem;
-  line-height: 1.55;
-  color: var(--ink-dim);
-  border-top: 1px dashed var(--line);
-  padding-top: 10px;
-  margin-top: 4px;
-}
 
-.rc__cite a { color: var(--violet); text-decoration: none; border-bottom: 1px solid var(--gold-soft); }
-.rc__cite a:hover, .rc__cite a:focus-visible { border-bottom-color: var(--gold); }
 
 /* a flag on a claim that needs care, e.g. a number that moves */
-.rc__flag {
-  display: inline-block;
-  font-family: var(--mono);
-  font-size: 0.68rem;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  color: var(--violet);
-  background: var(--lilac);
-  border-radius: var(--r-pill);
-  padding: 4px 11px;
-  margin-bottom: 10px;
-}
 
 /* --- house rules --- */
-.rc__rules { list-style: none; counter-reset: rule; display: grid; gap: 16px; max-width: 52ch; }
 
-.rc__rules li {
-  counter-increment: rule;
-  position: relative;
-  padding-left: 46px;
-}
 
-.rc__rules li::before {
-  content: counter(rule, decimal-leading-zero);
-  position: absolute;
-  left: 0; top: 1px;
-  font-family: var(--mono);
-  font-size: 0.8rem;
-  color: var(--gold);
-}
 
-.rc__rules b { display: block; font-family: var(--serif); font-size: 1.06rem; margin-bottom: 3px; }
-.rc__rules p { font-size: 0.95rem; color: var(--ink-dim); }
 
 /* --- help strip: always reachable from the receipts page --- */
-.rc__help {
-  margin-top: clamp(30px, 4vw, 50px);
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  padding: clamp(20px, 3vw, 30px);
-  background: var(--paper-soft);
-  max-width: 52ch;
-}
 
-.rc__help h3 { font-size: 1.12rem; margin-bottom: 8px; }
-.rc__help p { font-size: 0.95rem; color: var(--ink-dim); margin-bottom: 10px; }
-.rc__help p:last-child { margin-bottom: 0; }
-.rc__help strong { color: var(--ink); }
 
 /* --- back links out of the quiet page --- */
-.rc__back {
-  display: inline-flex; align-items: center; gap: 8px;
-  font-family: var(--mono);
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  color: var(--ink-dim);
-  text-decoration: none;
-  margin-top: 34px;
-  transition: color 0.25s;
-}
 
-.rc__back:hover, .rc__back:focus-visible { color: var(--gold); }
 
 html[data-theme="dark"] .rc__help { background: rgba(255, 255, 255, 0.03); }
-html[data-theme="dark"] .rc__flag { background: rgba(232, 224, 242, 0.12); color: var(--lilac); }
+html[data-theme="dark"] .rc__flag { background: var(--gold-soft); color: var(--ink); }
 
 @media (max-width: 760px) {
-  .rc__block { grid-template-columns: 1fr; gap: 14px; }
-  .rc__label { padding-top: 0; }
-  .rc__label b { display: inline-block; margin-right: 10px; margin-bottom: 0; vertical-align: -3px; }
 }
 
 /* ---------- links to the receipts, dropped into other pages ---------- */
-.receipt-link {
-  display: inline-flex; align-items: center; gap: 7px;
-  min-height: 44px;
-  font-family: var(--mono);
-  font-size: 0.68rem;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  color: var(--ink-dim);
-  text-decoration: none;
-  border-bottom: 1px solid transparent;
-  transition: color 0.25s, border-color 0.25s;
-}
 
-.receipt-link:hover, .receipt-link:focus-visible { color: var(--gold); border-bottom-color: var(--gold); }
-.receipt-link--light { color: var(--dim-on-dark); }
-.receipt-link--light:hover, .receipt-link--light:focus-visible { color: var(--gold); }
 
 /* ---------- house rules, inline above the wall composer ---------- */
 .houserules {
@@ -5185,7 +5358,7 @@ html[data-theme="dark"] .rc__flag { background: rgba(232, 224, 242, 0.12); color
   font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.14em;
-  color: var(--gold);
+  color: var(--dim-on-dark);
   margin-bottom: 8px;
 }
 
@@ -5215,9 +5388,6 @@ html[data-theme="dark"] .rc__flag { background: rgba(232, 224, 242, 0.12); color
 .composer__caution[hidden] { display: none; }
 
 /* receipt links dropped into the year machine and the pulse card */
-.ym__sources { margin-top: 18px; }
-.sparkcard__receipt { margin-top: 12px; }
-.footer__receipts { margin-bottom: 14px; }
 
 /* ---------- screen-reader-only utility ---------- */
 .visually-hidden {
@@ -5507,7 +5677,7 @@ html[data-a11y] .menu__row { animation: none !important; }
   font-family: var(--mono);
   font-size: 0.66rem;
   letter-spacing: 0.14em;
-  color: var(--gold-ink);
+  color: var(--ink-dim);      /* numbering is structure; the row label is the link */
 }
 .menu__label {
   font-family: var(--serif);
@@ -5570,7 +5740,7 @@ html[data-theme="dark"] .menu__row[aria-current="page"] .menu__label { color: va
   font-size: var(--t-label);
   text-transform: uppercase;
   letter-spacing: 0.14em;
-  color: var(--gold-ink);
+  color: var(--ink-dim);
   margin: 0 0 12px;
 }
 .masthead__title {
@@ -5677,7 +5847,7 @@ html[data-theme="dark"] .menu__row[aria-current="page"] .menu__label { color: va
   font-size: var(--t-label);
   text-transform: uppercase;
   letter-spacing: 0.14em;
-  color: var(--gold-ink);
+  color: var(--ink-dim);
   font-weight: 600;
 }
 .lesson p { margin: 8px 0 0; line-height: 1.65; }
@@ -5752,7 +5922,7 @@ html[data-theme="dark"] .menu__row[aria-current="page"] .menu__label { color: va
 }
 .choice:hover { border-color: var(--gold); transform: translateY(-3px); }
 .choice:focus-visible { outline: 2px solid var(--gold-ink); outline-offset: 3px; }
-.choice__k { font-family: var(--mono); font-size: var(--t-label); text-transform: uppercase; letter-spacing: 0.14em; color: var(--gold-ink); }
+.choice__k { font-family: var(--mono); font-size: var(--t-label); text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-dim); }
 .choice__t { font-family: var(--serif); font-size: var(--t-card); font-weight: 700; line-height: 1.2; margin: 0; }
 .choice__d { font-size: var(--t-small); color: var(--ink-dim); line-height: 1.6; margin: 0; }
 .choice__go { margin-top: auto; font-size: var(--t-small); font-weight: 700; border-bottom: 2px solid var(--gold); padding-bottom: 3px; align-self: flex-start; }
@@ -6188,11 +6358,9 @@ html[data-theme="dark"] .menu__row[aria-current="page"] .menu__label { color: va
    sections can never let a dark field bleed through their body copy. Sections
    that are deliberately dark (.ym, .wall-section) still carry their own. */
 body.page-flat { background: var(--paper); }
-[data-theme="dark"] body.page-flat { background: #14101f; }
+[data-theme="dark"] body.page-flat { background: var(--paper); }
 
 /* Receipts: tighter rhythm — it is a reference page, not a scroll journey */
-.rc { padding-top: clamp(56px, 6.5vw, 92px); padding-bottom: clamp(40px, 5vw, 68px); }
-.rc:first-of-type { padding-top: clamp(96px, 12vh, 132px); }
 
 /* =====================================================
    Home scroll vocabulary (js/homescroll.js)
@@ -6276,7 +6444,7 @@ html[data-a11y] .stat-pop { transform: none !important; opacity: 1 !important; }
   .paths__list { padding-bottom: 18vh; }
 
   [data-theme="dark"] .paths__item {
-    background: #14101f;
+    background: var(--paper);
     box-shadow: 0 -14px 30px -20px rgba(0, 0, 0, 0.75);
   }
   [data-theme="dark"] .paths__item:first-child { box-shadow: none; }
@@ -6290,3 +6458,269 @@ html[data-a11y] .stat-pop { transform: none !important; opacity: 1 !important; }
 }
 html[data-a11y] .paths__item { position: static !important; box-shadow: none !important; }
 html[data-a11y] .paths__list { padding-bottom: 0; }
+
+
+/* =====================================================
+   Learn hero — the collage arrives, then leaves.
+   Scroll sequence: full-bleed assembly, pull back into a
+   hung print, the label lands, then it recedes and the
+   pulse section below is simply there.
+
+   lh- prefixed throughout: this sheet is shared by every
+   page and #wfgallery's scoped rules land on the same
+   document, so generic names like .plate or .tile are not
+   safe here.
+   ===================================================== */
+
+.lh-stage { position: relative; height: 250svh; }
+
+.lh-sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;              /* the full-bleed frame must not widen the page */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(18px, 3.2vh, 38px);
+  padding: clamp(70px, 9vh, 110px) var(--gutter) clamp(40px, 6vh, 70px);
+}
+
+/* Sized for the resting state. The full-bleed opening is a transform applied
+   on top of this, so the layout never reflows while you scroll: one
+   composited element, moving. */
+.lh-plate {
+  position: relative;
+  width: min(940px, 100%, 96svh);
+  aspect-ratio: 750 / 500;
+  background: #fff;
+  border-radius: 2px;
+  box-shadow:
+    0 1px 2px rgba(44, 33, 64, 0.10),
+    0 18px 44px -12px rgba(44, 33, 64, 0.26);
+  overflow: hidden;
+  z-index: 1;
+}
+html[data-theme="dark"] .lh-plate {
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.5),
+    0 26px 60px -14px rgba(0, 0, 0, 0.62);
+}
+
+/* The hairline belongs to a framed print, not to a full-screen image, so it is
+   not there while the artwork is filling the viewport. */
+.lh-edge {
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  pointer-events: none;
+  z-index: 3;
+  opacity: 0;
+  transition: opacity 0.4s var(--ease);
+}
+.lh-plate.is-framed .lh-edge { opacity: 1; }
+
+/* On the way out the print stops being a print: no white ground and no cast
+   shadow left hanging in the air behind a picture that is fading. */
+.lh-plate.is-exiting { background: transparent; box-shadow: none; }
+.lh-plate.is-exiting .lh-edge { opacity: 0; }
+
+.lh-img { display: block; width: 100%; height: 100%; object-fit: cover; }
+/* Not hidden: a whisper of the whole piece stays under the shards while they
+   are still arriving, so the gaps between them read as the picture not yet
+   there rather than as hard white holes punched through it. Wherever a shard
+   has landed it is opaque and covers this exactly, so nothing is doubled. */
+.lh-plate.is-tiled .lh-img { opacity: 0.12; }
+.lh-plate.is-exiting .lh-img { opacity: 0; }
+
+/* The pieces arrive out of depth rather than sliding around on the surface, so
+   the tile layer needs a camera. Origin sits on the sunflower, where the
+   assembly resolves. */
+.lh-tiles {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  perspective: 1100px;
+  perspective-origin: 50% 45%;
+}
+/* Every shard is a full-plate layer carrying the same background, differing
+   only in how it is clipped, so the piece is always in perfect register. */
+.lh-tile {
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+  backface-visibility: hidden;
+}
+
+/* ----- the wall label ----- */
+/* Visible by default and hidden by the driver on its first frame, not the
+   other way round: starting at 0 meant that with JS off or broken the page
+   h1 never appeared at all. The driver's first render runs before paint,
+   and the preloader curtain is over the page regardless. */
+.lh-cap { text-align: center; z-index: 1; opacity: 1; }
+.lh-cap__eyebrow {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  color: var(--ink-dim);
+  margin-bottom: 12px;
+}
+.lh-cap__title {
+  font-size: clamp(1.5rem, 3.4vw, 2.9rem);
+  line-height: 1.06;
+  letter-spacing: -0.025em;
+  margin: 0;
+}
+
+.lh-cue {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(22px, 4vh, 40px);
+  transform: translateX(-50%);
+  z-index: 5;
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+.lh-cue::after {
+  content: "";
+  display: block;
+  width: 1px;
+  height: 42px;
+  margin: 10px auto 0;
+  background: linear-gradient(to bottom, var(--ink-dim), transparent);
+}
+
+/* Inside the gutter the resting print is 331px wide on a 390px screen. It goes
+   edge to edge and drops the frame: a hairline and a cast shadow only read
+   when there is paper around them. */
+@media (max-width: 640px) {
+  .lh-sticky { padding-left: 0; padding-right: 0; }
+  .lh-plate { width: 100vw; border-radius: 0; box-shadow: none; }
+  .lh-edge { border-left: 0; border-right: 0; border-radius: 0; }
+  .lh-cap { padding: 0 var(--gutter); }
+}
+
+/* No sequence: the finished picture and its label, in normal flow. .is-static
+   is set by the script, so this also covers the no-JS case via the media
+   query alone. */
+@media (prefers-reduced-motion: reduce) {
+  .lh-stage { height: auto; }
+  .lh-sticky { position: relative; height: auto; min-height: 100svh; }
+  .lh-cue { display: none; }
+  .lh-cap { opacity: 1; }
+}
+.lh-stage.is-static { height: auto; }
+.lh-stage.is-static .lh-sticky { position: relative; height: auto; min-height: 100svh; }
+.lh-stage.is-static .lh-cap { opacity: 1; }
+.lh-stage.is-static .lh-cue { display: none; }
+
+
+/* =====================================================
+   The thread — one continuous line drawn down the whole
+   page as you scroll. Generated in js/scrollStroke.js.
+
+   Violet, not gold. Gold on this site means "you can
+   click this" (plus the signature m), and a line running
+   the length of the page would have taken that away.
+
+   ss- prefixed: one stylesheet serves every page.
+   ===================================================== */
+
+.ss-thread {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  /* height is set in px by the script, from the real document height */
+  /* Behind the content, never over it. -1 rather than 0: a positioned element
+     at z-index 0 still paints above normal-flow text, so the line would have
+     crossed the copy instead of passing under it. This sits above the colour
+     morph (-2), which is what paints the ground on every section. */
+  z-index: -1;
+  pointer-events: none;    /* it must never eat a click */
+  overflow: visible;
+}
+
+.ss-thread path,
+.ss-thread-line {
+  fill: none;
+  stroke: var(--violet);
+  /* A drawn stroke, not a hairline. It can carry this weight now that it runs
+     under the content rather than across it: nothing it passes behind gets
+     harder to read, so the line is free to be a real mark on the page. */
+  stroke-width: 16;
+  stroke-linecap: round;
+  opacity: 0.25;
+}
+html[data-theme="dark"] .ss-thread path,
+html[data-theme="dark"] .ss-thread-line { opacity: 0.3; }
+
+/* The one section that is dark in BOTH themes. The light-theme violet is a
+   dark colour, so on #1e1533 the line all but vanished; this is the violet the
+   dark theme uses, which is the one that reads on that ground. */
+#popculture .ss-thread-line { stroke: #b9a3e6; opacity: 0.24; }
+
+/* Narrower screens, narrower line: the same weight reads much heavier when it
+   crosses a 390px viewport instead of a 1400px one. */
+@media (max-width: 860px) {
+  .ss-thread path,
+  .ss-thread-line { stroke-width: 10; opacity: 0.2; }
+}
+
+/* Accessible mode removes decorative motion across the site. The thread is
+   decoration and it moves, so it goes too. */
+html[data-a11y] .ss-thread, html[data-a11y] .ss-slice { display: none !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  /* The line is simply complete; the script skips the scroll drawing. */
+  .ss-thread path,
+  .ss-thread-line { opacity: 0.16; }
+}
+
+/* A section that paints an opaque background hides the thread completely, and
+   a line that vanishes for a whole screen reads as broken rather than as
+   behind something. Such a section gets its own slice of the same path,
+   painted over its background but under its content, so the line is unbroken
+   while still never crossing anything readable. Marked in the markup with
+   data-thread-through. */
+/* isolation, not position or z-index: both hosts already carry a position and
+   a z-index that the cover-stack depends on (#about is relative/2, .popculture
+   is sticky/0), and overriding either would break the section that slides over
+   the gallery. isolate only guarantees a stacking context, which is all the
+   slice needs. */
+[data-thread-through] { isolation: isolate; }
+.ss-slice {
+  position: absolute;
+  inset: 0;
+  /* Negative, so it paints above the host's own background and below all of
+     its content, without having to touch a single child. */
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;        /* the SVG viewport shows only this section's band */
+}
+
+/* Skip link -- WCAG 2.0 A, 2.4.1 Bypass Blocks. Off screen until focused, then
+   it lands in the corner over everything, including the fixed nav. */
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 999;
+  transform: translateY(-160%);
+  padding: 12px 18px;
+  border-radius: var(--r);
+  background: var(--violet-deep);
+  color: #faf6ef;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.18s var(--ease);
+}
+.skip-link:focus { transform: translateY(0); outline: 3px solid var(--gold); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .skip-link { transition: none; } }
