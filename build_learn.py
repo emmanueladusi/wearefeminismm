@@ -133,7 +133,19 @@ def main():
     learn = open(os.path.join(SITE, 'learn-classic.html')).read()
 
     css = re.findall(r'<style[^>]*>(.*?)</style>', gal, re.S)[0]
-    js = re.findall(r'<script[^>]*>(.*?)</script>', gal, re.S)[0]
+    # The gallery's own inline script is the first one with NO src. It used
+    # to be "the first script, full stop" — which broke the moment the GPU
+    # room renderer added <script src> tags above it in the head: the build
+    # happily spliced an empty string in and shipped a learn.html whose
+    # gallery had no JavaScript at all, with no error to say so.
+    js = None
+    for m in re.finditer(r'<script([^>]*)>(.*?)</script>', gal, re.S):
+        if 'src=' not in m.group(1):
+            js = m.group(2)
+            break
+    if not js:
+        sys.exit('build_learn: no inline <script> found in Gallery.html; '
+                 'refusing to write a learn.html with a dead gallery.')
     body = re.search(r'<body[^>]*>(.*)</body>', gal, re.S).group(1)
 
     # The prototype-context strip is prototype-only copy. It must be removed
@@ -177,6 +189,12 @@ def main():
     # --- head: the gallery's webfonts, which learn.html does not load -------
     fonts = '\n'.join(re.findall(
         r'<link[^>]*fonts\.(?:googleapis|gstatic)\.com[^>]*>', gal))
+    # The GPU room renderer's two <script src> tags travel with it. They are
+    # deferred, so they cost the Learn page nothing before first paint, and
+    # they must land in the HEAD: the body copy below has every <script>
+    # stripped out of it, which is what keeps the gallery's inline code from
+    # being spliced in twice.
+    galscripts = '\n  '.join(re.findall(r'<script[^>]*\ssrc="[^"]*"[^>]*></script>', gal))
     # Match the stylesheet link by pattern, not by a hardcoded ?v=220. The
     # literal version used to be baked in here, so the moment anyone
     # cache-bumped learn-classic.html this replace() matched nothing, returned
@@ -191,6 +209,8 @@ def main():
         lambda m: m.group(0) +
         '\n  <!-- webfonts the gallery needs; the rest of Learn is unaffected -->\n  '
         + fonts +
+        '\n  <!-- the GPU room renderer, deferred (see Gallery.html) -->\n  '
+        + galscripts +
         '\n  <style id="wfgallery-css">\n' + scoped + '\n  </style>',
         learn, count=1)
 

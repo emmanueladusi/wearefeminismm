@@ -29,6 +29,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=IBM+Plex+Sans:wght@400;500;600&display=swap" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=IBM+Plex+Sans:wght@400;600&display=swap" />
+  <!-- the GPU room renderer, deferred (see Gallery.html) -->
+  <script defer src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <script defer src="js/glroom.js?v=1"></script>
   <style id="wfgallery-css">
 /* =====================================================================
    THE GALLERY, v3 · chapter prototype
@@ -748,7 +751,20 @@ body.touchmode #wfgallery .lobby__floor{
 #wfgallery .hudbtn--exit:focus-visible{border-color:var(--gold);color:var(--gold)}#wfgallery .hint{position:absolute;left:0;right:0;bottom:calc(clamp(6px,1vw,12px) + 12px);z-index:50;text-align:center;font-family:var(--sans);letter-spacing:0;
   font-family:var(--mono);font-size:.64rem;letter-spacing:0.055em;color:var(--dim);pointer-events:none;
   transition:opacity .6s}#wfgallery .hint.dim{opacity:0}/* ---------- rooms ---------- */
-#wfgallery #stage{position:absolute;inset:0;z-index:20;overflow:hidden}#wfgallery .room{position:absolute;inset:0;perspective:1300px;perspective-origin:50% 46%;display:none}#wfgallery .room.active{display:block}/* pointer-events dance: in a preserve-3d scene the world's own flat plane
+/* the GPU room. Under #stage so panels, the HUD and the hint stay on
+   top; over the wall layers so the works hang in front of the plaster. */
+/* width/height are NOT redundant next to inset:0. A canvas is a replaced
+   element, so width:auto resolves to its INTRINSIC size — the drawing
+   buffer, which is viewport x dpr — and the box came out at 2880x1800 on
+   a 1440x900 screen, i.e. the room drawn into the top-left quarter of a
+   canvas four times too big. The insets position it; these size it. */
+#wfgallery #roomGL{position:absolute;inset:0;width:100%;height:100%;
+  z-index:19;display:none;pointer-events:none}body.glroom #wfgallery #roomGL{display:block}/* When GL draws the room, the DOM room stops being painted but must NOT
+   stop existing: opacity:0 keeps every piece focusable and readable to a
+   screen reader, which visibility:hidden and display:none would not. The
+   camera loop also stops writing its transforms while this is on, so the
+   whole style/layout/raster cost of travelling goes away. */
+#wfgallery .room.gl-on .world{opacity:0}#wfgallery .room.gl-on .world .piece{transition:none}#wfgallery #stage{position:absolute;inset:0;z-index:20;overflow:hidden}#wfgallery .room{position:absolute;inset:0;perspective:1300px;perspective-origin:50% 46%;display:none}#wfgallery .room.active{display:block}/* pointer-events dance: in a preserve-3d scene the world's own flat plane
    (z = 0) hit-tests IN FRONT of pieces hanging at negative z, and it
    swallows every click. So the world ignores the pointer and each piece
    opts back in. */
@@ -1863,6 +1879,12 @@ body.powersave #wfgallery .roomnav{cursor:auto}/* the toggle, and the notice tha
 
 
 
+  <!-- The rooms, drawn on the GPU. Sits between the wall shader and the
+       DOM stage: the shader wall shows through (the renderer clears to
+       transparent), and the HUD, panels and hint still sit above. When
+       GL is not driving — touch, reduced motion, no WebGL — this canvas
+       stays empty and #stage renders the room itself, exactly as before. -->
+  <canvas id="roomGL" aria-hidden="true"></canvas>
   <div id="stage"></div>
 
   <header class="hud">
@@ -2103,9 +2125,52 @@ const S = {
   lastFocus:null, resumeIdx:{},
   galleryEl:null, mxLast:null, myLast:null, glW:0, glH:0, tunerHover:false,
   reelReturn:null, lastRoom:null, version:1,
-  deck:'top', nav:'directory', deckPos:{top:0,lenses:0,waves:0,scholars:0}
+  deck:'top', nav:'directory', deckPos:{top:0,lenses:0,waves:0,scholars:0},
+  /* the camera vector the GPU room reads instead of a transform string */
+  glWorld:{x:0,y:0,z:0}, glRingA:0
 };
 S.tablet = !S.touch && matchMedia('(max-width:1180px)').matches;
+
+/* =====================================================================
+   THE GPU ROOM · gate and lifecycle
+
+   js/glroom.js draws the rooms as textured quads instead of moving
+   composited DOM. It is a RENDERER only: the DOM room is still built,
+   still focusable, still carries every listener, and a click on the
+   canvas is forwarded to the real element behind it. See the contract
+   at the top of glroom.js before changing any of this.
+
+   It only takes over where the DOM renderer is the thing that hurts —
+   a desktop pointer, real motion, and a working WebGL context. Touch
+   keeps its scroll-snap rails, reduced motion keeps the calm view, and
+   a machine with no WebGL keeps the DOM room. That is why adopting this
+   costs the gallery no capability: every fallback already existed.
+   ===================================================================== */
+const GLR = {
+  want: !S.touch && !S.prefersReduced,
+  ready: false,
+  on: false,                       // GL is drawing the CURRENT room
+  boot(){
+    if (this.ready || !this.want) return this.ready;
+    if (!window.THREE || !window.GLRoom) return false;   // deferred, or blocked
+    const cv = $('#roomGL');
+    if (!cv) return false;
+    this.ready = !!window.GLRoom.init(cv);
+    if (this.ready) document.body.classList.add('glroom');
+    return this.ready;
+  },
+  /* Build the GL mirror of whatever room was just put in the DOM. Called
+     after layout, so every card has a real width and LAYOUT's custom
+     properties have resolved. */
+  build(room, kind, pieces){
+    this.on = false;
+    if (!this.want || !this.boot()) return;
+    if (!pieces || !pieces.length) { window.GLRoom.clear(); return; }
+    try { this.on = !!window.GLRoom.buildRoom(room, kind, pieces); }
+    catch(e){ this.on = false; try{ window.GLRoom.clear(); }catch(_){} }
+  },
+  clear(){ this.on = false; if (this.ready) { try{ window.GLRoom.clear(); }catch(e){} } }
+};
 const SP = 780;                       // corridor spacing (px of depth per piece)
 const STEP = {corridor:SP, orbit:1, field:1, feed:1};   // camera units per piece
 const $ = s => document.querySelector(s);
@@ -2164,6 +2229,15 @@ addEventListener('resize', ()=>{
   if (t!==S.tablet){ S.tablet=t; document.body.classList.toggle('tabletmode',t);
     if (S.open && S.chapter) setChapter(S.chapter.id); }
   if (S.open && typeof layoutReel==='function' && REEL.covers.length) layoutReel();
+  /* The GPU room follows the window: the projection is derived from the
+     viewport, the wall offset in LAYOUT.corridor is viewport-dependent,
+     and the cards' CSS width is too — so the room is rebuilt rather than
+     merely re-projected, which is also when the textures get repainted at
+     the new size. Rare enough that the rebuild cost does not matter. */
+  if (GLR.ready) window.GLRoom.resize();
+  if (S.open && GLR.on && S.chapter && S.chapter.type!=='directory'){
+    GLR.build($('#stage .room'), S.chapter.type, S.pieces);
+  }
 },{passive:true});
 
 /* =====================================================================
@@ -2438,6 +2512,7 @@ function openGallery(chapterId){
   $('#exitBtn').focus({preventScroll:true});
 }
 function exitGallery(){
+  GLR.clear();                       // textures are GPU memory; never leak a room
   $('#gallery').classList.remove('open'); S.open=false;
   document.documentElement.style.overflow='';
   stopBG(); cancelAnimationFrame(S.raf); S.raf=null;
@@ -2525,6 +2600,13 @@ function setChapter(id){
   else if (isWave(c)) buildWaveRoom(world,c);
   else if (c.type==='scholars') buildScholarRoom(world);
   else buildStub(world,c.wave);
+
+  /* The GL mirror is built AFTER the room is in the document and laid
+     out: paintPiece measures each card, and LAYOUT's custom properties
+     have to have resolved. The directory keeps the DOM reel for now —
+     its covers are their own animation system (see layoutReel). */
+  if (c.type !== 'directory') GLR.build(room, c.type, S.pieces);
+  else GLR.clear();
 
   updateHUD();
   $('#hint').textContent = HINTS[c.type] || HINTS.still;
@@ -3079,7 +3161,31 @@ function initPointer(){
   if (!CUR.el) return;
   document.body.classList.add('hascur');
   const g = $('#gallery');
-  g.addEventListener('pointermove', e=>{ pointerBadge(e.clientX, e.clientY); }, {passive:true});
+  g.addEventListener('pointermove', e=>{
+    /* With the room on the GPU the DOM cards are transparent and no longer
+       sit under the cursor, so :hover cannot fire. The raycast answers the
+       same question, and the ANSWER IS A REAL ELEMENT — which is what lets
+       the cursor badge, the wall spotlight and the click below all keep
+       working against the markup instead of against the renderer. */
+    if (GLR.on){
+      const before = window.GLRoom._hover;
+      const idx = window.GLRoom.pointerMove(e.clientX, e.clientY);
+      if (idx !== before){
+        const el = window.GLRoom.hoveredEl();
+        glAimSpot(idx);
+        document.body.classList.toggle('glhover', idx>=0);
+        if (el) CUR.label = el.classList.contains('piece--quiz') ? 'Answer' : 'Open';
+      }
+    }
+    pointerBadge(e.clientX, e.clientY);
+  }, {passive:true});
+  /* A click on the canvas is forwarded to the card it landed on, so
+     wireOpen / answerQuiz / markViewed run exactly as they always have. */
+  g.addEventListener('click', e=>{
+    if (!GLR.on) return;
+    if (e.target && e.target.id !== 'roomGL' && !e.target.closest('#stage')) return;
+    if (window.GLRoom.click()) { e.preventDefault(); e.stopPropagation(); }
+  });
   g.addEventListener('pointerleave', ()=>{
     CUR.on=false; CUR.state=''; CUR.label='';
     CUR.el.classList.remove('on','act','side');
@@ -4695,6 +4801,16 @@ function loop(now){
   else S.raf = requestAnimationFrame(loop);
 
   const world = $('#stage .world'); if(!world) return;
+  /* One writer for the camera, so the GL room and the DOM room can never
+     disagree about where the visitor is standing. With GL on, the DOM
+     transform is NOT written at all — that string assignment is the
+     style recalc this whole exercise exists to remove — and the vector
+     goes to the renderer instead. */
+  const GLON = GLR.on;
+  const setWorld = (tf, x, y, z) => {
+    if (GLON){ S.glWorld.x = x; S.glWorld.y = y; S.glWorld.z = z; }
+    else world.style.transform = tf;
+  };
   // Camera. NOTE the sign on Y: rotateY(-x) is what brings the side you
   // are looking toward round to face you. It was positive before, which
   // turned the wall away from the cursor.
@@ -4702,7 +4818,8 @@ function loop(now){
   const base = 'rotateY('+lookY+'deg) rotateX('+lookX+'deg) ';
 
   if (c.type==='corridor'){
-    world.style.transform = base+'translate3d('+(-S.look.x*20)+'px,'+(-S.look.y*14)+'px,'+S.cam.z+'px)';
+    setWorld(base+'translate3d('+(-S.look.x*20)+'px,'+(-S.look.y*14)+'px,'+S.cam.z+'px)',
+             -S.look.x*20, -S.look.y*14, S.cam.z);
     S.pieces.forEach((rec,i)=>{
       const rel = S.cam.z - i*SP;             // 0 = centred, + = behind camera
       let o;
@@ -4714,8 +4831,10 @@ function loop(now){
 
   } else if (c.type==='orbit'){
     // the room turns around a stationary visitor; pieces stay upright
-    world.style.transform = base+'translate3d('+(-S.look.x*16)+'px,'+(-S.look.y*12)+'px,0)';
-    if (S.ringHost) S.ringHost.style.setProperty('--ring-a', (-S.cam.z*(360/S.corridorLen))+'deg');
+    setWorld(base+'translate3d('+(-S.look.x*16)+'px,'+(-S.look.y*12)+'px,0)',
+             -S.look.x*16, -S.look.y*12, 0);
+    S.glRingA = -S.cam.z*(360/S.corridorLen);
+    if (S.ringHost && !GLR.on) S.ringHost.style.setProperty('--ring-a', S.glRingA+'deg');
     const step=360/S.corridorLen;
     S.pieces.forEach((rec,i)=>{
       // angular distance from the front of the ring decides prominence
@@ -4733,7 +4852,8 @@ function loop(now){
     const b = FIELD_CELLS[Math.min(Math.ceil(t),S.corridorLen-1) % FIELD_CELLS.length];
     const f = t - Math.floor(t);
     const cx = a[0]+(b[0]-a[0])*f, cy = a[1]+(b[1]-a[1])*f, cz = a[2]+(b[2]-a[2])*f;
-    world.style.transform = base+'translate3d('+(-cx - S.look.x*22)+'px,'+(-cy - S.look.y*16)+'px,'+(-cz)+'px)';
+    setWorld(base+'translate3d('+(-cx - S.look.x*22)+'px,'+(-cy - S.look.y*16)+'px,'+(-cz)+'px)',
+             -cx - S.look.x*22, -cy - S.look.y*16, -cz);
     S.pieces.forEach((rec,i)=>{
       const d = Math.abs(i-t);
       // the piece you are on stays fully lit; neighbours drop away quickly
@@ -4744,7 +4864,8 @@ function loop(now){
 
   } else if (c.type==='feed'){
     // one piece forward, the rest stacked behind it in depth
-    world.style.transform = base+'translate3d('+(-S.look.x*14)+'px,'+(-S.look.y*10)+'px,'+(S.cam.z*520)+'px)';
+    setWorld(base+'translate3d('+(-S.look.x*14)+'px,'+(-S.look.y*10)+'px,'+(S.cam.z*520)+'px)',
+             -S.look.x*14, -S.look.y*10, S.cam.z*520);
     S.pieces.forEach((rec,i)=>{
       const rel = S.cam.z - i;                // 0 = at the front, + = passed
       // a passed piece rushes toward the camera and would balloon over the
@@ -4769,14 +4890,34 @@ function loop(now){
     const g = REEL.vertical() ? TUNE.lookWide : 1;
     const cam = g === 1 ? base
       : 'rotateY('+(lookY*g)+'deg) rotateX('+(lookX*g)+'deg) ';
-    world.style.transform = cam+'translate3d('+(-S.look.x*TUNE.camTX*g)+'px,'+
-                            (-S.look.y*TUNE.camTY*g)+'px,0)';
+    setWorld(cam+'translate3d('+(-S.look.x*TUNE.camTX*g)+'px,'+
+             (-S.look.y*TUNE.camTY*g)+'px,0)',
+             -S.look.x*TUNE.camTX*g, -S.look.y*TUNE.camTY*g, 0);
+  }
+
+  /* The GPU room is drawn from the vector the branch above just produced,
+     so there is exactly one camera and the two renderers cannot drift. */
+  if (GLON){
+    window.GLRoom.frame({
+      lookX:S.look.x, lookY:S.look.y, tune:TUNE,
+      worldX:S.glWorld.x, worldY:S.glWorld.y, worldZ:S.glWorld.z,
+      ringA:S.glRingA,
+      opacity:i => { const r=S.pieces[i]; return r && r.elm._glo!=null ? r.elm._glo : 1; }
+    });
   }
 }
 function setPieceDepth(elm,o,i){
-  elm.style.opacity=o;
-  elm.style.pointerEvents = o<.25?'none':'';
-  elm.tabIndex = Math.abs(i-S.activeIdx)<=1 ? 0 : -1;
+  /* The GPU room reads this number off the element rather than out of the
+     style system, so travelling stops dirtying one piece per frame. The
+     tabIndex still moves: it is the keyboard's model of where you are
+     standing, and it is written only when it actually changes. */
+  elm._glo = o;
+  if (!GLR.on){
+    elm.style.opacity=o;
+    elm.style.pointerEvents = o<.25?'none':'';
+  }
+  const ti = Math.abs(i-S.activeIdx)<=1 ? 0 : -1;
+  if (elm.tabIndex !== ti) elm.tabIndex = ti;
 }
 function settleIndex(raw){
   const idx=Math.max(0,Math.min(S.corridorLen-1,Math.round(raw)));
@@ -4956,6 +5097,23 @@ function surfaceParallax(){
     setWallVar('--mx',mx); setWallVar('--my',my);
     S.mxLast=mx; S.myLast=my;
   }
+}
+
+/* The GPU room's spotlight. aimSpotlight() below measures the element,
+   which is the right answer while the DOM carries the camera and the
+   wrong one once GL does — the card is still sitting at its untranslated
+   CSS position. This projects the mesh instead and writes the same two
+   custom properties, so the wall wash follows the work a visitor is
+   actually looking at. Off means "no piece attended to", same as before. */
+function glAimSpot(idx){
+  const g=$('#gallery'); if(!g) return;
+  if (idx==null || idx<0){ g.dataset.spot='off'; setSpotVar('--spotlight-opacity','0'); return; }
+  const p = window.GLRoom.screenPos(idx);
+  if (!p) return;
+  setSpotVar('--spotlight-x',(p.x*100).toFixed(1)+'%');
+  setSpotVar('--spotlight-y',(p.y*100).toFixed(1)+'%');
+  setSpotVar('--spotlight-opacity','1');
+  g.dataset.spot='on';
 }
 
 /* Gallery spotlight · aims the wall wash at whichever piece is live.
