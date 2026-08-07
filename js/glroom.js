@@ -280,7 +280,7 @@
     ENV.wall.uniforms.os.value = parseFloat(cs.getPropertyValue('--environment-overscan')) || 1.08;
     ENV.fibre.uniforms.alpha.value = parseFloat(cs.getPropertyValue('--gallery-fibre-opacity')) || 0.05;
     ENV.grain.uniforms.alpha.value = parseFloat(cs.getPropertyValue('--grain-opacity')) || 0.05;
-    ENV.paintLines(); ENV.paintPools(gs);
+    ENV.paintLines(); ENV.paintPools();
   };
 
   ENV.paintLines = function () {
@@ -309,66 +309,76 @@
     });
   };
 
-  ENV.paintPools = function (gs) {
-    var vig = (galleryStyle().getPropertyValue('--v-vig-rgb') || '8,6,13').trim();
-    var num = function (n, d) { var v = parseFloat(gs.getPropertyValue(n)); return isNaN(v) ? d : v; };
-    var li = num('--gallery-light-intensity', 1.12);
-    var vs = num('--vignette-strength', 0.9);
-    var vc = num('--vignette-corner-opacity', 0.82);
-    var ve = num('--vignette-edge-opacity', 0.6);
-    var vw = num('--vignette-centre-width', 52) / 100;
-
-    var pool = function (c, w, h, x, y, rx, ry, col) {
-      var g = c.createRadialGradient(x * w, y * h, 0, x * w, y * h, rx * w);
-      g.addColorStop(0, col); g.addColorStop(0.73, 'rgba(0,0,0,0)');
-      c.save(); c.translate(x * w, y * h); c.scale(1, (ry * h) / (rx * w)); c.translate(-x * w, -y * h);
-      c.fillStyle = g; c.fillRect(-w, -h * 2, w * 3, h * 5); c.restore();
+  /* Snapshot one environment element's paint into a 2d canvas, at the
+     element's own computed opacity and blend. Gradient stacks go through
+     a foreignObject rasterization — the browser paints its own CSS, so
+     the light room's re-pointed undertones come out exactly as authored.
+     url() backgrounds are drawn directly (an SVG data URI cannot fetch
+     external images), honouring background-position and cover sizing.
+     Every call reads COMPUTED style, so identity switches, data-bg tiers
+     and per-category overrides are all picked up with no copied numbers. */
+  function snapshotBgInto(c, el, W, H, done) {
+    if (!el) { done(); return; }
+    var cs = getComputedStyle(el);
+    var alpha = parseFloat(cs.opacity); if (isNaN(alpha)) alpha = 1;
+    if (!alpha) { done(); return; }
+    var blend = cs.mixBlendMode !== 'normal' ? cs.mixBlendMode : 'source-over';
+    var u = bgUrl(cs);
+    if (u) {
+      var im = new Image();
+      im.onload = function () {
+        c.save(); c.globalAlpha = alpha; c.globalCompositeOperation = blend;
+        drawCoverInto(c, W, H, im, cs);
+        c.restore(); done();
+      };
+      im.onerror = function () { done(); };
+      im.src = u;
+      return;
+    }
+    if (cs.backgroundImage === 'none' &&
+        (!cs.backgroundColor || cs.backgroundColor === 'rgba(0, 0, 0, 0)')) { done(); return; }
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H + '">' +
+      '<foreignObject width="100%" height="100%">' +
+      '<div xmlns="http://www.w3.org/1999/xhtml" style="width:' + W + 'px;height:' + H +
+      'px;background-color:' + cs.backgroundColor +
+      ';background-image:' + cs.backgroundImage.replace(/"/g, "'") +
+      ';background-size:' + cs.backgroundSize +
+      ';background-position:' + cs.backgroundPosition +
+      ';background-repeat:' + cs.backgroundRepeat + ';"></div></foreignObject></svg>';
+    var im2 = new Image();
+    im2.onload = function () {
+      c.save(); c.globalAlpha = alpha; c.globalCompositeOperation = blend;
+      c.drawImage(im2, 0, 0, W, H);
+      c.restore(); done();
     };
-    // light
-    var c1 = ENV.lightCv.getContext('2d'), W = ENV.lightCv.width, H = ENV.lightCv.height;
-    c1.clearRect(0, 0, W, H);
-    pool(c1, W, H, 0.5, -0.06, 0.46, 0.34, 'rgba(255,246,228,' + (0.13 * li) + ')');
-    pool(c1, W, H, 0.12, 0.42, 0.34, 0.30, 'rgba(178,150,224,' + (0.10 * li) + ')');
-    pool(c1, W, H, 0.88, 0.56, 0.30, 0.28, 'rgba(217,161,63,' + (0.07 * li) + ')');
-    ENV.light.uniforms.map.value.needsUpdate = true;
-    // arch
-    var c2 = ENV.archCv.getContext('2d'); W = ENV.archCv.width; H = ENV.archCv.height;
-    c2.clearRect(0, 0, W, H);
-    var lg = c2.createLinearGradient(0, 0, 0, H);
-    lg.addColorStop(0, 'rgba(' + vig + ',0)'); lg.addColorStop(0.62, 'rgba(' + vig + ',0)');
-    lg.addColorStop(0.71, 'rgba(' + vig + ',.05)'); lg.addColorStop(0.74, 'rgba(' + vig + ',.11)');
-    lg.addColorStop(0.78, 'rgba(' + vig + ',.045)'); lg.addColorStop(0.92, 'rgba(' + vig + ',0)');
-    c2.fillStyle = lg; c2.fillRect(0, 0, W, H);
-    pool(c2, W, H, 0.5, 0.76, 0.6, 0.22, 'rgba(255,250,240,.11)');
-    pool(c2, W, H, 0, 0, 0.56, 0.40, 'rgba(' + vig + ',.11)');
-    pool(c2, W, H, 1, 0, 0.56, 0.40, 'rgba(' + vig + ',.10)');
-    ENV.arch.uniforms.map.value.needsUpdate = true;
-    // floor
-    var c3 = ENV.floorCv.getContext('2d'); W = ENV.floorCv.width; H = ENV.floorCv.height;
-    c3.clearRect(0, 0, W, H);
-    var deep = (galleryStyle().getPropertyValue('--wall-deep') || 'rgba(20,12,34,.55)').trim();
-    var top2 = H * 0.66;
-    var fg = c3.createLinearGradient(0, top2, 0, H);
-    fg.addColorStop(0, 'rgba(20,12,34,0)'); fg.addColorStop(1, deep);
-    c3.fillStyle = fg; c3.fillRect(0, top2, W, H - top2);
-    pool(c3, W, H, 0.5, 1, 0.3, (H - top2) / H, 'rgba(217,161,63,.05)');
-    ENV.floor.uniforms.map.value.needsUpdate = true;
-    // vignette
-    var c4 = ENV.vigCv.getContext('2d'); W = ENV.vigCv.width; H = ENV.vigCv.height;
-    c4.clearRect(0, 0, W, H);
-    var rx = W * vw, ry = H * (vw + 0.14);
-    var rg = c4.createRadialGradient(W * 0.5, H * 0.46, 0, W * 0.5, H * 0.46, rx);
-    rg.addColorStop(0, 'rgba(' + vig + ',0)'); rg.addColorStop(0.66, 'rgba(' + vig + ',0)');
-    rg.addColorStop(0.9, 'rgba(' + vig + ',' + (0.30 * vc * vs) + ')');
-    rg.addColorStop(1, 'rgba(' + vig + ',' + (0.80 * vc * vs) + ')');
-    c4.save(); c4.translate(W * 0.5, H * 0.46); c4.scale(1, ry / rx); c4.translate(-W * 0.5, -H * 0.46);
-    c4.fillStyle = rg; c4.fillRect(-W, -H * 2, W * 3, H * 5); c4.restore();
-    var ea = 0.62 * ve * vs;
-    var eg = c4.createLinearGradient(0, 0, W, 0);
-    eg.addColorStop(0, 'rgba(' + vig + ',' + ea + ')'); eg.addColorStop(0.17, 'rgba(' + vig + ',0)');
-    eg.addColorStop(0.83, 'rgba(' + vig + ',0)'); eg.addColorStop(1, 'rgba(' + vig + ',' + ea + ')');
-    c4.fillStyle = eg; c4.fillRect(0, 0, W, H);
-    ENV.vig.uniforms.map.value.needsUpdate = true;
+    im2.onerror = function () { done(); };
+    im2.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+  }
+  /* run snapshots strictly in order (later layers paint over earlier) */
+  function snapshotChain(c, els, W, H, done) {
+    var i = -1;
+    (function next() { i++; if (i >= els.length) { done(); return; }
+      snapshotBgInto(c, document.querySelector(els[i]), W, H, next); })();
+  }
+
+  ENV.paintPools = function () {
+    /* Each canvas mirrors one DOM environment layer, painted BY the
+       browser from that layer's own computed style. No numbers copied
+       out of the stylesheet, so none can drift from it. The elements are
+       display:none while GL runs — computed style still answers. */
+    var sets = [
+      [ENV.lightCv, ENV.light, ['.gtex__light']],
+      [ENV.archCv,  ENV.arch,  ['.gtex__arch']],
+      [ENV.floorCv, ENV.floor, ['.gtex__floor']],
+      [ENV.vigCv,   ENV.vig,   ['.gtex__vig']]
+    ];
+    sets.forEach(function (set) {
+      var cv = set[0], mat = set[1], c = cv.getContext('2d');
+      c.clearRect(0, 0, cv.width, cv.height);
+      snapshotChain(c, set[2], cv.width, cv.height, function () {
+        mat.uniforms.map.value.needsUpdate = true;
+      });
+    });
   };
 
   ENV.resize = function (bw, bh) {
@@ -428,57 +438,22 @@
   };
   ENV.paintLobby = function (lobbyEl) {
     if (!ENV.lobbyMesh) ENV.buildLobby();
-    if (!ENV.lobbyMesh) return;
-    var cv = ENV.lobbyCv;
-    var c = cv.getContext('2d'), W = cv.width, H = cv.height;
-    c.clearRect(0, 0, W, H);
-    var cs = galleryStyle();
-    var wall = (cs.getPropertyValue('--gallery-wall') || '#241834').trim();
-    var edge = (cs.getPropertyValue('--gallery-edge') || wall).trim();
-    var black = (cs.getPropertyValue('--gallery-black') || '#08060d').trim();
-    /* the wall wash */
-    var lg = c.createLinearGradient(0, 0, 0, H);
-    lg.addColorStop(0, wall); lg.addColorStop(0.74, edge); lg.addColorStop(1, black);
-    c.fillStyle = lg; c.fillRect(0, 0, W, H);
-    var rg = c.createRadialGradient(W * 0.5, -H * 0.12, 0, W * 0.5, -H * 0.12, W * 0.66);
-    rg.addColorStop(0, 'rgba(247,238,222,.09)'); rg.addColorStop(1, 'rgba(247,238,222,0)');
-    c.fillStyle = rg; c.fillRect(0, 0, W, H);
-    var done = function () { ENV.lobby.uniforms.map.value.needsUpdate = true; };
-    /* the photograph, then the burn multiplied over it, then the quiet */
-    var photo = lobbyEl && lobbyEl.querySelector('.lobby__photo');
-    var burn = lobbyEl && lobbyEl.querySelector('.lobby__burn');
-    var quiet = function () {
-      var q1 = c.createRadialGradient(W * 0.5, H * 0.5, 0, W * 0.5, H * 0.5, W * 0.32);
-      q1.addColorStop(0, 'rgba(255,253,249,.8)'); q1.addColorStop(0.46, 'rgba(255,253,249,.4)');
-      q1.addColorStop(0.74, 'rgba(255,253,249,0)');
-      c.fillStyle = q1; c.fillRect(0, 0, W, H);
-      [[0.11, 0.46], [0.89, 0.52]].forEach(function (pXY) {
-        var q = c.createRadialGradient(W * pXY[0], H * pXY[1], 0, W * pXY[0], H * pXY[1], W * 0.18);
-        q.addColorStop(0, 'rgba(255,253,249,.42)'); q.addColorStop(0.74, 'rgba(255,253,249,0)');
-        c.fillStyle = q; c.fillRect(0, 0, W, H);
-      });
-      var q2 = c.createLinearGradient(0, 0, 0, H);
-      q2.addColorStop(0.66, 'rgba(255,253,249,0)'); q2.addColorStop(0.92, 'rgba(255,253,249,.5)');
-      c.fillStyle = q2; c.fillRect(0, 0, W, H);
-      done();
-    };
-    var drawLayer = function (el, blend, after) {
-      if (!el) { after(); return; }
-      var ecs = getComputedStyle(el);
-      var u = bgUrl(ecs), o = parseFloat(ecs.opacity);
-      if (!u || !o) { after(); return; }
-      var im = new Image();
-      im.onload = function () {
-        c.save(); c.globalAlpha = o;
-        c.globalCompositeOperation = blend || 'source-over';
-        drawCoverInto(c, W, H, im, ecs);
-        c.restore(); done(); after();
-      };
-      im.onerror = after;
-      im.src = u;
-    };
-    drawLayer(photo, null, function () { drawLayer(burn, 'multiply', quiet); });
-    done();
+    if (!ENV.lobbyMesh || !lobbyEl) return;
+    var cv = ENV.lobbyCv, c = cv.getContext('2d');
+    c.clearRect(0, 0, cv.width, cv.height);
+    /* the lobby's five layers, in their own source order, each painted by
+       the browser from its own computed style: the wall wash, THE WALL
+       PHOTOGRAPH (the collage, at its data-bg tier opacity — this is the
+       background whose absence was reported), the film burn multiplied
+       over it, the quiet pools, and the floor fade. */
+    var els = ['.lobby__wall', '.lobby__photo', '.lobby__burn',
+               '.lobby__quiet', '.lobby__floor'];
+    var i = -1;
+    (function next() {
+      i++;
+      if (i >= els.length) { ENV.lobby.uniforms.map.value.needsUpdate = true; return; }
+      snapshotBgInto(c, lobbyEl.querySelector(els[i]), cv.width, cv.height, next);
+    })();
   };
   ENV.showLobby = function (on) { if (ENV.lobbyMesh) ENV.lobbyMesh.visible = !!on; };
 
