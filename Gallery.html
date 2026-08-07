@@ -945,6 +945,19 @@ body.touchmode .lobby__wall,body.touchmode .lobby__floor{
    canvas four times too big. The insets position it; these size it. */
 #roomGL{position:absolute;inset:0;width:100%;height:100%;
   z-index:19;display:none;pointer-events:none}
+/* Once the room renderer owns the wall, the DOM environment must go —
+   not because it looks wrong, but because it is ELEVEN fullscreen layers
+   the compositor blended over the canvas on every frame, six of them
+   re-transforming on every cursor move. That was the cost the standalone
+   prototype did not have, and the reason travel and the cursor still felt
+   heavy after the artwork moved to the GPU. #bgGL goes too: its shader is
+   drawn in the same canvas now, which also takes the page from two WebGL
+   contexts down to one. All of it comes straight back the moment GL is
+   not driving — it is still what touch, reduced motion and no-WebGL see. */
+body.glroom #gtex,
+body.glroom .glines,
+body.glroom #bgGL,
+body.glroom .fallback-bg{display:none !important}
 body.glroom #roomGL{display:block}
 /* When GL draws the room, the DOM room stops being painted but must NOT
    stop existing: opacity:0 keeps every piece focusable and readable to a
@@ -3037,6 +3050,7 @@ function setChapter(id){
   closePanels();
   setRoomCategory(c);                 // retint the wall for this gallery room
   if (typeof paintWall==='function') paintWall();   // and the shader with it
+  if (GLR.ready) window.GLRoom.retint();            // and the canvas environment
   aimSpotlight(null);                 // no piece is lit until one is attended to
   aimSpotlight(null);                 // no piece is live in a room just entered
   const stage = $('#stage'); stage.innerHTML='';
@@ -5408,9 +5422,9 @@ function loop(now){
 
   /* The GPU room is drawn from the vector the branch above just produced,
      so there is exactly one camera and the two renderers cannot drift. */
-  if (GLON){
+  if (GLR.ready){
     window.GLRoom.frame({
-      lookX:S.look.x, lookY:S.look.y, tune:TUNE,
+      lookX:S.look.x, lookY:S.look.y, tune:TUNE, now:_t,
       worldX:S.glWorld.x, worldY:S.glWorld.y, worldZ:S.glWorld.z,
       ringA:S.glRingA,
       opacity:i => { const r=S.pieces[i]; return r && r.elm._glo!=null ? r.elm._glo : 1; }
@@ -5604,6 +5618,11 @@ function surfaceParallax(){
   // one smoothed -1..1 pair; every layer applies its own magnitude in CSS.
   // On the wall layers, not #gallery: the covers do not read these.
   const mx=+S.look.x.toFixed(4), my=+S.look.y.toFixed(4);
+  /* With the environment in the canvas these become two uniform writes
+     instead of a custom-property write on six elements per cursor frame,
+     which is the difference between the cursor feeling attached to the
+     room and feeling like it is dragging it. */
+  if(GLR.ready) return;
   if(mx!==S.mxLast || my!==S.myLast){
     setWallVar('--mx',mx); setWallVar('--my',my);
     S.mxLast=mx; S.myLast=my;
@@ -5617,14 +5636,9 @@ function surfaceParallax(){
    custom properties, so the wall wash follows the work a visitor is
    actually looking at. Off means "no piece attended to", same as before. */
 function glAimSpot(idx){
-  const g=$('#gallery'); if(!g) return;
-  if (idx==null || idx<0){ g.dataset.spot='off'; setSpotVar('--spotlight-opacity','0'); return; }
+  if (idx==null || idx<0){ window.GLRoom.env.aim(0,0,false); return; }
   const p = window.GLRoom.screenPos(idx);
-  if (!p) return;
-  setSpotVar('--spotlight-x',(p.x*100).toFixed(1)+'%');
-  setSpotVar('--spotlight-y',(p.y*100).toFixed(1)+'%');
-  setSpotVar('--spotlight-opacity','1');
-  g.dataset.spot='on';
+  if (p) window.GLRoom.env.aim(p.x, p.y, true);
 }
 
 /* Gallery spotlight · aims the wall wash at whichever piece is live.

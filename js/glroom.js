@@ -55,6 +55,344 @@
     _roomEl: null, _kind: null, _ringA: 0
   };
 
+  /* =================================================================
+     THE ENVIRONMENT, IN THE SAME CANVAS
+
+     This is the part that decides whether travel feels smooth, and it is
+     the one thing the standalone prototype had that the first integration
+     did not. The room's wall is eleven FULLSCREEN DOM layers — plaster
+     fibre, grain, two sets of linework, light, spot, arch, floor,
+     vignette — and six of them re-transform on every cursor frame. Even
+     with the artwork on the GPU, the compositor still had to blend all
+     eleven over the canvas every single frame, and a second WebGL context
+     was drawing the wall beside it.
+
+     So the environment moves in here: one canvas, one context, layers as
+     fullscreen-triangle shaders, cursor parallax as uniform writes. The
+     DOM stack is hidden while this runs (body.glroom in Gallery.html) and
+     comes straight back when it does not — it is still what touch,
+     reduced motion and no-WebGL see.
+
+     Everything is read from the live DOM and tokens rather than copied,
+     so a palette change, a room retint or an edit to the linework paths
+     still shows up here with no second source to keep in step.
+     ================================================================= */
+  var ENV = { layers: [], ok: false, _t0: 0 };
+
+  var FS_VERT = 'varying vec2 vUv; void main(){ vUv=uv; gl_Position=vec4(position.xy,0.9999,1.0); }';
+  function fsGeo(THREE) {
+    var g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(new Float32Array([-1, -1, 0, 3, -1, 0, -1, 3, 0]), 3));
+    g.setAttribute('uv', new THREE.BufferAttribute(new Float32Array([0, 0, 2, 0, 0, 2]), 2));
+    return g;
+  }
+  function rgbOf(v, fb) {
+    var t = String(v || '').trim(), m = t.match(/^#([0-9a-f]{6})$/i);
+    if (m) return [parseInt(m[1].slice(0, 2), 16) / 255, parseInt(m[1].slice(2, 4), 16) / 255,
+                   parseInt(m[1].slice(4, 6), 16) / 255];
+    m = t.match(/rgba?\(([^)]+)\)/i);
+    if (m) { var p = m[1].split(','); return [p[0] / 255, p[1] / 255, p[2] / 255]; }
+    return fb;
+  }
+  function envLayer(THREE, mat, order) {
+    mat.depthWrite = false; mat.depthTest = false;
+    var m = new THREE.Mesh(ENV.geo, mat);
+    m.frustumCulled = false; m.renderOrder = order;
+    GL.scene.add(m); ENV.layers.push(m);
+    return m;
+  }
+  function texFromCanvas(THREE, cv, repeat) {
+    var t = new THREE.CanvasTexture(cv);
+    if (repeat) t.wrapS = t.wrapT = THREE.RepeatWrapping;
+    t.colorSpace = THREE.SRGBColorSpace;
+    return t;
+  }
+  /* the two generated tiles the page already made into data URIs */
+  function tileCanvas(url, size) {
+    var cv = document.createElement('canvas'); cv.width = cv.height = size;
+    var im = new Image();
+    im.onload = function () { cv.getContext('2d').drawImage(im, 0, 0, size, size); if (cv._tex) cv._tex.needsUpdate = true; };
+    im.src = String(url).replace(/^url\(["']?/, '').replace(/["']?\)$/, '');
+    return cv;
+  }
+
+  ENV.build = function () {
+    var THREE = window.THREE;
+    ENV.geo = ENV.geo || fsGeo(THREE);
+    ENV._t0 = performance.now();
+
+    /* ---- 1 · the wall. glProg's fragment shader, verbatim, so the room
+       curves exactly as it does today and no text is ever distorted. --- */
+    ENV.wall = new THREE.ShaderMaterial({
+      uniforms: {
+        r: { value: new THREE.Vector2(1, 1) }, t: { value: 0 },
+        k: { value: 0.075 }, os: { value: 1.08 },
+        wTop: { value: new THREE.Vector3(0.141, 0.094, 0.204) },
+        wBot: { value: new THREE.Vector3(0.031, 0.024, 0.051) },
+        wGlow: { value: new THREE.Vector3(0.43, 0.29, 0.66) },
+        fall: { value: 0.346 }
+      },
+      vertexShader: FS_VERT,
+      fragmentShader:
+        'precision mediump float;uniform vec2 r;uniform float t;uniform float k;uniform float os;' +
+        'uniform vec3 wTop;uniform vec3 wBot;uniform vec3 wGlow;uniform float fall;' +
+        'float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}' +
+        'void main(){vec2 uv=gl_FragCoord.xy/r;' +
+        'vec2 c=(uv-.5)*vec2(r.x/r.y,1.0);' +
+        'float rr=dot(c,c);' +
+        'vec2 warp=c*(1.0+k*rr+k*.35*rr*rr)/os;' +
+        'vec2 buv=warp/vec2(r.x/r.y,1.0)+.5;' +
+        'float rw=dot(warp,warp);' +
+        'vec3 col=mix(wBot,wTop,smoothstep(.0,1.,buv.y));' +
+        'vec2 g1=vec2(.5+.22*sin(t*.11),1.06);' +
+        'vec2 g2=vec2(.24+.1*sin(t*.07+2.),.18+.06*cos(t*.09));' +
+        'vec2 g3=vec2(.8+.08*cos(t*.06),.3);' +
+        'col+=wGlow*.16*exp(-11.*distance(buv,g1));' +
+        'col+=wGlow*.20*exp(-7.*distance(buv,g2));' +
+        'col+=wGlow*.13*exp(-9.*distance(buv,g3));' +
+        'col*=1.-rw*fall;' +
+        'col+=(h(gl_FragCoord.xy)-.5)*.024;' +
+        'gl_FragColor=vec4(col,1.);}'
+    });
+    envLayer(THREE, ENV.wall, -100);
+
+    /* ---- 2/3 · fibre and grain, from the tiles the page generated ---- */
+    var cs = getComputedStyle(document.documentElement);
+    var fCv = tileCanvas(cs.getPropertyValue('--fibre-url'), 256);
+    var gCv = tileCanvas(cs.getPropertyValue('--grain-url'), 128);
+    ENV.fibreTex = texFromCanvas(THREE, fCv, true); fCv._tex = ENV.fibreTex;
+    ENV.grainTex = texFromCanvas(THREE, gCv, true); gCv._tex = ENV.grainTex;
+
+    ENV.fibre = new THREE.ShaderMaterial({
+      transparent: true,
+      uniforms: { map: { value: ENV.fibreTex }, r: { value: new THREE.Vector2(1, 1) },
+                  off: { value: new THREE.Vector2(0, 0) }, tile: { value: 230 }, alpha: { value: 0.05 } },
+      vertexShader: FS_VERT,
+      fragmentShader:
+        'precision mediump float;varying vec2 vUv;uniform sampler2D map;uniform vec2 r,off;uniform float tile,alpha;' +
+        'void main(){vec2 px=(gl_FragCoord.xy-r*.5)/1.04+r*.5;px-=vec2(off.x,-off.y);' +
+        'vec3 c=texture2D(map,px/tile).rgb;' +
+        'float rad=length(vec2((vUv.x-.5)/.72,(vUv.y-.5)/.62));' +
+        'gl_FragColor=vec4(c,alpha*smoothstep(.08,.78,rad));}'
+    });
+    envLayer(THREE, ENV.fibre, -90);
+
+    ENV.grain = new THREE.ShaderMaterial({
+      transparent: true,
+      uniforms: { map: { value: ENV.grainTex }, tile: { value: 150 }, alpha: { value: 0.05 } },
+      vertexShader: FS_VERT,
+      fragmentShader:
+        'precision mediump float;uniform sampler2D map;uniform float tile,alpha;' +
+        'void main(){gl_FragColor=vec4(texture2D(map,gl_FragCoord.xy/tile).rgb,alpha);}'
+    });
+    envLayer(THREE, ENV.grain, -80);
+
+    /* ---- 4 · the linework, read out of the SVGs already in the page,
+       so the gestures stay one composition with one source. ---------- */
+    ENV.farCv = document.createElement('canvas');
+    ENV.nearCv = document.createElement('canvas');
+    ENV.far = lineMat(THREE, ENV.farCv);
+    ENV.near = lineMat(THREE, ENV.nearCv);
+    envLayer(THREE, ENV.far, -70);
+    envLayer(THREE, ENV.near, 100);          /* the near gesture crosses IN FRONT */
+
+    /* ---- 5..9 · light, spot, arch, floor, vignette ------------------ */
+    ENV.lightCv = document.createElement('canvas');
+    ENV.archCv = document.createElement('canvas');
+    ENV.floorCv = document.createElement('canvas');
+    ENV.vigCv = document.createElement('canvas');
+    ENV.light = paintedMat(THREE, ENV.lightCv, true);
+    envLayer(THREE, ENV.light, -60);
+    ENV.spot = new THREE.ShaderMaterial({
+      transparent: true,
+      uniforms: { p: { value: new THREE.Vector2(0.5, 0.5) }, k: { value: 0 } },
+      vertexShader: FS_VERT,
+      fragmentShader:
+        'precision mediump float;varying vec2 vUv;uniform vec2 p;uniform float k;' +
+        'void main(){vec2 uv=vec2(vUv.x,1.-vUv.y);vec2 d=(uv-p)/vec2(.46,.40);' +
+        'gl_FragColor=vec4(1.,.973,.910,k*.09*max(0.,1.-smoothstep(0.,.72,length(d))));}'
+    });
+    envLayer(THREE, ENV.spot, -50);
+    ENV.arch = paintedMat(THREE, ENV.archCv, true);
+    envLayer(THREE, ENV.arch, -40);
+    ENV.floor = paintedMat(THREE, ENV.floorCv, false);
+    envLayer(THREE, ENV.floor, -30);
+    ENV.vig = paintedMat(THREE, ENV.vigCv, false);
+    envLayer(THREE, ENV.vig, -20);
+
+    ENV.ok = true;
+    ENV.repaint();
+  };
+
+  function lineMat(THREE, cv) {
+    return new THREE.ShaderMaterial({
+      transparent: true,
+      uniforms: { map: { value: texFromCanvas(THREE, cv) }, r: { value: new THREE.Vector2(1, 1) },
+                  off: { value: new THREE.Vector2(0, 0) }, alpha: { value: 0.62 } },
+      vertexShader: FS_VERT,
+      fragmentShader:
+        'precision mediump float;uniform sampler2D map;uniform vec2 r,off;uniform float alpha;' +
+        'void main(){vec4 c=texture2D(map,(gl_FragCoord.xy-vec2(off.x,-off.y))/r);' +
+        'gl_FragColor=vec4(c.rgb,c.a*alpha);}'
+    });
+  }
+  function paintedMat(THREE, cv, parallax) {
+    return new THREE.ShaderMaterial({
+      transparent: true,
+      uniforms: { map: { value: texFromCanvas(THREE, cv) }, r: { value: new THREE.Vector2(1, 1) },
+                  off: { value: new THREE.Vector2(0, 0) } },
+      vertexShader: FS_VERT,
+      fragmentShader:
+        'precision mediump float;uniform sampler2D map;uniform vec2 r,off;' +
+        'void main(){gl_FragColor=texture2D(map,(gl_FragCoord.xy-vec2(off.x,-off.y))/r);}'
+    });
+  }
+
+  /* Repaint the token-driven layers. Runs on room change and resize —
+     never per frame, which is the whole point. */
+  ENV.repaint = function () {
+    if (!ENV.ok) return;
+    var cs = getComputedStyle(document.documentElement);
+    var g = document.getElementById('gallery');
+    var gs = g ? getComputedStyle(g) : cs;
+    var top = rgbOf(cs.getPropertyValue('--gallery-wall'), [0.30, 0.21, 0.46]);
+    var bot = rgbOf(cs.getPropertyValue('--gallery-black'), [0.13, 0.09, 0.19]);
+    var glow = rgbOf(gs.getPropertyValue('--room-glow'), [0.55, 0.45, 0.76]);
+    var lum = top[0] * 0.299 + top[1] * 0.587 + top[2] * 0.114;
+    var kk = Math.max(0.12, 1 - lum);
+    ENV.wall.uniforms.wTop.value.set(top[0], top[1], top[2]);
+    ENV.wall.uniforms.wBot.value.set(bot[0], bot[1], bot[2]);
+    ENV.wall.uniforms.wGlow.value.set(glow[0] * kk, glow[1] * kk, glow[2] * kk);
+    ENV.wall.uniforms.fall.value = 0.10 + 0.28 * (1 - lum);
+    ENV.wall.uniforms.k.value = parseFloat(cs.getPropertyValue('--lens-distortion')) || 0.075;
+    ENV.wall.uniforms.os.value = parseFloat(cs.getPropertyValue('--environment-overscan')) || 1.08;
+    ENV.fibre.uniforms.alpha.value = parseFloat(cs.getPropertyValue('--gallery-fibre-opacity')) || 0.05;
+    ENV.grain.uniforms.alpha.value = parseFloat(cs.getPropertyValue('--grain-opacity')) || 0.05;
+    ENV.paintLines(); ENV.paintPools(gs);
+  };
+
+  ENV.paintLines = function () {
+    [['--far', ENV.farCv, ENV.far], ['--near', ENV.nearCv, ENV.near]].forEach(function (set) {
+      var sel = set[0] === '--far' ? '.glines--far' : '.glines--near';
+      var host = document.querySelector(sel);
+      var cv = set[1], c = cv.getContext('2d');
+      c.clearRect(0, 0, cv.width, cv.height);
+      if (!host) return;
+      var paths = host.querySelectorAll('path');
+      var s = Math.max(cv.width / 1600, cv.height / 900);
+      c.save();
+      c.translate((cv.width - 1600 * s) / 2, (cv.height - 900 * s) / 2);
+      c.scale(s, s);
+      c.lineCap = 'round'; c.lineJoin = 'round';
+      for (var i = 0; i < paths.length; i++) {
+        var p = paths[i], pcs = getComputedStyle(p);
+        c.strokeStyle = pcs.stroke && pcs.stroke !== 'none' ? pcs.stroke : '#6d4a94';
+        c.lineWidth = parseFloat(pcs.strokeWidth) || 1.2;
+        c.globalAlpha = parseFloat(pcs.opacity);
+        if (isNaN(c.globalAlpha)) c.globalAlpha = 0.35;
+        try { c.stroke(new Path2D(p.getAttribute('d'))); } catch (e) {}
+      }
+      c.restore(); c.globalAlpha = 1;
+      set[2].uniforms.map.value.needsUpdate = true;
+    });
+  };
+
+  ENV.paintPools = function (gs) {
+    var vig = (getComputedStyle(document.documentElement).getPropertyValue('--v-vig-rgb') || '8,6,13').trim();
+    var num = function (n, d) { var v = parseFloat(gs.getPropertyValue(n)); return isNaN(v) ? d : v; };
+    var li = num('--gallery-light-intensity', 1.12);
+    var vs = num('--vignette-strength', 0.9);
+    var vc = num('--vignette-corner-opacity', 0.82);
+    var ve = num('--vignette-edge-opacity', 0.6);
+    var vw = num('--vignette-centre-width', 52) / 100;
+
+    var pool = function (c, w, h, x, y, rx, ry, col) {
+      var g = c.createRadialGradient(x * w, y * h, 0, x * w, y * h, rx * w);
+      g.addColorStop(0, col); g.addColorStop(0.73, 'rgba(0,0,0,0)');
+      c.save(); c.translate(x * w, y * h); c.scale(1, (ry * h) / (rx * w)); c.translate(-x * w, -y * h);
+      c.fillStyle = g; c.fillRect(-w, -h * 2, w * 3, h * 5); c.restore();
+    };
+    // light
+    var c1 = ENV.lightCv.getContext('2d'), W = ENV.lightCv.width, H = ENV.lightCv.height;
+    c1.clearRect(0, 0, W, H);
+    pool(c1, W, H, 0.5, -0.06, 0.46, 0.34, 'rgba(255,246,228,' + (0.13 * li) + ')');
+    pool(c1, W, H, 0.12, 0.42, 0.34, 0.30, 'rgba(178,150,224,' + (0.10 * li) + ')');
+    pool(c1, W, H, 0.88, 0.56, 0.30, 0.28, 'rgba(217,161,63,' + (0.07 * li) + ')');
+    ENV.light.uniforms.map.value.needsUpdate = true;
+    // arch
+    var c2 = ENV.archCv.getContext('2d'); W = ENV.archCv.width; H = ENV.archCv.height;
+    c2.clearRect(0, 0, W, H);
+    var lg = c2.createLinearGradient(0, 0, 0, H);
+    lg.addColorStop(0, 'rgba(' + vig + ',0)'); lg.addColorStop(0.62, 'rgba(' + vig + ',0)');
+    lg.addColorStop(0.71, 'rgba(' + vig + ',.05)'); lg.addColorStop(0.74, 'rgba(' + vig + ',.11)');
+    lg.addColorStop(0.78, 'rgba(' + vig + ',.045)'); lg.addColorStop(0.92, 'rgba(' + vig + ',0)');
+    c2.fillStyle = lg; c2.fillRect(0, 0, W, H);
+    pool(c2, W, H, 0.5, 0.76, 0.6, 0.22, 'rgba(255,250,240,.11)');
+    pool(c2, W, H, 0, 0, 0.56, 0.40, 'rgba(' + vig + ',.11)');
+    pool(c2, W, H, 1, 0, 0.56, 0.40, 'rgba(' + vig + ',.10)');
+    ENV.arch.uniforms.map.value.needsUpdate = true;
+    // floor
+    var c3 = ENV.floorCv.getContext('2d'); W = ENV.floorCv.width; H = ENV.floorCv.height;
+    c3.clearRect(0, 0, W, H);
+    var deep = (getComputedStyle(document.documentElement).getPropertyValue('--wall-deep') || 'rgba(20,12,34,.55)').trim();
+    var top2 = H * 0.66;
+    var fg = c3.createLinearGradient(0, top2, 0, H);
+    fg.addColorStop(0, 'rgba(20,12,34,0)'); fg.addColorStop(1, deep);
+    c3.fillStyle = fg; c3.fillRect(0, top2, W, H - top2);
+    pool(c3, W, H, 0.5, 1, 0.3, (H - top2) / H, 'rgba(217,161,63,.05)');
+    ENV.floor.uniforms.map.value.needsUpdate = true;
+    // vignette
+    var c4 = ENV.vigCv.getContext('2d'); W = ENV.vigCv.width; H = ENV.vigCv.height;
+    c4.clearRect(0, 0, W, H);
+    var rx = W * vw, ry = H * (vw + 0.14);
+    var rg = c4.createRadialGradient(W * 0.5, H * 0.46, 0, W * 0.5, H * 0.46, rx);
+    rg.addColorStop(0, 'rgba(' + vig + ',0)'); rg.addColorStop(0.66, 'rgba(' + vig + ',0)');
+    rg.addColorStop(0.9, 'rgba(' + vig + ',' + (0.30 * vc * vs) + ')');
+    rg.addColorStop(1, 'rgba(' + vig + ',' + (0.80 * vc * vs) + ')');
+    c4.save(); c4.translate(W * 0.5, H * 0.46); c4.scale(1, ry / rx); c4.translate(-W * 0.5, -H * 0.46);
+    c4.fillStyle = rg; c4.fillRect(-W, -H * 2, W * 3, H * 5); c4.restore();
+    var ea = 0.62 * ve * vs;
+    var eg = c4.createLinearGradient(0, 0, W, 0);
+    eg.addColorStop(0, 'rgba(' + vig + ',' + ea + ')'); eg.addColorStop(0.17, 'rgba(' + vig + ',0)');
+    eg.addColorStop(0.83, 'rgba(' + vig + ',0)'); eg.addColorStop(1, 'rgba(' + vig + ',' + ea + ')');
+    c4.fillStyle = eg; c4.fillRect(0, 0, W, H);
+    ENV.vig.uniforms.map.value.needsUpdate = true;
+  };
+
+  ENV.resize = function (bw, bh) {
+    if (!ENV.ok) return;
+    [ENV.wall, ENV.fibre, ENV.far, ENV.near, ENV.light, ENV.arch, ENV.floor, ENV.vig].forEach(function (m) {
+      if (m.uniforms.r) m.uniforms.r.value.set(bw, bh);
+    });
+    ENV.fibre.uniforms.tile.value = 230 * GL._dpr;
+    ENV.grain.uniforms.tile.value = 150 * GL._dpr;
+    ENV.farCv.width = bw; ENV.farCv.height = bh;
+    ENV.nearCv.width = bw; ENV.nearCv.height = bh;
+    [ENV.lightCv, ENV.archCv, ENV.floorCv, ENV.vigCv].forEach(function (cv) {
+      cv.width = Math.round(bw / 2); cv.height = Math.round(bh / 2);
+    });
+    ENV.repaint();
+  };
+
+  /* Per frame: the cursor pair, and the clock. Each layer applies its own
+     magnitude — the CSS numbers, verbatim — as a uniform rather than as a
+     transform on a composited element. */
+  ENV.frame = function (mx, my, now) {
+    if (!ENV.ok) return;
+    ENV.wall.uniforms.t.value = (now - ENV._t0) / 1000;
+    ENV.fibre.uniforms.off.value.set(mx * 11.44, my * 7.28);
+    ENV.light.uniforms.off.value.set(mx * -14, my * -8);
+    ENV.arch.uniforms.off.value.set(0, my * 5);
+    ENV.far.uniforms.off.value.set(mx * 12, my * 12 * 0.55);
+    ENV.near.uniforms.off.value.set(mx * 26, my * 26 * 0.55);
+  };
+  ENV.aim = function (x, y, on) {
+    if (!ENV.ok) return;
+    ENV.spot.uniforms.p.value.set(x, y);
+    ENV.spot.uniforms.k.value = on ? 1 : 0;
+  };
+  GL.env = ENV;
+
   /* ---- capability gate -------------------------------------------- */
   function webglOK() {
     try {
@@ -359,6 +697,7 @@
     GL._ray = new THREE.Raycaster();
     GL._ndc = new THREE.Vector2(-2, -2);
     GL.ok = true;
+    try { ENV.build(); } catch (e) { ENV.ok = false; }
     GL.resize();
     return true;
   };
@@ -373,6 +712,7 @@
     GL.camera.fov = 2 * Math.atan((h / 2) / GL._persp) * 180 / Math.PI;
     GL.camera.position.set(0, 0, GL._persp);
     GL.camera.updateProjectionMatrix();
+    ENV.resize(Math.round(w * GL._dpr), Math.round(h * GL._dpr));
   };
 
   /* Read a piece's placement out of the custom properties LAYOUT wrote.
@@ -486,7 +826,11 @@
        st.ringA  orbit only: the ring's angle in degrees
      ================================================================= */
   GL.frame = function (st) {
-    if (!GL.ok || !GL.active) return;
+    if (!GL.ok) return;
+    /* The environment is drawn even when no room is mounted — it IS the
+       room's wall, and the directory stands in front of it too. */
+    ENV.frame(st.lookX || 0, st.lookY || 0, st.now || performance.now());
+    if (!GL.active) { GL.renderer.render(GL.scene, GL.camera); return; }
     var TUNE = st.tune || { camRotY: 3.5, camRotX: 2, camTX: 20, camTY: 14 };
     var lookY = -st.lookX * TUNE.camRotY * Math.PI / 180;
     var lookX = -st.lookY * TUNE.camRotX * Math.PI / 180;
@@ -561,6 +905,9 @@
      is already tight on it (see the tile-eviction note in Gallery.html).
      Every room change disposes rather than leaking.
      ================================================================= */
+  /* called when the room, its category tint or the palette changes */
+  GL.retint = function () { try { ENV.repaint(); } catch (e) {} };
+
   GL.clear = function () {
     if (!GL.ok) return;
     for (var i = 0; i < GL.items.length; i++) {
