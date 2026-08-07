@@ -6473,11 +6473,13 @@ html[data-a11y] .paths__list { padding-bottom: 0; }
    safe here.
    ===================================================== */
 
-.lh-stage { position: relative; height: 250svh; }
+/* One screen. It was 250svh of scroll runway when the sequence was driven by
+   scroll position; it plays on its own clock now and needs only the room to
+   be seen in. */
+.lh-stage { position: relative; height: 100svh; }
 
 .lh-sticky {
-  position: sticky;
-  top: 0;
+  position: relative;
   height: 100svh;
   overflow: hidden;              /* the full-bleed frame must not widen the page */
   display: flex;
@@ -6485,7 +6487,9 @@ html[data-a11y] .paths__list { padding-bottom: 0; }
   align-items: center;
   justify-content: center;
   gap: clamp(18px, 3.2vh, 38px);
-  padding: clamp(70px, 9vh, 110px) var(--gutter) clamp(40px, 6vh, 70px);
+  /* The bottom pad has to clear the scroll cue, which is positioned against
+     the same box. At 40-70px the cue landed on the caption's last line. */
+  padding: clamp(70px, 9vh, 110px) var(--gutter) clamp(104px, 14vh, 156px);
 }
 
 /* Sized for the resting state. The full-bleed opening is a transform applied
@@ -6523,10 +6527,6 @@ html[data-theme="dark"] .lh-plate {
 }
 .lh-plate.is-framed .lh-edge { opacity: 1; }
 
-/* On the way out the print stops being a print: no white ground and no cast
-   shadow left hanging in the air behind a picture that is fading. */
-.lh-plate.is-exiting { background: transparent; box-shadow: none; }
-.lh-plate.is-exiting .lh-edge { opacity: 0; }
 
 .lh-img { display: block; width: 100%; height: 100%; object-fit: cover; }
 /* Not hidden: a whisper of the whole piece stays under the shards while they
@@ -6534,7 +6534,6 @@ html[data-theme="dark"] .lh-plate {
    there rather than as hard white holes punched through it. Wherever a shard
    has landed it is opaque and covers this exactly, so nothing is doubled. */
 .lh-plate.is-tiled .lh-img { opacity: 0.12; }
-.lh-plate.is-exiting .lh-img { opacity: 0; }
 
 /* The pieces arrive out of depth rather than sliding around on the surface, so
    the tile layer needs a camera. Origin sits on the sunflower, where the
@@ -6577,6 +6576,11 @@ html[data-theme="dark"] .lh-plate {
   margin: 0;
 }
 
+/* Hidden until the hero has finished arriving, then it says there is more
+   below. Without it the page looks like a single framed picture and nothing
+   tells you to keep going. */
+.lh-cue { opacity: 0; transition: opacity 0.6s var(--ease) 0.2s; }
+.lh-stage.is-done .lh-cue { opacity: 1; }
 .lh-cue {
   position: absolute;
   left: 50%;

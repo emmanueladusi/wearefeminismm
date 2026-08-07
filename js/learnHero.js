@@ -1,20 +1,21 @@
-/* Learn hero — the collage arrives, then leaves.
+/* Learn hero — the collage arrives, and stays.
    ---------------------------------------------------------------------------
-   The sequence, all of it driven by scroll position except the first beat:
+   Landing on Learn is the whole cue. It plays itself:
 
      1. the artwork fills the screen and assembles itself out of cut shards
      2. it pulls back into a hung print
      3. "Learn through experience." lands under it, as a wall label
-     4. it recedes and fades, and the pulse section below is simply there
 
-   Step 1 is the only thing on a clock. Nothing scroll-driven engages until it
-   has finished: landing and immediately scrolling used to start the zoom over
-   the top of the assembly, so the piece was shrinking while it was still
-   arriving. Whatever gets scrolled through in the meantime is not swallowed —
-   the sequence rebases to wherever the reader actually is.
+   And then it stays. Two earlier versions of this were wrong in opposite
+   directions. The first drove the pull-back from scroll position, which cost
+   the reader two and a half screens to see the hero happen at all and ran
+   backwards if they scrolled up. The second added an exit that shrank the
+   picture away as you carried on: the artwork is the best thing on the page
+   and there was no reason to take it back.
 
    Classes are prefixed lh- because this stylesheet is shared by every page and
    #wfgallery's own rules land on the same document. */
+
 (function () {
   var stage = document.querySelector(".lh-stage");
   var plate = document.querySelector(".lh-plate");
@@ -105,11 +106,9 @@
 
   /* ---------- 1. the assembly -------------------------------------------- */
 
-  var ready = false, baseTop = null;
-
   function arm() {
-    ready = true;
-    if (vh) onScroll();
+    // The picture is whole; now it pulls back to become a print.
+    if (vw) pullBack(); else settle();
   }
 
   function assemble() {
@@ -173,84 +172,72 @@
     setTimeout(finish, end + 150);
   }
 
-  /* ---------- 2-4. the scroll sequence ----------------------------------- */
-
-  function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
-  function smooth(v) { return v * v * (3 - 2 * v); }
-  function seg(t, a, b) { return clamp01((t - a) / (b - a)); }
+  /* ---------- 2-3. it pulls back, and stays ------------------------------ */
 
   var vw = 0, vh = 0, pw = 0, ph = 0, restX = 0, restY = 0, cover = 1;
-  var framed = false, exiting = false, ticking = false;
 
   // offsetLeft/offsetTop are layout values and a transform cannot move them,
   // so the resting centre stays knowable while the plate is mid-zoom.
   function measure() {
     vw = innerWidth; vh = innerHeight;
     pw = plate.offsetWidth; ph = plate.offsetHeight;
-    restX = plate.offsetLeft + pw / 2;   // relative to .lh-sticky, pinned at top 0
+    restX = plate.offsetLeft + pw / 2;
     restY = plate.offsetTop + ph / 2;
     cover = Math.max(vw / pw, vh / ph);
   }
 
-  function render(t) {
-    var p = smooth(seg(t, 0.02, 0.38));      // full-bleed -> hung print
-    var c = smooth(seg(t, 0.26, 0.46));      // the label lands
-    var x = smooth(seg(t, 0.46, 0.90));      // and it recedes
-
-    var dx = (vw / 2 - restX) * (1 - p);
-    var dy = (vh / 2 - restY) * (1 - p);
-    // The exit keeps pulling the camera back past the resting size rather than
-    // drawing anything over the top of the artwork.
-    var s = (1 + (cover - 1) * (1 - p)) * (1 - 0.30 * x);
-
-    plate.style.transform =
-      "translate(" + dx.toFixed(2) + "px," + dy.toFixed(2) + "px) scale(" + s.toFixed(4) + ")";
-    plate.style.opacity = (1 - x).toFixed(3);
-
-    var wantFramed = p > 0.72;
-    if (wantFramed !== framed) { framed = wantFramed; plate.classList.toggle("is-framed", framed); }
-
-    var wantExit = x > 0.001;
-    if (wantExit !== exiting) { exiting = wantExit; plate.classList.toggle("is-exiting", exiting); }
-
-    cap.style.transform = "translateY(" + ((1 - c) * 22).toFixed(2) + "px)";
-    cap.style.opacity = (c * (1 - clamp01(seg(t, 0.50, 0.76)))).toFixed(3);
-
-    if (cue) cue.style.opacity = (1 - clamp01(t / 0.10)).toFixed(3);
+  function fullBleed() {
+    return "translate(" + (vw / 2 - restX).toFixed(2) + "px," +
+           (vh / 2 - restY).toFixed(2) + "px) scale(" + cover.toFixed(4) + ")";
   }
 
-  function frame() {
-    ticking = false;
-    var total = stage.offsetHeight - vh;
-    if (total <= 0) { render(0); return; }
+  // The pull-back runs on its own clock rather than on scroll. Driving it by
+  // scroll meant the reader had to spend two and a half screens to see the
+  // hero happen, and it ran backwards if they scrolled up. Arriving at Learn
+  // is the cue; nothing is asked of them.
+  function pullBack() {
+    measure();
+    var a = plate.animate(
+      [{ transform: fullBleed() }, { transform: "none" }],
+      { duration: 1500, easing: "cubic-bezier(0.16, 1, 0.3, 1)", fill: "both" }
+    );
+    a.onfinish = settle;
+    setTimeout(settle, 1800);          // onfinish does not fire if it is cancelled
 
-    var raw = -stage.getBoundingClientRect().top;
-    if (!ready) { render(0); return; }
-
-    if (baseTop === null) baseTop = Math.max(raw, 0);
-    var span = Math.max(total - baseTop, total * 0.5);
-    render(clamp01((raw - baseTop) / span));
+    // The label lands as the picture finishes arriving, not after it.
+    cap.animate(
+      [{ opacity: 0, transform: "translateY(22px)" }, { opacity: 0, transform: "translateY(22px)", offset: 0.45 },
+       { opacity: 1, transform: "none" }],
+      { duration: 1900, easing: "cubic-bezier(0.16, 1, 0.3, 1)", fill: "both" }
+    );
   }
 
-  function onScroll() {
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(frame);
+  var settled = false;
+  function settle() {
+    if (settled) return;
+    settled = true;
+    plate.style.transform = "none";    // hand back to layout, so a resize is free
+    plate.classList.add("is-framed");
+    cap.style.opacity = 1;
+    cap.style.transform = "none";
+    stage.classList.add("is-done");    // the scroll cue appears here
   }
+
+  // A resize once it has settled needs nothing: the plate is back on layout.
+  addEventListener("resize", function () { measure(); place(); });
 
   /* ---------- start ------------------------------------------------------ */
 
-  // Reduced motion gets the finished picture and its label, in normal flow.
+  // Reduced motion gets the finished picture and its label, straight away.
   if (reduce) {
     plate.classList.add("is-framed");
-    stage.classList.add("is-static");
+    stage.classList.add("is-static", "is-done");
+    cap.style.opacity = 1;
     return;
   }
 
   measure();
-  addEventListener("scroll", onScroll, { passive: true });
-  addEventListener("resize", function () { measure(); place(); onScroll(); });
-  frame();
+  plate.style.transform = fullBleed();  // start filling the screen
 
   // Same idiom as heroReveal.js: this hero opens the page, so it must not play
   // behind the preloader curtain or you catch only the tail of it. Safety-fires
