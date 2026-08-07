@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>wearefeminismm · Gallery GL (main screen, WebGL prototype)</title>
+<meta name="robots" content="noindex" />
+<!-- =====================================================================
+     GALLERY GL · prototype 02 · THE MAIN SCREEN (the top-level hang)
+     Second pass: the environment is now the REAL one, ported 1:1 from
+     Gallery.html rather than a stand-in wash.
+
+     The stack, bottom to top, exactly as the DOM page layers it:
+       wall     the barrel-warped shader wall (glProg verbatim: k=.075,
+                overscan 1.08, wTop #241834 → wBot #08060d, three slow
+                glow pools in the room tint, lens-shaped falloff, noise)
+       fibre    the generated 256px woven tile, 230px, radial-masked,
+                opacity .05, cursor parallax 11.44px / 7.28px
+       grain    the generated 128px grain tile, 150px, opacity .05, PINNED
+       lines·far  the three curatorial gestures (exact path data), ink
+                from LINE_INK per focused collection, drift 64s alternate,
+                cursor parallax 12px / ·.55, draw-in reveal on entry
+       light    three diffused pools, parallax -14px / -8px
+       spot     the wall wash that follows the hang: main pool on the
+                focused work, weaker pools on its neighbours (lightTheWall)
+       arch     the horizon line + haze + corner pulls, parallax y·5px
+       floor    the bottom fade into --wall-deep with the gold breath
+       vignette the directory's own tokens: strength .58, corner .82,
+                edge .6, centre 52% at 50% 46%
+       covers   the three works (unchanged from pass one)
+       vf       the viewfinder brackets, tracking the focused work
+       lines·near  the one gesture that travels IN FRONT of the artwork,
+                parallax 26px, drift 44s
+     Cursor parallax is the DOM's surfaceParallax: one smoothed -1..1
+     pair, eased at .08, each layer applying its own magnitude. Covers
+     deliberately do not read it — same as the DOM page.
+
+     Idle behaviour matches too: the DOM wall redraws only when dirty and
+     the drift pauses on env-idle, so this loop also stops when settled —
+     wake it with the cursor, a scroll or a drag.
+
+     ?perf overlay. fps must be judged on the real Mac.
+     ===================================================================== -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400;1,9..144,600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" />
+<style>
+:root{
+  --room:#171021; --gold:#d9a13f; --cream:#f5efe4; --dim:#b9b1c8;
+  --v-ink:#f2ede4; --v-ink-2:rgba(242,237,228,.82); --v-ink-3:rgba(233,226,244,.6);
+  --serif:'Fraunces',Georgia,serif;
+  --sans:'IBM Plex Sans',system-ui,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{background:#08060d;color:var(--cream);font-family:var(--sans);overflow:hidden}
+#gl{position:fixed;inset:0;display:block;width:100%;height:100%;cursor:grab}
+#gl.dragging{cursor:grabbing}
+#gl.point{cursor:pointer}
+
+/* ---- wall title · .reeltitle.is-wall, verbatim proportions ---- */
+.reeltitle{position:fixed;z-index:7;pointer-events:none;text-align:left;
+  transition:opacity .3s ease}
+.reeltitle h2{font-family:var(--serif);font-weight:450;color:var(--v-ink);
+  font-size:clamp(1.7rem,3.2vw,2.7rem);line-height:.92;letter-spacing:-.026em;
+  text-wrap:balance}
+.reeltitle p{margin-top:10px;font-weight:400;font-size:.874rem;line-height:1.55;
+  color:var(--v-ink-2);max-width:40ch}
+
+/* ---- fixed metadata around the frame · .reelmeta, verbatim ---- */
+.reelmeta{position:fixed;z-index:7;pointer-events:none;
+  font-size:.66rem;font-weight:500;letter-spacing:.055em;text-transform:uppercase;
+  color:var(--v-ink-3);transition:opacity .3s ease}
+.reelmeta b{display:block;color:var(--gold);font-weight:400}
+.reelmeta--tl{left:clamp(20px,3vw,44px);top:calc(clamp(6px,1vw,12px) + 72px)}
+.reelmeta--tr{right:clamp(14px,3vw,44px);top:calc(clamp(6px,1vw,12px) + 72px);text-align:right}
+.reelmeta--bl{right:clamp(14px,3vw,44px);text-align:right;bottom:calc(clamp(22px,3.4vh,42px) + 34px)}
+.reelmeta--br{right:clamp(14px,3vw,44px);bottom:clamp(22px,3.4vh,42px);text-align:right}
+.is-busy .reelmeta{opacity:0}
+
+.hudline{position:fixed;left:0;right:0;top:0;z-index:8;display:flex;align-items:center;gap:16px;
+  padding:14px clamp(16px,3vw,34px);pointer-events:none;
+  background:linear-gradient(180deg,rgba(13,8,22,.6),transparent)}
+.hudline b{font-family:var(--serif);font-weight:600;font-size:1rem}
+.badge{position:fixed;right:16px;top:12px;z-index:20;font-size:.62rem;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--gold);border:1px solid rgba(217,161,63,.4);
+  border-radius:99px;padding:5px 11px;pointer-events:none}
+
+.toast{position:fixed;left:50%;bottom:64px;transform:translateX(-50%) translateY(8px);z-index:40;
+  background:rgba(23,16,33,.92);border:1px solid rgba(217,161,63,.45);border-radius:12px;
+  color:var(--cream);font-size:.82rem;padding:10px 18px;opacity:0;pointer-events:none;
+  transition:opacity .3s, transform .3s}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+#perf{position:fixed;left:14px;bottom:14px;z-index:30;display:none;font-size:11px;line-height:1.5;
+  font-family:ui-monospace,monospace;color:#cfe8cf;background:rgba(8,5,16,.72);
+  border:1px solid rgba(217,161,63,.3);border-radius:10px;padding:8px 12px;pointer-events:none;white-space:pre}
+body.showperf #perf{display:block}
+#boot{position:fixed;inset:0;z-index:50;display:grid;place-items:center;background:#171021;
+  transition:opacity .5s;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+#boot.off{opacity:0;pointer-events:none}
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+
+<div class="hudline"><b>The exhibition · three collections</b></div>
+<p class="badge">WebGL prototype · main screen</p>
+
+<div class="reeltitle is-wall" id="reelTitle"><h2></h2><p></p></div>
+<p class="reelmeta reelmeta--tl" id="meta-tl"></p>
+<p class="reelmeta reelmeta--tr" id="meta-tr"></p>
+<p class="reelmeta reelmeta--bl" id="meta-bl"></p>
+<p class="reelmeta reelmeta--br" id="meta-br"></p>
+<p class="toast" id="toast"></p>
+
+<div id="perf"></div>
+<div id="boot">hanging the room…</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script>
+'use strict';
+/* ===================================================================
+   DATA · the three collections + the hang, verbatim from Gallery.html
+   =================================================================== */
+const COLLECTIONS=[
+ {id:'col-lenses', kind:'lenses', name:'Understanding Feminism', count:'Three lenses',
+  sub:'Three lenses that change how the movement is understood.',
+  tint:[126,86,192], metaTR:['The words','One room']},
+ {id:'col-waves', kind:'waves', name:'Learning About the Waves', count:'Four historical movements',
+  sub:'One hundred and seventy-eight years, in four movements.',
+  tint:[168,74,118], metaTR:['1848 – now','Four rooms']},
+ {id:'col-people', kind:'scholars', name:'Scholars', count:'Six voices and resources',
+  sub:'Six Black Canadian scholars whose work carries this.',
+  tint:[150,120,206], metaTR:['The people','One room']}
+];
+const TOP_HANG=[
+ [ {cx:.219, cy:-.022, w:.521, h:.585, z:   0, ry:  0},
+   {cx:.628, cy:-.115, w:.233, h:.330, z:-190, ry:-13},
+   {cx:.940, cy: .105, w:.276, h:.375, z:-260, ry:-19} ],
+ [ {cx:.0895,cy:-.072, w:.254, h:.370, z:-230, ry: 15},
+   {cx:.500, cy: .015, w:.480, h:.470, z:   0, ry:  0},
+   {cx:.913, cy: .068, w:.254, h:.390, z:-230, ry:-15} ],
+ [ {cx:.060, cy:-.105, w:.276, h:.355, z:-260, ry: 19},
+   {cx:.372, cy: .100, w:.233, h:.330, z:-190, ry: 13},
+   {cx:.781, cy:-.010, w:.521, h:.605, z:   0, ry:  0} ]
+];
+const HANG_KEYS=['cx','cy','w','h','z','ry'];
+const TOP_TITLE=[ {x:.042,y:.790,w:.38}, {x:.042,y:.795,w:.38}, {x:.520,y:.810,w:.36} ];
+const SCHOLAR_IMGS=[
+ ['img/scholars/njoki-wane.jpg','center 30%'],
+ ['img/scholars/janelle-brady.webp','center 20%'],
+ ['img/scholars/tanitia-munroe.jpg','27% center'],
+ ['img/scholars/rinaldo-walcott.jpg','center 38%'],
+ ['img/scholars/travonne-edwards.webp','center 18%'],
+ ['img/scholars/sam-tecle.jpg','40% 42%']
+];
+/* the reel's tuned feel + the room's art direction · V2 tokens */
+const CFG={ persp:1500, sideFade:.74, snap:.16, wheelStep:42,
+            distortion:.075, overscan:1.08,
+            wallTop:[.141,.094,.204],      /* --gallery-wall  #241834 */
+            wallBot:[.031,.024,.051],      /* --gallery-black #08060d */
+            vigRGB:[8,6,13],
+            vfOffset:16, vfSize:26 };
+/* the curatorial ink pair per focused collection (LINE_INK) */
+const LINE_INK={ lenses:['#6d4a94','#a8802e'], waves:['#a8802e','#6d4a94'],
+                 scholars:['#6d4a94','#a8802e'] };
+/* the four gestures, exact path data from the DOM page */
+const LINES_FAR=[
+ {d:'M -260 690 C 90 430, 352 748, 636 556 S 1004 190, 1206 306 C 1368 384, 1322 596, 1158 598 C 1016 600, 1014 404, 1182 372 C 1444 322, 1650 498, 1900 392',
+  ink:0, w:1.5, o:.42, len:5200, dly:.15},
+ {d:'M -220 168 C 190 34, 470 268, 806 152 S 1332 30, 1900 214',
+  ink:0, w:1.15, o:.32, len:3200, dly:.5},
+ {d:'M -240 1010 C 20 884, 92 630, 316 654 C 494 674, 492 872, 318 884 C 168 894, 132 706, 300 620 C 592 470, 940 800, 1290 716 S 1748 566, 1920 656',
+  ink:1, w:1.25, o:.34, len:4800, dly:.85}
+];
+const LINES_NEAR=[
+ {d:'M -220 812 C 296 726, 578 906, 928 766 S 1512 630, 1920 726',
+  ink:1, w:1.7, o:.3, len:3200, dly:1.1}
+];
+const DPR=Math.min(window.devicePixelRatio||1,2);
+
+/* ===================================================================
+   RENDERER
+   =================================================================== */
+const canvas=document.getElementById('gl');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});
+renderer.setPixelRatio(DPR);
+renderer.setClearColor(0x08060d,1);
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(40,1,40,12000);
+
+/* one fullscreen-triangle geometry shared by every environment layer */
+const FS_GEO=new THREE.BufferGeometry();
+FS_GEO.setAttribute('position',new THREE.BufferAttribute(new Float32Array([-1,-1,0, 3,-1,0, -1,3,0]),3));
+FS_GEO.setAttribute('uv',new THREE.BufferAttribute(new Float32Array([0,0, 2,0, 0,2]),2));
+const FS_VERT='varying vec2 vUv; void main(){ vUv=uv; gl_Position=vec4(position.xy,0.9999,1.0); }';
+function envLayer(mat,order){
+  const m=new THREE.Mesh(FS_GEO,mat);
+  m.frustumCulled=false; m.renderOrder=order;
+  mat.depthWrite=false; mat.depthTest=false;
+  scene.add(m); return m;
+}
+
+/* ---- 1 · THE WALL · glProg's fragment shader, verbatim ---- */
+const wallMat=new THREE.ShaderMaterial({
+  uniforms:{ r:{value:new THREE.Vector2(1,1)}, t:{value:0},
+             k:{value:CFG.distortion}, os:{value:CFG.overscan},
+             wTop:{value:new THREE.Vector3(...CFG.wallTop)},
+             wBot:{value:new THREE.Vector3(...CFG.wallBot)},
+             wGlow:{value:new THREE.Vector3(.43,.29,.66)},
+             fall:{value:.346} },
+  vertexShader:FS_VERT,
+  fragmentShader:
+   'precision mediump float;uniform vec2 r;uniform float t;uniform float k;uniform float os;'+
+   'uniform vec3 wTop;uniform vec3 wBot;uniform vec3 wGlow;uniform float fall;'+
+   'float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}'+
+   'void main(){vec2 uv=gl_FragCoord.xy/r;'+
+   'vec2 c=(uv-.5)*vec2(r.x/r.y,1.0);'+
+   'float rr=dot(c,c);'+
+   'vec2 warp=c*(1.0+k*rr+k*.35*rr*rr)/os;'+
+   'vec2 buv=warp/vec2(r.x/r.y,1.0)+.5;'+
+   'float rw=dot(warp,warp);'+
+   'vec3 col=mix(wBot,wTop,smoothstep(.0,1.,buv.y));'+
+   'vec2 g1=vec2(.5+.22*sin(t*.11),1.06);'+
+   'vec2 g2=vec2(.24+.1*sin(t*.07+2.),.18+.06*cos(t*.09));'+
+   'vec2 g3=vec2(.8+.08*cos(t*.06),.3);'+
+   'col+=wGlow*.16*exp(-11.*distance(buv,g1));'+
+   'col+=wGlow*.20*exp(-7.*distance(buv,g2));'+
+   'col+=wGlow*.13*exp(-9.*distance(buv,g3));'+
+   'col*=1.-rw*fall;'+
+   'col+=(h(gl_FragCoord.xy)-.5)*.024;'+
+   'gl_FragColor=vec4(col,1.);}'
+});
+envLayer(wallMat,-100);
+
+/* ---- 2+3 · FIBRE and GRAIN · the same generated tiles ---- */
+function makeTiles(){
+  const g=document.createElement('canvas'); g.width=g.height=128;
+  const gx=g.getContext('2d'), gi=gx.createImageData(128,128), gd=gi.data;
+  for(let i=0;i<gd.length;i+=4){
+    const v=128+(Math.random()-.5)*70;
+    gd[i]=gd[i+1]=gd[i+2]=v; gd[i+3]=255;
+  }
+  gx.putImageData(gi,0,0);
+  const F=256;
+  const f=document.createElement('canvas'); f.width=f.height=F;
+  const fx=f.getContext('2d');
+  fx.fillStyle='#808080'; fx.fillRect(0,0,F,F);
+  fx.lineCap='round';
+  for(let i=0;i<340;i++){
+    const x=Math.random()*F, y=Math.random()*F;
+    const a=Math.random()*Math.PI, len=6+Math.random()*22;
+    const dx=Math.cos(a)*len, dy=Math.sin(a)*len;
+    const light=Math.random()>.5;
+    fx.strokeStyle= light ? 'rgba(255,255,255,.30)' : 'rgba(0,0,0,.22)';
+    fx.lineWidth=.5+Math.random()*.9;
+    for(let ox=-F;ox<=F;ox+=F) for(let oy=-F;oy<=F;oy+=F){
+      fx.beginPath(); fx.moveTo(x+ox,y+oy); fx.lineTo(x+dx+ox,y+dy+oy); fx.stroke();
+    }
+  }
+  return {grain:g, fibre:f};
+}
+function tileTex(cv){
+  const t=new THREE.CanvasTexture(cv);
+  t.wrapS=t.wrapT=THREE.RepeatWrapping;
+  t.colorSpace=THREE.SRGBColorSpace;
+  return t;
+}
+const TILES=makeTiles();
+const fibreMat=new THREE.ShaderMaterial({
+  transparent:true,
+  uniforms:{ map:{value:tileTex(TILES.fibre)}, r:{value:new THREE.Vector2(1,1)},
+             off:{value:new THREE.Vector2(0,0)}, tile:{value:230}, alpha:{value:.05} },
+  vertexShader:FS_VERT,
+  fragmentShader:`
+    precision mediump float; varying vec2 vUv;
+    uniform sampler2D map; uniform vec2 r,off; uniform float tile,alpha;
+    void main(){
+      /* the inner node carries scale(1.04) about the centre */
+      vec2 px=(gl_FragCoord.xy-r*.5)/1.04+r*.5;
+      px-=vec2(off.x,-off.y);
+      vec3 c=texture2D(map,px/tile).rgb;
+      /* radial mask: transparent 8% -> solid 78% (72% x 62% ellipse) */
+      float rad=length(vec2((vUv.x-.5)/.72,(vUv.y-.5)/.62));
+      gl_FragColor=vec4(c,alpha*smoothstep(.08,.78,rad));
+    }`
+});
+envLayer(fibreMat,-90);
+const grainMat=new THREE.ShaderMaterial({
+  transparent:true,
+  uniforms:{ map:{value:tileTex(TILES.grain)}, tile:{value:150}, alpha:{value:.05} },
+  vertexShader:FS_VERT,
+  fragmentShader:`
+    precision mediump float; varying vec2 vUv;
+    uniform sampler2D map; uniform float tile,alpha;
+    void main(){ gl_FragColor=vec4(texture2D(map,gl_FragCoord.xy/tile).rgb,alpha); }`
+});
+envLayer(grainMat,-80);
+
+/* ---- 4 · LINEWORK · exact paths, canvas-drawn, drift + parallax ----
+   The canvas is repainted only on resize, on an ink change (settle), and
+   during the 2.6s draw-in reveal. Motion is a uv transform: the same
+   translate/rotate/scale the CSS drift keyframes carry. */
+function lineLayerMat(cv){
+  return new THREE.ShaderMaterial({
+    transparent:true,
+    uniforms:{ map:{value:new THREE.CanvasTexture(cv)}, r:{value:new THREE.Vector2(1,1)},
+               off:{value:new THREE.Vector2(0,0)}, rot:{value:0}, sc:{value:1},
+               alpha:{value:1} },
+    vertexShader:FS_VERT,
+    fragmentShader:`
+      precision mediump float; varying vec2 vUv;
+      uniform sampler2D map; uniform vec2 r,off; uniform float rot,sc,alpha;
+      void main(){
+        vec2 px=gl_FragCoord.xy-r*.5;
+        float cs=cos(rot),sn=sin(rot);
+        px=mat2(cs,-sn,sn,cs)*px/sc;
+        px+=r*.5-vec2(off.x,-off.y);
+        vec4 c=texture2D(map,px/r);
+        gl_FragColor=vec4(c.rgb,c.a*alpha);
+      }`
+  });
+}
+function paintLines(cv,paths,inks,reveal){
+  const w=cv.width,h=cv.height;
+  const c=cv.getContext('2d');
+  c.clearRect(0,0,w,h);
+  /* viewBox 1600x900, preserveAspectRatio slice: scale to cover, centred */
+  const s=Math.max(w/1600,h/900);
+  c.save();
+  c.translate((w-1600*s)/2,(h-900*s)/2);
+  c.scale(s,s);
+  c.lineCap='round'; c.lineJoin='round';
+  paths.forEach(p=>{
+    c.strokeStyle=inks[p.ink];
+    c.lineWidth=p.w;
+    c.globalAlpha=p.o;
+    if(reveal!=null){
+      /* glineDraw: 2.6s cubic-bezier(.4,0,.2,1), per-path delay */
+      const t=Math.max(0,Math.min(1,(reveal-p.dly)/2.6));
+      const e=t*t*(3-2*t);                    // close to the DOM curve
+      if(e<=0){ return; }
+      c.setLineDash([p.len]);
+      c.lineDashOffset=p.len*(1-e);
+    } else c.setLineDash([]);
+    c.stroke(new Path2D(p.d));
+  });
+  c.restore();
+}
+const farCv=document.createElement('canvas'), nearCv=document.createElement('canvas');
+const farMat=lineLayerMat(farCv), nearMat=lineLayerMat(nearCv);
+farMat.uniforms.alpha.value=.62;                       /* --gl-o */
+nearMat.uniforms.alpha.value=.62*.62;                  /* --gl-near-o · --gl-o */
+envLayer(farMat,-70);
+const nearMesh=envLayer(nearMat,100);                  /* in FRONT of the art */
+
+/* ---- 5 · LIGHT · three diffused pools, painted once per resize ---- */
+const lightCv=document.createElement('canvas');
+const lightMat=new THREE.ShaderMaterial({
+  transparent:true,
+  uniforms:{ map:{value:new THREE.CanvasTexture(lightCv)}, r:{value:new THREE.Vector2(1,1)},
+             off:{value:new THREE.Vector2(0,0)} },
+  vertexShader:FS_VERT,
+  fragmentShader:`
+    precision mediump float;
+    uniform sampler2D map; uniform vec2 r,off;
+    void main(){ gl_FragColor=texture2D(map,(gl_FragCoord.xy-vec2(off.x,-off.y))/r); }`
+});
+envLayer(lightMat,-60);
+function paintLight(){
+  const w=lightCv.width,h=lightCv.height,c=lightCv.getContext('2d');
+  c.clearRect(0,0,w,h);
+  const pool=(x,y,rx,ry,col)=>{
+    const g=c.createRadialGradient(x*w,y*h,0,x*w,y*h,Math.max(rx*w,ry*h));
+    g.addColorStop(0,col); g.addColorStop(.73,'rgba(0,0,0,0)');
+    c.save(); c.translate(x*w,y*h); c.scale(1,(ry*h)/(rx*w)); c.translate(-x*w,-y*h);
+    c.fillStyle=g; c.fillRect(-w,-h,w*3,h*3); c.restore();
+  };
+  pool(.5,-.06,.46,.34,'rgba(255,246,228,.13)');
+  pool(.12,.42,.34,.30,'rgba(178,150,224,.10)');
+  pool(.88,.56,.30,.28,'rgba(217,161,63,.07)');
+  lightMat.uniforms.map.value.needsUpdate=true;
+}
+
+/* ---- 6 · SPOT · the wash that follows the hang (lightTheWall) ---- */
+const spotMat=new THREE.ShaderMaterial({
+  transparent:true,
+  uniforms:{ r:{value:new THREE.Vector2(1,1)},
+             p1:{value:new THREE.Vector2(.22,.48)},
+             p2:{value:new THREE.Vector2(.63,.39)},
+             p3:{value:new THREE.Vector2(.94,.6)} },
+  vertexShader:FS_VERT,
+  fragmentShader:`
+    precision mediump float; varying vec2 vUv;
+    uniform vec2 r,p1,p2,p3;
+    float pool(vec2 uv,vec2 p,float a){
+      vec2 d=(uv-p)/vec2(.46,.40);
+      return a*max(0.,1.-smoothstep(0.,.72,length(d)));
+    }
+    void main(){
+      vec2 uv=vec2(vUv.x,1.-vUv.y);
+      float k=pool(uv,p1,.12)+pool(uv,p2,.09)+pool(uv,p3,.09);
+      gl_FragColor=vec4(1.,.973,.910,k);
+    }`
+});
+envLayer(spotMat,-50);
+
+/* ---- 7 · ARCH · horizon + haze + corner pulls ---- */
+const archCv=document.createElement('canvas');
+const archMat=new THREE.ShaderMaterial({
+  transparent:true,
+  uniforms:{ map:{value:new THREE.CanvasTexture(archCv)}, r:{value:new THREE.Vector2(1,1)},
+             off:{value:new THREE.Vector2(0,0)} },
+  vertexShader:FS_VERT,
+  fragmentShader:`
+    precision mediump float;
+    uniform sampler2D map; uniform vec2 r,off;
+    void main(){ gl_FragColor=texture2D(map,(gl_FragCoord.xy-vec2(off.x,-off.y))/r); }`
+});
+envLayer(archMat,-40);
+function paintArch(){
+  const w=archCv.width,h=archCv.height,c=archCv.getContext('2d');
+  c.clearRect(0,0,w,h);
+  const vig=CFG.vigRGB.join(',');
+  const lg=c.createLinearGradient(0,0,0,h);
+  lg.addColorStop(0,'rgba('+vig+',0)');   lg.addColorStop(.62,'rgba('+vig+',0)');
+  lg.addColorStop(.71,'rgba('+vig+',.05)'); lg.addColorStop(.74,'rgba('+vig+',.11)');
+  lg.addColorStop(.78,'rgba('+vig+',.045)'); lg.addColorStop(.92,'rgba('+vig+',0)');
+  c.fillStyle=lg; c.fillRect(0,0,w,h);
+  const haze=c.createRadialGradient(w*.5,h*.76,0,w*.5,h*.76,w*.6);
+  haze.addColorStop(0,'rgba(255,250,240,.11)'); haze.addColorStop(.7,'rgba(255,250,240,0)');
+  c.save(); c.translate(w*.5,h*.76); c.scale(1,(h*.22)/(w*.6)); c.translate(-w*.5,-h*.76);
+  c.fillStyle=haze; c.fillRect(-w,-h*4,w*3,h*8); c.restore();
+  const corner=(x,a)=>{
+    const g=c.createRadialGradient(x*w,0,0,x*w,0,w*.56);
+    g.addColorStop(0,'rgba('+vig+','+a+')'); g.addColorStop(.72,'rgba('+vig+',0)');
+    c.save(); c.translate(x*w,0); c.scale(1,(h*.40)/(w*.56)); c.translate(-x*w,0);
+    c.fillStyle=g; c.fillRect(-w,-h*4,w*3,h*8); c.restore();
+  };
+  corner(0,.11); corner(1,.10);
+  archMat.uniforms.map.value.needsUpdate=true;
+}
+
+/* ---- 8 · FLOOR · the fade into --wall-deep with the gold breath ---- */
+const floorCv=document.createElement('canvas');
+const floorMat=new THREE.ShaderMaterial({
+  transparent:true,
+  uniforms:{ map:{value:new THREE.CanvasTexture(floorCv)}, r:{value:new THREE.Vector2(1,1)} },
+  vertexShader:FS_VERT,
+  fragmentShader:`
+    precision mediump float;
+    uniform sampler2D map; uniform vec2 r;
+    void main(){ gl_FragColor=texture2D(map,gl_FragCoord.xy/r); }`
+});
+envLayer(floorMat,-30);
+function paintFloor(){
+  const w=floorCv.width,h=floorCv.height,c=floorCv.getContext('2d');
+  c.clearRect(0,0,w,h);
+  const top=h*.66;                              /* bottom 34% of the room */
+  const lg=c.createLinearGradient(0,top,0,h);
+  lg.addColorStop(0,'rgba(20,12,34,0)'); lg.addColorStop(1,'rgba(20,12,34,.55)');
+  c.fillStyle=lg; c.fillRect(0,top,w,h-top);
+  const g=c.createRadialGradient(w*.5,h,0,w*.5,h,w*.3);
+  g.addColorStop(0,'rgba(217,161,63,.05)'); g.addColorStop(.7,'rgba(217,161,63,0)');
+  c.save(); c.translate(w*.5,h); c.scale(1,(h-top)/(w*.3)); c.translate(-w*.5,-h);
+  c.fillStyle=g; c.fillRect(-w,0,w*3,h*2); c.restore();
+  floorMat.uniforms.map.value.needsUpdate=true;
+}
+
+/* ---- 9 · VIGNETTE · the directory's own tokens ---- */
+const vigCv=document.createElement('canvas');
+const vigMat=new THREE.ShaderMaterial({
+  transparent:true,
+  uniforms:{ map:{value:new THREE.CanvasTexture(vigCv)}, r:{value:new THREE.Vector2(1,1)} },
+  vertexShader:FS_VERT,
+  fragmentShader:`
+    precision mediump float;
+    uniform sampler2D map; uniform vec2 r;
+    void main(){ gl_FragColor=texture2D(map,gl_FragCoord.xy/r); }`
+});
+envLayer(vigMat,-20);
+function paintVig(){
+  const w=vigCv.width,h=vigCv.height,c=vigCv.getContext('2d');
+  c.clearRect(0,0,w,h);
+  const vig=CFG.vigRGB.join(',');
+  const S=.58, corner=.82, edge=.6;             /* directory tokens */
+  /* radial: 52% x 66% at 50% 46% — transparent 66%, then the fall-off */
+  const rx=w*.52, ry=h*.66;
+  const rg=c.createRadialGradient(w*.5,h*.46,0,w*.5,h*.46,rx);
+  rg.addColorStop(0,'rgba('+vig+',0)'); rg.addColorStop(.66,'rgba('+vig+',0)');
+  rg.addColorStop(.9,'rgba('+vig+','+(.30*corner*S)+')');
+  rg.addColorStop(1,'rgba('+vig+','+(.80*corner*S)+')');
+  c.save(); c.translate(w*.5,h*.46); c.scale(1,ry/rx); c.translate(-w*.5,-h*.46);
+  c.fillStyle=rg; c.fillRect(-w,-h*2,w*3,h*5); c.restore();
+  /* the side edges */
+  const lg=c.createLinearGradient(0,0,w,0);
+  const ea=.62*edge*S;
+  lg.addColorStop(0,'rgba('+vig+','+ea+')'); lg.addColorStop(.17,'rgba('+vig+',0)');
+  lg.addColorStop(.83,'rgba('+vig+',0)');   lg.addColorStop(1,'rgba('+vig+','+ea+')');
+  c.fillStyle=lg; c.fillRect(0,0,w,h);
+  vigMat.uniforms.map.value.needsUpdate=true;
+}
+
+/* ---- 10 · VIEWFINDER · four brackets tracking the focused work ---- */
+const vfGroup=new THREE.Group();
+{
+  const mat=new THREE.MeshBasicMaterial({color:0xf2ede4,transparent:true,opacity:.72,
+    depthTest:false});
+  const arm=()=>new THREE.Mesh(new THREE.PlaneGeometry(1,1),mat);
+  for(let i=0;i<4;i++){
+    const cg=new THREE.Group();
+    const hA=arm(); hA.scale.set(CFG.vfSize,1,1); hA.position.set(CFG.vfSize/2*(i%2?-1:1),0,0);
+    const vA=arm(); vA.scale.set(1,CFG.vfSize,1); vA.position.set(0,-CFG.vfSize/2*(i<2?1:-1),0);
+    cg.add(hA); cg.add(vA); cg.renderOrder=90;
+    vfGroup.add(cg);
+  }
+  vfGroup.renderOrder=90;
+  scene.add(vfGroup);
+}
+function placeVF(cx,cy,w2,h2){
+  const o=CFG.vfOffset, L=cx-w2/2-o, R=cx+w2/2+o, T=-cy+h2/2+o, B=-cy-h2/2-o;
+  vfGroup.children[0].position.set(L,T,1);
+  vfGroup.children[1].position.set(R,T,1);
+  vfGroup.children[2].position.set(L,B,1);
+  vfGroup.children[3].position.set(R,B,1);
+}
+
+/* ===================================================================
+   COVER ART · painted once (unchanged from pass one)
+   =================================================================== */
+function loadImg(src){ return new Promise(r=>{ const i=new Image(); i.onload=()=>r(i); i.onerror=()=>r(i); i.src=src; }); }
+function paintLensesPoster(){
+  const W=880,H=1100,cv=document.createElement('canvas');
+  cv.width=W; cv.height=H; const c=cv.getContext('2d');
+  const g=c.createLinearGradient(0,0,W*.15,H);
+  g.addColorStop(0,'#3d2659'); g.addColorStop(1,'#190f27');
+  c.fillStyle=g; c.fillRect(0,0,W,H);
+  c.fillStyle='rgba(242,237,228,.75)';
+  c.font='500 26px "IBM Plex Sans", sans-serif';
+  let x=W*.12;
+  for(const ch of 'ONE WORD'){ c.fillText(ch,x,H*.30); x+=c.measureText(ch).width+26*.14; }
+  c.fillStyle='#f2ede4';
+  c.font='italic 600 150px Fraunces, Georgia, serif';
+  c.fillText('three',W*.11,H*.475);
+  c.fillText('lenses',W*.11,H*.61);
+  c.strokeStyle='rgba(217,161,63,.85)'; c.lineWidth=3;
+  c.beginPath(); c.moveTo(W*.12,H*.70); c.lineTo(W*.34,H*.70); c.stroke();
+  c.fillStyle='rgba(242,237,228,.62)';
+  c.font='500 23px "IBM Plex Sans", sans-serif';
+  c.fillText('WHITE FEMINISM · BLACK FEMINISM',W*.12,H*.785);
+  c.fillText('· INTERSECTIONALITY',W*.12,H*.83);
+  return cv;
+}
+function paintPhotoCover(img){
+  const W=1280,H=1100,cv=document.createElement('canvas');
+  cv.width=W; cv.height=H; const c=cv.getContext('2d');
+  c.fillStyle='#190f27'; c.fillRect(0,0,W,H);
+  if(img&&img.naturalWidth){
+    c.filter='saturate(.9) contrast(1.02)';
+    const r=Math.max(W/img.naturalWidth,H/img.naturalHeight);
+    const dw=img.naturalWidth*r,dh=img.naturalHeight*r;
+    c.drawImage(img,(W-dw)/2,(H-dh)/2,dw,dh);
+    c.filter='none';
+  }
+  return cv;
+}
+function paintScholarsCover(imgs){
+  const W=1000,H=1100,cv=document.createElement('canvas');
+  cv.width=W; cv.height=H; const c=cv.getContext('2d');
+  const g=c.createLinearGradient(0,0,W*.2,H);
+  g.addColorStop(0,'#3d2659'); g.addColorStop(1,'#190f27');
+  c.fillStyle=g; c.fillRect(0,0,W,H);
+  const CELLS=[ [.06,.08,.40,.34],[.53,.20,.38,.30],[.10,.48,.34,.28],
+                [.50,.56,.40,.34],[.28,.24,.30,.26],[.62,.02,.30,.24] ];
+  imgs.forEach((im,i)=>{
+    if(!im||!im.naturalWidth) return;
+    const [fx,fy,fw,fh]=CELLS[i%CELLS.length];
+    const x=fx*W,y=fy*H,w=fw*W,h=fh*H;
+    c.save();
+    c.beginPath(); c.roundRect(x,y,w,h,4); c.clip();
+    c.filter='saturate(.92) contrast(1.04)';
+    const r=Math.max(w/im.naturalWidth,h/im.naturalHeight);
+    const dw=im.naturalWidth*r,dh=im.naturalHeight*r;
+    c.drawImage(im,x+(w-dw)/2,y+(h-dh)/2,dw,dh);
+    c.filter='none';
+    c.restore();
+    c.strokeStyle='rgba(242,237,228,.18)'; c.lineWidth=2;
+    c.beginPath(); c.roundRect(x,y,w,h,4); c.stroke();
+  });
+  return cv;
+}
+function paintLabel(idx,n,title,meta){
+  const W=760,H=190,s=2,cv=document.createElement('canvas');
+  cv.width=W*s; cv.height=H*s; const c=cv.getContext('2d'); c.scale(s,s);
+  c.fillStyle='#d9a13f';
+  c.font='500 21px "IBM Plex Sans", sans-serif';
+  let x=0; const pad=v=>String(v).padStart(2,'0');
+  for(const ch of pad(idx+1)+' / '+pad(n)){ c.fillText(ch,x,26); x+=c.measureText(ch).width+21*.11; }
+  c.fillStyle='#f2ede4';
+  c.font='600 42px Fraunces, Georgia, serif';
+  c.fillText(title,0,84);
+  c.fillStyle='rgba(233,226,244,.6)';
+  c.font='500 22px "IBM Plex Sans", sans-serif';
+  x=0; for(const ch of meta.toUpperCase()){ c.fillText(ch,x,136); x+=c.measureText(ch).width+22*.09; }
+  const t=new THREE.CanvasTexture(cv); t.colorSpace=THREE.SRGBColorSpace;
+  t.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());
+  return {tex:t,w:W,h:H};
+}
+function coverMaterial(tex,texAspect){
+  return new THREE.ShaderMaterial({
+    transparent:true,
+    uniforms:{ map:{value:tex}, opacity:{value:1}, planeAspect:{value:1},
+               texAspect:{value:texAspect}, shift:{value:0} },
+    vertexShader:'varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }',
+    fragmentShader:`
+      precision mediump float; varying vec2 vUv;
+      uniform sampler2D map; uniform float opacity,planeAspect,texAspect,shift;
+      void main(){
+        float uw=min(1.,planeAspect/texAspect);
+        float vw=min(1.,texAspect/planeAspect);
+        vec2 uv2=vec2(.5+(vUv.x-.5)*uw+shift*uw, .5+(vUv.y-.5)*vw);
+        vec3 col=texture2D(map,uv2).rgb;
+        float y=1.-vUv.y; float s;
+        if(y<.32)      s=mix(.34,.05,y/.32);
+        else if(y<.72) s=mix(.05,.5,(y-.32)/.4);
+        else           s=mix(.5,.88,(y-.72)/.28);
+        col=mix(col,vec3(.031,.024,.051),s);
+        gl_FragColor=vec4(col,opacity);
+      }`
+  });
+}
+function shadowSprite(){
+  const cv=document.createElement('canvas'); cv.width=512; cv.height=512;
+  const c=cv.getContext('2d');
+  c.filter='blur(34px)';
+  c.fillStyle='rgba(5,2,12,.85)';
+  c.beginPath(); c.roundRect(96,96,320,320,10); c.fill();
+  const t=new THREE.CanvasTexture(cv); t.colorSpace=THREE.SRGBColorSpace;
+  return t;
+}
+
+/* ===================================================================
+   STATE + BUILD
+   =================================================================== */
+const REEL={pos:0,target:0,vel:0,dragging:false,down:null,moved:0,
+            wheelAcc:0,wheelT:0,covers:[]};
+const S={look:{x:0,y:0,tx:0,ty:0},hovered:-1,idleFrames:0,raf:null,
+         reveal:-1,revealT0:0};
+const raycaster=new THREE.Raycaster();
+const pointerNDC=new THREE.Vector2(-2,-2);
+let SHADOW_TEX=null;
+
+async function build(){
+  await document.fonts.load('italic 600 150px Fraunces');
+  await document.fonts.load('600 42px Fraunces');
+  await document.fonts.load('500 26px "IBM Plex Sans"');
+  const [waveImg,...schImgs]=await Promise.all(
+    [loadImg('img/waves/wave-02.jpg'),...SCHOLAR_IMGS.map(s=>loadImg(s[0]))]);
+
+  SHADOW_TEX=shadowSprite();
+  const faces=[paintLensesPoster(),paintPhotoCover(waveImg),paintScholarsCover(schImgs)];
+
+  COLLECTIONS.forEach((col,i)=>{
+    const cvs=faces[i];
+    const tex=new THREE.CanvasTexture(cvs);
+    tex.colorSpace=THREE.SRGBColorSpace;
+    tex.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());
+    tex.generateMipmaps=true; tex.minFilter=THREE.LinearMipmapLinearFilter;
+    const mat=coverMaterial(tex,cvs.width/cvs.height);
+    const art=new THREE.Mesh(new THREE.PlaneGeometry(1,1),mat);
+    art.userData={idx:i};
+    const sh=new THREE.Mesh(new THREE.PlaneGeometry(1,1),
+      new THREE.MeshBasicMaterial({map:SHADOW_TEX,transparent:true,depthWrite:false,opacity:.6}));
+    const lab=paintLabel(i,COLLECTIONS.length,col.name,col.count);
+    const labMesh=new THREE.Mesh(new THREE.PlaneGeometry(lab.w,lab.h),
+      new THREE.MeshBasicMaterial({map:lab.tex,transparent:true,depthWrite:false,opacity:0}));
+    const g=new THREE.Group();
+    g.add(sh); g.add(art); g.add(labMesh);
+    scene.add(g);
+    REEL.covers.push({g,art,sh,lab:labMesh,mat,col});
+  });
+
+  resize();
+  renderer.compile(scene,camera);
+  REEL.covers.forEach(c=>{ renderer.initTexture(c.mat.uniforms.map.value);
+                           renderer.initTexture(c.lab.material.map); });
+  renderer.initTexture(SHADOW_TEX);
+  paintChrome(0,true);
+  document.getElementById('boot').classList.add('off');
+  S.reveal=0; S.revealT0=performance.now();      /* the draw-in, on entry */
+  wake();
+}
+
+/* ===================================================================
+   THE HANG · layoutReel's top branch, on meshes
+   =================================================================== */
+let vfRect=[0,0,100,100];
+function layoutHang(){
+  const vw=innerWidth,vh=innerHeight,P=CFG.persp;
+  const last=TOP_HANG.length-1;
+  const a=Math.max(0,Math.min(last,Math.floor(REEL.pos)));
+  const b=Math.max(0,Math.min(last,a+1));
+  const f=Math.max(0,Math.min(1,REEL.pos-a));
+  const vel=Math.max(-1,Math.min(1,REEL.vel*26));
+  const hang=[];
+
+  for(let i=0;i<REEL.covers.length;i++){
+    const A=TOP_HANG[a][i],B=TOP_HANG[b][i],c={};
+    HANG_KEYS.forEach(k=>{ c[k]=A[k]+(B[k]-A[k])*f; });
+    hang.push(c);
+    const rec=REEL.covers[i];
+    const ad=Math.abs(i-REEL.pos);
+
+    const f2=P/(P+Math.abs(c.z));
+    const ct=Math.max(.2,Math.cos(c.ry*Math.PI/180));
+    const wpx=(c.w*vw)/(f2*ct);
+    const hpx=(c.h*vh)/f2;
+    const cx=(c.cx*vw-vw*.5)/f2;
+    const cy=((((.5+c.cy)*vh)-vh*.48)/f2-vh*.02);
+    const cz=c.z-Math.abs(vel)*26;
+    const cry=c.ry-vel*2;
+
+    rec.g.position.set(cx,-cy,cz);
+    rec.g.rotation.y=-cry*Math.PI/180;
+    rec.art.scale.set(wpx,hpx,1);
+    rec.mat.uniforms.planeAspect.value=wpx/hpx;
+    rec.mat.uniforms.opacity.value=1-(1-CFG.sideFade)*Math.min(1,ad*1.1);
+
+    const wS=c.w*vw,lS=c.cx*vw-wS/2,rS=lS+wS;
+    let shift=0;
+    if(lS<0) shift=Math.min(-lS,wS*.34)/(f2*ct);
+    else if(rS>vw) shift=-Math.min(rS-vw,wS*.34)/(f2*ct);
+    rec.mat.uniforms.shift.value=-shift/wpx;
+
+    const shd=1-Math.min(.62,Math.abs(c.z)/460);
+    rec.sh.scale.set(wpx*1.65,hpx*1.65,1);
+    rec.sh.position.set(-c.ry*.9,-hpx*.06,-30);
+    rec.sh.material.opacity=.55*shd*rec.mat.uniforms.opacity.value;
+
+    const ls=Math.min(.5, wpx*.92/760);
+    rec.lab.scale.setScalar(ls);
+    rec.lab.position.set(-wpx/2+760*ls/2, -hpx/2-40-95*ls*.5, 4);
+    rec.lab.material.opacity = ad<.55?0:Math.min(.9,(ad-.55)/.45*.9);
+  }
+  /* the viewfinder + the wall wash both read the hang (layoutReel tail) */
+  const j=Math.max(0,Math.min(2,Math.round(REEL.pos)));
+  const cj=hang[j], f2j=P/(P+Math.abs(cj.z));
+  vfRect=[(cj.cx*innerWidth-innerWidth*.5)/f2j,
+          ((((.5+cj.cy)*innerHeight)-innerHeight*.48)/f2j-innerHeight*.02),
+          cj.w*innerWidth, cj.h*innerHeight];
+  placeVF(vfRect[0],vfRect[1],vfRect[2],vfRect[3]);
+  spotMat.uniforms.p1.value.set(cj.cx,.5+cj.cy);
+  let k=0;
+  hang.forEach((c,i)=>{
+    if(i===j||k>1) return;
+    spotMat.uniforms['p'+(k+2)].value.set(c.cx,.5+c.cy);
+    k++;
+  });
+  /* the wall title walks the negative space between the hang states */
+  const TA=TOP_TITLE[a],TB=TOP_TITLE[b];
+  const tt=document.getElementById('reelTitle');
+  tt.style.left=((TA.x+(TB.x-TA.x)*f)*100).toFixed(2)+'vw';
+  tt.style.top=((TA.y+(TB.y-TA.y)*f)*100).toFixed(2)+'vh';
+  tt.style.width=((TA.w+(TB.w-TA.w)*f)*100).toFixed(2)+'vw';
+}
+
+/* chrome that only changes when the index settles — including the
+   linework ink, which is art-directed for the destination (LINE_INK) */
+let painted=-1;
+function paintChrome(i,force){
+  if(!force&&i===painted) return;
+  painted=i;
+  const col=COLLECTIONS[i],pad=v=>String(v).padStart(2,'0');
+  const tt=document.getElementById('reelTitle');
+  tt.querySelector('h2').textContent=col.name;
+  tt.querySelector('p').textContent=col.sub;
+  document.getElementById('meta-tl').innerHTML='<b>Collection '+pad(i+1)+' / '+pad(COLLECTIONS.length)+'</b>'+col.count;
+  document.getElementById('meta-tr').innerHTML='<b>'+col.metaTR[0]+'</b>'+col.metaTR[1];
+  document.getElementById('meta-br').innerHTML='<b>Drag or scroll</b>Enter opens the collection';
+  document.getElementById('meta-bl').innerHTML='<b>Not started</b>';
+  const ink=LINE_INK[col.kind]||LINE_INK.lenses;
+  if(S.reveal<0){                       /* mid-reveal keeps its own painter */
+    paintLines(farCv,LINES_FAR,ink,null);
+    paintLines(nearCv,LINES_NEAR,ink,null);
+    farMat.uniforms.map.value.needsUpdate=true;
+    nearMat.uniforms.map.value.needsUpdate=true;
+  }
+}
+
+/* ===================================================================
+   LOOP
+   =================================================================== */
+let lastT=0,EASE_F=1;
+const ease60=k=>1-Math.pow(1-k,EASE_F);
+const perf={hist:new Float32Array(120),i:0,ema:16.7};
+const glowCur=new THREE.Vector3(.43,.29,.66);
+/* glow luminance scaling, as paintWall does it */
+const wallLum=CFG.wallTop[0]*.299+CFG.wallTop[1]*.587+CFG.wallTop[2]*.114;
+const glowK=Math.max(.12,1-wallLum);
+
+function frame(now){
+  const dt=lastT?Math.min(50,now-lastT):16.667; lastT=now;
+  EASE_F=dt/16.667;
+  perf.ema+=(dt-perf.ema)*.05; perf.hist[perf.i++%120]=dt;
+
+  const prev=REEL.pos;
+  const k=REEL.dragging?1:(Math.abs(REEL.target-REEL.pos)>.002?ease60(CFG.snap):0);
+  if(k) REEL.pos+=(REEL.target-REEL.pos)*k;
+  const perFrame=EASE_F>0?(REEL.pos-prev)/EASE_F:0;
+  REEL.vel+=(perFrame-REEL.vel)*ease60(.25);
+  if(Math.abs(REEL.vel)<1e-4) REEL.vel=0;
+
+  /* surfaceParallax: one smoothed pair, eased at .08 */
+  S.look.x+=(S.look.tx-S.look.x)*ease60(.08);
+  S.look.y+=(S.look.ty-S.look.y)*ease60(.08);
+  const mx=+S.look.x.toFixed(4), my=+S.look.y.toFixed(4);
+  const looking=Math.abs(S.look.tx-S.look.x)>.0004||Math.abs(S.look.ty-S.look.y)>.0004;
+
+  const revealing=S.reveal>=0;
+  const moving=!!(k||REEL.vel)||REEL.dragging||looking||revealing;
+
+  if(k||REEL.vel||REEL.dragging) layoutHang();
+  document.body.classList.toggle('is-busy',
+    REEL.dragging||Math.abs(REEL.target-REEL.pos)>.25);
+
+  /* each layer applies its own magnitude — the CSS numbers, verbatim */
+  fibreMat.uniforms.off.value.set(mx*11.44,my*7.28);
+  lightMat.uniforms.off.value.set(mx*-14,my*-8);
+  archMat.uniforms.off.value.set(0,my*5);
+  /* linework drift: the glineDrift keyframes, 64s / 44s, alternate */
+  const drift=(dur)=>{
+    const p=(now/1000)%(dur*2), q=p<dur?p/dur:2-p/dur;
+    const e=q*q*(3-2*q);
+    return e;
+  };
+  const eF=drift(64), eN=drift(44);
+  farMat.uniforms.off.value.set(mx*12+(-5+11*eF), my*12*.55+(3-7*eF));
+  farMat.uniforms.rot.value=(-.14+.26*eF)*Math.PI/180;
+  farMat.uniforms.sc.value=1.005-.005*eF;
+  nearMat.uniforms.off.value.set(mx*26+(-5+11*eN), my*26*.55+(3-7*eN));
+  nearMat.uniforms.rot.value=(-.14+.26*eN)*Math.PI/180;
+  nearMat.uniforms.sc.value=1.005-.005*eN;
+
+  /* the entry draw-in, then the lines hold still */
+  if(revealing){
+    const t=(now-S.revealT0)/1000;
+    const ink=LINE_INK[COLLECTIONS[Math.round(REEL.target)].kind];
+    paintLines(farCv,LINES_FAR,ink,t);
+    paintLines(nearCv,LINES_NEAR,ink,t);
+    farMat.uniforms.map.value.needsUpdate=true;
+    nearMat.uniforms.map.value.needsUpdate=true;
+    if(t>4.6){ S.reveal=-1;
+      paintLines(farCv,LINES_FAR,ink,null); paintLines(nearCv,LINES_NEAR,ink,null);
+      farMat.uniforms.map.value.needsUpdate=true; nearMat.uniforms.map.value.needsUpdate=true; }
+  }
+
+  /* the wall: room tone follows the focused collection, pools breathe
+     only while the room is awake — the DOM wall is dirty-flagged too */
+  const t0=COLLECTIONS[Math.round(Math.max(0,Math.min(2,REEL.pos)))].tint;
+  glowCur.x+=(t0[0]/255*glowK-glowCur.x)*ease60(.06);
+  glowCur.y+=(t0[1]/255*glowK-glowCur.y)*ease60(.06);
+  glowCur.z+=(t0[2]/255*glowK-glowCur.z)*ease60(.06);
+  wallMat.uniforms.wGlow.value.copy(glowCur);
+  wallMat.uniforms.t.value=now/1000;
+
+  if(!moving&&painted!==Math.round(REEL.target)) paintChrome(Math.round(REEL.target));
+
+  hoverPick();
+  renderer.render(scene,camera);
+
+  if(moving) S.idleFrames=0; else S.idleFrames++;
+  if(S.idleFrames>2&&!document.body.classList.contains('showperf')){
+    S.raf=null; return;               /* settled: drift pauses, like env-idle */
+  }
+  S.raf=requestAnimationFrame(frame);
+  drawPerf();
+}
+function wake(){ if(S.raf==null){ lastT=0; S.raf=requestAnimationFrame(frame); } }
+
+function hoverPick(){
+  raycaster.setFromCamera(pointerNDC,camera);
+  const hits=raycaster.intersectObjects(REEL.covers.map(r=>r.art));
+  const idx=hits.length?hits[0].object.userData.idx:-1;
+  if(idx!==S.hovered){ S.hovered=idx; canvas.classList.toggle('point',idx>=0); }
+}
+
+/* ===================================================================
+   INPUT · the reel's tuned feel + the cursor feeding the parallax
+   =================================================================== */
+function setReel(i){ REEL.target=Math.max(0,Math.min(COLLECTIONS.length-1,i)); wake(); }
+addEventListener('wheel',e=>{
+  const now=performance.now();
+  if(now-REEL.wheelT>220) REEL.wheelAcc=0;
+  REEL.wheelT=now;
+  REEL.wheelAcc+=Math.abs(e.deltaX)>Math.abs(e.deltaY)?e.deltaX:e.deltaY;
+  if(Math.abs(REEL.wheelAcc)>CFG.wheelStep){
+    setReel(REEL.target+Math.sign(REEL.wheelAcc));
+    REEL.wheelAcc=0;
+  }
+},{passive:true});
+addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight') setReel(REEL.target+1);
+  else if(e.key==='ArrowLeft') setReel(REEL.target-1);
+  else if(e.key==='Home') setReel(0);
+  else if(e.key==='End') setReel(2);
+  else if(e.key==='Enter') activate(Math.round(REEL.target));
+});
+const stepPx=()=>innerWidth*.51;
+canvas.addEventListener('pointerdown',e=>{
+  REEL.dragging=true; REEL.moved=0;
+  REEL.down={x:e.clientX,pos:REEL.pos};
+  canvas.classList.add('dragging'); canvas.setPointerCapture(e.pointerId);
+  wake();
+});
+canvas.addEventListener('pointermove',e=>{
+  /* the cursor drives the wall: -1..1 both axes, smoothed in the loop */
+  S.look.tx=(e.clientX/innerWidth)*2-1;
+  S.look.ty=(e.clientY/innerHeight)*2-1;
+  pointerNDC.set((e.clientX/innerWidth)*2-1,-(e.clientY/innerHeight)*2+1);
+  if(REEL.dragging){
+    const dx=e.clientX-REEL.down.x;
+    REEL.moved=Math.max(REEL.moved,Math.abs(dx));
+    REEL.pos=Math.max(-.2,Math.min(2.2,REEL.down.pos-dx/stepPx()));
+    REEL.target=Math.max(0,Math.min(2,Math.round(REEL.pos)));
+  }
+  wake();
+});
+canvas.addEventListener('pointerup',e=>{
+  canvas.classList.remove('dragging');
+  const tap=REEL.dragging&&REEL.moved<=8;
+  REEL.dragging=false;
+  if(tap&&S.hovered>=0){
+    if(S.hovered!==Math.round(REEL.target)) setReel(S.hovered);
+    else activate(S.hovered);
+  }
+  wake();
+});
+canvas.addEventListener('pointerleave',()=>{ S.look.tx=0; S.look.ty=0; pointerNDC.set(-2,-2); wake(); });
+function activate(i){
+  if(COLLECTIONS[i].kind==='waves'){ location.href='gallery-gl.html'; return; }
+  const toast=document.getElementById('toast');
+  toast.textContent='“'+COLLECTIONS[i].name+'” opens here once its rooms are ported — Waves is the one that chains today.';
+  toast.classList.add('on');
+  clearTimeout(activate._t);
+  activate._t=setTimeout(()=>toast.classList.remove('on'),2600);
+}
+
+/* ===================================================================
+   RESIZE
+   =================================================================== */
+function resize(){
+  const w=innerWidth,h=innerHeight;
+  renderer.setSize(w,h,false);
+  camera.aspect=w/h;
+  camera.fov=2*Math.atan((h/2)/CFG.persp)*180/Math.PI;
+  camera.position.set(0,0,CFG.persp);
+  camera.updateProjectionMatrix();
+  const bw=Math.round(w*DPR),bh=Math.round(h*DPR);
+  wallMat.uniforms.r.value.set(bw,bh);
+  fibreMat.uniforms.r.value.set(bw,bh);
+  fibreMat.uniforms.tile.value=230*DPR;
+  grainMat.uniforms.tile.value=150*DPR;
+  [farMat,nearMat,lightMat,archMat,floorMat,vigMat,spotMat].forEach(m=>{
+    if(m.uniforms.r) m.uniforms.r.value.set(bw,bh);
+  });
+  /* offscreen painters redraw at the new size */
+  [farCv,nearCv].forEach(cv=>{ cv.width=bw; cv.height=bh; });
+  [lightCv,archCv,floorCv,vigCv].forEach(cv=>{ cv.width=Math.round(bw/2); cv.height=Math.round(bh/2); });
+  const ink=LINE_INK[COLLECTIONS[Math.max(0,Math.min(2,Math.round(REEL.target)))].kind];
+  paintLines(farCv,LINES_FAR,ink,null); farMat.uniforms.map.value.needsUpdate=true;
+  paintLines(nearCv,LINES_NEAR,ink,null); nearMat.uniforms.map.value.needsUpdate=true;
+  paintLight(); paintArch(); paintFloor(); paintVig();
+  layoutHang();
+  wake();
+}
+addEventListener('resize',resize,{passive:true});
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden) wake(); });
+
+if(location.search.includes('perf')) document.body.classList.add('showperf');
+function drawPerf(){
+  if(!document.body.classList.contains('showperf')) return;
+  let worst=0; for(let i=0;i<120;i++) worst=Math.max(worst,perf.hist[i]);
+  document.getElementById('perf').textContent=
+    'frame  '+perf.ema.toFixed(1)+' ms ema\n'+
+    'worst  '+worst.toFixed(1)+' ms /120f\n'+
+    'draws  '+renderer.info.render.calls+'  tris '+renderer.info.render.triangles;
+}
+
+build();
+</script>
+</body>
+</html>

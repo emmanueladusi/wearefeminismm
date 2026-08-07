@@ -24,7 +24,13 @@
   --gold-soft: rgba(234, 115, 147, 0.16);
   --gold-ink: #93485d;        /* the accent as TEXT: 4.62:1. The raw accent is 2.08:1 */
   --cream-on-dark: #f2efed;
-  --dim-on-dark: #f2efed;
+  /* The quiet tier on dark grounds. It was set equal to --cream-on-dark during
+     the palette change, which meant every subhead, caption, eyebrow and privacy
+     line on the year machine and the wall rendered at exactly the headline's
+     brightness -- a slab of uniformly loud text with no hierarchy left in it.
+     8.18:1 on the wall and 7.45:1 on the year machine, so it is a second tier
+     by a wide margin and still far past AA for body copy. */
+  --dim-on-dark: #c4b2ab;
   --line: rgba(69, 47, 40, 0.18);
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   --serif: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -160,7 +166,7 @@ html {
   justify-content: space-between;
   padding: 18px clamp(20px, 5vw, 64px);
   z-index: 100;
-  background: rgba(250, 246, 239, 0.82);
+  background: rgba(226, 219, 216, 0.82);
   backdrop-filter: blur(14px) saturate(1.3);
   -webkit-backdrop-filter: blur(14px) saturate(1.3);
   border-bottom: 1px solid transparent;
@@ -206,11 +212,11 @@ html {
 @media (max-width: 760px) {
   .nav {
     padding: 12px 20px;
-    background: rgba(250, 246, 239, 0.94);
+    background: rgba(226, 219, 216, 0.94);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
-  html[data-theme="dark"] header.nav { background: rgba(18, 14, 28, 0.94); }
+  html[data-theme="dark"] header.nav { background: rgba(33, 23, 19, 0.94); }
 
   .nav .nav__toggle { width: 44px; height: 44px; }
 
@@ -294,7 +300,7 @@ html {
 .h7__media::after {
   content: "";
   position: absolute; inset: 0;
-  background: rgba(250, 246, 239, 0.14);
+  background: rgba(226, 219, 216, 0.14);
   mix-blend-mode: overlay;
   pointer-events: none;
 }
@@ -786,7 +792,7 @@ html[data-a11y] .pathway__arrow { transition: none !important; }
   margin-left: -4.5px;
   border-radius: 50%;
   background: var(--gold);
-  box-shadow: 0 0 12px rgba(217, 161, 63, 0.7);
+  box-shadow: 0 0 12px rgba(234, 115, 147, 0.7);
   will-change: transform;
 }
 
@@ -904,16 +910,22 @@ html[data-a11y] .pathway__arrow { transition: none !important; }
   margin-bottom: 52px;
 }
 
+/* The one thing on this section a reader is meant to act on, so it is the one
+   thing with weight: a lit panel rather than the faintest box on the page. */
 .composer {
-  background: rgba(250, 246, 239, 0.06);
-  border: 1px solid rgba(250, 246, 239, 0.16);
+  background: rgba(226, 219, 216, 0.09);
+  border: 1px solid rgba(226, 219, 216, 0.28);
   border-radius: var(--r-lg);
-  padding: 22px;
+  padding: clamp(20px, 3vw, 28px);
   margin-bottom: 40px;
-  transition: border-color 0.3s;
+  box-shadow: 0 22px 60px -34px rgba(0, 0, 0, 0.75);
+  transition: border-color 0.3s, background-color 0.3s;
 }
 
-.composer:focus-within { border-color: var(--gold); }
+.composer:focus-within {
+  border-color: var(--gold);
+  background: rgba(226, 219, 216, 0.12);
+}
 
 .composer textarea {
   width: 100%;
@@ -921,7 +933,8 @@ html[data-a11y] .pathway__arrow { transition: none !important; }
   border: none;
   color: var(--cream-on-dark);
   font-family: var(--sans);
-  font-size: 1rem;
+  font-size: 1.05rem;
+  line-height: 1.6;
   resize: vertical;
   margin-bottom: 14px;
 }
@@ -961,17 +974,17 @@ html[data-a11y] .pathway__arrow { transition: none !important; }
   transition: transform 0.25s var(--ease), box-shadow 0.25s;
 }
 
-.btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(217, 161, 63, 0.35); }
+.btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(234, 115, 147, 0.35); }
 
 .btn--gold { background: var(--violet); color: var(--paper); }
-.btn--gold:hover { box-shadow: 0 10px 30px rgba(74, 53, 104, 0.35); }
+.btn--gold:hover { box-shadow: 0 10px 30px rgba(120, 81, 79, 0.35); }
 
 /* wall cards */
 .wall { display: flex; flex-direction: column; gap: 18px; }
 
 .wall__empty {
   text-align: center;
-  border: 1px dashed rgba(250, 246, 239, 0.25);
+  border: 1px dashed rgba(226, 219, 216, 0.25);
   border-radius: var(--r-lg);
   padding: 56px 24px;
   color: var(--dim-on-dark);
@@ -980,8 +993,8 @@ html[data-a11y] .pathway__arrow { transition: none !important; }
 .wall__empty strong { color: var(--cream-on-dark); font-family: var(--serif); font-weight: 400; font-style: italic; font-size: 1.15em; }
 
 .post {
-  background: rgba(250, 246, 239, 0.05);
-  border: 1px solid rgba(250, 246, 239, 0.12);
+  background: rgba(226, 219, 216, 0.05);
+  border: 1px solid rgba(226, 219, 216, 0.12);
   border-radius: var(--r-lg);
   padding: 26px;
   transition: border-color 0.3s;
@@ -990,7 +1003,7 @@ html[data-a11y] .pathway__arrow { transition: none !important; }
 /* only the card that just arrived animates */
 .post--new { animation: post-in 0.5s var(--ease); }
 
-.post:hover { border-color: rgba(217, 161, 63, 0.45); }
+.post:hover { border-color: rgba(234, 115, 147, 0.45); }
 
 @keyframes post-in {
   from { opacity: 0; transform: translateY(16px); }
@@ -1052,13 +1065,13 @@ html[data-a11y] .pathway__arrow { transition: none !important; }
 .replies {
   margin-top: 16px;
   padding-left: 18px;
-  border-left: 2px solid rgba(217, 161, 63, 0.4);
+  border-left: 2px solid rgba(234, 115, 147, 0.4);
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.reply { font-size: 0.92rem; color: rgba(250, 246, 239, 0.75); }
+.reply { font-size: 0.92rem; color: rgba(226, 219, 216, 0.75); }
 .reply strong {
   font-family: var(--mono);
   font-size: 0.68rem;
@@ -1072,8 +1085,8 @@ html[data-a11y] .pathway__arrow { transition: none !important; }
 .reply-form input {
   flex: 1;
   min-width: 0;
-  background: rgba(250, 246, 239, 0.07);
-  border: 1px solid rgba(250, 246, 239, 0.18);
+  background: rgba(226, 219, 216, 0.07);
+  border: 1px solid rgba(226, 219, 216, 0.18);
   border-radius: var(--r-pill);
   padding: 10px 18px;
   color: var(--cream-on-dark);
@@ -1086,7 +1099,7 @@ html[data-a11y] .pathway__arrow { transition: none !important; }
 
 .reply-form button {
   border: none;
-  background: rgba(250, 246, 239, 0.14);
+  background: rgba(226, 219, 216, 0.14);
   color: var(--cream-on-dark);
   border-radius: var(--r-pill);
   padding: 10px 20px;
@@ -1274,6 +1287,19 @@ html[data-a11y] .pathway__arrow { transition: none !important; }
 
 .footer__fine { font-size: 0.8rem; color: var(--ink-dim); }
 
+/* The way to sources.html. It lives in the footer rather than the top nav on
+   purpose: a references page is what you go looking for after you have read
+   something, not on the way in. */
+.footer__refs { font-size: 0.86rem; margin: 16px 0 0; }
+.footer__refs a {
+  color: var(--ink-dim);
+  text-decoration: none;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 3px;
+  transition: color 0.25s, border-color 0.25s;
+}
+.footer__refs a:hover { color: var(--ink); border-color: var(--gold); }
+
 /* The last two lines of the page. Quiet on purpose: they are an aside to
    whoever actually got here, not a closing statement to an audience. */
 .footer__quiet {
@@ -1344,7 +1370,7 @@ html[data-a11y] .pathway__arrow { transition: none !important; }
   font-family: var(--serif);
   font-weight: 600;
   font-size: var(--t-lead);
-  color: rgba(250, 246, 239, 0.92);
+  color: rgba(226, 219, 216, 0.92);
   opacity: 0;
 }
 body.page-exit .pt { visibility: visible; pointer-events: auto; }
@@ -1382,7 +1408,7 @@ body.page-exit .pt__mark { animation: pt-mark 0.28s ease-out 0.24s forwards; }
 .preloader__bar {
   width: 150px;
   height: 1.5px;
-  background: rgba(250, 246, 239, 0.18);
+  background: rgba(226, 219, 216, 0.18);
   margin: 0 auto 14px;
   overflow: hidden;
 }
@@ -1438,7 +1464,7 @@ body.is-loading .h7__desc, body.is-loading .h7__ctas { animation-play-state: pau
 .cursor-ring {
   width: 36px;
   height: 36px;
-  border: 1.5px solid rgba(217, 161, 63, 0.65);
+  border: 1.5px solid rgba(234, 115, 147, 0.65);
   transition: width 0.28s var(--ease), height 0.28s var(--ease),
     border-color 0.28s, opacity 0.25s;
 }
@@ -1529,7 +1555,7 @@ body.is-loading .h7__desc, body.is-loading .h7__ctas { animation-play-state: pau
   border-radius: var(--r, 18px);
   pointer-events: none;
   box-shadow:
-    0 0 10px 3px rgba(217, 161, 63, 0.55),
+    0 0 10px 3px rgba(234, 115, 147, 0.55),
     0 0 60px 45px rgba(138, 99, 210, 0.22);
   opacity: calc(0.25 + var(--pulse) * 0.75);
   filter: saturate(calc(0.4 + var(--pulse) * 1.6)) brightness(calc(0.6 + var(--pulse) * 0.6));
@@ -1557,7 +1583,7 @@ body.is-loading .h7__desc, body.is-loading .h7__ctas { animation-play-state: pau
 /* pale sections (pulse form) need gentler bloom so it doesn't wash out */
 .siri-glow--field .siri-glow__bloom {
   box-shadow:
-    0 0 8px 2px rgba(217, 161, 63, 0.45),
+    0 0 8px 2px rgba(234, 115, 147, 0.45),
     0 0 42px 26px rgba(138, 99, 210, 0.16);
 }
 
@@ -1700,7 +1726,7 @@ body.is-loading .h7__desc, body.is-loading .h7__ctas { animation-play-state: pau
   /* Nearly opaque. At 0.9 the card photo showed through enough to pull the
      text on it under 4.5:1; the panel is what guarantees the contrast, so it
      has to actually cover. */
-  background: rgba(250, 246, 239, 0.96);
+  background: rgba(226, 219, 216, 0.96);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   border-radius: var(--r);
@@ -2037,7 +2063,11 @@ body.is-loading .h7__desc, body.is-loading .h7__ctas { animation-play-state: pau
   max-width: 7.5ch;
 }
 .sparkcard__qr img {
-  width: 58px; height: auto; display: block;
+  /* 58px was too small for this payload. The old code encoded 15 characters;
+     the replacement encodes a full https URL, so it carries more modules in the
+     same square and needs the extra pixels to stay readable by a phone held at
+     an angle. Verified decoding down to 58px, so 76px is deliberate headroom. */
+  width: 76px; height: auto; display: block;
   background: #fff;               /* white quiet zone so it scans on a dark card too */
   padding: 4px; border-radius: 6px;
 }
@@ -2137,7 +2167,7 @@ body.is-loading .h7__desc, body.is-loading .h7__ctas { animation-play-state: pau
 .bias-card.is-correct .bias-card__feedback { color: #3f9d6e; }
 .bias-card.is-soft {
   border-color: rgba(123, 97, 255, 0.35);
-  box-shadow: 0 18px 40px -20px rgba(74, 53, 104, 0.3);
+  box-shadow: 0 18px 40px -20px rgba(120, 81, 79, 0.3);
 }
 .bias-card.is-soft .bias-card__feedback { color: var(--violet); }
 @keyframes biasPulse {
@@ -2155,7 +2185,7 @@ body.is-loading .h7__desc, body.is-loading .h7__ctas { animation-play-state: pau
 }
 .bias__btn:hover { transform: translateY(-2px); }
 .bias__btn--flag { background: var(--violet); color: var(--paper); border-color: var(--violet); }
-.bias__btn--flag:hover { box-shadow: 0 10px 26px rgba(74, 53, 104, 0.35); }
+.bias__btn--flag:hover { box-shadow: 0 10px 26px rgba(120, 81, 79, 0.35); }
 .bias__btn--fair { background: transparent; color: var(--ink); }
 .bias__btn--fair:hover { border-color: var(--violet); color: var(--violet); }
 
@@ -2431,7 +2461,7 @@ body.is-loading .h7__desc, body.is-loading .h7__ctas { animation-play-state: pau
   transition: transform 0.2s var(--ease), box-shadow 0.25s, background 0.25s, color 0.25s, border-color 0.25s;
 }
 .myth__btn:hover { transform: translateY(-2px); }
-.myth__btn--myth:hover { border-color: var(--violet); color: var(--violet); box-shadow: 0 10px 24px -12px rgba(74, 53, 104, 0.4); }
+.myth__btn--myth:hover { border-color: var(--violet); color: var(--violet); box-shadow: 0 10px 24px -12px rgba(120, 81, 79, 0.4); }
 .myth__btn--real:hover { border-color: #58b389; color: #3f9d6e; box-shadow: 0 10px 24px -12px rgba(88, 179, 137, 0.45); }
 
 /* end screen (mirrors the quiz) */
@@ -2571,9 +2601,9 @@ body.is-loading .h7__desc, body.is-loading .h7__ctas { animation-play-state: pau
 /* the type metrics carry the amber of the rest of the construction rig */
 .brandmark--axis .bmc-metric line { stroke: rgba(207, 140, 48, 0.62); stroke-dasharray: 16 11; }
 
-html[data-theme="dark"] .brandmark--axis .bmc-sheet line { stroke: rgba(250, 246, 239, 0.13); }
-html[data-theme="dark"] .brandmark--axis .bmc-sheet--major line { stroke: rgba(250, 246, 239, 0.22); }
-html[data-theme="dark"] .brandmark--axis .bmc-metric line { stroke: rgba(250, 246, 239, 0.42); }
+html[data-theme="dark"] .brandmark--axis .bmc-sheet line { stroke: rgba(226, 219, 216, 0.13); }
+html[data-theme="dark"] .brandmark--axis .bmc-sheet--major line { stroke: rgba(226, 219, 216, 0.22); }
+html[data-theme="dark"] .brandmark--axis .bmc-metric line { stroke: rgba(226, 219, 216, 0.42); }
 
 /* The rig residue has to flip with the theme, not just dim.
 
@@ -2597,8 +2627,8 @@ html[data-theme="dark"] .brandmark--axis .bmc-metric line { stroke: rgba(250, 24
 .brandmark--axis .bmc-glyph--sig .bmc-node { display: none; }
 
 html[data-theme="dark"] .brandmark--axis .bmc-node { fill: #e2dbd8; }
-html[data-theme="dark"] .brandmark--axis .bmc-circ { stroke: rgba(250, 246, 239, 0.34); }
-html[data-theme="dark"] .brandmark--axis .bmc-grid line { stroke: rgba(250, 246, 239, 0.07); }
+html[data-theme="dark"] .brandmark--axis .bmc-circ { stroke: rgba(226, 219, 216, 0.34); }
+html[data-theme="dark"] .brandmark--axis .bmc-grid line { stroke: rgba(226, 219, 216, 0.07); }
 
 /* At the wordmark's own narrow breakpoint the centred column is correct
    again: under a near-full-bleed wordmark, a left-hung lede stops reading
@@ -2747,7 +2777,7 @@ html[data-theme="dark"] .brandmark--axis .bmc-grid line { stroke: rgba(250, 246,
   /* solid dark panel so the light text stays readable whatever colour the
      morph backdrop is behind it (it was a 5%-white glass that washed out) */
   background: rgba(22, 15, 38, 0.66);
-  border: 1px solid rgba(250, 246, 239, 0.16);
+  border: 1px solid rgba(226, 219, 216, 0.16);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
 }
@@ -2822,7 +2852,7 @@ html[data-theme="dark"] .brandmark--axis .bmc-grid line { stroke: rgba(250, 246,
   top: 50%; left: 50%;
   width: 58px; height: 2.5px;
   border-radius: 2px;
-  background: rgba(250, 246, 239, 0.55);
+  background: rgba(226, 219, 216, 0.55);
   transform-origin: center;
 }
 .glyph-axis--a { transform: translate(-50%, -50%) rotate(0deg);   animation: axisSpin 14s linear infinite; }
@@ -2835,15 +2865,15 @@ html[data-theme="dark"] .brandmark--axis .bmc-grid line { stroke: rgba(250, 246,
   border-radius: 50%;
   background: var(--gold);
   transform: translate(-50%, -50%);
-  box-shadow: 0 0 0 0 rgba(217, 161, 63, 0.55);
+  box-shadow: 0 0 0 0 rgba(234, 115, 147, 0.55);
   animation: knotPulse 2.4s var(--ease) infinite;
 }
 @keyframes axisSpin {
   to { transform: translate(-50%, -50%) rotate(360deg); }
 }
 @keyframes knotPulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(217, 161, 63, 0.5); }
-  50%      { box-shadow: 0 0 0 9px rgba(217, 161, 63, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(234, 115, 147, 0.5); }
+  50%      { box-shadow: 0 0 0 9px rgba(234, 115, 147, 0); }
 }
 
 /* =====================================================
@@ -3569,8 +3599,8 @@ html[data-a11y] .cover-stack > .popculture { position: static !important; }
   padding: 11px 0;
   /* neutral rules: a hairline is structure, and two gold ones in the corner of
      the frame were pulling against the picture */
-  border-top: 1px solid rgba(250, 246, 239, 0.22);
-  border-bottom: 1px solid rgba(250, 246, 239, 0.22);
+  border-top: 1px solid rgba(226, 219, 216, 0.22);
+  border-bottom: 1px solid rgba(226, 219, 216, 0.22);
   display: grid;
   gap: 5px;
 }
@@ -3586,13 +3616,13 @@ html[data-a11y] .cover-stack > .popculture { position: static !important; }
   text-transform: uppercase;
   letter-spacing: 0.14em;
   line-height: 1.7;
-  color: rgba(250, 246, 239, 0.62);
+  color: rgba(226, 219, 216, 0.62);
 }
 .plaque__fact dd {
   margin: 0;
   font-size: 0.76rem;
   line-height: 1.7;
-  color: rgba(250, 246, 239, 0.9);
+  color: rgba(226, 219, 216, 0.9);
 }
 /* the label that stops the curator's note from starting mid-air */
 .piece__label {
@@ -3617,7 +3647,7 @@ html[data-a11y] .cover-stack > .popculture { position: static !important; }
   margin: 0;
 }
 .piece__author {
-  color: rgba(250, 246, 239, 0.72);
+  color: rgba(226, 219, 216, 0.72);
   font-family: var(--serif);
   font-style: italic;
   font-size: 0.8rem;
@@ -3699,7 +3729,7 @@ html[data-a11y] .piece__photo:hover { transform: none !important; box-shadow: no
   text-decoration: none;
   font-weight: 600;
   font-size: 0.95rem;
-  border-bottom: 1px solid rgba(217, 161, 63, 0.45);
+  border-bottom: 1px solid rgba(234, 115, 147, 0.45);
   padding-bottom: 2px;
   transition: border-color 0.25s var(--ease), opacity 0.25s var(--ease);
 }
@@ -3714,7 +3744,7 @@ html[data-a11y] .piece__photo:hover { transform: none !important; box-shadow: no
 .piece__suggest { color: var(--gold); text-decoration: none; }
 .piece__suggest:hover { text-decoration: underline; }
 .piece__credits {
-  color: rgba(250, 246, 239, 0.4);
+  color: rgba(226, 219, 216, 0.4);
   font-size: 0.8rem;
   line-height: 1.55;
   margin: clamp(16px, 2vw, 22px) 0 0;
@@ -3758,7 +3788,7 @@ html[data-a11y] .piece__photo:hover { transform: none !important; box-shadow: no
 .ym__agebox {
   display: inline-flex; align-items: center; gap: 4px;
   background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(217, 161, 63, 0.3);   /* was rgb(212,175,55): a second, undeclared gold */
+  border: 1px solid rgba(234, 115, 147, 0.3);   /* was rgb(212,175,55): a second, undeclared gold */
   border-radius: var(--r-pill);
   padding: 4px;
 }
@@ -3771,7 +3801,7 @@ html[data-a11y] .piece__photo:hover { transform: none !important; box-shadow: no
   cursor: pointer;
   transition: background 0.2s ease;
 }
-.ym__step:hover { background: rgba(217, 161, 63, 0.18); }
+.ym__step:hover { background: rgba(234, 115, 147, 0.18); }
 .ym__age {
   width: 3.2ch;
   background: none; border: 0;
@@ -3796,9 +3826,12 @@ html[data-a11y] .piece__photo:hover { transform: none !important; box-shadow: no
   padding: 14px 24px;
   transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
 }
-.ym__go:hover { transform: translateY(-2px); box-shadow: 0 14px 34px rgba(217, 161, 63, 0.3); }
+.ym__go:hover { transform: translateY(-2px); box-shadow: 0 14px 34px rgba(234, 115, 147, 0.3); }
 .ym__privacy {
-  color: rgba(250, 246, 239, 0.55);   /* 5.46:1; 0.4 measured 3.54 */
+  /* Was rgba(226,219,216,0.55). That measured 5.46:1 on the old violet ground
+     and 4.40:1 on this one, which is under AA for 12px text, so it uses the
+     quiet tier now (7.45:1) rather than its own alpha. */
+  color: var(--dim-on-dark);
   font-size: 0.78rem;
   margin: 12px 0 0;
 }
@@ -3809,7 +3842,7 @@ html[data-a11y] .piece__photo:hover { transform: none !important; box-shadow: no
   gap: 4px 18px;
   align-items: baseline;
   padding: 14px 0 14px 18px;
-  border-left: 2px solid rgba(217, 161, 63, 0.35);
+  border-left: 2px solid rgba(234, 115, 147, 0.35);
   opacity: 0; transform: translateY(14px);
   transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
 }
@@ -3834,7 +3867,7 @@ html[data-a11y] .piece__photo:hover { transform: none !important; box-shadow: no
   line-height: 1.55;
   margin: 0;
 }
-.ym__item--dark { border-left-color: var(--gold); background: rgba(217, 161, 63, 0.07); border-radius: 0 12px 12px 0; }
+.ym__item--dark { border-left-color: var(--gold); background: rgba(234, 115, 147, 0.07); border-radius: 0 12px 12px 0; }
 .ym__item--open, .ym__item--line { grid-template-columns: 1fr; border-left-color: transparent; padding-left: 0; }
 .ym__scene {
   font-family: var(--serif);
@@ -3843,7 +3876,7 @@ html[data-a11y] .piece__photo:hover { transform: none !important; box-shadow: no
   line-height: 1.4;
   margin: 0;
 }
-.ym__item--line { margin-top: 10px; padding-top: 22px; border-top: 1px dashed rgba(250, 246, 239, 0.35); }
+.ym__item--line { margin-top: 10px; padding-top: 22px; border-top: 1px dashed rgba(226, 219, 216, 0.35); }
 .ym__item--line .ym__scene { color: var(--gold); }
 /* Rights that arrived after she was gone: the gold drains out and the
    border goes dashed like the mortality rule above. The words stay fully
@@ -3851,12 +3884,12 @@ html[data-a11y] .piece__photo:hover { transform: none !important; box-shadow: no
    payoff of the page below AA for anyone with low vision. */
 .ym__item--gone { opacity: 0; }
 .ym__item--gone.in { opacity: 1; }
-.ym__item--gone { border-left-style: dashed; border-left-color: rgba(250, 246, 239, 0.22); }
-.ym__item--gone .ym__year { color: rgba(250, 246, 239, 0.6); }
-.ym__item--gone .ym__at { color: rgba(250, 246, 239, 0.6); font-style: italic; }
-.ym__item--gone > p { color: rgba(250, 246, 239, 0.55); }
-.ym__item--gone.ym__item--dark { background: rgba(250, 246, 239, 0.04); border-left-color: rgba(250, 246, 239, 0.3); }
-.ym__item--gone .ym__at::after { content: " · most likely after you"; color: rgba(250, 246, 239, 0.5); font-size: 0.85em; }
+.ym__item--gone { border-left-style: dashed; border-left-color: rgba(226, 219, 216, 0.22); }
+.ym__item--gone .ym__year { color: rgba(226, 219, 216, 0.6); }
+.ym__item--gone .ym__at { color: rgba(226, 219, 216, 0.6); font-style: italic; }
+.ym__item--gone > p { color: rgba(226, 219, 216, 0.55); }
+.ym__item--gone.ym__item--dark { background: rgba(226, 219, 216, 0.04); border-left-color: rgba(226, 219, 216, 0.3); }
+.ym__item--gone .ym__at::after { content: " · most likely after you"; color: rgba(226, 219, 216, 0.5); font-size: 0.85em; }
 .ym__item--now.in { opacity: 1; }
 .ym__item--now .ym__at::after { content: " · still waiting"; color: var(--gold); font-size: 0.85em; }
 .ym__foot { margin-top: clamp(26px, 4vw, 40px); }
@@ -3891,7 +3924,10 @@ html[data-a11y] .piece__photo:hover { transform: none !important; box-shadow: no
   gap: clamp(10px, 2svh, 22px);
   text-align: center;
   padding: 0 var(--gutter);
-  background: radial-gradient(120% 90% at 50% 0%, #2b1e4a, #17102a 70%);
+  /* Was #2b1e4a -> #17102a. The takeover covers the whole screen for the length
+     of the trip back to 1912, so it was the largest surviving piece of the old
+     violet on the site, and visibility:hidden kept it out of every static check. */
+  background: radial-gradient(120% 90% at 50% 0%, #3a2620, #160e0b 70%);
   opacity: 0; visibility: hidden; pointer-events: none;
   transition: opacity 0.55s var(--ease), visibility 0s linear 0.55s;
   cursor: pointer;
@@ -3908,7 +3944,7 @@ html[data-a11y] .piece__photo:hover { transform: none !important; box-shadow: no
   font-size: clamp(5rem, 24vw, 15rem);
   line-height: 1;
   margin: 0;
-  text-shadow: 0 0 90px rgba(217, 161, 63, 0.35);
+  text-shadow: 0 0 90px rgba(234, 115, 147, 0.35);
 }
 .ym-travel__scene {
   font-family: var(--serif);
@@ -3924,7 +3960,7 @@ html[data-a11y] .piece__photo:hover { transform: none !important; box-shadow: no
   position: absolute;
   bottom: max(20px, env(safe-area-inset-bottom, 20px));
   left: 0; right: 0;
-  color: rgba(250, 246, 239, 0.55);   /* 0.35 measured 3.05:1 */
+  color: var(--dim-on-dark);
   font-size: 0.75rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -3992,7 +4028,7 @@ body.ym-lock { overflow: hidden; }
   overflow: hidden;
   margin-bottom: 20px;
   background: linear-gradient(150deg, var(--violet), #ea7393);
-  box-shadow: 0 12px 28px -12px rgba(74, 53, 104, 0.55);
+  box-shadow: 0 12px 28px -12px rgba(120, 81, 79, 0.55);
 }
 
 /* ===== Get involved (GTA orgs) — drifting aurora over dark ===== */
@@ -4046,7 +4082,7 @@ body.ym-lock { overflow: hidden; }
   stroke: #ea7393;
   stroke-width: 2.6;
   stroke-linecap: round;
-  filter: drop-shadow(0 0 5px rgba(217, 161, 63, 0.8));
+  filter: drop-shadow(0 0 5px rgba(234, 115, 147, 0.8));
   stroke-dasharray: 1;      /* pathLength="1" on the element */
   stroke-dashoffset: 1;     /* hidden until it draws */
 }
@@ -4090,7 +4126,7 @@ body.ym-lock { overflow: hidden; }
 .pin:focus-visible .pin__label { opacity: 1; }
 .pin:hover .pin__mark,
 .pin:focus .pin__mark { filter: drop-shadow(0 0 9px rgba(255, 224, 150, 0.95)); }
-.pin__label rect { fill: rgba(12, 8, 24, 0.88); stroke: rgba(250, 246, 239, 0.18); }
+.pin__label rect { fill: rgba(12, 8, 24, 0.88); stroke: rgba(226, 219, 216, 0.18); }
 .pin__label text { fill: #d7cfcb; font-family: var(--mono); font-size: 11px; letter-spacing: 0.02em; }
 @media (max-width: 620px) { .pin__label text { font-size: 15px; } }
 
@@ -4105,7 +4141,7 @@ body.ym-lock { overflow: hidden; }
   text-decoration: none;
   color: inherit;
   background: rgba(20, 14, 38, 0.5);
-  border: 1px solid rgba(250, 246, 239, 0.16);
+  border: 1px solid rgba(226, 219, 216, 0.16);
   border-radius: var(--r-lg);
   padding: 24px 22px 22px;
   backdrop-filter: blur(8px);
@@ -4115,7 +4151,7 @@ body.ym-lock { overflow: hidden; }
 .involve:hover,
 .involve:focus-visible {
   transform: translateY(-5px);
-  border-color: rgba(250, 246, 239, 0.42);
+  border-color: rgba(226, 219, 216, 0.42);
   box-shadow: 0 24px 50px -22px rgba(0, 0, 0, 0.6);
   outline: none;
 }
@@ -4223,7 +4259,7 @@ span.resource__photo {
 .askwaves.is-live .waves__dot {
   width: 10px; height: 10px;
   border-radius: 50%;
-  background: rgba(250, 246, 239, 0.22);
+  background: rgba(226, 219, 216, 0.22);
   transition: background 0.4s var(--ease), transform 0.4s var(--ease);
 }
 .askwaves.is-live .waves__dot.is-active {
@@ -4655,7 +4691,7 @@ html[data-theme="dark"] body { background: var(--paper); }
    light colour morph.js writes inline each frame */
 html[data-theme="dark"] #morph {
   background:
-    radial-gradient(120% 80% at 50% -12%, rgba(96, 62, 150, 0.34), transparent 60%),
+    radial-gradient(120% 80% at 50% -12%, rgba(120, 81, 79, 0.34), transparent 60%),
     #110d1b !important;
 }
 /* Sections keep their own ground in dark mode.
@@ -4673,9 +4709,9 @@ html[data-theme="dark"] .resources { background-color: var(--paper-soft); }
 /* the violet glow the backdrop used to cast across everything, kept where it
    is actually seen: behind the wordmark at the top of the page */
 html[data-theme="dark"] .brandmark--hero {
-  background-image: radial-gradient(120% 80% at 50% -12%, rgba(96, 62, 150, 0.34), transparent 60%);
+  background-image: radial-gradient(120% 80% at 50% -12%, rgba(120, 81, 79, 0.34), transparent 60%);
 }
-html[data-theme="dark"] .nav { background: rgba(18, 14, 28, 0.72); border-bottom-color: var(--line); }
+html[data-theme="dark"] .nav { background: rgba(33, 23, 19, 0.72); border-bottom-color: var(--line); }
 /* light glass panels -> dark glass so dark text doesn't land on light */
 html[data-theme="dark"] .sparkcard,
 html[data-theme="dark"] .pulse__card,
@@ -4708,10 +4744,14 @@ html[data-a11y] {
   font-size: 115%;                                   /* larger text (scales rem) */
   --sans: Verdana, "Segoe UI", Tahoma, Arial, sans-serif;   /* plain, high-legibility */
   --serif: Verdana, "Segoe UI", Tahoma, Arial, sans-serif;
-  --ink: #17102a;                                    /* higher contrast on light */
-  --ink-dim: #392f52;
+  /* Umber, not the old violet-black. Accessible mode overrides the ink for the
+     whole site, so #17102a/#392f52 turned every page violet for exactly the
+     readers who have the least slack for a muddy palette. Both new values
+     measure higher than the ones they replace: 13.53 and 10.25 on paper. */
+  --ink: #1c110d;                                    /* higher contrast on light */
+  --ink-dim: #3b2721;
 }
-html[data-theme="dark"][data-a11y] { --ink: #ffffff; --ink-dim: #ded7ec; }
+html[data-theme="dark"][data-a11y] { --ink: #ffffff; --ink-dim: #ece4e1; }   /* 14.00:1 */
 /* stop all motion */
 html[data-a11y] *, html[data-a11y] *::before, html[data-a11y] *::after {
   animation-duration: 0.001ms !important;
@@ -4891,10 +4931,10 @@ html[data-theme="dark"] .bwc-reel > span { color: #e2dbd8; }
 .tline .art::before {   /* woven-cloth weave over the sky */
   content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
   background:
-    repeating-linear-gradient(90deg, rgba(250, 246, 239, 0.03) 0 1px, transparent 1px 7px),
-    repeating-linear-gradient(0deg,  rgba(250, 246, 239, 0.022) 0 1px, transparent 1px 9px),
+    repeating-linear-gradient(90deg, rgba(226, 219, 216, 0.03) 0 1px, transparent 1px 7px),
+    repeating-linear-gradient(0deg,  rgba(226, 219, 216, 0.022) 0 1px, transparent 1px 9px),
     repeating-linear-gradient(45deg, rgba(20, 14, 34, 0.055) 0 2px, transparent 2px 11px),
-    repeating-linear-gradient(-45deg, rgba(250, 246, 239, 0.02) 0 2px, transparent 2px 13px);
+    repeating-linear-gradient(-45deg, rgba(226, 219, 216, 0.02) 0 2px, transparent 2px 13px);
 }
 .tline .art::after {    /* film grain over everything (sky + waves) */
   content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none;
@@ -4947,15 +4987,15 @@ html[data-theme="dark"] .bwc-reel > span { color: #e2dbd8; }
 .tline .art svg path { fill: var(--w-fill); }
 .tline .art .w1 { bottom: 12%; opacity: 0.35; animation: tlDrift 13s linear infinite; }
 .tline .art .w2 { bottom: 5%;  opacity: 0.6;  animation: tlDrift 9s  linear infinite reverse;
-                  filter: drop-shadow(0 -3px 5px rgba(250, 246, 239, 0.16)); }
+                  filter: drop-shadow(0 -3px 5px rgba(226, 219, 216, 0.16)); }
 .tline .art .w3 { bottom: -2%; opacity: 0.95; animation: tlDrift 7s  linear infinite;
-                  filter: drop-shadow(0 -4px 7px rgba(250, 246, 239, 0.22)); }
+                  filter: drop-shadow(0 -4px 7px rgba(226, 219, 216, 0.22)); }
 @keyframes tlDrift { from { transform: translateX(-6%); } to { transform: translateX(6%); } }
 .tline .art .num {
   position: absolute; top: 7%; left: 7%;
   font-family: var(--serif); font-weight: 700;
   font-size: clamp(3rem, 9vw, 7rem); line-height: 1;
-  color: transparent; -webkit-text-stroke: 2px rgba(250, 246, 239, 0.5);
+  color: transparent; -webkit-text-stroke: 2px rgba(226, 219, 216, 0.5);
 }
 .tline .art .grain {   /* light shaft + vignette */
   position: absolute; inset: 0; z-index: 2; opacity: 0.65; mix-blend-mode: overlay;
@@ -4976,7 +5016,7 @@ html[data-theme="dark"] .bwc-reel > span { color: #e2dbd8; }
 .tline .hero-title h3 { font-size: clamp(2.6rem, 7.5vw, 6rem); line-height: 0.98; }
 .tline .hero-title .tag {
   margin-top: 14px; font-size: clamp(1rem, 1.6vw, 1.25rem);
-  color: rgba(250, 246, 239, 0.78); font-style: italic; font-family: var(--serif);
+  color: rgba(226, 219, 216, 0.78); font-style: italic; font-family: var(--serif);
 }
 
 /* ---------- event nodes on the thread ---------- */
@@ -5047,7 +5087,7 @@ html[data-theme="dark"] .bwc-reel > span { color: #e2dbd8; }
   color: var(--cream-on-dark);
 }
 .tline .node--bridge .node__blurb { color: var(--dim-on-dark); }
-.tline .node--bridge .node__why { background: rgba(217, 161, 63, 0.14); color: var(--cream-on-dark); }
+.tline .node--bridge .node__why { background: rgba(234, 115, 147, 0.14); color: var(--cream-on-dark); }
 .tline .node--bridge .node__hint { color: var(--dim-on-dark); }
 .tline .bridge-label {
   font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.24em;
@@ -5074,7 +5114,7 @@ html[data-theme="dark"] .bwc-reel > span { color: #e2dbd8; }
   padding: 4vh var(--gutter) 14vh;
 }
 .tline .check__card {
-  border: 1.5px dashed rgba(217, 161, 63, 0.55);
+  border: 1.5px dashed rgba(234, 115, 147, 0.55);
   border-radius: var(--r-lg); padding: clamp(20px, 3vw, 30px);
   background: var(--tl-check, rgba(255, 255, 255, 0.6));
   transition: border-color 0.4s var(--ease), background 0.4s var(--ease);
@@ -5107,7 +5147,7 @@ html[data-theme="dark"] .bwc-reel > span { color: #e2dbd8; }
   background: var(--gold); margin: 0 auto 34px;
   animation: tlPulse 2.4s var(--ease) infinite;
 }
-@keyframes tlPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(217,161,63,0.45) } 50% { box-shadow: 0 0 0 16px rgba(217,161,63,0) } }
+@keyframes tlPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(234, 115, 147,0.45) } 50% { box-shadow: 0 0 0 16px rgba(234, 115, 147,0) } }
 .tline .finale h3 { font-size: clamp(1.8rem, 4.2vw, 3rem); max-width: 20ch; margin: 0 auto; }
 .tline .finale p { margin: 18px auto 0; max-width: 44ch; color: var(--ink-dim); }
 
@@ -5132,7 +5172,7 @@ html[data-theme="dark"] .bwc-reel > span { color: #e2dbd8; }
   font-family: var(--mono); font-weight: 700; font-size: 0.68rem;
   text-transform: uppercase; letter-spacing: 0.18em;
   color: var(--ink-dim);
-  background: rgba(250, 246, 239, 0.82);
+  background: rgba(226, 219, 216, 0.82);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid var(--line); border-radius: var(--r-pill);
@@ -5351,14 +5391,18 @@ html[data-theme="dark"] .rc__flag { background: var(--gold-soft); color: var(--i
 
 
 /* ---------- house rules, inline above the wall composer ---------- */
+/* Quieter than the composer on purpose. This is reference you consult, and it
+   used to out-rank the textarea it was explaining. */
 .houserules {
-  max-width: 640px;
-  margin: 0 auto 18px;
+  max-width: none;
+  margin: 0 0 24px;
   text-align: left;
-  border: 1px solid rgba(250, 246, 239, 0.16);
-  border-radius: var(--r);
-  padding: 15px 18px;
-  background: rgba(250, 246, 239, 0.04);
+  border: none;
+  border-top: 1px solid rgba(226, 219, 216, 0.16);
+  border-bottom: 1px solid rgba(226, 219, 216, 0.16);
+  border-radius: 0;
+  padding: 16px 0;
+  background: none;
 }
 
 .houserules p.houserules__row {
@@ -5432,7 +5476,7 @@ html[data-theme="dark"] .rc__flag { background: var(--gold-soft); color: var(--i
   padding: 0 18px;
   color: var(--dim-on-dark);
   background: none;
-  border: 1px solid rgba(250, 246, 239, 0.18);
+  border: 1px solid rgba(226, 219, 216, 0.18);
   border-radius: var(--r-pill);
   cursor: pointer;
   transition: color 0.25s, border-color 0.25s;
@@ -5479,7 +5523,7 @@ html[data-theme="dark"] .rc__flag { background: var(--gold-soft); color: var(--i
   stroke: var(--gold);
   stroke-width: 2;
   stroke-linecap: round;
-  filter: drop-shadow(0 0 6px rgba(217, 161, 63, 0.45));
+  filter: drop-shadow(0 0 6px rgba(234, 115, 147, 0.45));
   stroke-dasharray: var(--len) var(--len);
   stroke-dashoffset: var(--len);
   animation:
@@ -5556,7 +5600,7 @@ html[data-a11y] .post--new { animation: none !important; }
 .eyebrow--light { letter-spacing: 0.24em; }
 
 /* .piece__credits measured 3.59:1 against #281b17 and failed AA outright */
-.piece__credits { line-height: 1.7; color: rgba(250, 246, 239, 0.62); }
+.piece__credits { line-height: 1.7; color: rgba(226, 219, 216, 0.62); }
 
 /* the darkest panel on the site was also the one running tightest */
 .lens__def { line-height: 1.66; }
@@ -5868,6 +5912,45 @@ html[data-theme="dark"] .menu__row[aria-current="page"] .menu__label { color: va
 }
 .lesson__sources { font-size: var(--t-small); color: var(--ink-dim); line-height: 1.7; }
 .lesson__sources a { color: inherit; }
+
+/* ===== The references page (sources.html) =====
+   Each entry is a pair: the claim as it is worded on the site, then where it
+   came from. Two lines, not a bibliography row, because the useful question a
+   reader has here is "is the thing I just read true", not "who published it".
+   The year sits in the margin at desktop width and folds above the claim on a
+   phone, so nothing ever wraps under a hanging number. */
+.srcs { list-style: none; margin: 22px 0 0; padding: 0; }
+.src {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr;
+  gap: 4px 22px;
+  padding: 18px 0;
+  border-top: 1px solid var(--line);
+}
+.src:last-child { border-bottom: 1px solid var(--line); }
+.src__year {
+  grid-row: span 2;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  padding-top: 0.25em;
+}
+.src__claim { margin: 0; line-height: 1.55; max-width: 62ch; }
+.src__where {
+  margin: 0;
+  max-width: 74ch;
+  font-size: var(--t-small);
+  color: var(--ink-dim);
+  line-height: 1.65;
+}
+.src__where a { color: inherit; }
+.src__where cite { font-style: italic; }
+@media (max-width: 700px) {
+  .src { grid-template-columns: 1fr; gap: 6px; }
+  .src__year { grid-row: auto; padding-top: 0; }
+}
 
 /* knowledge check — feedback is text + icon, never colour alone */
 .kc { margin-top: 22px; padding: 18px; border: 1px solid var(--line); border-radius: var(--r-sm, 10px); }
@@ -6204,7 +6287,7 @@ html[data-theme="dark"] .menu__row[aria-current="page"] .menu__label { color: va
 .ym__all {
   min-height: 44px;
   padding: 10px 16px;
-  border: 1px solid rgba(250, 246, 239, 0.3);
+  border: 1px solid rgba(226, 219, 216, 0.3);
   border-radius: 999px;
   background: none;
   color: var(--cream-on-dark);
@@ -6223,7 +6306,7 @@ html[data-theme="dark"] .menu__row[aria-current="page"] .menu__label { color: va
 }
 .ym__progress-track {
   height: 4px; border-radius: 999px;
-  background: rgba(250, 246, 239, 0.18);
+  background: rgba(226, 219, 216, 0.18);
   overflow: hidden;
 }
 .ym__progress-fill {
@@ -6235,7 +6318,7 @@ html[data-theme="dark"] .menu__row[aria-current="page"] .menu__label { color: va
   margin: 0 0 14px;
   padding: 16px 18px;
   border-left: 3px solid var(--gold);
-  background: rgba(250, 246, 239, 0.05);
+  background: rgba(226, 219, 216, 0.05);
   border-radius: 0 10px 10px 0;
   color: var(--cream-on-dark);
   line-height: 1.65;
@@ -6244,12 +6327,37 @@ html[data-theme="dark"] .menu__row[aria-current="page"] .menu__label { color: va
 @media (prefers-reduced-motion: reduce) { .ym__progress-fill { transition: none; } }
 
 /* ---------- Voice: private reflection wall ---------- */
-.privacy-list { margin: 12px 0 0; padding-left: 20px; }
-.privacy-list li { margin: 8px 0; line-height: 1.6; }
+/* A spec panel, not a legal notice: two columns of short labelled facts. The
+   bulleted single-column version ran 363px tall and pushed the composer most of
+   a screen down the page. */
+.privacy-list {
+  list-style: none; margin: 10px 0 0; padding: 0;
+  /* Two columns, not auto-fit: four facts across three tracks left the last one
+     stranded on a row of its own beside two empty cells. */
+  display: grid; gap: 6px 32px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+.privacy-list li {
+  margin: 0; padding: 6px 0;
+  font-size: var(--t-small); line-height: 1.5;
+  color: var(--dim-on-dark);
+}
+.privacy-list strong { display: block; color: var(--cream-on-dark); font-weight: 600; }
+
+/* The one line here that keeps a reader safe rather than merely informed. */
+.privacy-warn {
+  margin: 12px 0 0; padding: 10px 0 10px 13px;
+  border-left: 2px solid var(--gold);
+  font-size: var(--t-small); line-height: 1.55;
+  color: var(--dim-on-dark);
+}
+.privacy-warn strong { color: var(--cream-on-dark); }
+
 .houserules__soon {
-  margin-top: 14px; padding-top: 12px;
-  border-top: 1px solid rgba(250, 246, 239, 0.14);
-  font-size: var(--t-small);
+  margin-top: 12px; padding-top: 11px;
+  border-top: 1px solid rgba(226, 219, 216, 0.14);
+  font-size: var(--t-label);
+  line-height: 1.55;
 }
 
 .prompts { margin: 26px 0 18px; }
@@ -6262,7 +6370,7 @@ html[data-theme="dark"] .menu__row[aria-current="page"] .menu__label { color: va
 .prompt {
   min-height: 44px;
   padding: 10px 16px;
-  border: 1px dashed rgba(250, 246, 239, 0.32);
+  border: 1px dashed rgba(226, 219, 216, 0.32);
   border-radius: 999px;
   background: none;
   color: var(--cream-on-dark);

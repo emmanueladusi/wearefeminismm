@@ -38,12 +38,12 @@
     const svg =
       '<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200">' +
       '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">' +
-      '<stop offset="0" stop-color="#4a3568"/><stop offset=".55" stop-color="#a8459e"/>' +
-      '<stop offset="1" stop-color="#d9a13f"/></linearGradient></defs>' +
+      '<stop offset="0" stop-color="#452f28"/><stop offset=".55" stop-color="#93485d"/>' +
+      '<stop offset="1" stop-color="#ea7393"/></linearGradient></defs>' +
       '<rect width="900" height="1200" fill="url(#g)"/>' +
-      '<text x="450" y="600" fill="rgba(250,246,239,.85)" font-family="monospace" font-size="44" text-anchor="middle" letter-spacing="6">' +
+      '<text x="450" y="600" fill="rgba(242,239,237,.85)" font-family="monospace" font-size="44" text-anchor="middle" letter-spacing="6">' +
       label.toUpperCase() + "</text>" +
-      '<text x="450" y="660" fill="rgba(250,246,239,.55)" font-family="monospace" font-size="26" text-anchor="middle" letter-spacing="4">drop photo here</text>' +
+      '<text x="450" y="660" fill="rgba(242,239,237,.55)" font-family="monospace" font-size="26" text-anchor="middle" letter-spacing="4">drop photo here</text>' +
       "</svg>";
     return "data:image/svg+xml," + encodeURIComponent(svg);
   }

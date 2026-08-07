@@ -2224,7 +2224,7 @@ body.perfopen .perfpanel{display:block}
     <p class="eyebrow eyebrow--light">Part two · the history · now an exhibition</p>
     <h1>Enter <em>the gallery.</em></h1>
     <p class="portal__lead">Three lenses on one word. Four waves across 178 years. Six scholars whose
-      work carries it. Every piece hangs in its own room, and you choose where to walk.</p>
+      work carries it. Every piece hangs in its own room, and you choose where to go.</p>
 
     <div class="portal__ctas">
       <button class="btn btn--coin" id="enterBtn">
@@ -2260,7 +2260,7 @@ body.perfopen .perfpanel{display:block}
       <div class="wall__how">
         <p class="wall__how-label">How it works</p>
         <ul class="controls">
-          <li><span class="k">scroll</span> walk further into the room</li>
+          <li><span class="k">scroll</span> reach further into the horizon</li>
           <li><span class="k">cursor</span> look around, gently</li>
           <li><span class="k">click</span> see any work up close</li>
           <li><span class="k">esc</span> leave the gallery at any time</li>
@@ -2357,7 +2357,7 @@ body.perfopen .perfpanel{display:block}
     </div>
   </header>
 
-  <p class="hint" id="hint">scroll to walk · move your cursor to look · click a piece to inspect · esc to exit</p>
+  <p class="hint" id="hint">scroll to travel · move your cursor to look · click a piece to inspect · esc to exit</p>
 
   <!-- The diagnostic readout. Not dev-only instrumentation: this is the
        one thing that can answer "is it smooth on YOUR machine", which no
@@ -2400,21 +2400,21 @@ const LENSES = {
   items:[
     {id:'lens-white', name:'White feminism', viz:'bar', cap:'gender',
      def:'Sees <em>one</em> axis: gender. Fights for women, full stop.'},
-    {id:'lens-black', name:'Black feminism', viz:'stack', cap:'not equal weight',
-     def:'Names what the first lens misses: <em>not every woman carries the same weight.</em>'},
+    {id:'lens-black', name:'Black feminism', viz:'stack', cap:'in their own words',
+     def:'Defines the everyday experiences of Black women and girls, <em>in their own words.</em>'},
     {id:'lens-inter', name:'Intersectionality', viz:'knot', cap:'all at once',
-     def:'The knot that ties it back together: race, gender, class, all at once, under one movement.'}
+     def:'The knot that ties everything together: race, gender, class, all at once, under one movement.'}
   ]
 };
 
 const WAVES = [
  {id:'w1', num:'01', title:'The Ballot', range:'1848–1929', tag:'The right to exist on paper.',
   img:'img/waves/wave-01.jpg', built:true,
-  pattern:'A horizontal perspective corridor. The pieces hang in chronological order and you walk past them.',
+  pattern:'A horizontal perspective corridor. The pieces hang in chronological order and you move past them.',
   events:[
     {id:'w1e1', year:'1851', title:'Sojourner Truth asks: “Ain’t I a woman?”',
      blurb:'A formerly enslaved abolitionist stands up at a women’s convention in Ohio and points at the gap in the room: this fight wasn’t including Black women.',
-     why:'She named the blind spot 138 years before anyone had the word “intersectionality” for it. The thread starts here.'},
+     why:'She named what the movement was leaving out 138 years before anyone had the word “intersectionality” for it. The thread starts here.'},
     {id:'w1e2', year:'1916', title:'Manitoba goes first',
      blurb:'After years of petitions and a satirical “Mock Parliament,” Manitoba becomes the first Canadian province where women win the vote.',
      why:'Change didn’t start in Ottawa. It started close to home, province by province. Local pressure works.'},
@@ -2448,7 +2448,7 @@ const WAVES = [
      blurb:'Black feminists in Boston write the statement that reframes everything: if Black women were free, <em>everybody</em> would have to be free.',
      why:'This is the blueprint for the feminism this whole site teaches: freedom measured from the most excluded person up.'},
     {id:'w2e4', year:'1981', title:'bell hooks: <em>Ain’t I a Woman</em>',
-     blurb:'She borrows her title from Sojourner Truth, 130 years later, and puts Black women back at the centre of the story.',
+     blurb:'Gloria Jean Watkins writes as <em>bell hooks</em>, the name of her great-grandmother Bell Blair Hooks, kept lowercase so the work matters more than the author. The title she borrows from Sojourner Truth, 130 years later, and puts Black women back at the centre of the story.',
      why:'The thread loops back on itself: the question from 1851 was still waiting for an answer.'}
   ],
   quiz:{id:'w2q', q:'“The personal is political” meant…', answer:1,
@@ -3019,7 +3019,7 @@ function setChapter(id){
 const HINTS = {
   directory:'drag, scroll or use the arrow keys · enter opens what is in focus · esc steps back one level',
   lenses:'move your cursor to look around · click a lens to inspect it · esc to exit',
-  corridor:'scroll to walk the corridor · arrows step between pieces · click a piece to inspect · esc to exit',
+  corridor:'scroll to travel the corridor · arrows step between pieces · click a piece to inspect · esc to exit',
   orbit:'scroll to turn the room around you · it stops on each piece · click to inspect · esc to exit',
   field:'scroll to follow the guided path through the field · the map below tracks you · esc to exit',
   feed:'scroll to bring the next piece forward · one at a time · click to inspect · esc to exit',
@@ -5065,7 +5065,7 @@ function maybeComplete(chId){
   if (viewedSet(chId).size >= piecesInChapter(c)){
     S.endShown[chId]=true;
     $('#endTitle').innerHTML='Wave <em>complete.</em>';
-    $('#endBody').textContent='You walked every piece of '+c.wave.title+'. The current keeps moving, and so can you.';
+    $('#endBody').textContent='You saw every piece of '+c.wave.title+'. The current keeps moving, and so can you.';
     setTimeout(()=>{ if(S.open && !$('#detail').classList.contains('open')) showEnd(); }, 600);
   }
 }

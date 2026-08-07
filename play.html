@@ -4,26 +4,29 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script>(function(){try{var t=localStorage.getItem("wf-theme");var d=t?t==="dark":matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.setAttribute("data-theme",d?"dark":"light");if(localStorage.getItem("wf-a11y"))document.documentElement.setAttribute("data-a11y","");}catch(e){}})();</script>
-  <title>wearefeminismm · Your voice</title>
-  <meta name="description" content="See where our research has travelled, then add your voice to the anonymous wall. A student-led space where every voice matters." />
+  <title>wearefeminismm · Play</title>
+  <meta name="description" content="A new round of feminism cards every day, a streak worth keeping, then travel back to 1912." />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <meta name="theme-color" content="#452f28" />
   <!-- Open Graph / social share -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="wearefeminismm" />
-  <meta property="og:title" content="wearefeminismm · Your voice" />
-  <meta property="og:description" content="See where our research has travelled, then add your voice to the anonymous wall. A student-led space where every voice matters." />
-  <meta property="og:url" content="https://emmanueladusi.github.io/wearefeminismm/voice.html" />
+  <meta property="og:title" content="wearefeminismm · Play" />
+  <meta property="og:description" content="A new round of feminism cards every day, a streak worth keeping, then travel back to 1912." />
+  <meta property="og:url" content="https://emmanueladusi.github.io/wearefeminismm/play.html" />
   <meta property="og:image" content="https://emmanueladusi.github.io/wearefeminismm/img/og-image.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="wearefeminismm · Your voice" />
-  <meta name="twitter:description" content="See where our research has travelled, then add your voice to the anonymous wall." />
+  <meta name="twitter:title" content="wearefeminismm · Play" />
+  <meta name="twitter:description" content="A new round of feminism cards every day, a streak worth keeping, then travel back to 1912." />
   <meta name="twitter:image" content="https://emmanueladusi.github.io/wearefeminismm/img/og-image.png" />
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
   <link rel="stylesheet" href="css/styles.css?v=263" />
+  <link rel="stylesheet" href="css/daily.css?v=3" />
+  <link rel="stylesheet" href="css/wordle.css?v=3" />
+  <link rel="stylesheet" href="css/arcade.css?v=2" />
   <script>(function(){var d=document.documentElement;d.classList.add("js");setTimeout(function(){if(!d.classList.contains("reveal-ready"))d.classList.remove("js");},2500);})();</script>
 </head>
 <body class="page-flat">
@@ -54,8 +57,8 @@
       <a href="index.html">Home</a>
       <a href="learn.html">Learn</a>
       <a href="community.html">Community</a>
-      <a href="play.html">Play</a>
-      <a href="voice.html" aria-current="page">Your voice</a>
+      <a href="play.html" aria-current="page">Play</a>
+      <a href="voice.html">Your voice</a>
     </nav>
     <div class="nav__right">
       <span class="nav__tools"><button class="nav__toggle" id="darkToggle" type="button" title="Dark mode" aria-label="Dark mode" aria-pressed="false" data-magnetic><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.5 6.5 0 0 0 9.8 9.8z"/></svg></button>
@@ -89,12 +92,12 @@
           <span class="menu__label">Community</span>
           <span class="menu__go" aria-hidden="true">&#8594;</span>
         </a></li>
-        <li><a class="menu__row" href="play.html">
+        <li><a class="menu__row" href="play.html" aria-current="page">
           <span class="menu__num" aria-hidden="true">04</span>
           <span class="menu__label">Play</span>
           <span class="menu__go" aria-hidden="true">&#8594;</span>
         </a></li>
-        <li><a class="menu__row" href="voice.html" aria-current="page">
+        <li><a class="menu__row" href="voice.html">
           <span class="menu__num" aria-hidden="true">05</span>
           <span class="menu__label">Your voice</span>
           <span class="menu__go" aria-hidden="true">&#8594;</span>
@@ -122,113 +125,158 @@
        the offer and gets straight to the three things you can do. ===== -->
   <header class="masthead hero--poster" id="top">
     <div class="pwrap">
-      <p class="masthead__eyebrow">Your voice</p>
+      <p class="masthead__eyebrow">Play</p>
       <h1 class="poster">
-        <span class="poster__line"><span class="pw" style="--w:0">Add</span> <span class="pw pw--gold" style="--w:1">your</span> <span class="pw pw--gold" style="--w:2"><em>voice.</em></span></span>
+        <span class="poster__line"><span class="pw" style="--w:0">New</span> <span class="pw pw--gold" style="--w:1"><em>every day.</em></span></span>
       </h1>
-      <p class="masthead__lead">A private page. Nothing you write here leaves your device.</p>
+      <p class="masthead__lead">Three short things: a word whose length changes every morning, five cards to call, and a trip back to 1912. Pick one, keep a streak, come back tomorrow.</p>
     </div>
   </header>
 
-  <!-- no data-scene: journey.js fades a section by its distance from the
-       viewport centre, and once the wall has posts it is 2+ viewports tall,
-       so it never gets near the centre and sat at 0.18 opacity while being
-       read. The morph backdrop carries the transition instead, as on .ym -->
-  <!-- ===== Private Reflection Wall.
-       Named for what it actually is. Until a shared, moderated wall exists,
-       nothing here implies anyone else can read or reply to a reflection. -->
-  <section class="wall-section" id="wall" data-bg="#281b17">
-    <canvas class="wall-canvas" id="wallCanvas" aria-hidden="true"></canvas>
-    <div class="wall-section__inner">
-      <p class="eyebrow eyebrow--light">Write · private to this device</p>
-      <h2 class="wall-section__title">Private Reflection Wall</h2>
-      <p class="wall-section__sub">Somewhere to put it into words.</p>
+  <!-- ===== Play: the picker =====
+       The three activities used to sit open on top of each other, which made
+       this page a wall. They are boxes now; js/arcade.js swaps one in. -->
+  <section class="arcade" id="arcadeSection" data-bg="#d4ccc8">
+    <div class="arcade__inner">
 
-      <!-- Every fact the bulleted version carried, at a quarter of the height.
-           It used to be five full paragraphs in a bordered box sitting between
-           the heading and the textarea, so the first screen of a section called
-           "write something" was terms and conditions. The shared-device line is
-           the one that protects a reader, so it is pulled out of the set and
-           given the accent rule rather than left fourth in a list. -->
-      <div class="houserules">
-        <p class="houserules__row"><span>What happens to what you write</span></p>
-        <ul class="privacy-list">
-          <li><strong>Stays on this device.</strong> Saved in this browser, nowhere else.</li>
-          <li><strong>Never uploaded.</strong> Your words do not reach a server, ours or anyone else's.</li>
-          <li><strong>Nobody else can read it.</strong> No shared feed, and no replies.</li>
-          <li><strong>Delete any time.</strong> One at a time, or all at once.</li>
-        </ul>
-        <p class="privacy-warn"><strong>Sharing this device?</strong> Anyone else using this phone,
-          laptop or school computer may be able to see your reflections. Delete them when you are done.</p>
-        <p class="houserules__soon">A shared, moderated wall is planned. If it is ever built, it will
-          open with its own clear rules, and it will not quietly turn these private notes public.</p>
-      </div>
+      <div id="arcade">
+        <p class="arcade__eyebrow">Pick one &middot; new every day</p>
+        <div class="arcade__grid">
 
-      <div class="prompts">
-        <p class="prompts__label">Not sure where to start? These are prompts, not other people's posts.</p>
-        <ul class="prompts__list">
-          <li><button class="prompt" type="button" data-prompt="Something I noticed at school this week was ">Something I noticed at school this week…</button></li>
-          <li><button class="prompt" type="button" data-prompt="Something I wish someone had told me earlier is ">Something I wish someone had told me earlier…</button></li>
-          <li><button class="prompt" type="button" data-prompt="After reading the timeline, the thing that stayed with me was ">After the timeline, what stayed with me…</button></li>
-        </ul>
-      </div>
+          <button class="acard" type="button" data-opens="theword" data-title="The Word">
+            <span class="acard__badge" data-badge hidden></span>
+            <span class="acard__k">Guess</span>
+            <h3 class="acard__t">The Word</h3>
+            <p class="acard__sub" data-sub>New word every day</p>
+            <p class="acard__d">One word a day, and the length changes. Solve it and find out what it means.</p>
+            <span class="acard__go">Play <span class="cta__arrow" aria-hidden="true">&rarr;</span></span>
+          </button>
 
-      <form class="composer" id="wallForm" style="--r: 18px" data-aig data-aig-radius="18" data-aig-duration="8">
-        <label class="visually-hidden" for="wallText">Your private reflection</label>
-        <textarea id="wallText" rows="3" maxlength="1200" placeholder="Write it here. It stays on this device."></textarea>
-        <!-- the caution sits ABOVE the submit row: below it, a phone keyboard
-             pushed the crisis helpline off the bottom of the screen -->
-        <p class="composer__caution" id="wallCaution" role="status" hidden></p>
-        <div class="composer__row">
-          <span class="composer__anon">Saved on this device only</span>
-          <button type="submit" class="btn" data-magnetic>Save reflection</button>
+          <button class="acard" type="button" data-opens="dailyround" data-title="The Daily">
+            <span class="acard__badge" data-badge hidden></span>
+            <span class="acard__k">Call it</span>
+            <h3 class="acard__t">The Daily</h3>
+            <p class="acard__sub">5 cards &middot; about a minute</p>
+            <p class="acard__d">Myths to catch, posts to read closely, questions to answer. Every card tells you why.</p>
+            <span class="acard__go">Play <span class="cta__arrow" aria-hidden="true">&rarr;</span></span>
+          </button>
+
+          <button class="acard" type="button" data-opens="machine" data-title="The Time Machine">
+            <span class="acard__badge" data-badge hidden></span>
+            <span class="acard__k">Travel</span>
+            <h3 class="acard__t">The Time Machine</h3>
+            <p class="acard__sub">Back to 1912</p>
+            <p class="acard__d">Set your age and see how old you would have been when each right you have finally arrived.</p>
+            <span class="acard__go">Start <span class="cta__arrow" aria-hidden="true">&rarr;</span></span>
+          </button>
+
         </div>
-      </form>
+      </div>
 
-      <p class="visually-hidden" id="wallStatus" role="status" aria-live="polite"></p>
-      <div class="wall" id="wallList"></div>
+      <div class="arcade__shell" id="arcadeShell" hidden>
+        <div class="arcade__bar">
+          <button class="arcade__back" id="arcadeBack" type="button">
+            <span aria-hidden="true">&larr;</span> All games
+          </button>
+          <h2 class="arcade__now" id="arcadeNow" tabindex="-1"></h2>
+        </div>
 
-      <div class="wall-section__foot">
-        <p class="wall-section__note">Be gentle with yourself here. If something is heavy, the numbers
-          below are free, confidential and open right now.</p>
-        <p class="wall-section__help">Kids Help Phone: text <strong>CONNECT</strong> to <strong>686868</strong>,
-          or call <strong>1-800-668-6868</strong>. Suicide Crisis Helpline: call or text <strong>988</strong>.</p>
-        <!-- Black-serving lines, listed separately rather than folded into the
-             line above: a girl looking for someone who will get it without
-             being explained to should not have to read past three general
-             numbers to find one. -->
-        <p class="wall-section__help">Black youth, if you want someone who already gets it: <strong>RiseUp</strong>,
-          from Kids Help Phone, text <strong>RISE</strong> to <strong>686868</strong>, free and confidential, any hour.
-          <a class="ext" href="https://blackyouth.ca/" target="_blank" rel="noopener">Black Youth Helpline<span class="visually-hidden"> (opens in a new tab)</span></a>:
-          call <strong>1-833-294-8650</strong>, every day, 9am to 10pm.</p>
-        <button class="wall__clear" id="wallClear" type="button" hidden>Delete every reflection on this device</button>
+  <!-- ===== The Word =====
+       The daily guessing puzzle. Length changes day to day (js/wordList.js
+       decides which lengths exist), and the answer's meaning is revealed at
+       the end whether you got it or not. -->
+  <section class="word" id="theword" hidden>
+    <div class="word__inner">
+      <p class="word__eyebrow">Guess &middot; new word every day</p>
+      <div id="wordle"></div>
+    </div>
+  </section>
+
+  <!-- ===== The Daily =====
+       The reason to come back. js/daily.js reads the same content files the
+       three original games use, so new cards are still written in
+       js/mythCards.js, js/biasCards.js and js/quizQuestions.js. -->
+  <section class="daily" id="dailyround" hidden>
+    <div class="daily__inner">
+      <p class="daily__eyebrow">Play &middot; one round a day</p>
+      <div id="daily"></div>
+    </div>
+  </section>
+
+  <section class="ym" id="machine" aria-label="The year machine" hidden>
+    <div class="ym__inner">
+      <p class="eyebrow eyebrow--light">Activity · about two minutes</p>
+      <h2 class="ym__title">What if <em>you</em> were there?</h2>
+      <p class="ym__lead">Set your age and the page sends you back to 1912. You will then see, one row
+        at a time, how old you would have been when each right you already have finally arrived in
+        Canada. Every date is sourced.</p>
+
+      <div class="ym__controls">
+        <div class="ym__agebox">
+          <button class="ym__step" type="button" data-d="-1" aria-label="One year younger">−</button>
+          <input class="ym__age" id="ymAge" type="number" inputmode="numeric" min="10" max="25" value="16" aria-label="Your age in years" />
+          <button class="ym__step" type="button" data-d="1" aria-label="One year older">+</button>
+        </div>
+        <button class="ym__go" id="ymGo" type="button" data-magnetic>Send me back <span class="cta__arrow">→</span></button>
+        <button class="ym__all" id="ymAll" type="button">Show all results now</button>
+      </div>
+      <p class="ym__privacy">Your age is never saved or sent anywhere. All of this happens on your screen.</p>
+
+      <div class="ym__progress" id="ymProgress" hidden>
+        <p class="ym__progress-label"><span id="ymProgressText">Travelling…</span></p>
+        <div class="ym__progress-track"><div class="ym__progress-fill" id="ymProgressFill"></div></div>
+      </div>
+
+      <ol class="ym__list" id="ymList"></ol>
+      <div class="ym__foot" id="ymFoot" hidden>
+        <p class="ym__summary" id="ymSummary"></p>
+        <p class="ym__foot-line">All of that is one lifetime. One girl, waiting. You made it back to 2026.</p>
+        <a class="ym__cta" href="voice.html#wall">Write a private reflection <span class="cta__arrow">↓</span></a>
       </div>
     </div>
   </section>
 
+      </div>
+    </div>
+  </section>
+
+  <!-- the time-travel takeover (js/yearmachine.js): the year ticks 2026 -> 1912 -->
+  <!-- tabindex so focus can move INTO the overlay while scroll is locked;
+       aria-modal because the rest of the page is unreachable while it is up -->
+  <div class="ym-travel" id="ymTravel" tabindex="-1" role="dialog" aria-modal="true"
+       aria-label="Travelling back to 1912" aria-hidden="true">
+    <p class="ym-travel__year" id="ymTravelYear">2026</p>
+    <p class="ym-travel__scene" id="ymTravelScene"></p>
+    <p class="ym-travel__skip">tap anywhere, or press any key, to skip</p>
+  </div>
 
   </main>
 
   <!-- ===== Footer ===== -->
   <footer class="footer" data-bg="#e2dbd8" data-scene>
     <p class="footer__mark">wearefeminismm</p>
-    <p class="footer__mission">The wall is still listening.</p>
+    <p class="footer__mission">Come back tomorrow. There is another round waiting.</p>
     <p class="footer__coming">Next: workshops · mentorship · resource hub</p>
     <a class="footer__ig" href="https://instagram.com/ourfeministspacee" target="_blank" rel="noopener" data-magnetic>@ourfeministspacee on Instagram →</a>
     <p class="footer__fine">Made with care. Your words are anonymous, and you never have to share your name.</p>
     <p class="footer__refs"><a href="sources.html">Every claim on this site, and where it comes from &#8594;</a></p>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
   <script src="js/scroll.js?v=79"></script>
   <script src="js/polish.js?v=82"></script>
-  <script src="js/aiglow.js?v=79"></script>
   <script src="js/main.js?v=88"></script>
+  <script src="js/quizQuestions.js?v=1"></script>
+  <script src="js/mythCards.js?v=1"></script>
+  <script src="js/biasCards.js?v=1"></script>
+  <script src="js/daily.js?v=2"></script>
+  <script src="js/wordList.js?v=2"></script>
+  <script src="js/wordle.js?v=1"></script>
   <script src="js/inkgarden.js?v=1"></script>
-  <script src="js/wall3d.js?v=80"></script>
+  <script src="js/yearmachine.js?v=5"></script>
+  <script src="js/arcade.js?v=1"></script>
   <script src="js/theme.js?v=2"></script>
   <script src="js/nav.js?v=4"></script>
   <script src="js/ui.js?v=1"></script>

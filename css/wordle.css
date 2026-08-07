@@ -1,0 +1,180 @@
+/* ================================================================
+   THE WORD — the daily guessing puzzle (js/wordle.js).
+   Scoped under .word / .wd. Uses the site's tokens, so it follows
+   light, dark and accessible mode without a palette of its own.
+   ================================================================ */
+
+.word {
+  background: var(--paper);
+  padding: var(--section-y) var(--gutter);
+}
+.word__inner { max-width: 620px; margin: 0 auto; }
+
+.word__eyebrow {
+  font-family: var(--mono);
+  font-size: var(--t-label);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  margin: 0 0 14px;
+}
+
+.wd { display: flex; flex-direction: column; align-items: center; }
+
+.wd__kicker {
+  font-family: var(--mono);
+  font-size: var(--t-label);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  margin: 0 0 6px;
+  text-align: center;
+}
+.wd__kicker b { color: var(--gold-ink); }
+
+.wd__chal {
+  margin: 6px 0 0;
+  padding: 8px 14px;
+  border: 1px dashed var(--gold-ink);
+  border-radius: var(--r-pill);
+  font-size: var(--t-small);
+  color: var(--ink);
+}
+.wd__chal b { color: var(--gold-ink); }
+
+/* ---------- the grid ---------- */
+
+.wd__grid { display: flex; flex-direction: column; gap: 6px; margin: 20px 0 0; }
+.wd__row { display: flex; gap: 6px; justify-content: center; }
+
+/* Tiles shrink as the word gets longer so an eight-letter day still fits a
+   narrow phone without the grid scrolling sideways. */
+.wd__t {
+  /* The gaps have to come out of the sum as well as the padding: an 8-letter
+     row at 390px overflowed by 2px without it, which is enough to make the
+     whole page scroll sideways. */
+  width: clamp(26px, calc((min(100vw, 560px) - 48px - (var(--len) - 1) * 6px) / var(--len)), 58px);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--line);
+  border-radius: 8px;
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: clamp(1rem, calc(90vw / var(--len) / 2.6), 1.8rem);
+  color: var(--ink);
+  text-transform: uppercase;
+  background: transparent;
+}
+.wd__t.is-typed { border-color: var(--ink-dim); }
+
+/* Two states that must never be told apart by hue alone: the accent pink and
+   the deeper rose differ in lightness as well, and every tile also carries an
+   aria-label spelling the state out. */
+.wd__t.is-hit  { background: var(--gold); border-color: var(--gold); color: #2f1f1a; }
+.wd__t.is-near { background: var(--violet); border-color: var(--violet); color: var(--paper); }
+.wd__t.is-off  { background: var(--paper-soft); border-color: var(--paper-soft); color: var(--ink-dim); }
+
+.wd__row.is-nudge { animation: wdNudge 0.32s ease; }
+@keyframes wdNudge {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.wd__msg {
+  min-height: 1.4em;
+  margin: 12px 0 0;
+  font-size: var(--t-small);
+  color: var(--gold-ink);
+  text-align: center;
+}
+
+/* ---------- the keyboard ---------- */
+
+.wd__keys { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; width: 100%; }
+.wd__krow { display: flex; gap: 5px; justify-content: center; }
+
+.wd__k {
+  /* basis 0, so ten keys share whatever the row has rather than each demanding
+     their content width and pushing the row past the screen */
+  flex: 1 1 0;
+  max-width: 44px;
+  min-width: 0;
+  min-height: 48px;
+  padding: 0 2px;
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--ink);
+  background: var(--paper-soft);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+.wd__k--wide { max-width: 62px; flex: 1.4 1 auto; }
+.wd__k:hover { border-color: var(--gold-ink); }
+.wd__k:focus-visible { outline: 2px solid var(--gold-ink); outline-offset: 2px; }
+.wd__k.is-hit  { background: var(--gold); border-color: var(--gold); color: #2f1f1a; }
+.wd__k.is-near { background: var(--violet); border-color: var(--violet); color: var(--paper); }
+.wd__k.is-off  { background: transparent; color: var(--ink-dim); opacity: 0.45; }
+
+/* ---------- the end ---------- */
+
+.wd__foot:empty { display: none; }
+.wd__foot {
+  width: 100%;
+  margin-top: 26px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+  text-align: center;
+}
+
+.wd__verdict {
+  margin: 0 0 14px;
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: var(--ink-dim);
+}
+.wd__verdict.is-yes { color: var(--gold-ink); }
+
+.wd__answer {
+  margin: 0 0 8px;
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: clamp(1.8rem, 6vw, 2.6rem);
+  letter-spacing: 0.02em;
+  color: var(--ink);
+}
+.wd__meaning {
+  margin: 0 auto 18px;
+  max-width: 42ch;
+  line-height: 1.6;
+  color: var(--ink-dim);
+}
+
+.wd__streak { margin: 0 0 16px; color: var(--ink); }
+.wd__streak b { color: var(--gold-ink); }
+
+.wd__versus {
+  display: inline-flex; flex-direction: column; gap: 2px;
+  margin: 0 0 18px; padding: 12px 22px;
+  border: 1px solid var(--line); border-radius: var(--r);
+  background: var(--paper-soft);
+}
+.wd__vs-row { font-family: var(--mono); font-size: var(--t-small); letter-spacing: 0.1em; color: var(--ink-dim); }
+.wd__vs-row b { color: var(--ink); font-size: 1.2em; margin-left: 6px; }
+.wd__vs-line { margin-top: 6px; font-family: var(--serif); font-style: italic; color: var(--gold-ink); }
+
+.wd__actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.wd__back { margin: 16px 0 0; font-size: var(--t-small); color: var(--ink-dim); }
+.wd__empty { color: var(--ink-dim); }
+
+@media (prefers-reduced-motion: reduce) {
+  .wd__row.is-nudge { animation: none !important; }
+  .wd__k, .wd__t { transition: none !important; }
+}
+html[data-a11y] .wd__row.is-nudge { animation: none !important; }
+html[data-a11y] .wd__k, html[data-a11y] .wd__t { transition: none !important; }

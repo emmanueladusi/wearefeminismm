@@ -166,6 +166,7 @@ function screenText(text) {
     return (
       "Before this goes up: if any of that is happening to you right now, please talk to someone who can help tonight. " +
       "<strong>Kids Help Phone: text CONNECT to 686868</strong>, free and confidential, any hour. " +
+      "Black youth can text <strong>RISE</strong> to the same number for RiseUp. " +
       "You can also call or text <strong>988</strong>. Your words are still yours, and sending again will put them on the wall."
     );
   }

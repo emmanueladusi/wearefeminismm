@@ -23,10 +23,14 @@
     const c = document.createElement("canvas");
     c.width = 256; c.height = 128;
     const g = c.getContext("2d");
+    // Umber and pink, matching :root. These are canvas literals, so the palette
+    // change to the stylesheet could not reach them: this file kept painting the
+    // old suffragette violet over the wall long after every CSS surface had
+    // moved, and because the backdrop is opaque it won that argument on screen.
     const grad = g.createLinearGradient(0, 0, 0, 128);
-    grad.addColorStop(0, "#f2ead8");
-    grad.addColorStop(0.55, "#9a86c4");
-    grad.addColorStop(1, "#241a38");
+    grad.addColorStop(0, "#e2dbd8");    // --paper
+    grad.addColorStop(0.55, "#8f6a63"); // warm mid
+    grad.addColorStop(1, "#231713");    // below the wall's own ground
     g.fillStyle = grad;
     g.fillRect(0, 0, 256, 128);
     const glow = (x, y, r, col, a) => {
@@ -35,8 +39,8 @@
       rg.addColorStop(1, "rgba(255,255,255,0)");
       g.globalAlpha = a; g.fillStyle = rg; g.fillRect(0, 0, 256, 128); g.globalAlpha = 1;
     };
-    glow(60, 34, 66, "#fff4dd", 0.9);
-    glow(200, 44, 56, "#ffd894", 0.8);
+    glow(60, 34, 66, "#fdf4f1", 0.9);
+    glow(200, 44, 56, "#f2a8bd", 0.8);
     const tex = new THREE.CanvasTexture(c);
     tex.mapping = THREE.EquirectangularReflectionMapping;
     tex.colorSpace = THREE.SRGBColorSpace;
@@ -96,15 +100,15 @@
     const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 30);
     camera.position.z = 6;
 
-    scene.add(new THREE.AmbientLight(0xe8e0f2, 0.7));
-    const key = new THREE.DirectionalLight(0xffe6b0, 1.6);
+    scene.add(new THREE.AmbientLight(0xf2e8e5, 0.7));
+    const key = new THREE.DirectionalLight(0xffd9df, 1.6);
     key.position.set(3, 4, 5);
     scene.add(key);
 
     const gemMesh = new THREE.Mesh(
       new THREE.TorusKnotGeometry(1.15, 0.4, 220, 36),
       new THREE.MeshPhysicalMaterial({
-        color: 0x6a4fb0,
+        color: 0x78514f,   /* --violet */
         metalness: 0.15,
         roughness: 0.1,
         clearcoat: 1,
@@ -119,7 +123,7 @@
     // a thin gold ring orbiting the gem
     const ring = new THREE.Mesh(
       new THREE.TorusGeometry(2.35, 0.035, 10, 64),
-      new THREE.MeshStandardMaterial({ color: 0xd9a13f, metalness: 1, roughness: 0.25 })
+      new THREE.MeshStandardMaterial({ color: 0xea7393, metalness: 1, roughness: 0.25 })   /* --gold */
     );
     ring.rotation.x = Math.PI / 2.4;
     scene.add(ring);
@@ -166,7 +170,10 @@
     renderer.setPixelRatio(1);   // ambient backdrop: 1x is plenty and halves the fill cost
     renderer.outputColorSpace = THREE.SRGBColorSpace;
 
-    const DEEP = 0x2e2145;
+    // Must equal .wall-section's data-bg. This is an opaque backdrop covering
+    // the whole section, so any drift between the two shows up as a hard seam
+    // where the year machine ends and the wall begins.
+    const DEEP = 0x281b17;
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(DEEP);
     scene.fog = new THREE.Fog(DEEP, 6, 26);
@@ -174,8 +181,8 @@
     const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 40);
     camera.position.z = 10;
 
-    scene.add(new THREE.AmbientLight(0xcbb8e6, 0.5));
-    const gold = new THREE.PointLight(0xffd894, 2.2, 40);
+    scene.add(new THREE.AmbientLight(0xe8d9d4, 0.5));
+    const gold = new THREE.PointLight(0xf2a8bd, 2.2, 40);
     gold.position.set(6, 4, 4);
     scene.add(gold);
 
@@ -192,7 +199,7 @@
       const m = new THREE.Mesh(
         geos[(Math.random() * geos.length) | 0],
         new THREE.MeshStandardMaterial({
-          color: isGold ? 0xd9a13f : 0x6a4fb0,
+          color: isGold ? 0xea7393 : 0x78514f,   /* --gold, --violet */
           metalness: isGold ? 0.9 : 0.3,
           roughness: 0.35,
           transparent: true,
@@ -223,7 +230,7 @@
     pGeo.setAttribute("position", new THREE.BufferAttribute(pPos, 3));
     const dust = new THREE.Points(
       pGeo,
-      new THREE.PointsMaterial({ color: 0xf3e6c4, size: 0.05, transparent: true, opacity: 0.55 })
+      new THREE.PointsMaterial({ color: 0xf2efed, size: 0.05, transparent: true, opacity: 0.55 })
     );
     scene.add(dust);
 

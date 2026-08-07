@@ -1,7 +1,6 @@
 /* Community directory — search, filter, list/map toggle.
 
-   The five organizations are the ones that were already on this page; the
-   structured fields come from each organization's own public description.
+   The structured fields come from each organization's own public description.
    Where a detail could not be confirmed the value is the string "Not listed",
    which is rendered as-is. Nothing here is guessed.
 
@@ -71,6 +70,50 @@
       status: "Running",
       url: "https://helpagirlout.org/",
       lastVerified: "27 July 2026",
+    },
+    {
+      name: "Black Women's Institute for Health",
+      desc: "A national, Black-led organization on the health of Black women and girls: therapy, mentorship circles, workshops and research, run out of North York.",
+      location: "Toronto",
+      age: "Not listed",
+      type: "Health and mentorship",
+      cost: "Not listed",
+      status: "Running",
+      url: "https://bwhealthinstitute.com/",
+      lastVerified: "7 August 2026",
+    },
+    {
+      name: "Black Women in Motion",
+      desc: "Survivor-led and grassroots. Wellness, education, employment and peer-education programs for Black women, girls and gender-diverse survivors of gender-based violence.",
+      location: "Toronto",
+      age: "Not listed",
+      type: "Wellness and employment",
+      cost: "Not listed",
+      status: "Running",
+      url: "https://blackwomeninmotion.org/",
+      lastVerified: "7 August 2026",
+    },
+    {
+      name: "Black Girls Magazine",
+      desc: "A print magazine written by Black girls across the GTA, published twice a year, with a teen edition and summer writing and art workshops.",
+      location: "GTA-wide",
+      age: "8 and up",
+      type: "Writing and publishing",
+      cost: "Not listed",
+      status: "Running",
+      url: "https://www.blackgirlsmagazine.ca/",
+      lastVerified: "7 August 2026",
+    },
+    {
+      name: "Elspeth Heyworth Centre for Women",
+      desc: "Settlement, counselling, employment and anti-human-trafficking support for immigrant and newcomer women, seniors, youth and families. Finch Avenue West, plus Vaughan and Bradford.",
+      location: "GTA-wide",
+      age: "Not listed",
+      type: "Settlement and support",
+      cost: "Not listed",
+      status: "Running",
+      url: "https://ehcw.ca/",
+      lastVerified: "7 August 2026",
     },
   ];
 

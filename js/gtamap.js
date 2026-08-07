@@ -2,9 +2,10 @@
 
    Dots trace the GTA silhouette and stay flat on the canvas — they don't move
    under the cursor, they just light up (and their neighbour links brighten) as
-   the pointer passes, like a lamp sweeping across the map. The five org markers
-   sit in the SVG overlay above this as little houses, each linked by a gold arc
-   that draws + un-draws in a seamless loop.
+   the pointer passes, like a lamp sweeping across the map. The org markers sit
+   in the SVG overlay above this as little houses, each linked by a gold arc
+   that draws + un-draws in a seamless loop. That overlay is generated: see
+   tools/gen-map-pins.py, which owns the pin coordinates and the arc spline.
 
    Reduced motion: one calm static frame, no interaction. */
 

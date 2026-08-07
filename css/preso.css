@@ -55,7 +55,9 @@
   font-size: clamp(0.7rem, 1.4vw, 0.8rem);
   letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-dim);
 }
-.preso .cap b { color: var(--gold); font-weight: 700; }
+/* --gold-ink, not --gold: the raw accent is 2.08:1 on paper. The ink variant
+   measures 4.62:1 and aliases straight back to --gold in dark mode. */
+.preso .cap b { color: var(--gold-ink); font-weight: 700; }
 
 /* ── SCENE 1 · LAST YEAR ── */
 .preso .s1 .word { display: block; overflow: hidden; }
@@ -92,25 +94,30 @@
 .preso .sm .sm__ghost {
   position: absolute; top: 8%; left: 0; white-space: nowrap;
   font-family: var(--serif); font-weight: 600; font-size: clamp(5rem, 19vw, 15rem); line-height: 1;
-  color: transparent; -webkit-text-stroke: 2px rgba(74, 53, 104, 0.16); user-select: none;
+  color: transparent; -webkit-text-stroke: 2px rgba(120, 81, 79, 0.16); user-select: none;
   will-change: transform;   /* rasterize the stroked text once; drift composites it */
 }
 .preso .is-on.sm .sm__ghost { animation: prDrift 10s linear both; }
-.preso .sm__spread { position: relative; display: flex; align-items: center; justify-content: center; gap: clamp(18px, 5vw, 70px); width: 100%; max-width: 1080px; }
+/* Tighter than it was (1080px, 70px gap): the pair sat at opposite edges of a
+   wide stage with the picture at 30vw, so a centred composition still read as
+   two small things marooned in a lot of paper. */
+.preso .sm__spread { position: relative; display: flex; align-items: center; justify-content: center; gap: clamp(18px, 4vw, 52px); width: 100%; max-width: 960px; }
 .preso .sm__text { text-align: left; flex: 1; min-width: 0; }
 .preso .sm__text .cap { margin-bottom: clamp(10px, 2.4svh, 22px); }
 .preso .is-on.sm .sm__text .cap { animation: prFade 0.7s var(--ease) 0.2s both; }
 .preso .sm__line { overflow: hidden; }
 .preso .sm__line span { display: inline-block; font-family: var(--serif); font-weight: 600; font-size: clamp(1.9rem, 5.6vw, 4.2rem); line-height: 1.08; color: var(--ink); }
-.preso .sm__line--em span { font-style: italic; color: var(--magenta); }
+.preso .sm__line--em span { font-style: italic; color: var(--gold-ink); }
 .preso .is-on.sm .sm__line:nth-of-type(2) span { animation: prRise 0.75s var(--spring) 0.35s both; }
 .preso .is-on.sm .sm__line:nth-of-type(3) span { animation: prRise 0.75s var(--spring) 0.5s both; }
 .preso .sm__foot { margin-top: clamp(12px, 3svh, 26px); font-family: var(--mono); font-size: clamp(0.7rem, 1.3vw, 0.78rem); letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-dim); }
 .preso .is-on.sm .sm__foot { animation: prFade 0.7s var(--ease) 1.05s both; }
 .preso .sm__photo {
-  flex: none; width: clamp(180px, 30vw, 360px); aspect-ratio: 3 / 4;
+  /* Sized against the stage as well as the width, so it fills a short window
+     instead of leaving the bottom half of the scene empty. */
+  flex: none; width: clamp(210px, 34vw, 430px); max-height: 64svh; aspect-ratio: 3 / 4;
   background-size: cover; background-position: 50% 24%; border-radius: 16px; rotate: 2.5deg;
-  box-shadow: 0 34px 80px -30px rgba(44, 33, 64, 0.5); clip-path: inset(0 0 100% 0);
+  box-shadow: 0 34px 80px -30px rgba(43, 28, 23, 0.5); clip-path: inset(0 0 100% 0);
 }
 .preso .is-on.sm .sm__photo { animation: prPhotoDrop 0.95s var(--ease) 0.55s both, prPhotoSettle 1.1s var(--spring) 0.55s both; }
 @keyframes prPhotoDrop { to { clip-path: inset(0 0 0 0); } }
@@ -125,7 +132,7 @@
 .preso .s3 { gap: 0; }
 .preso .s3 .split { position: relative; width: 100%; height: min(74svh, 640px); }
 .preso .s3 .half { position: absolute; left: 0; width: 100%; height: 50%; overflow: hidden; display: flex; justify-content: center; }
-.preso .s3 .half span { font-family: var(--serif); font-weight: 600; font-size: clamp(6rem, 26vw, 21rem); line-height: 1; letter-spacing: 0.02em; color: var(--violet-deep); display: block; }
+.preso .s3 .half span { font-family: var(--serif); font-weight: 600; font-size: clamp(6rem, 26vw, 21rem); line-height: 1; letter-spacing: 0.02em; color: var(--ink); display: block; }
 .preso .s3 .half--top { top: 0; align-items: flex-start; }
 .preso .s3 .half--top span { transform: translateY(calc(min(74svh, 640px) / 2 - 50%)); }
 .preso .s3 .half--bot { bottom: 0; align-items: flex-end; }
@@ -137,7 +144,7 @@
 .preso .s3 .strip {
   position: absolute; left: 50%; top: 50%; width: min(78vw, 860px); height: clamp(120px, 24svh, 240px);
   transform: translate(-50%, -50%); background-size: cover; background-position: center;
-  border-radius: 14px; box-shadow: 0 30px 70px -28px rgba(44, 33, 64, 0.45); clip-path: inset(50% 0 50% 0);
+  border-radius: 14px; box-shadow: 0 30px 70px -28px rgba(43, 28, 23, 0.45); clip-path: inset(50% 0 50% 0);
 }
 .preso .is-on.s3 .strip { animation: prStrip 0.9s var(--ease) 1.5s both; }
 @keyframes prStrip { to { clip-path: inset(0 0 0 0); } }
@@ -155,15 +162,15 @@
   position: absolute; top: 50%; left: 0; transform: translateY(-50%);
   font-family: var(--serif); font-weight: 600; white-space: nowrap;
   font-size: clamp(7rem, 30vw, 24rem); line-height: 1; color: transparent;
-  -webkit-text-stroke: 2px rgba(74, 53, 104, 0.22); user-select: none;
+  -webkit-text-stroke: 2px rgba(120, 81, 79, 0.22); user-select: none;
   will-change: transform;   /* rasterize the stroked text once; drift composites it */
 }
 .preso .is-on.s4 .ghost { animation: prDrift 9s linear both; }
 @keyframes prDrift { from { transform: translate(4vw, -50%); } to { transform: translate(-26vw, -50%); } }
 .preso .s4 .cards { position: relative; display: flex; gap: clamp(10px, 3vw, 34px); align-items: center; }
-.preso .s4 .card { width: clamp(120px, 24vw, 300px); aspect-ratio: 3 / 4; background: #fffdfa; padding: clamp(6px, 1.2vw, 12px); border-radius: 10px; box-shadow: 0 26px 60px -24px rgba(44, 33, 64, 0.4); }
+.preso .s4 .card { width: clamp(120px, 24vw, 300px); aspect-ratio: 3 / 4; background: #faf6f4; padding: clamp(6px, 1.2vw, 12px); border-radius: 10px; box-shadow: 0 26px 60px -24px rgba(43, 28, 23, 0.4); }
 .preso .s4 .card .ph { width: 100%; height: 82%; background-size: cover; background-position: center; border-radius: 6px; }
-.preso .s4 .card .tag { height: 18%; display: grid; place-items: center; font-family: var(--mono); font-size: clamp(0.7rem, 1.2vw, 0.78rem); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-dim); }
+.preso .s4 .card .tag { height: 18%; display: grid; place-items: center; font-family: var(--mono); font-size: clamp(0.7rem, 1.2vw, 0.78rem); letter-spacing: 0.14em; text-transform: uppercase; color: #5c4038; }
 .preso .s4 .card:nth-child(1) { rotate: -5deg; }
 .preso .s4 .card:nth-child(2) { rotate: 2.5deg; margin-top: clamp(-40px, -4vw, -14px); }
 .preso .s4 .card:nth-child(3) { rotate: 6deg; }
@@ -177,14 +184,14 @@
 
 /* ── SCENE · MANIFESTO ── */
 .preso .s5 .stack { display: flex; flex-direction: column; gap: clamp(2px, 1svh, 10px); }
-.preso .s5 .line span { display: inline-block; font-family: var(--serif); font-weight: 600; font-size: clamp(2.6rem, 10.5vw, 8.2rem); line-height: 1.02; letter-spacing: -0.01em; color: var(--violet-deep); }
-.preso .s5 .line--ghost span { color: var(--magenta); font-style: italic; }
+.preso .s5 .line span { display: inline-block; font-family: var(--serif); font-weight: 600; font-size: clamp(2.6rem, 10.5vw, 8.2rem); line-height: 1.02; letter-spacing: -0.01em; color: var(--ink); }
+.preso .s5 .line--ghost span { color: var(--gold-ink); font-style: italic; }
 .preso .is-on.s5 .line:nth-child(1) span { animation: prZoomSoft 1.1s var(--ease) 0.15s both; }
 .preso .is-on.s5 .line:nth-child(2) span { animation: prZoomSoft 1.1s var(--ease) 0.55s both; }
 .preso .is-on.s5 .line:nth-child(3) span { animation: prZoomSoft 1.1s var(--ease) 0.95s both; }
 @keyframes prZoomSoft { from { opacity: 0; transform: scale(1.16); filter: blur(3px); } }
 .preso .s5 .closer { margin-top: clamp(16px, 4svh, 36px); font-family: var(--serif); font-style: italic; font-size: clamp(1.1rem, 3.4vw, 2rem); color: var(--ink); }
-.preso .s5 .closer em { color: var(--gold); font-style: normal; }
+.preso .s5 .closer em { color: var(--gold-ink); font-style: normal; }
 .preso .is-on.s5 .closer { animation: prBlur 1s var(--ease) 1.6s both; }
 
 /* ===== HUD: scene counter + scroll progress ===== */
@@ -206,7 +213,7 @@
   padding: 6px 14px; white-space: nowrap;
   transition: color 0.3s var(--ease), border-color 0.3s var(--ease);
 }
-.preso .hud__skip:hover, .preso .hud__skip:focus-visible { color: var(--gold); border-color: var(--gold); }
+.preso .hud__skip:hover, .preso .hud__skip:focus-visible { color: var(--gold-ink); border-color: var(--gold-ink); }
 @media (max-width: 560px) { .preso .hud__skip { padding: 5px 11px; font-size: 0.68rem; } }
 /* three collage cards at 120px min each overflow a 375px phone — let them
    shrink with the viewport instead */
@@ -234,5 +241,5 @@
   border-color: var(--ink-dim);
   margin-right: 8px;
 }
-.preso .hud__play:hover, .preso .hud__play:focus-visible { color: var(--gold); border-color: var(--gold); }
+.preso .hud__play:hover, .preso .hud__play:focus-visible { color: var(--gold-ink); border-color: var(--gold-ink); }
 @media (max-width: 560px) { .preso .hud__play { min-width: 4.5em; } }

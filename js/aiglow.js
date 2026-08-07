@@ -27,7 +27,11 @@
   var CSS = [
     "@property --aig-angle{syntax:'<angle>';inherits:false;initial-value:0deg;}",
     ".aig{position:relative;isolation:isolate;border-radius:var(--aig-radius,24px);",
-    "--aig-conic:conic-gradient(from var(--aig-angle),#30D5C8,#7B61FF,#FF3CAC,#FFB86B,#6EE7B7,#30D5C8);}",
+    /* The ported effect shipped with Apple's teal/indigo/magenta/mint ring,
+       which put the loudest and least related colours on the site directly
+       around the reflection composer. Same shimmer, this site's palette:
+       accent pink through rose to paper and back down into umber. */
+    "--aig-conic:conic-gradient(from var(--aig-angle),#ea7393,#f2a8bd,#e8d3d0,#a86a72,#78514f,#ea7393);}",
     /* glow container sits BEHIND the element's own content (z-index -1 inside
        the isolated context) so children stay crisp without any markup change */
     ".aig__glows{position:absolute;inset:0;border-radius:inherit;pointer-events:none;",

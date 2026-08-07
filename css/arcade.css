@@ -1,0 +1,156 @@
+/* ================================================================
+   PLAY — the picker (js/arcade.js).
+   Boxes you choose from, rather than three activities stacked open.
+   ================================================================ */
+
+.arcade { background: var(--paper-soft); padding: var(--section-y) var(--gutter); }
+.arcade__inner { max-width: 1000px; margin: 0 auto; }
+
+.arcade__eyebrow {
+  font-family: var(--mono);
+  font-size: var(--t-label);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  margin: 0 0 20px;
+}
+
+.arcade__grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+/* A real <button>: it changes what is on screen rather than going anywhere,
+   so it is not a link, and it stays reachable by keyboard for free. */
+.acard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  min-height: 200px;
+  padding: 24px;
+  text-align: left;
+  font: inherit;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  cursor: pointer;
+  transition: transform 0.25s var(--ease), border-color 0.25s, box-shadow 0.25s;
+}
+.acard:hover {
+  transform: translateY(-4px);
+  border-color: var(--gold-ink);
+  box-shadow: 0 26px 50px -34px rgba(43, 28, 23, 0.55);
+}
+.acard:focus-visible { outline: 2px solid var(--gold-ink); outline-offset: 3px; }
+
+.acard__k {
+  font-family: var(--mono);
+  font-size: var(--t-label);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold-ink);
+}
+.acard__t {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+  line-height: 1.1;
+  margin: 0;
+}
+.acard__d { margin: 0; font-size: var(--t-small); color: var(--ink-dim); line-height: 1.55; }
+.acard__sub {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: var(--t-label);
+  letter-spacing: 0.1em;
+  color: var(--ink-dim);
+}
+.acard__go { margin-top: auto; font-weight: 700; color: var(--gold-ink); font-size: var(--t-small); }
+
+.acard__badge {
+  position: absolute;
+  top: 18px; right: 18px;
+  padding: 5px 11px;
+  border-radius: var(--r-pill);
+  background: var(--paper-soft);
+  border: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: var(--t-label);
+  letter-spacing: 0.08em;
+  color: var(--ink-dim);
+}
+.acard__badge.is-hot { border-color: var(--gold); color: var(--gold-ink); }
+.acard__badge[hidden] { display: none; }
+
+/* ---------- the opened game ---------- */
+
+.arcade__shell { max-width: 1000px; margin: 0 auto; }
+.arcade__shell[hidden] { display: none; }
+
+.arcade__bar {
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 22px;
+}
+
+.arcade__back {
+  display: inline-flex; align-items: center; gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  font-family: var(--mono);
+  font-size: var(--t-label);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+.arcade__back:hover, .arcade__back:focus-visible { border-color: var(--gold-ink); color: var(--gold-ink); }
+
+.arcade__now {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: clamp(1.2rem, 3vw, 1.6rem);
+  margin: 0;
+}
+.arcade__now:focus { outline: none; }
+
+/* The games were full-bleed sections with their own grounds. Inside the shell
+   they become cards, but they must KEEP a ground of their own: stripping it
+   put the year machine's cream text straight onto light paper at 1.29:1, and
+   dropped the word grid's accent from 4.62:1 to 3.99:1. Each panel keeps the
+   surface its own colours were designed against. */
+.arcade__shell .word,
+.arcade__shell .daily {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: clamp(18px, 3vw, 34px);
+}
+.arcade__shell .ym {
+  background: var(--violet-deep);
+  color: var(--cream-on-dark);
+  border-radius: var(--r-lg);
+  padding: clamp(22px, 4vw, 40px);
+}
+.arcade__shell .word[hidden],
+.arcade__shell .daily[hidden],
+.arcade__shell .ym[hidden] { display: none; }
+.arcade__shell .word__inner,
+.arcade__shell .daily__inner,
+.arcade__shell .ym__inner { max-width: none; margin: 0; }
+.arcade__shell .word__eyebrow,
+.arcade__shell .daily__eyebrow { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .acard { transition: none !important; }
+  .acard:hover { transform: none; }
+}
+html[data-a11y] .acard { transition: none !important; }
+html[data-a11y] .acard:hover { transform: none; }

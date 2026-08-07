@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>art texture preview — timeline prototype</title>
+<!-- dev-only: renders the four chapter artworks side by side at scroll 0
+     so the texture pass can be eyeballed without scrolling the prototype -->
+<style>
+  body { margin: 0; background: #faf6ef; font-family: ui-monospace, Menlo, monospace;
+         display: grid; grid-template-columns: 1fr 1fr; gap: 18px; padding: 18px; }
+  .card { aspect-ratio: 4/3; border-radius: 20px; overflow: hidden; position: relative;
+          box-shadow: 0 18px 44px rgba(44,33,64,.25); }
+
+  /* === copied verbatim from timeline.html (texture pass) === */
+  .art { position: absolute; inset: 0; background: var(--art-sky); }
+  .art::before {
+    content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background:
+      repeating-linear-gradient(90deg, rgba(250, 246, 239, 0.03) 0 1px, transparent 1px 7px),
+      repeating-linear-gradient(0deg,  rgba(250, 246, 239, 0.022) 0 1px, transparent 1px 9px),
+      repeating-linear-gradient(45deg, rgba(20, 14, 34, 0.055) 0 2px, transparent 2px 11px),
+      repeating-linear-gradient(-45deg, rgba(250, 246, 239, 0.02) 0 2px, transparent 2px 13px);
+  }
+  .art::after {
+    content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='180' height='180' filter='url(%23n)'/></svg>");
+    background-size: 180px 180px;
+    mix-blend-mode: overlay;
+    opacity: 0.34;
+  }
+  .art svg { position: absolute; left: -25%; width: 150%; height: 46%; bottom: 0; z-index: 2; }
+  .art svg path { fill: var(--w-fill); }
+  .art .w1 { bottom: 12%; opacity: 0.35; }
+  .art .w2 { bottom: 5%;  opacity: 0.6;
+             filter: drop-shadow(0 -3px 5px rgba(250, 246, 239, 0.16)); }
+  .art .w3 { bottom: -2%; opacity: 0.95;
+             filter: drop-shadow(0 -4px 7px rgba(250, 246, 239, 0.22)); }
+  .art .num {
+    position: absolute; top: 7%; left: 7%;
+    font-family: -apple-system, "SF Pro Display", sans-serif; font-weight: 800;
+    font-size: 5rem; line-height: 1;
+    color: transparent; -webkit-text-stroke: 2px rgba(250, 246, 239, 0.5);
+  }
+  .art .grain {
+    position: absolute; inset: 0; z-index: 2; opacity: 0.65; mix-blend-mode: overlay;
+    background:
+      linear-gradient(118deg, rgba(255,255,255,0.14) 8%, transparent 32%, transparent 55%, rgba(255,255,255,0.07) 78%, transparent 92%),
+      radial-gradient(60% 50% at 20% 10%, rgba(255,255,255,0.2), transparent 60%),
+      radial-gradient(50% 40% at 85% 80%, rgba(0,0,0,0.28), transparent 60%),
+      radial-gradient(130% 110% at 50% 45%, transparent 62%, rgba(10, 6, 20, 0.4) 100%);
+  }
+
+  .art__photo {
+    position: absolute; z-index: 0;
+    left: 50%; transform: translateX(-50%);
+    filter: grayscale(1) contrast(1.05) brightness(1.12);
+    mix-blend-mode: luminosity;
+    pointer-events: none;
+  }
+  #c1 .art__photo { width: 96%; top: 5%; opacity: 0.52;
+    -webkit-mask-image: radial-gradient(ellipse 76% 74% at 50% 40%, #000 34%, transparent 88%);
+    mask-image: radial-gradient(ellipse 76% 74% at 50% 40%, #000 34%, transparent 88%); }
+  #c2 .art__photo { width: 80%; top: 9%; left: 40%; opacity: 0.55;
+    -webkit-mask-image: radial-gradient(ellipse 72% 78% at 48% 44%, #000 32%, transparent 87%);
+    mask-image: radial-gradient(ellipse 72% 78% at 48% 44%, #000 32%, transparent 87%); }
+  #c3 .art__photo { width: 110%; top: 0; opacity: 0.5;
+    -webkit-mask-image: radial-gradient(ellipse 88% 94% at 50% 46%, #000 34%, transparent 95%);
+    mask-image: radial-gradient(ellipse 88% 94% at 50% 46%, #000 34%, transparent 95%); }
+  #c4 .art__photo { width: 90%; top: 5%; left: 60%; opacity: 0.55;
+    -webkit-mask-image: radial-gradient(ellipse 72% 78% at 44% 42%, #000 30%, transparent 90%);
+    mask-image: radial-gradient(ellipse 72% 78% at 44% 42%, #000 30%, transparent 90%); }
+</style>
+</head>
+<body>
+<div class="card" id="c1" style="--art-sky: linear-gradient(160deg, #4a3568, #2e2145); --w-fill: #8b72c2;">
+  <div class="art">
+    <img class="art__photo" src="../img/waves/wave-01.jpg" alt="" />
+    <svg viewBox="0 0 900 140" preserveAspectRatio="none" class="w1"><path d="M0 70 Q 112 30 225 70 T 450 70 T 675 70 T 900 70 V 140 H 0 Z"/></svg>
+    <svg viewBox="0 0 900 140" preserveAspectRatio="none" class="w2"><path d="M0 70 Q 112 24 225 70 T 450 70 T 675 70 T 900 70 V 140 H 0 Z"/></svg>
+    <svg viewBox="0 0 900 140" preserveAspectRatio="none" class="w3"><path d="M0 70 Q 112 18 225 70 T 450 70 T 675 70 T 900 70 V 140 H 0 Z"/></svg>
+    <span class="num">01</span><span class="grain"></span>
+  </div>
+</div>
+<div class="card" id="c2" style="--art-sky: linear-gradient(160deg, #6d2f4e, #3b1c33); --w-fill: #e0797f;">
+  <div class="art">
+    <img class="art__photo" src="../img/waves/wave-02.jpg" alt="" />
+    <svg viewBox="0 0 900 140" preserveAspectRatio="none" class="w1"><path d="M0 70 Q 112 30 225 70 T 450 70 T 675 70 T 900 70 V 140 H 0 Z"/></svg>
+    <svg viewBox="0 0 900 140" preserveAspectRatio="none" class="w2"><path d="M0 70 Q 112 24 225 70 T 450 70 T 675 70 T 900 70 V 140 H 0 Z"/></svg>
+    <svg viewBox="0 0 900 140" preserveAspectRatio="none" class="w3"><path d="M0 70 Q 112 18 225 70 T 450 70 T 675 70 T 900 70 V 140 H 0 Z"/></svg>
+    <span class="num">02</span><span class="grain"></span>
+  </div>
+</div>
+<div class="card" id="c3" style="--art-sky: linear-gradient(160deg, #2f5a63, #1d2c45); --w-fill: #8fd0c4;">
+  <div class="art">
+    <img class="art__photo" src="../img/waves/wave-03.jpg" alt="" />
+    <svg viewBox="0 0 900 140" preserveAspectRatio="none" class="w1"><path d="M0 70 Q 112 30 225 70 T 450 70 T 675 70 T 900 70 V 140 H 0 Z"/></svg>
+    <svg viewBox="0 0 900 140" preserveAspectRatio="none" class="w2"><path d="M0 70 Q 112 24 225 70 T 450 70 T 675 70 T 900 70 V 140 H 0 Z"/></svg>
+    <svg viewBox="0 0 900 140" preserveAspectRatio="none" class="w3"><path d="M0 70 Q 112 18 225 70 T 450 70 T 675 70 T 900 70 V 140 H 0 Z"/></svg>
+    <span class="num">03</span><span class="grain"></span>
+  </div>
+</div>
+<div class="card" id="c4" style="--art-sky: linear-gradient(160deg, #5b3b8f, #241a3e); --w-fill: #a684e0;">
+  <div class="art">
+    <img class="art__photo" src="../img/waves/wave-04.jpg" alt="" />
+    <svg viewBox="0 0 900 140" preserveAspectRatio="none" class="w1"><path d="M0 70 Q 112 30 225 70 T 450 70 T 675 70 T 900 70 V 140 H 0 Z"/></svg>
+    <svg viewBox="0 0 900 140" preserveAspectRatio="none" class="w2"><path d="M0 70 Q 112 24 225 70 T 450 70 T 675 70 T 900 70 V 140 H 0 Z"/></svg>
+    <svg viewBox="0 0 900 140" preserveAspectRatio="none" class="w3"><path d="M0 70 Q 112 18 225 70 T 450 70 T 675 70 T 900 70 V 140 H 0 Z"/></svg>
+    <span class="num">04</span><span class="grain"></span>
+  </div>
+</div>
+</body>
+</html>

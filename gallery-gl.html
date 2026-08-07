@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>wearefeminismm · Gallery GL (Wave One corridor, WebGL prototype)</title>
+<meta name="robots" content="noindex" />
+<!-- =====================================================================
+     GALLERY GL · prototype 01 · Wave One as a single WebGL scene
+
+     Why this file exists: the DOM gallery's travel cost is structural.
+     Moving the camera is a translateZ under perspective, which is a
+     continuous screen-space scale change on every card, and Chromium
+     answers that by re-rasterizing the cards' tiles on the CPU while we
+     scroll. This prototype moves the same room onto one <canvas>: every
+     card is painted ONCE into a texture, and from then on a frame is a
+     couple of lerps, a handful of uniform writes and one GPU draw. The
+     browser's style/layout/paint/raster pipeline is idle during travel.
+
+     Faithfulness contract (compare against Gallery.html, chapter 02):
+       geometry   x = ±clamp(150, 19vw, 300) alternating, z = -i·780,
+                  rotY = ∓9°, first piece centred        (LAYOUT.corridor)
+       camera     perspective 1300px -> fov derived from viewport height;
+                  ease .08 @60fps frame-rate independent  (loop(), ease60)
+       look       rotY -x·3.5°, rotX -y·2°, drift -x·20px, -y·14px  (TUNE)
+       fade       same rel-distance opacity curve         (corridor branch)
+       material   museum card: #fbf7ef→#ede4d2, 1px gold border, 6px room
+                  inset + gold ring, gold datum line, paper grain
+     Text-reading surfaces (detail panel, quiz) stay DOM, exactly like the
+     reference site (project-aperture.com) keeps its chrome in DOM.
+
+     Not in scope: touch layouts, reduced-motion (the calm page already
+     covers it), the other five chapters. If this feels right on the real
+     MacBook, the same card-to-texture kit covers orbit/field/feed, which
+     differ only in where the meshes sit and how the camera moves.
+
+     ?perf overlay: frame ms EMA + worst-of-last-120, drawn on the real
+     machine. Headless numbers are meaningless here (30Hz pin).
+     ===================================================================== -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=IBM+Plex+Sans:wght@400;500;600&display=swap" />
+<style>
+:root{
+  --paper:#faf6ef; --ink:#241a3e; --ink-dim:#6c6480;
+  --violet:#4a3568; --violet-deep:#2e2145; --room:#171021;
+  --gold:#d9a13f; --cream:#f5efe4; --dim:#b9b1c8;
+  --serif:'Fraunces',Georgia,serif;
+  --sans:'IBM Plex Sans',system-ui,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--room);color:var(--cream);font-family:var(--sans);overflow:hidden}
+#gl{position:fixed;inset:0;display:block;width:100%;height:100%;cursor:grab}
+#gl.dragging{cursor:grabbing}
+#gl.point{cursor:pointer}
+
+/* ---- HUD: DOM chrome over the canvas, same as the DOM gallery ---- */
+.hud{position:fixed;left:0;right:0;top:0;z-index:20;display:flex;align-items:center;gap:18px;
+  padding:14px clamp(16px,3vw,34px);pointer-events:none;
+  background:linear-gradient(180deg,rgba(13,8,22,.72),transparent)}
+.hud b{font-family:var(--serif);font-weight:600;font-size:1.02rem;letter-spacing:.01em}
+.hud span{font-size:.72rem;letter-spacing:.055em;text-transform:uppercase;color:var(--dim)}
+.hud .bar{flex:1;height:2px;border-radius:2px;background:rgba(255,255,255,.14);max-width:220px}
+.hud .bar i{display:block;height:100%;width:0;border-radius:2px;background:var(--gold);transition:width .3s}
+.hint{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:20;
+  font-size:.72rem;letter-spacing:.055em;color:var(--dim);pointer-events:none;white-space:nowrap;
+  text-transform:uppercase}
+.badge{position:fixed;right:16px;top:12px;z-index:20;font-size:.62rem;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--gold);border:1px solid rgba(217,161,63,.4);
+  border-radius:99px;padding:5px 11px;pointer-events:none}
+
+/* ---- detail overlay (reading surface stays DOM, like the reference) ---- */
+.detail{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;padding:22px}
+.detail.open{display:flex}
+.detail__scrim{position:absolute;inset:0;background:rgba(10,6,20,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.detail__panel{position:relative;width:min(640px,94vw);max-height:min(82vh,760px);overflow:auto;border-radius:20px;
+  background:linear-gradient(175deg,#fbf7ef,#f1e9da);color:var(--ink);
+  border:1px solid rgba(217,161,63,.55);box-shadow:0 40px 120px rgba(5,2,12,.7);
+  padding:clamp(24px,4vw,40px)}
+.detail__year{font-size:.72rem;letter-spacing:.055em;text-transform:uppercase;color:var(--violet);font-weight:600}
+.detail__title{font-family:var(--serif);font-weight:600;font-size:clamp(1.4rem,3vw,2rem);line-height:1.15;margin:8px 0 12px}
+.detail__img{border-radius:10px;overflow:hidden;margin:0 0 16px;max-height:280px}
+.detail__img img{width:100%;height:100%;object-fit:cover;display:block}
+.detail__blurb{font-size:1rem;line-height:1.55}
+.detail__why{margin-top:14px;padding:14px 16px;border-left:3px solid var(--gold);
+  background:rgba(217,161,63,.08);border-radius:0 10px 10px 0;font-size:.95rem;line-height:1.5}
+.detail__why b{display:block;font-size:.7rem;letter-spacing:.055em;text-transform:uppercase;color:var(--violet);margin-bottom:6px}
+.detail__close{position:absolute;right:14px;top:14px;width:38px;height:38px;border-radius:50%;
+  border:1px solid rgba(74,53,104,.4);background:none;color:var(--violet);font-size:1rem;cursor:pointer}
+.detail__close:hover{background:rgba(74,53,104,.08)}
+/* quiz, functional in DOM */
+.quiz__q{font-family:var(--serif);font-size:1.15rem;margin:4px 0 14px}
+.quiz__opts{display:grid;gap:8px}
+.quiz__opt{text-align:left;border:1px solid rgba(74,53,104,.3);border-radius:10px;padding:11px 14px;
+  font:inherit;font-size:.9rem;background:none;color:inherit;cursor:pointer;
+  transition:border-color .2s,background .2s}
+.quiz__opt:hover{border-color:var(--violet);background:rgba(74,53,104,.06)}
+.quiz__opt.right{border-color:#3e7d4f;background:rgba(62,125,79,.12)}
+.quiz__opt.wrong{border-color:#a04545;background:rgba(160,69,69,.1)}
+.quiz__verdict{margin-top:12px;font-size:.9rem;min-height:1.4em}
+.quiz__verdict b{color:var(--violet)}
+
+/* ---- perf meter (?perf) ---- */
+#perf{position:fixed;left:14px;bottom:14px;z-index:30;display:none;font-size:11px;line-height:1.5;
+  font-family:ui-monospace,monospace;color:#cfe8cf;background:rgba(8,5,16,.72);
+  border:1px solid rgba(217,161,63,.3);border-radius:10px;padding:8px 12px;pointer-events:none;white-space:pre}
+body.showperf #perf{display:block}
+#boot{position:fixed;inset:0;z-index:50;display:grid;place-items:center;background:var(--room);
+  transition:opacity .5s;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+#boot.off{opacity:0;pointer-events:none}
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+
+<div class="hud">
+  <b>Wave One · The Ballot</b>
+  <span id="hudCount">piece 1 of 7</span>
+  <div class="bar"><i id="hudBar"></i></div>
+</div>
+<p class="hint">scroll to travel the corridor · arrows step between pieces · click a piece to inspect · esc resets</p>
+<p class="badge">WebGL prototype</p>
+
+<div class="detail" id="detail" aria-hidden="true">
+  <div class="detail__scrim" data-close></div>
+  <div class="detail__panel" role="dialog" aria-modal="true">
+    <button class="detail__close" data-close aria-label="Close">&#10005;</button>
+    <div id="detailBody"></div>
+  </div>
+</div>
+
+<div id="perf"></div>
+<div id="boot">building the room…</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script>
+'use strict';
+/* ===================================================================
+   DATA · Wave One, verbatim from Gallery.html's WAVES[0]
+   =================================================================== */
+const WAVE = {
+ num:'01', title:'The Ballot', range:'1848–1929', tag:'The right to exist on paper.',
+ img:'img/waves/wave-01.jpg',
+ events:[
+  {id:'w1e1', year:'1851', title:'Sojourner Truth asks: “Ain’t I a woman?”',
+   blurb:'A formerly enslaved abolitionist stands up at a women’s convention in Ohio and points at the gap in the room: this fight wasn’t including Black women.',
+   why:'She named what the movement was leaving out 138 years before anyone had the word “intersectionality” for it. The thread starts here.'},
+  {id:'w1e2', year:'1916', title:'Manitoba goes first',
+   blurb:'After years of petitions and a satirical “Mock Parliament,” Manitoba becomes the first Canadian province where women win the vote.',
+   why:'Change didn’t start in Ottawa. It started close to home, province by province. Local pressure works.'},
+  {id:'w1e3', year:'1918', title:'Canada’s federal vote, for some women',
+   blurb:'Women win the federal vote… unless they were of Asian descent, or First Nations, or Inuit. Many waited until 1948, or even 1960.',
+   why:'A win on paper isn’t a win for everyone. Every wave after this one exists because someone noticed who got left out.'},
+  {id:'w1e4', year:'1929', title:'The Persons Case',
+   blurb:'The Famous Five take “are women persons?” all the way up, and win. Women are legally “persons” in Canada at last.',
+   why:'You can’t sit in the Senate if the law says you’re not a person. Sometimes the fight is over one word.'}
+ ],
+ quiz:{id:'w1q', q:'The first wave won the vote for…', answer:1,
+  opts:['Every woman in Canada, all at once','Mostly white, upper-class women; others waited decades','No one; the vote came later'],
+  right:'Exactly. <b>Who gets left out</b> is the question that powers every wave after this one.',
+  wrong:'Not quite. Look one node up: who was still waiting after 1918?'},
+ bridge:{id:'w1b', year:'1946', title:'Viola Desmond sits down',
+  label:'Between the waves · the current kept moving',
+  blurb:'In a New Glasgow movie theatre, she refuses to leave the whites-only floor, and is arrested over one cent of tax.',
+  why:'The history books say the waves “paused” here. Black women didn’t. She’s on the $10 bill now.'}
+};
+
+/* ===================================================================
+   CONSTANTS · matched 1:1 to the DOM gallery
+   =================================================================== */
+const SP = 780;                         // corridor spacing, px of depth
+const PERSPECTIVE = 1300;               // .room{perspective:1300px}
+const TUNE = { camRotY:3.5, camRotX:2, camTX:20, camTY:14, ease:.08, lookEase:.08 };
+const CARD_W = () => Math.min(520, innerWidth*.42);          // .piece width
+const WALL_OFF = () => Math.min(300, Math.max(150, innerWidth*.19));
+const DPR = Math.min(window.devicePixelRatio || 1, 2);
+const COL = { room:0x171021, gold:'#d9a13f', ink:'#241a3e', inkDim:'#6c6480',
+              violet:'#4a3568', cream:'#f5efe4' };
+
+/* ===================================================================
+   CARD PAINTER · draws one museum card into a canvas, once.
+   The texture is the card: gradient stock, gold border, room-colour
+   inset ring, datum line, paper grain — the .frame recipe, in 2D.
+   =================================================================== */
+const TEX_SCALE = 2;                     // texture pixels per CSS px
+function roundRect(c,x,y,w,h,r){
+  c.beginPath();
+  c.moveTo(x+r,y); c.arcTo(x+w,y,x+w,y+h,r); c.arcTo(x+w,y+h,x,y+h,r);
+  c.arcTo(x,y+h,x,y,r); c.arcTo(x,y,x+w,y,r); c.closePath();
+}
+function wrapText(c,text,x,y,maxW,lh){
+  const words=text.split(' '); let line='',yy=y;
+  for(const w of words){
+    const t=line?line+' '+w:w;
+    if(c.measureText(t).width>maxW && line){ c.fillText(line,x,yy); line=w; yy+=lh; }
+    else line=t;
+  }
+  if(line) c.fillText(line,x,yy);
+  return yy+lh;
+}
+let GRAIN=null;
+function grainPattern(c){
+  if(!GRAIN){
+    const g=document.createElement('canvas'); g.width=g.height=110;
+    const gc=g.getContext('2d'), d=gc.createImageData(110,110);
+    for(let i=0;i<d.data.length;i+=4){
+      const v=Math.random()*255|0;
+      d.data[i]=d.data[i+1]=d.data[i+2]=v; d.data[i+3]=13;   // ≈.05 alpha
+    }
+    gc.putImageData(d,0,0); GRAIN=g;
+  }
+  return c.createPattern(GRAIN,'repeat');
+}
+/* Measures then paints; returns {canvas, w, h} in CSS px. */
+function paintCard(spec){
+  const W = 520;                        // paint at max card width; mesh scales
+  const P = 22;                         // .frame padding
+  const s = TEX_SCALE;
+  const probe = document.createElement('canvas').getContext('2d');
+
+  // --- measure content height ---
+  let y = P + 8;
+  if (spec.image) y += (W-P*2)*9/16 + 14;                    // 16:9 art
+  y += 11.2*1.1 + 6;                                          // year line
+  probe.font='600 21px Fraunces, Georgia, serif';
+  const titleLines = countLines(probe, spec.title, W-P*2);
+  y += titleLines*25 + 8;
+  probe.font='400 14.4px "IBM Plex Sans", sans-serif';
+  const blurbLines = countLines(probe, spec.blurb, W-P*2);
+  y += blurbLines*22 + 12;
+  y += 12 + 11.8;                                             // hint
+  const H = Math.ceil(y + P);
+
+  // --- paint ---
+  const cv=document.createElement('canvas');
+  cv.width=W*s; cv.height=H*s;
+  const c=cv.getContext('2d'); c.scale(s,s);
+
+  // stock: linear-gradient(175deg,#fbf7ef,#ede4d2) approximated vertically
+  roundRect(c,0,0,W,H,14);
+  const bg=c.createLinearGradient(0,0,W*.06,H);
+  bg.addColorStop(0,'#fbf7ef'); bg.addColorStop(1,'#ede4d2');
+  c.fillStyle=bg; c.fill();
+
+  // inset ring: 6px of room colour, then a 1px gold line
+  c.save(); roundRect(c,0,0,W,H,14); c.clip();
+  c.strokeStyle='#171021'; c.lineWidth=12; roundRect(c,0,0,W,H,14); c.stroke();
+  c.strokeStyle='rgba(217,161,63,.45)'; c.lineWidth=1.4;
+  roundRect(c,6.5,6.5,W-13,H-13,9); c.stroke();
+  c.restore();
+  // outer border 1px gold
+  c.strokeStyle='rgba(217,161,63,.5)'; c.lineWidth=1; roundRect(c,.5,.5,W-1,H-1,14); c.stroke();
+
+  // gold datum line
+  const dg=c.createLinearGradient(P,0,W-P,0);
+  dg.addColorStop(0,COL.gold); dg.addColorStop(1,'rgba(217,161,63,.12)');
+  c.fillStyle=dg; c.fillRect(P, P-7, W-P*2, 1);
+
+  let yy=P+8;
+  if (spec.image){
+    const iw=W-P*2, ih=iw*9/16;
+    c.save(); roundRect(c,P,yy,iw,ih,8); c.clip();
+    c.fillStyle='#2e2145'; c.fillRect(P,yy,iw,ih);
+    if (spec.image.complete && spec.image.naturalWidth){
+      const im=spec.image, r=Math.max(iw/im.naturalWidth, ih/im.naturalHeight);
+      const dw=im.naturalWidth*r, dh=im.naturalHeight*r;
+      c.drawImage(im, P+(iw-dw)/2, yy+(ih-dh)/2, dw, dh);
+      c.fillStyle='rgba(23,16,33,.12)'; c.fillRect(P,yy,iw,ih);   // --v-scrim
+    }
+    c.restore();
+    yy+=ih+14;
+  }
+
+  // year · uppercase metadata, violet
+  c.fillStyle=COL.violet;
+  c.font='600 11.2px "IBM Plex Sans", sans-serif';
+  c.save(); c.translate(P,yy+10);
+  drawTracked(c, spec.year.toUpperCase(), 0, 0, 0.055*11.2);
+  c.restore();
+  yy+=11.2*1.1+6;
+
+  // title · serif
+  c.fillStyle=COL.ink;
+  c.font='600 21px Fraunces, Georgia, serif';
+  yy=wrapText(c,spec.title,P,yy+18,W-P*2,25)-25+8+ (titleLines-1)*0;
+
+  // blurb
+  c.fillStyle=COL.inkDim;
+  c.font='400 14.4px "IBM Plex Sans", sans-serif';
+  yy=wrapText(c,spec.blurb,P,yy+14,W-P*2,22)-22+12;
+
+  // hint · gold
+  c.fillStyle=COL.gold;
+  c.font='600 11.8px "IBM Plex Sans", sans-serif';
+  c.fillText(spec.hint||'open the piece',P,yy+12);
+
+  // paper grain
+  c.globalCompositeOperation='overlay';
+  roundRect(c,0,0,W,H,14); c.save(); c.clip();
+  c.fillStyle=grainPattern(c); c.fillRect(0,0,W,H); c.restore();
+  c.globalCompositeOperation='source-over';
+
+  return {canvas:cv, w:W, h:H};
+}
+function countLines(c,text,maxW){
+  const words=text.split(' '); let line='',n=1;
+  for(const w of words){
+    const t=line?line+' '+w:w;
+    if(c.measureText(t).width>maxW && line){ n++; line=w; } else line=t;
+  }
+  return n;
+}
+function drawTracked(c,text,x,y,track){
+  let xx=x;
+  for(const ch of text){ c.fillText(ch,xx,y); xx+=c.measureText(ch).width+track; }
+}
+
+/* Quiz card face: static picture; the working quiz opens in DOM. */
+function paintQuizCard(){
+  const W=560,P=22,s=TEX_SCALE;
+  const probe=document.createElement('canvas').getContext('2d');
+  probe.font='600 18.4px Fraunces, Georgia, serif';
+  const qLines=countLines(probe,WAVE.quiz.q,W-P*2);
+  let H=P+8+12+14+qLines*24+10;
+  probe.font='400 14.4px "IBM Plex Sans", sans-serif';
+  const optLines=WAVE.quiz.opts.map(o=>countLines(probe,o,W-P*2-28));
+  optLines.forEach(n=>{ H+=n*20+24+8; });
+  H+=P;
+  const cv=document.createElement('canvas'); cv.width=W*s; cv.height=H*s;
+  const c=cv.getContext('2d'); c.scale(s,s);
+  roundRect(c,0,0,W,H,14);
+  const bg=c.createLinearGradient(0,0,W*.06,H);
+  bg.addColorStop(0,'#fbf7ef'); bg.addColorStop(1,'#ede4d2');
+  c.fillStyle=bg; c.fill();
+  c.save(); roundRect(c,0,0,W,H,14); c.clip();
+  c.strokeStyle='#171021'; c.lineWidth=12; roundRect(c,0,0,W,H,14); c.stroke();
+  c.strokeStyle='rgba(217,161,63,.45)'; c.lineWidth=1.4; roundRect(c,6.5,6.5,W-13,H-13,9); c.stroke();
+  c.restore();
+  c.strokeStyle='rgba(217,161,63,.5)'; c.lineWidth=1; roundRect(c,.5,.5,W-1,H-1,14); c.stroke();
+  const dg=c.createLinearGradient(P,0,W-P,0);
+  dg.addColorStop(0,COL.gold); dg.addColorStop(1,'rgba(217,161,63,.12)');
+  c.fillStyle=dg; c.fillRect(P,P-7,W-P*2,1);
+  let yy=P+8;
+  c.fillStyle=COL.gold; c.font='600 11.2px "IBM Plex Sans", sans-serif';
+  drawTracked(c,'QUICK CHECK · WAVE 01',P,yy+10,0.055*11.2); yy+=26;
+  c.fillStyle=COL.ink; c.font='600 18.4px Fraunces, Georgia, serif';
+  yy=wrapText(c,WAVE.quiz.q,P,yy+16,W-P*2,24)+2;
+  c.font='400 14.4px "IBM Plex Sans", sans-serif';
+  WAVE.quiz.opts.forEach((o,i)=>{
+    const n=optLines[i], bh=n*20+16;
+    c.strokeStyle='rgba(74,53,104,.3)'; c.lineWidth=1;
+    roundRect(c,P,yy,W-P*2,bh,10); c.stroke();
+    c.fillStyle=COL.ink;
+    wrapText(c,o,P+14,yy+20,W-P*2-28,20);
+    yy+=bh+8;
+  });
+  c.globalCompositeOperation='overlay';
+  roundRect(c,0,0,W,H,14); c.save(); c.clip();
+  c.fillStyle=grainPattern(c); c.fillRect(0,0,W,H); c.restore();
+  c.globalCompositeOperation='source-over';
+  return {canvas:cv,w:W,h:H};
+}
+
+/* ===================================================================
+   SCENE
+   =================================================================== */
+const canvas=document.getElementById('gl');
+const renderer=new THREE.WebGLRenderer({canvas, antialias:true, powerPreference:'high-performance'});
+renderer.setPixelRatio(DPR);
+renderer.setClearColor(COL.room, 1);
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(40, 1, 40, 12000);
+const world=new THREE.Group();          // mirrors #stage .world
+scene.add(world);
+
+/* Wall backdrop: one quad, screen-locked behind the corridor. Plaster
+   mottle + vignette + live grain, the same job the DOM page gives its
+   own background shader — kept here so the GL room carries a comparable
+   per-frame GPU load, not an unfairly empty one. */
+const wallMat=new THREE.ShaderMaterial({
+  depthWrite:false,
+  uniforms:{ t:{value:0}, res:{value:new THREE.Vector2(1,1)} },
+  vertexShader:'varying vec2 vUv; void main(){ vUv=uv; gl_Position=vec4(position.xy,0.9999,1.0); }',
+  fragmentShader:`
+    precision mediump float; varying vec2 vUv; uniform float t; uniform vec2 res;
+    float h(vec2 p){ return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453); }
+    float n(vec2 p){ vec2 i=floor(p),f=fract(p); f=f*f*(3.-2.*f);
+      return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y); }
+    void main(){
+      vec2 uv=vUv; vec2 asp=vec2(res.x/res.y,1.);
+      vec3 room=vec3(.090,.063,.129);                 /* #171021 */
+      vec3 room2=vec3(.141,.102,.243);                /* #241a3e */
+      float pl=n(uv*asp*3.2)*.6+n(uv*asp*9.1)*.4;     /* plaster mottle */
+      vec3 col=mix(room,room2,pl*.35);
+      float d=distance(uv,vec2(.5,.46));
+      col*=1.0-smoothstep(.28,.85,d)*.72;             /* vignette */
+      col+=vec3(.85,.63,.25)*pow(max(0.,1.-d*2.6),3.)*.05; /* warm pool */
+      float g=h(uv*res+fract(t)*7.)-.5;               /* live grain */
+      col+=g*.035;
+      gl_FragColor=vec4(col,1.);
+    }`
+});
+const wall=new THREE.Mesh(new THREE.PlaneGeometry(2,2), wallMat);
+wall.frustumCulled=false; wall.renderOrder=-1;
+scene.add(wall);
+
+/* Shared soft shadow sprite, one radial texture reused per card. */
+function shadowTexture(){
+  const cv=document.createElement('canvas'); cv.width=cv.height=256;
+  const c=cv.getContext('2d');
+  const g=c.createRadialGradient(128,118,20,128,128,126);
+  g.addColorStop(0,'rgba(5,2,12,.55)'); g.addColorStop(1,'rgba(5,2,12,0)');
+  c.fillStyle=g; c.fillRect(0,0,256,256);
+  const t=new THREE.CanvasTexture(cv); t.colorSpace=THREE.SRGBColorSpace;
+  return t;
+}
+const SHADOW_TEX=shadowTexture();
+
+/* ===================================================================
+   BUILD · pieces to meshes
+   =================================================================== */
+const S={ cam:{z:0,tz:0}, look:{x:0,y:0,tx:0,ty:0}, activeIdx:0,
+          pieces:[], seen:new Set(), open:false, hovered:-1,
+          idleFrames:0, raf:null };
+const raycaster=new THREE.Raycaster();
+const pointerNDC=new THREE.Vector2(-2,-2);
+
+function cardMesh(painted, spec){
+  const tex=new THREE.CanvasTexture(painted.canvas);
+  tex.colorSpace=THREE.SRGBColorSpace;
+  tex.anisotropy=Math.min(8, renderer.capabilities.getMaxAnisotropy());
+  tex.generateMipmaps=true;
+  tex.minFilter=THREE.LinearMipmapLinearFilter;
+  const mat=new THREE.MeshBasicMaterial({map:tex, transparent:true});
+  const mesh=new THREE.Mesh(new THREE.PlaneGeometry(painted.w, painted.h), mat);
+  mesh.userData=spec;
+
+  const sh=new THREE.Mesh(
+    new THREE.PlaneGeometry(painted.w*1.5, painted.h*1.5),
+    new THREE.MeshBasicMaterial({map:SHADOW_TEX, transparent:true, depthWrite:false}));
+  sh.position.set(0,-painted.h*.10,-40);
+  mesh.add(sh); mesh.userData.shadow=sh;
+
+  const g=new THREE.Group(); g.add(mesh);
+  g.userData=mesh.userData; mesh.userData.group=g;
+  return {group:g, mesh:mesh};
+}
+
+function layoutCorridor(){
+  const off=WALL_OFF(), scale=CARD_W()/520;
+  S.pieces.forEach((rec,i)=>{
+    const g=rec.group;
+    g.position.set(i===0?0:(i%2===0?-off:off), 0, -i*SP);
+    /* CSS rotateY(θ) about a y-down axis = three rotateY(-θ) */
+    g.rotation.y = i===0?0:(i%2===0? -9 : 9) * Math.PI/180 * -1;
+    g.scale.setScalar(scale * (rec.kind==='quiz' ? 560/520 : 1));
+  });
+}
+
+async function build(){
+  await document.fonts.load('600 21px Fraunces');
+  await document.fonts.load('400 14.4px "IBM Plex Sans"');
+  await document.fonts.load('600 11.2px "IBM Plex Sans"');
+
+  const heroImg=new Image(); heroImg.src=WAVE.img;
+  await new Promise(r=>{ heroImg.onload=r; heroImg.onerror=r; });
+
+  const add=(painted,spec,kind)=>{
+    const {group,mesh}=cardMesh(painted,spec);
+    world.add(group);
+    S.pieces.push({group,mesh,spec,kind,op:1,hover:0});
+  };
+
+  add(paintCard({image:heroImg, year:'WAVE '+WAVE.num+' · '+WAVE.range,
+    title:WAVE.title, blurb:WAVE.tag}), {type:'hero'}, 'hero');
+  WAVE.events.forEach(ev=> add(paintCard({year:ev.year, title:ev.title, blurb:ev.blurb}),
+    {type:'event', ev}, 'event'));
+  add(paintQuizCard(), {type:'quiz'}, 'quiz');
+  add(paintCard({year:WAVE.bridge.year+' · BETWEEN THE WAVES', title:WAVE.bridge.title,
+    blurb:WAVE.bridge.blurb}), {type:'event', ev:WAVE.bridge}, 'bridge');
+
+  layoutCorridor();
+  resize();
+  /* Aperture's trick: compile shaders + upload every texture before the
+     first real frame, so the first scroll never hitches. */
+  renderer.compile(scene,camera);
+  S.pieces.forEach(r=>renderer.initTexture(r.mesh.material.map));
+  renderer.initTexture(SHADOW_TEX);
+  document.getElementById('boot').classList.add('off');
+  wake();
+}
+
+/* ===================================================================
+   CAMERA + LOOP · the DOM gallery's loop(), minus the DOM
+   =================================================================== */
+let lastT=0, EASE_F=1;
+const ease60=k=>1-Math.pow(1-k,EASE_F);
+const perf={hist:new Float32Array(120),i:0,ema:16.7};
+
+function frame(now){
+  const dt=lastT?Math.min(50,now-lastT):16.667; lastT=now;
+  EASE_F=dt/16.667;
+  perf.ema+=(dt-perf.ema)*.05; perf.hist[perf.i++%120]=dt;
+
+  S.cam.z += (S.cam.tz-S.cam.z)*ease60(.08);
+  S.look.x += (S.look.tx-S.look.x)*ease60(TUNE.lookEase);
+  S.look.y += (S.look.ty-S.look.y)*ease60(TUNE.lookEase);
+
+  /* world transform, exactly the CSS one:
+     rotateY(-lx·3.5°) rotateX(-ly·2°) translate3d(-lx·20, -ly·14, cam.z)
+     with CSS-axis → three-axis sign flips on both rotations and Y. */
+  const lookY=-S.look.x*TUNE.camRotY*Math.PI/180;
+  const lookX=-S.look.y*TUNE.camRotX*Math.PI/180;
+  world.rotation.set(-lookX,-lookY,0,'YXZ');
+  world.position.set(-S.look.x*TUNE.camTX, S.look.y*TUNE.camTY, S.cam.z);
+
+  /* per-piece: opacity by the same rel-distance curve + hover ease.
+     These are uniform/scalar writes on ≤7 objects — no DOM, no recalc. */
+  let moving=Math.abs(S.cam.tz-S.cam.z)>.08 ||
+             Math.abs(S.look.tx-S.look.x)>.0004 || Math.abs(S.look.ty-S.look.y)>.0004;
+  S.pieces.forEach((rec,i)=>{
+    const rel=S.cam.z-i*SP;
+    let o;
+    if(rel>140) o=Math.max(0,1-(rel-140)/260);
+    else o=Math.max(.08,1-Math.max(0,(-rel-SP*.4))/(SP*2.4));
+    if(Math.abs(o-rec.op)>.001){ rec.op=o; moving=true; }
+    rec.mesh.material.opacity=rec.op;
+    rec.mesh.userData.shadow.material.opacity=rec.op*.8;
+    const hoverT=(i===S.hovered && !S.open)?1:0;
+    if(Math.abs(hoverT-rec.hover)>.001){
+      rec.hover+=(hoverT-rec.hover)*ease60(.18);
+      moving=true;
+    }
+    const sc=(CARD_W()/520)*(rec.kind==='quiz'?560/520:1)*(1+rec.hover*.03);
+    rec.group.scale.setScalar(sc);
+  });
+
+  settleIndex(S.cam.z/SP);
+  wallMat.uniforms.t.value=now/1000;
+
+  hoverPick();
+  renderer.render(scene,camera);
+
+  if(moving) S.idleFrames=0; else S.idleFrames++;
+  if(S.idleFrames>2 && !document.body.classList.contains('showperf')){
+    S.raf=null; return;                  // settled: stop asking for frames
+  }
+  S.raf=requestAnimationFrame(frame);
+  drawPerf();
+}
+function wake(){ if(S.raf==null){ lastT=0; S.raf=requestAnimationFrame(frame); } }
+
+function settleIndex(raw){
+  const idx=Math.max(0,Math.min(S.pieces.length-1,Math.round(raw)));
+  if(idx!==S.activeIdx){
+    S.activeIdx=idx;
+    document.getElementById('hudCount').textContent='piece '+(idx+1)+' of '+S.pieces.length;
+    document.getElementById('hudBar').style.width=(S.seen.size/S.pieces.length*100)+'%';
+  }
+}
+
+function hoverPick(){
+  if(S.open){ setHover(-1); return; }
+  raycaster.setFromCamera(pointerNDC,camera);
+  const hits=raycaster.intersectObjects(S.pieces.map(r=>r.mesh));
+  let idx=-1;
+  if(hits.length){
+    const m=hits[0].object;
+    idx=S.pieces.findIndex(r=>r.mesh===m);
+    if(idx>=0 && S.pieces[idx].op<.25) idx=-1;   // ghosted pieces are inert
+  }
+  setHover(idx);
+}
+function setHover(idx){
+  if(idx===S.hovered) return;
+  S.hovered=idx;
+  canvas.classList.toggle('point', idx>=0);
+}
+
+/* ===================================================================
+   INPUT
+   =================================================================== */
+const maxZ=()=> (S.pieces.length-1)*SP;
+addEventListener('wheel',e=>{
+  if(S.open) return;
+  const d=Math.abs(e.deltaX)>Math.abs(e.deltaY)?e.deltaX:e.deltaY;
+  S.cam.tz=Math.max(0,Math.min(maxZ(),S.cam.tz+d*1.6));
+  wake();
+},{passive:true});
+addEventListener('keydown',e=>{
+  if(S.open){ if(e.key==='Escape') closeDetail(); return; }
+  if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key==='PageDown')
+    S.cam.tz=Math.min(maxZ(),(S.activeIdx+1)*SP);
+  else if(e.key==='ArrowLeft'||e.key==='ArrowUp'||e.key==='PageUp')
+    S.cam.tz=Math.max(0,(S.activeIdx-1)*SP);
+  else if(e.key==='Home') S.cam.tz=0;
+  else if(e.key==='End') S.cam.tz=maxZ();
+  else if(e.key==='Escape'){ S.cam.tz=0; }
+  else if(e.key==='Enter' && S.hovered>=0){ openPiece(S.pieces[S.hovered]); return; }
+  else return;
+  wake();
+});
+let drag=null;
+canvas.addEventListener('pointerdown',e=>{
+  drag={x:e.clientX,y:e.clientY,z:S.cam.tz,moved:false};
+  canvas.classList.add('dragging'); canvas.setPointerCapture(e.pointerId);
+});
+canvas.addEventListener('pointermove',e=>{
+  S.look.tx=(e.clientX/innerWidth)*2-1;
+  S.look.ty=(e.clientY/innerHeight)*2-1;
+  pointerNDC.set((e.clientX/innerWidth)*2-1,-(e.clientY/innerHeight)*2+1);
+  if(drag){
+    const dx=e.clientX-drag.x;
+    if(Math.abs(dx)>5) drag.moved=true;
+    S.cam.tz=Math.max(0,Math.min(maxZ(),drag.z+dx*-2.2));
+  }
+  wake();
+});
+canvas.addEventListener('pointerup',e=>{
+  canvas.classList.remove('dragging');
+  const wasTap=drag&&!drag.moved; drag=null;
+  if(wasTap&&S.hovered>=0&&!S.open) openPiece(S.pieces[S.hovered]);
+});
+canvas.addEventListener('pointerleave',()=>{ S.look.tx=0; S.look.ty=0; pointerNDC.set(-2,-2); wake(); });
+
+/* ===================================================================
+   DETAIL + QUIZ · reading stays DOM
+   =================================================================== */
+const detail=document.getElementById('detail');
+const detailBody=document.getElementById('detailBody');
+function openPiece(rec){
+  const sp=rec.spec;
+  if(sp.type==='hero'){
+    detailBody.innerHTML='<span class="detail__year">WAVE '+WAVE.num+' · '+WAVE.range+'</span>'+
+      '<h3 class="detail__title">'+WAVE.title+'</h3>'+
+      '<div class="detail__img"><img src="'+WAVE.img+'" alt=""/></div>'+
+      '<p class="detail__blurb"><em>'+WAVE.tag+'</em></p>';
+  } else if(sp.type==='quiz'){
+    detailBody.innerHTML='<span class="detail__year">QUICK CHECK · WAVE 01</span>'+
+      '<p class="quiz__q">'+WAVE.quiz.q+'</p><div class="quiz__opts"></div>'+
+      '<p class="quiz__verdict" aria-live="polite"></p>';
+    const opts=detailBody.querySelector('.quiz__opts'),
+          verdict=detailBody.querySelector('.quiz__verdict');
+    WAVE.quiz.opts.forEach((o,oi)=>{
+      const b=document.createElement('button');
+      b.type='button'; b.className='quiz__opt'; b.textContent=o;
+      b.addEventListener('click',()=>{
+        [...opts.children].forEach(x=>x.classList.remove('right','wrong'));
+        if(oi===WAVE.quiz.answer){ b.classList.add('right'); verdict.innerHTML=WAVE.quiz.right; markSeen(rec); }
+        else { b.classList.add('wrong'); verdict.innerHTML=WAVE.quiz.wrong; }
+      });
+      opts.appendChild(b);
+    });
+  } else {
+    const ev=sp.ev;
+    detailBody.innerHTML='<span class="detail__year">'+ev.year+(ev.label?' · '+ev.label:'')+'</span>'+
+      '<h3 class="detail__title">'+ev.title+'</h3>'+
+      '<p class="detail__blurb">'+ev.blurb+'</p>'+
+      '<div class="detail__why"><b>Why it matters</b>'+ev.why+'</div>';
+  }
+  if(sp.type!=='quiz') markSeen(rec);
+  detail.classList.add('open'); detail.setAttribute('aria-hidden','false');
+  S.open=true;
+  detail.querySelector('.detail__close').focus();
+}
+function markSeen(rec){
+  S.seen.add(rec.spec.ev?rec.spec.ev.id:rec.kind);
+  document.getElementById('hudBar').style.width=(S.seen.size/S.pieces.length*100)+'%';
+}
+function closeDetail(){
+  detail.classList.remove('open'); detail.setAttribute('aria-hidden','true');
+  S.open=false; wake();
+}
+detail.addEventListener('click',e=>{ if(e.target.closest('[data-close]')) closeDetail(); });
+
+/* ===================================================================
+   RESIZE · fov derived from the CSS perspective, so projection matches
+   =================================================================== */
+function resize(){
+  const w=innerWidth,h=innerHeight;
+  renderer.setSize(w,h,false);
+  camera.aspect=w/h;
+  camera.fov=2*Math.atan((h/2)/PERSPECTIVE)*180/Math.PI;
+  camera.position.set(0,0,PERSPECTIVE);
+  camera.updateProjectionMatrix();
+  wallMat.uniforms.res.value.set(w,h);
+  layoutCorridor();
+  wake();
+}
+addEventListener('resize',resize,{passive:true});
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden) wake(); });
+
+/* ---- perf overlay ---- */
+if(location.search.includes('perf')) document.body.classList.add('showperf');
+function drawPerf(){
+  if(!document.body.classList.contains('showperf')) return;
+  let worst=0; for(let i=0;i<120;i++) worst=Math.max(worst,perf.hist[i]);
+  document.getElementById('perf').textContent=
+    'frame  '+perf.ema.toFixed(1)+' ms ema\n'+
+    'worst  '+worst.toFixed(1)+' ms /120f\n'+
+    'draws  '+renderer.info.render.calls+'  tris '+renderer.info.render.triangles;
+}
+
+build();
+</script>
+</body>
+</html>
