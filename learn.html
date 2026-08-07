@@ -764,7 +764,29 @@ body.touchmode #wfgallery .lobby__floor{
    screen reader, which visibility:hidden and display:none would not. The
    camera loop also stops writing its transforms while this is on, so the
    whole style/layout/raster cost of travelling goes away. */
-#wfgallery .room.gl-on .world{opacity:0}#wfgallery .room.gl-on .world .piece{transition:none}#wfgallery #stage{position:absolute;inset:0;z-index:20;overflow:hidden}#wfgallery .room{position:absolute;inset:0;perspective:1300px;perspective-origin:50% 46%;display:none}#wfgallery .room.active{display:block}/* pointer-events dance: in a preserve-3d scene the world's own flat plane
+/* opacity:0 is NOT enough, and getting this wrong made the gallery
+   slower than the DOM version it replaced. A hidden subtree still keeps
+   whatever it was already paying for: preserve-3d plus a translate3d on
+   every piece is a composited layer each, the .frame keeps its 72px
+   blur, and the artwork keeps its decoded bitmap. So both renderers were
+   resident at once — and GPU tile memory is exactly this gallery's
+   ceiling (see the eviction note above). Flatten the copy: no 3D
+   transform means no layer, no shadow means nothing to blur, no painted
+   artwork means no second bitmap. It stays laid out and focusable, which
+   is the only reason it is still in the document at all.
+
+   These are !important on purpose, which is not laziness here: the card
+   surfaces are painted by a stack of per-category rules (.room[data-type]
+   .frame and friends) that legitimately out-rank a generic override, and
+   the intent is absolute — while GL owns the room, NOTHING in the DOM
+   copy paints, whatever any room type asks for. */
+#wfgallery .room.gl-on .world{opacity:0 !important;pointer-events:none;transform-style:flat !important}#wfgallery .room.gl-on .world .rail,
+#wfgallery .room.gl-on .world .ring{transform-style:flat !important}#wfgallery .room.gl-on .world .piece{transform:none !important;transition:none !important}#wfgallery .room.gl-on .world .frame{box-shadow:none !important;background:none !important;
+  border-color:transparent !important;filter:none !important}#wfgallery .room.gl-on .world .frame::before,
+#wfgallery .room.gl-on .world .frame::after,
+#wfgallery .room.gl-on .world .piece::before{display:none !important}#wfgallery .room.gl-on .world .piece__img,
+#wfgallery .room.gl-on .world .scholar__photo,
+#wfgallery .room.gl-on .world .lensviz{visibility:hidden}#wfgallery #stage{position:absolute;inset:0;z-index:20;overflow:hidden}#wfgallery .room{position:absolute;inset:0;perspective:1300px;perspective-origin:50% 46%;display:none}#wfgallery .room.active{display:block}/* pointer-events dance: in a preserve-3d scene the world's own flat plane
    (z = 0) hit-tests IN FRONT of pieces hanging at negative z, and it
    swallows every click. So the world ignores the pointer and each piece
    opts back in. */
