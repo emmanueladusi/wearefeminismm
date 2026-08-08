@@ -722,7 +722,8 @@ body.touchmode #wfgallery .gtex__light,
 body.touchmode #wfgallery .gtex__arch,
 body.touchmode #wfgallery .glines__pan,
 body.touchmode #wfgallery .lobby__wall,
-body.touchmode #wfgallery .lobby__floor{
+body.touchmode #wfgallery .lobby__floor,
+body.touchmode #wfgallery .lobby__flat{
   --mx:0 !important;--my:0 !important}/* ---- PROTOTYPE ONLY · art-direction switcher ---- */
 /* ---- DEV ONLY · live tuner. Remove with killTuner() + this block. ---- */
 
@@ -933,7 +934,21 @@ body.touchmode #wfgallery .lobby__floor{
   --portal-crop:1.06;     /* media zoom through the portal             */
 }#wfgallery .dirroom{position:absolute;inset:0;pointer-events:none;overflow:hidden;
   display:block;padding:0}/* --- the room the reel stands in --------------------------------- */
-#wfgallery .lobby{position:absolute;inset:0;pointer-events:none;overflow:hidden}#wfgallery .lobby__wall{position:absolute;inset:0;
+#wfgallery .lobby{position:absolute;inset:0;pointer-events:none;overflow:hidden}/* THE FLATTENED PICTURE WALL. The wash, the photograph and the film burn
+   are three full-viewport layers, two of them decoded bitmaps and one of
+   them a mix-blend-mode:multiply — and a fullscreen multiply forces the
+   compositor to re-blend everything under it on every frame it moves,
+   which on this GPU is the difference between gliding and lagging (the
+   tile-memory ceiling, again). So the three are composited ONCE, into
+   this canvas, from their own computed styles — same gradients, same
+   assets, same tier opacity, same multiply math — and the compositor
+   moves one static bitmap. The quiet pools stay live above it (they
+   follow the spotlight), and the floor stays live above those.
+   The transform is .lobby__wall's, verbatim, so the drift is unchanged. */
+#wfgallery .lobby__flat{position:absolute;inset:0;width:100%;height:100%;
+  transform:scale(1.06) translate3d(calc(var(--mx) * 10px),calc(var(--my) * 6px),0)}#wfgallery .lobby.is-flat .lobby__wall,
+#wfgallery .lobby.is-flat .lobby__photo,
+#wfgallery .lobby.is-flat .lobby__burn{display:none}#wfgallery .lobby__wall{position:absolute;inset:0;
   transform:scale(1.06) translate3d(calc(var(--mx) * 10px),calc(var(--my) * 6px),0);
   background:
     /* the room tone: wide enough to wash the whole wall, including the
@@ -2309,7 +2324,7 @@ addEventListener('resize', ()=>{
   if (S.open && GLR.on && S.chapter && S.chapter.type!=='directory'){
     GLR.build($('#stage .room'), S.chapter.type, S.pieces);
   }
-  if (S.open && S.chapter && S.chapter.type==='directory') glReelSync();
+  if (S.open && S.chapter && S.chapter.type==='directory'){ glReelSync(); paintLobbyFlat(); }
 },{passive:true});
 
 /* =====================================================================
@@ -2669,6 +2684,7 @@ function setChapter(id){
     /* the window may have changed size while this deck was detached, so
        the hang is laid out again either way */
     layoutReel();
+    paintLobbyFlat();
   }
   else if (c.type==='lenses') buildLensRoom(world);
   else if (isWave(c)) buildWaveRoom(world,c);
@@ -3807,7 +3823,7 @@ function setVar(node, name, value){
    re-queried on every call and compared by identity. One querySelector
    per write is nothing next to being silently wrong. */
 const WALL_PARALLAX_SEL =
-  '.gtex__fibre,.gtex__light,.gtex__arch,.glines__pan,.lobby__wall,.lobby__floor';
+  '.gtex__fibre,.gtex__light,.gtex__arch,.glines__pan,.lobby__flat,.lobby__floor';
 let _wallRoots = null, _wallLobby = null;
 function wallRoots(){
   const lobby = $('.lobby');
@@ -5524,6 +5540,72 @@ $('#flatBack').addEventListener('click',leaveCalm);
 $('#exitBtn').addEventListener('click',exitGallery);
 // One backward action, one level at a time. Exit is a separate control.
 $('#dirBtn').addEventListener('click',navBack);
+
+
+/* =====================================================================
+   THE FLATTENED PICTURE WALL · paint
+   Composites .lobby__wall + .lobby__photo + .lobby__burn into the one
+   .lobby__flat canvas, reading each layer's OWN computed style, so the
+   result is the same pixels the three layers produced — including the
+   data-bg tier opacity, the phone crop, and the multiply (canvas2d
+   'multiply' under globalAlpha is the same formula as mix-blend-mode
+   at element opacity over an opaque backdrop). The is-flat class lands
+   only after the real pixels do, so there is never a blank wall.
+   Called from the directory build, the resize handler, and nowhere per
+   frame — that is the entire point.
+   ===================================================================== */
+function paintLobbyFlat(){
+  const lobby = $('#stage .lobby'); if(!lobby) return;
+  let cv = lobby.querySelector('.lobby__flat');
+  if(!cv){
+    cv = document.createElement('canvas');
+    cv.className = 'lobby__flat';
+    cv.setAttribute('aria-hidden','true');
+    lobby.prepend(cv);
+  }
+  const dpr = Math.min(devicePixelRatio||1, 1.5);   // same cap as the shader wall
+  const W = Math.max(2, Math.round(innerWidth*dpr));
+  const H = Math.max(2, Math.round(innerHeight*dpr));
+  cv.width = W; cv.height = H;
+  const c = cv.getContext('2d');
+  const layer = (el, blend, next) => {
+    if(!el) return next();
+    const cs = getComputedStyle(el);
+    const m = String(cs.backgroundImage||'').match(/url\(["']?([^"')]+)["']?\)/);
+    const o = parseFloat(cs.opacity);
+    if(!m || !o) return next();
+    const im = new Image();
+    im.onload = () => {
+      c.save(); c.globalAlpha = o; c.globalCompositeOperation = blend;
+      const r = Math.max(W/im.naturalWidth, H/im.naturalHeight);
+      const dw = im.naturalWidth*r, dh = im.naturalHeight*r;
+      const pos = (cs.backgroundPosition||'50% 50%').split(' ');
+      const pf = v => { const n=parseFloat(v); return isNaN(n) ? .5 : Math.max(0,Math.min(1,n/100)); };
+      c.drawImage(im, (W-dw)*pf(pos[0]), (H-dh)*pf(pos[1]!=null?pos[1]:pos[0]), dw, dh);
+      c.restore(); next();
+    };
+    im.onerror = next;
+    im.src = m[1];
+  };
+  // 1 · the wash: the browser rasterizes .lobby__wall's own backgrounds
+  const wcs = getComputedStyle(lobby.querySelector('.lobby__wall'));
+  const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="'+W+'" height="'+H+'">'+
+    '<foreignObject width="100%" height="100%">'+
+    '<div xmlns="http://www.w3.org/1999/xhtml" style="width:'+W+'px;height:'+H+
+    'px;background-color:'+wcs.backgroundColor+
+    ';background-image:'+wcs.backgroundImage.replace(/"/g,"'")+
+    ';background-size:'+wcs.backgroundSize+
+    ';background-position:'+wcs.backgroundPosition+
+    ';background-repeat:'+wcs.backgroundRepeat+'"></div></foreignObject></svg>';
+  const wImg = new Image();
+  const photos = () =>
+    layer(lobby.querySelector('.lobby__photo'), 'source-over', () =>
+    layer(lobby.querySelector('.lobby__burn'), 'multiply', () =>
+      lobby.classList.add('is-flat')));
+  wImg.onload = () => { c.drawImage(wImg, 0, 0, W, H); photos(); };
+  wImg.onerror = photos;
+  wImg.src = 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+}
 
 /* =====================================================================
    THE FRAME RECORDER
