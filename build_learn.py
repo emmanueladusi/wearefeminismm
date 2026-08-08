@@ -209,8 +209,8 @@ def main():
         lambda m: m.group(0) +
         '\n  <!-- webfonts the gallery needs; the rest of Learn is unaffected -->\n  '
         + fonts +
-        '\n  <!-- the GPU room renderer, deferred (see Gallery.html) -->\n  '
-        + galscripts +
+        (('\n  <!-- scripts the gallery loads by src -->\n  ' + galscripts)
+         if galscripts else '') +
         '\n  <style id="wfgallery-css">\n' + scoped + '\n  </style>',
         learn, count=1)
 
