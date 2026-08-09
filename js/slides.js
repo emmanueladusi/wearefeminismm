@@ -87,19 +87,22 @@
 
     { k: "Finding two",
       t: "It is *misunderstood.*",
+      draw: ["tangle"],
       s: "Feminism gets misinterpreted, so it gets dismissed before anyone looks at it properly.",
       c: "Brand, 2018, p. 12",
       kind: "big",
       say: "Finding two, misunderstood" },
 
     { k: "Connected to the MYSP",
-      t: "Belong. Thrive.",
+      t: "Belong. *Thrive.*",
+      draw: ["rise"],
       s: "The two pillars this work sits under.",
       kind: "big",
       say: "MYSP, Belong and Thrive" },
 
     { k: "The solution",
       t: "Let students *lead.*",
+      draw: ["arrow"],
       s: "Give them the chance to get involved, and make teacher involvement mandatory.",
       kind: "big",
       say: "The solution" },
@@ -121,6 +124,7 @@
   var PROCESS = [
     { k: "Building the product",
       t: "A *wave.* A *timeline.* A *game.*",
+      draw: ["wave", "tick", "dash"],
       s: "Three prototypes. I scratched all three, because none of them taught this the way I wanted it taught.",
       say: "The prototypes I scratched" },
 
@@ -155,7 +159,8 @@
       say: "Workshops" },
 
     { k: "The process",
-      t: "An emotional *roller coaster.*",
+      t: "An emotional roller *coaster.*",
+      draw: ["coaster"],
       s: "Some days the ideas would not stop coming. Other days I had the best one I have ever had and lost it a second later.",
       say: "Reflection on the process" },
 
@@ -247,6 +252,7 @@
     });
 
     return '<div class="sl__decor" aria-hidden="true">' + svg +
+             '<i class="sl__sweep"></i>' +
              '<div class="sl__wire"><i class="sl__wirefill"></i></div>' +
              '<div class="sl__marks"></div>' +
              '<div class="sl__bloom">' + bloom + "</div>" +
@@ -284,6 +290,39 @@
     return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   }
 
+  /* ---------------------------------------------------------------------
+     Drawn marks. Some words describe a shape, so the shape gets drawn under
+     the word as the line lands: the wave waves, the timeline runs and ticks,
+     the roller coaster dips, "lead" points, "thrive" climbs, "misunderstood"
+     tangles. A slide names them in `draw`, one per accented run in order.
+
+     Only ever attached to a SINGLE-word run. A mark under a run that wraps
+     across two lines would need per-line-box geometry, and the payoff is not
+     worth that; where a phrase is accented, it simply goes unmarked.
+
+     preserveAspectRatio="none" so a mark stretches to whatever the word is
+     wide, which also means `vector-effect: non-scaling-stroke` is required
+     or the stroke stretches with it and reads lopsided.
+     --------------------------------------------------------------------- */
+
+  function mk() {
+    var d = [].slice.call(arguments).map(function (p) {
+      return '<path d="' + p + '"/>';
+    }).join("");
+    return '<svg class="sl__mk" viewBox="0 0 100 14" preserveAspectRatio="none" ' +
+           'aria-hidden="true" focusable="false">' + d + "</svg>";
+  }
+
+  var MARKS = {
+    wave:    mk("M1 8 q 12 -6 24 0 t 24 0 t 24 0 t 25 0"),
+    tick:    mk("M1 9 H99", "M14 4 V13 M39 4 V13 M64 4 V13 M89 4 V13"),
+    dash:    mk("M2 9 h13 M27 9 h13 M52 9 h13 M77 9 h13"),
+    rise:    mk("M1 13 C 32 13, 44 4, 99 2"),
+    arrow:   mk("M1 9 H93", "M85 4 L95 9 L85 14"),
+    coaster: mk("M1 12 C 15 -1, 27 13, 43 5 S 71 0, 99 10"),
+    tangle:  mk("M2 9 c 7 -8, 15 -1, 11 4 -4 5 -9 -1 -3 -5 8 -6 17 4 25 0 8 -4 6 -9 12 -6 7 4 2 9 8 8 9 -1 14 -6 22 -6")
+  };
+
   /* Copy above marks its accented run with *asterisks*. Splitting on the
      delimiter rather than pattern-matching means punctuation inside the run
      ("*at home.*") needs no special case, and an unclosed marker degrades to
@@ -300,15 +339,18 @@
      `step` hands out the running order index shared with the other blocks, so
      the eyebrow, the words, the support line and the citation arrive in one
      continuous sequence rather than three competing ones. */
-  function words(str, step) {
-    var out = "";
+  function words(str, step, draw) {
+    var out = "", run = -1;
     String(str).split("*").forEach(function (seg, si) {
       if (!seg) return;
       var hi = si % 2 === 1;
-      seg.split(/\s+/).forEach(function (w) {
-        if (!w) return;
+      var ws = seg.split(/\s+/).filter(Boolean);
+      if (hi) run++;
+      // one word only, per the note above
+      var mark = hi && ws.length === 1 ? MARKS[(draw || [])[run]] : null;
+      ws.forEach(function (w) {
         out += '<span class="sl__w" style="--i:' + step() + '">' +
-               (hi ? '<em class="sl__hi">' + esc(w) + "</em>" : esc(w)) +
+               (hi ? '<em class="sl__hi">' + esc(w) + (mark || "") + "</em>" : esc(w)) +
                "</span> ";
       });
     });
@@ -336,9 +378,12 @@
 
       body.innerHTML =
         '<div class="sl__in' + (s.long ? " sl__in--long" : "") +
-             (s.kind ? " sl__in--" + s.kind : "") + '">' +
+             (s.kind ? " sl__in--" + s.kind : "") +
+             // A mark hangs below its word, so a marked headline that wraps
+             // needs the extra leading or the mark crowds the line beneath it.
+             (s.draw ? " sl__in--marked" : "") + '">' +
           (s.k ? '<p class="sl__k" style="--i:' + step() + '">' + rich(s.k) + "</p>" : "") +
-          '<p class="sl__t">' + words(s.t, step) + "</p>" +
+          '<p class="sl__t">' + words(s.t, step, s.draw) + "</p>" +
           (s.s ? '<p class="sl__s" style="--i:' + step() + '">' + rich(s.s) + "</p>" : "") +
           (s.c ? '<p class="sl__c" style="--i:' + step() + '">' + rich(s.c) + "</p>" : "") +
           // `u` is the only field allowed raw markup, for the &middot; between
@@ -360,6 +405,17 @@
       inner.classList.add("is-armed");
       void inner.offsetWidth;
       inner.classList.remove("is-armed");
+
+      // A soft band of light crosses the slide on every change. It sits in the
+      // decoration layer behind the words and is replayed the same way, by
+      // reflow rather than by a timer, so the change always has a beat to it
+      // instead of one line simply being replaced by the next.
+      var sweep = root.querySelector(".sl__sweep");
+      if (sweep) {
+        sweep.classList.remove("is-go");
+        void sweep.offsetWidth;
+        sweep.classList.add("is-go");
+      }
 
       // The thread grows to this beat. Set imperatively so that if the CSS
       // transition never runs, the thread is still the right length.

@@ -145,8 +145,13 @@ body.sl-up { overflow: hidden; }
 .sl__w {
   display: inline-block; /* transformable, and still wraps at spaces */
   --d: calc(var(--i, 0) * 34ms);
+  /* blur(0), not `none`: a filter cannot interpolate to the `none` keyword,
+     so the resting state has to be a real zero-length blur or the word
+     snaps into focus instead of resolving. */
+  filter: blur(0);
   transition: opacity 0.46s ease var(--d),
-              transform 0.46s cubic-bezier(0.22, 1, 0.36, 1) var(--d);
+              transform 0.46s cubic-bezier(0.22, 1, 0.36, 1) var(--d),
+              filter 0.46s ease var(--d);
 }
 .sl__k, .sl__s, .sl__c, .sl__u {
   --d: calc(var(--i, 0) * 34ms);
@@ -163,6 +168,7 @@ body.sl-up { overflow: hidden; }
   opacity: 0;
   transform: translateY(0.38em);
 }
+.sl__in.is-armed .sl__w { filter: blur(6px); }
 
 /* The accented run inside a line. Upright, not italic: at display size the
    italic of the system face is noticeably lighter and the emphasis reads as a
@@ -172,6 +178,61 @@ body.sl-up { overflow: hidden; }
 .sl__hi {
   color: var(--gold-ink);
   font-style: normal;
+  position: relative; /* the drawn mark hangs off this */
+}
+
+/* ---------- the drawn marks ----------
+   A word that describes a shape gets that shape drawn beneath it as the line
+   lands. The mark stretches to the width of its word, so the stroke needs
+   `non-scaling-stroke` or a long word renders a thin, stretched line and a
+   short one renders a fat one. overflow visible because several of the paths
+   deliberately run past the viewBox edge. */
+.sl__mk {
+  position: absolute;
+  left: 0;
+  bottom: -0.17em;
+  width: 100%;
+  height: 0.3em;
+  overflow: visible;
+  pointer-events: none;
+}
+.sl__mk path {
+  fill: none;
+  stroke: var(--gold-ink);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  /* Resting state is DRAWN. If transitions never run, the mark is simply
+     there, which is the same bargain the words make. */
+  stroke-dasharray: 300;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 0.72s ease calc(var(--i, 0) * 34ms + 250ms);
+}
+.sl__in.is-armed .sl__mk path {
+  transition: none;
+  stroke-dashoffset: 300;
+}
+
+/* ---------- the slide change ----------
+   A soft band of light crosses behind the words on every change, so a new
+   slide arrives rather than simply replacing the last one. Low opacity and
+   behind the text on purpose: it should register as a beat, not as an effect
+   the room starts watching for. */
+.sl__sweep {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(104deg,
+    transparent 36%, var(--gold-soft) 50%, transparent 64%);
+  opacity: 0;
+  pointer-events: none;
+}
+.sl__sweep.is-go { animation: slSweep 0.66s ease-out; }
+
+@keyframes slSweep {
+  0%   { opacity: 0; transform: translateX(-38%); }
+  40%  { opacity: 1; }
+  100% { opacity: 0; transform: translateX(42%); }
 }
 
 .sl__k {
@@ -231,6 +292,12 @@ body.sl-up { overflow: hidden; }
   max-width: 13ch;
 }
 
+/* Room for a mark hanging under a word on any line but the last. Applied only
+   where a slide actually draws one, so unmarked headlines keep their tight
+   display leading. */
+.sl__in--marked .sl__t { line-height: 1.16; }
+.sl__in--marked.sl__in--big .sl__t { line-height: 1.14; }
+
 /* The one slide that breaks the left-aligned rhythm. It is the line the whole
    talk is built towards, so it should not look like the four before it. */
 .sl__in--poster { text-align: center; }
@@ -279,23 +346,29 @@ body.sl-up { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) {
   .sl { transition: none; }
   .sl__wg { animation: none; }
+  .sl__sweep.is-go { animation: none; }
   .sl__w,
   .sl__k, .sl__s, .sl__c, .sl__u,
+  .sl__mk path,
   .sl__wirefill, .sl__mark, .sl__dot { transition: none; }
   /* Neutralise the armed state outright. Without this the words would still
      be SET to opacity 0 for the instant it is applied, and with transitions
-     off there would be nothing to bring them back. */
+     off there would be nothing to bring them back. Same for the drawn marks,
+     which would otherwise stay permanently undrawn. */
   .sl__in.is-armed .sl__w,
   .sl__in.is-armed .sl__k,
   .sl__in.is-armed .sl__s,
   .sl__in.is-armed .sl__c,
-  .sl__in.is-armed .sl__u { opacity: 1; transform: none; }
+  .sl__in.is-armed .sl__u { opacity: 1; transform: none; filter: blur(0); }
+  .sl__in.is-armed .sl__mk path { stroke-dashoffset: 0; }
 }
 html[data-a11y] .sl { transition: none; }
 html[data-a11y] .sl__wg { animation: none; }
+html[data-a11y] .sl__sweep.is-go { animation: none; }
 html[data-a11y] .sl__w,
 html[data-a11y] .sl__k, html[data-a11y] .sl__s,
 html[data-a11y] .sl__c, html[data-a11y] .sl__u,
+html[data-a11y] .sl__mk path,
 html[data-a11y] .sl__wirefill,
 html[data-a11y] .sl__mark,
 html[data-a11y] .sl__dot { transition: none; }
@@ -303,4 +376,5 @@ html[data-a11y] .sl__in.is-armed .sl__w,
 html[data-a11y] .sl__in.is-armed .sl__k,
 html[data-a11y] .sl__in.is-armed .sl__s,
 html[data-a11y] .sl__in.is-armed .sl__c,
-html[data-a11y] .sl__in.is-armed .sl__u { opacity: 1; transform: none; }
+html[data-a11y] .sl__in.is-armed .sl__u { opacity: 1; transform: none; filter: blur(0); }
+html[data-a11y] .sl__in.is-armed .sl__mk path { stroke-dashoffset: 0; }
