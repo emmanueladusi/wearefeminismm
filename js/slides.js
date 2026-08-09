@@ -58,35 +58,43 @@
      in two seconds and look back at him, not sit reading ahead.
 
      `k` eyebrow, `t` the one idea, `s` optional support line, `c` citation,
-     `long` for a line that cannot be cut down and needs the smaller size.
-     `say` is what the presenter's own peek card shows for this beat.
+     `u` the address line, `long` for a line that cannot be cut down and needs
+     the smaller size, `kind` big/poster, `draw` the marks for its accented
+     runs, `bloom` for the two lines about one becoming many, and `enter` which
+     of the five entrances the headline arrives on (no two slides in a row
+     share one). `say` is what the presenter's own peek card shows.
      --------------------------------------------------------------------- */
 
   var OPENING = [
     { k: "Action research 2026",
       t: "Emmanuel Adusi",
+      enter: "zoom",
       s: "Heading to the University of Waterloo this fall for Honours Mathematics.",
       kind: "big",
       say: "Good morning, who I am" },
 
     { k: "Why me",
       t: "I do not face what *they* face.",
+      enter: "rise",
       s: "17 years old. 1.5 generation Nigerian-Canadian. I research this because I can be part of the solution.",
       say: "Positionality, why I took this on" },
 
     { k: "The research question",
       t: "How does the *understanding of feminism* affect the experiences of young girls within the TDSB, ages 13 to 19?",
+      enter: "slide",
       long: true,
       say: "The research question" },
 
     { k: "Finding one",
       t: "It was not talked about *at home.*",
+      enter: "fall",
       s: "Especially in African households. My own father told me that in his homeland, Nigeria, they do not believe in it.",
       c: "Salami, 2020, p. 59",
       say: "Finding one, not talked about at home" },
 
     { k: "Finding two",
       t: "It is *misunderstood.*",
+      enter: "flip",
       draw: ["tangle"],
       s: "Feminism gets misinterpreted, so it gets dismissed before anyone looks at it properly.",
       c: "Brand, 2018, p. 12",
@@ -95,6 +103,7 @@
 
     { k: "Connected to the MYSP",
       t: "Belong. *Thrive.*",
+      enter: "rise",
       draw: ["rise"],
       s: "The two pillars this work sits under.",
       kind: "big",
@@ -102,6 +111,7 @@
 
     { k: "The solution",
       t: "Let students *lead.*",
+      enter: "slide",
       draw: ["arrow"],
       s: "Give them the chance to get involved, and make teacher involvement mandatory.",
       kind: "big",
@@ -109,6 +119,7 @@
 
     { k: "Key message",
       t: "The wearefeminismm community started *from me.*",
+      enter: "zoom",
       s: "Last year I said change needs to start somewhere, and that it was me. This year it is a community.",
       bloom: true,
       say: "Key message, then the site takes over" }
@@ -124,18 +135,21 @@
   var PROCESS = [
     { k: "Building the product",
       t: "A *wave.* A *timeline.* A *game.*",
+      enter: "fall",
       draw: ["wave", "tick", "dash"],
       s: "Three prototypes. I scratched all three, because none of them taught this the way I wanted it taught.",
       say: "The prototypes I scratched" },
 
     { k: "What action research taught me",
       t: "So I *asked* someone.",
+      enter: "flip",
       s: "The best way to get an idea is to ask another person for one. I asked my brother. He said: use art.",
       kind: "big",
       say: "Asking my brother, and it clicked" },
 
     { k: "Why art",
       t: "Art locates African people as *subjects,* not objects.",
+      enter: "slide",
       s: "Art is central to Afrocentricity. That is the method this gallery is built on.",
       c: "Asante, 1980",
       long: true,
@@ -150,22 +164,26 @@
   var CLOSING = [
     { k: "Next steps",
       t: "A resource *every school* can use.",
+      enter: "rise",
       s: "Not just mine to show. Something classrooms across the TDSB can pick up and teach with.",
       say: "Next steps, a resource for schools" },
 
     { k: "Next steps",
       t: "*Workshops,* with this as the main attraction.",
+      enter: "fall",
       s: "Somewhere people stay engaged, because there is something in front of them to actually use.",
       say: "Workshops" },
 
     { k: "The process",
       t: "An emotional roller *coaster.*",
+      enter: "slide",
       draw: ["coaster"],
       s: "Some days the ideas would not stop coming. Other days I had the best one I have ever had and lost it a second later.",
       say: "Reflection on the process" },
 
     { k: "What I would do differently",
       t: "I would have run a *workshop.*",
+      enter: "flip",
       s: "A survey is faster to send out. A workshop is where people actually say what they mean.",
       say: "What I would do differently" },
 
@@ -173,6 +191,7 @@
     // the left-aligned rhythm, because it is the line the whole thing was
     // building towards and it should not look like the four before it.
     { t: "I am. You are. *We are.*",
+      enter: "zoom",
       s: "wearefeminismm is a community.",
       kind: "poster",
       bloom: true,
@@ -180,6 +199,7 @@
 
     { k: "Thank you",
       t: "Emmanuel Adusi",
+      enter: "rise",
       s: "Two m's. The same as the community.",
       u: "emmanueladusi.github.io/wearefeminismm &middot; @ourfeministspacee",
       kind: "big",
@@ -381,7 +401,8 @@
              (s.kind ? " sl__in--" + s.kind : "") +
              // A mark hangs below its word, so a marked headline that wraps
              // needs the extra leading or the mark crowds the line beneath it.
-             (s.draw ? " sl__in--marked" : "") + '">' +
+             (s.draw ? " sl__in--marked" : "") +
+             " sl__in--e-" + (s.enter || "rise") + '">' +
           (s.k ? '<p class="sl__k" style="--i:' + step() + '">' + rich(s.k) + "</p>" : "") +
           '<p class="sl__t">' + words(s.t, step, s.draw) + "</p>" +
           (s.s ? '<p class="sl__s" style="--i:' + step() + '">' + rich(s.s) + "</p>" : "") +
@@ -413,6 +434,10 @@
       var sweep = root.querySelector(".sl__sweep");
       if (sweep) {
         sweep.classList.remove("is-go");
+        // Direction comes from the slide's own index, not from a flip-flop, so
+        // a given slide always sweeps the same way and stepping backward is
+        // not a different gesture than stepping forward onto it.
+        sweep.classList.toggle("is-rev", i % 2 === 1);
         void sweep.offsetWidth;
         sweep.classList.add("is-go");
       }

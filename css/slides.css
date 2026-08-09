@@ -144,7 +144,8 @@ body.sl-up { overflow: hidden; }
    in. Turn transitions off entirely and every word is simply there. */
 .sl__w {
   display: inline-block; /* transformable, and still wraps at spaces */
-  --d: calc(var(--i, 0) * 34ms);
+  --gap: 34ms;                              /* per-entrance, overridden below */
+  --d: calc(var(--i, 0) * var(--gap));
   /* blur(0), not `none`: a filter cannot interpolate to the `none` keyword,
      so the resting state has to be a real zero-length blur or the word
      snaps into focus instead of resolving. */
@@ -169,6 +170,32 @@ body.sl-up { overflow: hidden; }
   transform: translateY(0.38em);
 }
 .sl__in.is-armed .sl__w { filter: blur(6px); }
+
+/* ---------- five entrances ----------
+   One entrance repeated seventeen times is its own kind of flat, so the
+   headline arrives differently from slide to slide and no two in a row match.
+   Only the HEADLINE varies: the eyebrow, support line and citation always
+   rise, so there is something steady under the part that is playing.
+
+   Each variant only redefines the ARMED state, which is where a word starts
+   from. The resting state is untouched and still the visible one, so the
+   safety bargain holds for every variant without restating it. `--gap` moves
+   the stagger with it, because the same delay under a different movement
+   reads as the same entrance wearing a hat. */
+
+.sl__in--e-fall.is-armed  .sl__w { transform: translateY(-0.44em); }
+.sl__in--e-slide.is-armed .sl__w { transform: translateX(-0.62em); }
+.sl__in--e-zoom.is-armed  .sl__w { transform: scale(0.84); }
+.sl__in--e-flip.is-armed  .sl__w { transform: translateY(0.5em) rotateX(-62deg); }
+
+.sl__in--e-fall  .sl__w { --gap: 27ms; }
+.sl__in--e-slide .sl__w { --gap: 46ms; }  /* slowest: reads like it is being written */
+.sl__in--e-zoom  .sl__w { --gap: 19ms; }  /* fastest: lands almost as one block */
+.sl__in--e-flip  .sl__w { --gap: 40ms; }
+
+/* rotateX needs somewhere to rotate in, or it reads as a flat squash. */
+.sl__in--e-flip .sl__t { perspective: 900px; }
+.sl__in--e-flip .sl__w { transform-origin: 50% 100%; }
 
 /* The accented run inside a line. Upright, not italic: at display size the
    italic of the system face is noticeably lighter and the emphasis reads as a
@@ -207,7 +234,7 @@ body.sl-up { overflow: hidden; }
      there, which is the same bargain the words make. */
   stroke-dasharray: 300;
   stroke-dashoffset: 0;
-  transition: stroke-dashoffset 0.72s ease calc(var(--i, 0) * 34ms + 250ms);
+  transition: stroke-dashoffset 0.72s ease calc(var(--i, 0) * var(--gap, 34ms) + 250ms);
 }
 .sl__in.is-armed .sl__mk path {
   transition: none;
@@ -228,11 +255,20 @@ body.sl-up { overflow: hidden; }
   pointer-events: none;
 }
 .sl__sweep.is-go { animation: slSweep 0.66s ease-out; }
+/* Alternate the direction by slide, so back-to-back changes are not the same
+   gesture twice. Set from the beat index, not from a counter here, so stepping
+   BACKWARD through the talk sweeps the way that slide always sweeps. */
+.sl__sweep.is-rev.is-go { animation-name: slSweepRev; }
 
 @keyframes slSweep {
   0%   { opacity: 0; transform: translateX(-38%); }
   40%  { opacity: 1; }
   100% { opacity: 0; transform: translateX(42%); }
+}
+@keyframes slSweepRev {
+  0%   { opacity: 0; transform: translateX(38%); }
+  40%  { opacity: 1; }
+  100% { opacity: 0; transform: translateX(-42%); }
 }
 
 .sl__k {
