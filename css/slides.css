@@ -128,21 +128,50 @@ body.sl-up { overflow: hidden; }
    would size it from the 1rem body text and strangle a 5rem headline. */
 .sl__in { width: 100%; text-align: left; }
 
-/* Entrance: one small rise, once. Nothing loops, nothing draws the eye back
-   while he is talking over it.
+/* ---------- the entrance ----------
 
-   DELIBERATELY no animation-delay and no fill mode. A staggered version needs
-   `both` (or `backwards`) to hold each child at opacity 0 through its delay,
-   and anything that pins text to a keyframe means a stalled animation clock
-   shows a BLANK slide on the projector. Here the resting state is the visible
-   one: if the animation never runs at all, the slide simply appears. */
-.sl__in.is-in {
-  animation: slRise 0.44s cubic-bezier(0.22, 1, 0.36, 1);
+   The line lands word by word, the same kinetic type the site's own poster
+   headings use, so the slides read as part of this site rather than as a deck
+   dropped in front of it.
+
+   THIS IS A TRANSITION, NOT A KEYFRAME ANIMATION, and that is the whole
+   safety argument. A staggered keyframe needs `animation-fill-mode: both` to
+   hold each word invisible through its delay, which pins the text to the
+   animation clock: if that clock never runs, the projector shows an empty
+   slide. Here the RESTING state is the visible one. The armed state is only
+   ever applied for the single synchronous moment between adding the class and
+   removing it, and it carries `transition: none` so it is never seen going
+   in. Turn transitions off entirely and every word is simply there. */
+.sl__w {
+  display: inline-block; /* transformable, and still wraps at spaces */
+  --d: calc(var(--i, 0) * 34ms);
+  transition: opacity 0.46s ease var(--d),
+              transform 0.46s cubic-bezier(0.22, 1, 0.36, 1) var(--d);
+}
+.sl__k, .sl__s, .sl__c, .sl__u {
+  --d: calc(var(--i, 0) * 34ms);
+  transition: opacity 0.5s ease var(--d),
+              transform 0.5s cubic-bezier(0.22, 1, 0.36, 1) var(--d);
 }
 
-@keyframes slRise {
-  from { opacity: 0; transform: translateY(14px); }
-  to   { opacity: 1; transform: none; }
+.sl__in.is-armed .sl__w,
+.sl__in.is-armed .sl__k,
+.sl__in.is-armed .sl__s,
+.sl__in.is-armed .sl__c,
+.sl__in.is-armed .sl__u {
+  transition: none;
+  opacity: 0;
+  transform: translateY(0.38em);
+}
+
+/* The accented run inside a line. Upright, not italic: at display size the
+   italic of the system face is noticeably lighter and the emphasis reads as a
+   wobble rather than as weight. Colour is --gold-ink, which is the accent's
+   text-safe form (4.62:1 on paper, 6.16:1 after dark); the raw accent is
+   2.08:1 and has no business carrying words. */
+.sl__hi {
+  color: var(--gold-ink);
+  font-style: normal;
 }
 
 .sl__k {
@@ -152,6 +181,17 @@ body.sl-up { overflow: hidden; }
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--gold-ink);
+}
+/* A short rule leading into the label: it ties the eyebrow to the thread
+   running along the foot of the slide, so the two accents read as one system. */
+.sl__k::before {
+  content: "";
+  display: inline-block;
+  width: clamp(18px, 2.4vw, 34px);
+  height: 1px;
+  margin-right: 0.85em;
+  vertical-align: middle;
+  background: var(--gold-ink);
 }
 
 /* Sized for a ROOM, not a reader at a desk: this is read from the back row at
@@ -169,6 +209,9 @@ body.sl-up { overflow: hidden; }
   /* "intersectionality" is core vocabulary here and a projector is narrow */
   overflow-wrap: break-word;
   max-width: 15ch;
+  /* Evens the rag instead of leaving one orphaned word on the last line.
+     Progressive: browsers without it just wrap normally. */
+  text-wrap: balance;
 }
 
 /* The research question cannot be shortened without changing what it says, so
@@ -178,6 +221,26 @@ body.sl-up { overflow: hidden; }
   line-height: 1.13;
   max-width: 21ch;
 }
+
+/* --long and --big pull in opposite directions, so a slide may carry one or
+   the other, never both. A short line gets to be enormous. */
+.sl__in--big .sl__t {
+  font-size: clamp(3.1rem, 5.2vw + 1.6rem, 8.4rem);
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+  max-width: 13ch;
+}
+
+/* The one slide that breaks the left-aligned rhythm. It is the line the whole
+   talk is built towards, so it should not look like the four before it. */
+.sl__in--poster { text-align: center; }
+.sl__in--poster .sl__t {
+  font-size: clamp(3rem, 6.4vw + 1.4rem, 9.5rem);
+  line-height: 0.98;
+  letter-spacing: -0.032em;
+  max-width: none;
+}
+.sl__in--poster .sl__s { margin-left: auto; margin-right: auto; }
 
 .sl__s {
   margin: clamp(18px, 2.4vw, 34px) 0 0;
@@ -215,15 +278,29 @@ body.sl-up { overflow: hidden; }
 
 @media (prefers-reduced-motion: reduce) {
   .sl { transition: none; }
-  .sl__in.is-in { animation: none; }
   .sl__wg { animation: none; }
-  .sl__wirefill,
-  .sl__mark,
-  .sl__dot { transition: none; }
+  .sl__w,
+  .sl__k, .sl__s, .sl__c, .sl__u,
+  .sl__wirefill, .sl__mark, .sl__dot { transition: none; }
+  /* Neutralise the armed state outright. Without this the words would still
+     be SET to opacity 0 for the instant it is applied, and with transitions
+     off there would be nothing to bring them back. */
+  .sl__in.is-armed .sl__w,
+  .sl__in.is-armed .sl__k,
+  .sl__in.is-armed .sl__s,
+  .sl__in.is-armed .sl__c,
+  .sl__in.is-armed .sl__u { opacity: 1; transform: none; }
 }
 html[data-a11y] .sl { transition: none; }
-html[data-a11y] .sl__in.is-in { animation: none; }
 html[data-a11y] .sl__wg { animation: none; }
+html[data-a11y] .sl__w,
+html[data-a11y] .sl__k, html[data-a11y] .sl__s,
+html[data-a11y] .sl__c, html[data-a11y] .sl__u,
 html[data-a11y] .sl__wirefill,
 html[data-a11y] .sl__mark,
 html[data-a11y] .sl__dot { transition: none; }
+html[data-a11y] .sl__in.is-armed .sl__w,
+html[data-a11y] .sl__in.is-armed .sl__k,
+html[data-a11y] .sl__in.is-armed .sl__s,
+html[data-a11y] .sl__in.is-armed .sl__c,
+html[data-a11y] .sl__in.is-armed .sl__u { opacity: 1; transform: none; }

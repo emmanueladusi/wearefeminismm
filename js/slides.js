@@ -66,42 +66,46 @@
     { k: "Action research 2026",
       t: "Emmanuel Adusi",
       s: "Heading to the University of Waterloo this fall for Honours Mathematics.",
+      kind: "big",
       say: "Good morning, who I am" },
 
     { k: "Why me",
-      t: "I do not face what they face.",
+      t: "I do not face what *they* face.",
       s: "17 years old. 1.5 generation Nigerian-Canadian. I research this because I can be part of the solution.",
       say: "Positionality, why I took this on" },
 
     { k: "The research question",
-      t: "How does the understanding of feminism affect the experiences of young girls within the TDSB, ages 13 to 19?",
+      t: "How does the *understanding of feminism* affect the experiences of young girls within the TDSB, ages 13 to 19?",
       long: true,
       say: "The research question" },
 
     { k: "Finding one",
-      t: "It was not talked about at home.",
+      t: "It was not talked about *at home.*",
       s: "Especially in African households. My own father told me that in his homeland, Nigeria, they do not believe in it.",
       c: "Salami, 2020, p. 59",
       say: "Finding one, not talked about at home" },
 
     { k: "Finding two",
-      t: "It is misunderstood.",
+      t: "It is *misunderstood.*",
       s: "Feminism gets misinterpreted, so it gets dismissed before anyone looks at it properly.",
       c: "Brand, 2018, p. 12",
+      kind: "big",
       say: "Finding two, misunderstood" },
 
     { k: "Connected to the MYSP",
       t: "Belong. Thrive.",
       s: "The two pillars this work sits under.",
+      kind: "big",
       say: "MYSP, Belong and Thrive" },
 
     { k: "The solution",
-      t: "Let students lead.",
+      t: "Let students *lead.*",
       s: "Give them the chance to get involved, and make teacher involvement mandatory.",
+      kind: "big",
       say: "The solution" },
 
     { k: "Key message",
-      t: "The wearefeminismm community started from me.",
+      t: "The wearefeminismm community started *from me.*",
       s: "Last year I said change needs to start somewhere, and that it was me. This year it is a community.",
       bloom: true,
       say: "Key message, then the site takes over" }
@@ -116,17 +120,18 @@
      with the reasoning narrated over the top of it. */
   var PROCESS = [
     { k: "Building the product",
-      t: "A wave. A timeline. A game.",
+      t: "A *wave.* A *timeline.* A *game.*",
       s: "Three prototypes. I scratched all three, because none of them taught this the way I wanted it taught.",
       say: "The prototypes I scratched" },
 
     { k: "What action research taught me",
-      t: "So I asked someone.",
+      t: "So I *asked* someone.",
       s: "The best way to get an idea is to ask another person for one. I asked my brother. He said: use art.",
+      kind: "big",
       say: "Asking my brother, and it clicked" },
 
     { k: "Why art",
-      t: "Art locates African people as subjects, not objects.",
+      t: "Art locates African people as *subjects,* not objects.",
       s: "Art is central to Afrocentricity. That is the method this gallery is built on.",
       c: "Asante, 1980",
       long: true,
@@ -140,27 +145,31 @@
      questions and carries the address, so anyone in the room can go find it. */
   var CLOSING = [
     { k: "Next steps",
-      t: "A resource every school can use.",
+      t: "A resource *every school* can use.",
       s: "Not just mine to show. Something classrooms across the TDSB can pick up and teach with.",
       say: "Next steps, a resource for schools" },
 
     { k: "Next steps",
-      t: "Workshops, with this as the main attraction.",
+      t: "*Workshops,* with this as the main attraction.",
       s: "Somewhere people stay engaged, because there is something in front of them to actually use.",
       say: "Workshops" },
 
     { k: "The process",
-      t: "An emotional roller coaster.",
+      t: "An emotional *roller coaster.*",
       s: "Some days the ideas would not stop coming. Other days I had the best one I have ever had and lost it a second later.",
       say: "Reflection on the process" },
 
     { k: "What I would do differently",
-      t: "I would have run a workshop.",
+      t: "I would have run a *workshop.*",
       s: "A survey is faster to send out. A workshop is where people actually say what they mean.",
       say: "What I would do differently" },
 
-    { t: "I am. You are. We are.",
+    // The peak. Centred and oversized, the one slide in the talk that breaks
+    // the left-aligned rhythm, because it is the line the whole thing was
+    // building towards and it should not look like the four before it.
+    { t: "I am. You are. *We are.*",
       s: "wearefeminismm is a community.",
+      kind: "poster",
       bloom: true,
       say: "I am. You are. We are." },
 
@@ -168,6 +177,7 @@
       t: "Emmanuel Adusi",
       s: "Two m's. The same as the community.",
       u: "emmanueladusi.github.io/wearefeminismm &middot; @ourfeministspacee",
+      kind: "big",
       say: "Thank you · leave this up for questions" }
   ];
 
@@ -274,6 +284,37 @@
     return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   }
 
+  /* Copy above marks its accented run with *asterisks*. Splitting on the
+     delimiter rather than pattern-matching means punctuation inside the run
+     ("*at home.*") needs no special case, and an unclosed marker degrades to
+     an accented tail rather than printing a stray asterisk at the audience. */
+  function rich(str) {
+    return String(str).split("*").map(function (seg, i) {
+      if (!seg) return "";
+      return i % 2 ? '<em class="sl__hi">' + esc(seg) + "</em>" : esc(seg);
+    }).join("");
+  }
+
+  /* The headline is emitted one word per span so the line can land word by
+     word, the same kinetic entrance the site's own poster headings use.
+     `step` hands out the running order index shared with the other blocks, so
+     the eyebrow, the words, the support line and the citation arrive in one
+     continuous sequence rather than three competing ones. */
+  function words(str, step) {
+    var out = "";
+    String(str).split("*").forEach(function (seg, si) {
+      if (!seg) return;
+      var hi = si % 2 === 1;
+      seg.split(/\s+/).forEach(function (w) {
+        if (!w) return;
+        out += '<span class="sl__w" style="--i:' + step() + '">' +
+               (hi ? '<em class="sl__hi">' + esc(w) + "</em>" : esc(w)) +
+               "</span> ";
+      });
+    });
+    return out;
+  }
+
   function show(deckName, i) {
     var deck = DECKS[deckName];
     if (!deck) return;
@@ -290,24 +331,35 @@
     if (live !== i) {
       live = i;
 
+      var n = 0;
+      function step() { return n++; }
+
       body.innerHTML =
-        '<div class="sl__in' + (s.long ? " sl__in--long" : "") + '">' +
-          (s.k ? '<p class="sl__k">' + esc(s.k) + "</p>" : "") +
-          '<p class="sl__t">' + esc(s.t) + "</p>" +
-          (s.s ? '<p class="sl__s">' + esc(s.s) + "</p>" : "") +
-          (s.c ? '<p class="sl__c">' + esc(s.c) + "</p>" : "") +
+        '<div class="sl__in' + (s.long ? " sl__in--long" : "") +
+             (s.kind ? " sl__in--" + s.kind : "") + '">' +
+          (s.k ? '<p class="sl__k" style="--i:' + step() + '">' + rich(s.k) + "</p>" : "") +
+          '<p class="sl__t">' + words(s.t, step) + "</p>" +
+          (s.s ? '<p class="sl__s" style="--i:' + step() + '">' + rich(s.s) + "</p>" : "") +
+          (s.c ? '<p class="sl__c" style="--i:' + step() + '">' + rich(s.c) + "</p>" : "") +
           // `u` is the only field allowed raw markup, for the &middot; between
           // the address and the handle. It is authored here, never user input.
-          (s.u ? '<p class="sl__u">' + s.u + "</p>" : "") +
+          (s.u ? '<p class="sl__u" style="--i:' + step() + '">' + s.u + "</p>" : "") +
         "</div>";
 
-      // Retrigger the entrance without requestAnimationFrame: rAF never fires
-      // in a backgrounded tab, which would leave a slide stuck at its start
-      // state on the projector while he is already talking over it.
+      /* Arm, force the browser to take the armed state, then disarm. The
+         armed rule carries `transition: none`, so this cannot be seen going
+         in; releasing it is what animates.
+
+         No requestAnimationFrame and no timer anywhere in here, deliberately.
+         rAF never fires in a backgrounded tab and a timer can be throttled,
+         either of which would strand a slide mid-entrance on the projector.
+         The three statements below are synchronous, so the words are already
+         on their way out of the armed state before this function returns, and
+         if transitions are off entirely the text is simply there. */
       var inner = body.firstChild;
-      inner.classList.remove("is-in");
+      inner.classList.add("is-armed");
       void inner.offsetWidth;
-      inner.classList.add("is-in");
+      inner.classList.remove("is-armed");
 
       // The thread grows to this beat. Set imperatively so that if the CSS
       // transition never runs, the thread is still the right length.
