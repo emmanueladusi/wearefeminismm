@@ -1,0 +1,48 @@
+/* ================================================================
+   PRESENTER MODE (js/present.js) — the peek card, and nothing else.
+   Emmanuel presents with no visible chrome: the audience sees only the
+   website. This card exists solely because he asked for a way to check
+   where he is, and it stays hidden until he presses P.
+   ================================================================ */
+
+.pm-peek {
+  position: fixed;
+  left: 18px;
+  bottom: 18px;
+  z-index: 9000;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-width: min(46ch, 68vw);
+  padding: 12px 16px;
+  border-radius: 10px;
+  /* Its own dark surface rather than site tokens: it must stay readable on
+     whichever page and theme it happens to appear over, including the
+     gallery's near-black rooms. */
+  background: rgba(18, 12, 10, 0.9);
+  color: #f4ece8;
+  box-shadow: 0 10px 34px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.22s ease, transform 0.22s ease;
+  pointer-events: none; /* never in the way of a live click */
+}
+.pm-peek.is-on { opacity: 1; transform: none; }
+
+.pm-peek__n {
+  font-family: var(--mono, ui-monospace, monospace);
+  font-size: 0.66rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #e3a9bb;
+}
+.pm-peek__now { font-size: 0.95rem; line-height: 1.35; }
+.pm-peek__next {
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: rgba(244, 236, 232, 0.62);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pm-peek { transition: none; }
+}

@@ -7417,7 +7417,14 @@ body:not([data-wallf-mode="field"]) .wallf-field { pointer-events: none; }
   content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
   background: linear-gradient(0deg, rgba(8,5,10,.86) 0%, rgba(8,5,10,.66) 44%, transparent 100%);
 }
-body:not([data-wallf-mode="field"]) .wallf-door { opacity: 0; transform: translateY(24px); pointer-events: none; }
+/* The door root is pointer-events:none so the light field shows through its
+   empty areas, which means its CONTENT has to opt back in (__say, __ways
+   below). Once the door is dismissed those opt-ins were still live: an
+   invisible dead zone sat over roughly 40% of the screen and swallowed clicks
+   meant for the wall behind it. Descendants have to be switched off too. */
+body:not([data-wallf-mode="field"]) .wallf-door,
+body:not([data-wallf-mode="field"]) .wallf-door * { pointer-events: none; }
+body:not([data-wallf-mode="field"]) .wallf-door { opacity: 0; transform: translateY(24px); }
 .wallf-door__in { max-width: 1320px; margin: 0 auto; display: flex; align-items: flex-end; justify-content: space-between; gap: 34px; flex-wrap: wrap; }
 .wallf-door__say { pointer-events: auto; flex: 1 1 380px; min-width: 0; }
 .wallf-door__eyebrow { font-family: var(--mono); font-size: 10.5px; letter-spacing: .22em; text-transform: uppercase; color: rgba(242,233,230,.5); margin-bottom: 14px; }

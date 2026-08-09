@@ -313,7 +313,10 @@
         onLeaveBack: isHero ? function () {} : function () { tlN.pause(0); },
       });
       ST.refresh();
-      if (isHero) whenReady(function () { tlN.restart(); }); // opening fade plays on load
+      if (isHero) {
+        whenReady(function () { tlN.restart(); }); // opening fade plays on load
+        window.__heroReplay = function () { tlN.restart(); };
+      }
       return;
     }
 
@@ -446,7 +449,12 @@
     ST.refresh();
     // The hero opens the page: once the preloader lifts, play the full
     // sequence (reveal → word-cycle → gold sweep) WITHOUT locking scroll.
-    if (isHero) whenReady(play);
+    if (isHero) {
+      whenReady(play);
+      // Presenter mode replays this on cue: the talk reaches "the animation
+      // hits you" minutes after load, by which time it has long finished.
+      window.__heroReplay = play;
+    }
   }
 
   if (document.readyState === "loading") {

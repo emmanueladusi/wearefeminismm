@@ -1,0 +1,284 @@
+/* Presenter mode — the site IS the slide deck.
+   ---------------------------------------------------------------------------
+   Emmanuel presents this site live. Without this, that means alt-tabbing
+   between a slideshow and the website, which breaks the spell of a site whose
+   whole argument is "look at this, it is not boring." So: one key moves the
+   REAL site to the exact thing he is talking about, in the order of his
+   speaker notes. There is no slideshow.
+
+   INERT BY DEFAULT. Nothing below runs unless the URL carries ?present, so a
+   student who finds this site can never fall into a half-finished talk.
+
+   Beats are deliberately COARSER than sentences. Several paragraphs of the
+   talk sit on one beat; he advances when he wants the site to move, not on
+   every line.
+
+   Naming note: this is `present` / `.pm-*`, never `preso` — js/preso.js is a
+   different, older feature (the recap reel) and owns #preso/#presoIdx. */
+
+(function () {
+  var QS = new URLSearchParams(location.search);
+  if (!QS.has("present")) return;
+
+  var KEY = "wf-present";
+  var page = location.pathname.split("/").pop() || "index.html";
+
+  /* ---------------------------------------------------------------------
+     The beats. `p` page, `t` selector to bring into view, `say` the label
+     shown only in the peek card, `prep` optional reveal step, `url` extra
+     query to carry when ARRIVING at this beat from another page.
+     --------------------------------------------------------------------- */
+
+  var BEATS = [
+    { p: "index.html", t: "#brandmark", say: "Opening · the double m, who I am, the research" },
+    { p: "index.html", t: "#brandmark", say: "Here's a look · replay the reveal", prep: replayHero },
+    { p: "index.html", t: "#popculture", say: "Piece of the month" },
+    { p: "index.html", t: "#about", say: "About me, and why it's last" },
+    { p: "learn.html", t: "#boring-pulse", say: "82 surveyed · 44% said boring · and the second finding" },
+    { p: "learn.html", t: "#exhibition", say: "The prototypes I scratched, then my brother's idea" },
+    { p: "learn.html", t: "#gallery", say: "The gallery opens · Afrocentric method, Asante", gal: true, prep: enterGallery },
+    { p: "learn.html", t: "#gallery", say: "Scholars · Dr. Munroe", gal: true, url: "room=scholars", prep: goScholars },
+    { p: "learn.html", t: "#after-pulse", say: "44% became 6%" },
+    { p: "play.html", t: "#thecrossword", say: "Learning gets tested · wordle and crossword", prep: openCrossword },
+    { p: "community.html", t: "#directory", say: "Organizations girls can actually reach" },
+    { p: "community.html", t: "#recommend", say: "Submit a group and be featured" },
+    { p: "wall.html", t: "#wallf", say: "Your own wall, moderated", prep: enterWall },
+    { p: "index.html", t: "#brandmark", say: "Next steps, reflection, I am. You are. We are." }
+  ];
+
+  /* ---------------------------------------------------------------------
+     Where are we
+     --------------------------------------------------------------------- */
+
+  function readIdx() {
+    var fromUrl = parseInt(QS.get("beat"), 10);
+    if (!isNaN(fromUrl)) return clamp(fromUrl);
+    try {
+      var v = parseInt(sessionStorage.getItem(KEY), 10);
+      return isNaN(v) ? 0 : clamp(v);
+    } catch (e) { return 0; }
+  }
+  function saveIdx(i) {
+    // sessionStorage, not local: closing the tab must end the talk.
+    try { sessionStorage.setItem(KEY, String(i)); } catch (e) {}
+  }
+  function clamp(i) { return Math.max(0, Math.min(BEATS.length - 1, i)); }
+
+  var idx = readIdx();
+
+  /* ---------------------------------------------------------------------
+     Reveal steps for the beats that are gated behind a click
+     --------------------------------------------------------------------- */
+
+  function replayHero() {
+    if (window.__heroReplay) window.__heroReplay();
+  }
+
+  function enterGallery() {
+    // Gallery.html checks `!e.isTrusted` and enters synchronously on a
+    // synthetic click, skipping its coin-flip delay. Nothing to wait for
+    // beyond the ~900ms clip-path open.
+    if (!isGalleryOpen()) {
+      var btn = document.getElementById("enterBtn");
+      if (btn) btn.click();
+      return 900;
+    }
+    // Already open means we arrived BACKWARD from the scholars room. Put the
+    // gallery back on its opening room, or he introduces the gallery over a
+    // room the talk has not reached yet.
+    if (typeof window.setChapter === "function") window.setChapter("directory");
+    return 300;
+  }
+
+  function goScholars() {
+    if (typeof window.openGallery === "function") {
+      window.openGallery("scholars");
+      return 900;
+    }
+    // No global? Fall back to the gallery's own ?room= deep link, which does
+    // exactly this on load and is a documented, already-tested path.
+    if (!isGalleryOpen()) return hardNav("learn.html", idx, "room=scholars");
+    return 0;
+  }
+
+  function isGalleryOpen() {
+    var g = document.getElementById("gallery");
+    return !!(g && g.classList.contains("open"));
+  }
+
+  function openCrossword() {
+    var card = document.querySelector('[data-opens="thecrossword"]');
+    var panel = document.getElementById("thecrossword");
+    if (card && panel && panel.hidden) { card.click(); return 240; }
+    return 0;
+  }
+
+  function enterWall() {
+    var door = document.getElementById("wallfDoor");
+    var go = document.querySelector('[data-wf-go="everything"]');
+    // NOT offsetParent: the door is position:fixed, and a fixed element always
+    // reports a null offsetParent, so that test read "hidden" while the door
+    // was plainly on screen and the talk stopped at the entrance.
+    if (go && door && getComputedStyle(door).display !== "none") { go.click(); return 460; }
+    return 0;
+  }
+
+  /* ---------------------------------------------------------------------
+     Going there
+     --------------------------------------------------------------------- */
+
+  function scrollTo(sel) {
+    var el = document.querySelector(sel);
+    if (!el) return;
+    // While the gallery is open it covers the viewport, so scrolling the
+    // document underneath it would move nothing anyone can see.
+    if (isGalleryOpen()) return;
+    if (window.__lenis) window.__lenis.scrollTo(el, { offset: 0 });
+    else el.scrollIntoView({ behavior: "smooth", block: "start" });
+    // The colour backdrop caches section offsets; a jump that changed page
+    // height would otherwise leave it painting against stale numbers.
+    if (window.__morph && window.__morph.measure) {
+      setTimeout(function () { window.__morph.measure(); }, 60);
+    }
+  }
+
+  function hardNav(toPage, toIdx, extra) {
+    saveIdx(toIdx);
+    var q = "?present&beat=" + toIdx + (extra ? "&" + extra : "");
+    // js/transition.js exposes no programmatic hook and is closure-scoped, so
+    // rather than re-implement its 480ms wipe (and its re-entry guard, and its
+    // bfcache reset) we hand it a real anchor and let it do its own job.
+    var a = document.createElement("a");
+    a.href = toPage + q;
+    a.style.cssText = "position:absolute;left:-9999px;width:1px;height:1px";
+    document.body.appendChild(a);
+    a.click();
+    return -1;
+  }
+
+  function land(i) {
+    var b = BEATS[i];
+    var wait = 0;
+
+    // #gallery is position:fixed inset:0 AND locks documentElement overflow
+    // while open, so any beat that is not a gallery beat has to close it
+    // first. Without this, stepping backward out of the gallery left the talk
+    // narrating the 44% card from behind a full-screen gallery.
+    if (isGalleryOpen() && !b.gal) {
+      var x = document.getElementById("exitBtn");
+      if (x) { x.click(); wait = 420; }
+    }
+
+    if (b.prep) {
+      var r = b.prep();
+      if (r === -1) return;          // prep navigated away; nothing left to do
+      wait = Math.max(wait, r || 0);
+    }
+    if (wait) setTimeout(function () { scrollTo(b.t); }, wait);
+    else scrollTo(b.t);
+  }
+
+  function go(i) {
+    i = clamp(i);
+    var b = BEATS[i];
+    if (b.p !== page) { hardNav(b.p, i, b.url); return; }
+    idx = i;
+    saveIdx(i);
+    land(i);
+    peek(true);
+  }
+
+  /* ---------------------------------------------------------------------
+     The peek card — the one concession to "hidden entirely". Nothing shows
+     until a key is pressed, and it fades on its own.
+     --------------------------------------------------------------------- */
+
+  var card, hideTimer;
+  function peek(brief) {
+    if (!card) {
+      card = document.createElement("div");
+      card.className = "pm-peek";
+      card.setAttribute("aria-hidden", "true");
+      document.body.appendChild(card);
+    }
+    var next = BEATS[idx + 1];
+    card.innerHTML =
+      '<span class="pm-peek__n">' + (idx + 1) + " / " + BEATS.length + "</span>" +
+      '<span class="pm-peek__now">' + BEATS[idx].say + "</span>" +
+      (next ? '<span class="pm-peek__next">next &middot; ' + next.say + "</span>" : "");
+    card.classList.add("is-on");
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(function () { card.classList.remove("is-on"); }, brief ? 1400 : 2600);
+  }
+
+  /* ---------------------------------------------------------------------
+     Keys
+     --------------------------------------------------------------------- */
+
+  function typing(e) {
+    var t = e.target;
+    if (!t) return false;
+    var tag = t.tagName;
+    return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || t.isContentEditable;
+  }
+
+  addEventListener("keydown", function (e) {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+    var k = e.key;
+    // PageUp/PageDown are what a presentation clicker actually sends, and a
+    // clicker is a separate device in his other hand — nobody types those
+    // while filling in a crossword. So they drive the talk even when focus is
+    // sitting in a field, which is exactly what happens after demoing the
+    // crossword or the wall composer. Without this he would have to click
+    // somewhere empty mid-sentence before the talk would move again.
+    var clicker = (k === "PageDown" || k === "PageUp");
+
+    // Everything else must yield to whatever he is typing into.
+    if (typing(e) && !clicker) return;
+
+    if (k === "ArrowRight" || k === "ArrowDown" || k === " " || k === "PageDown") {
+      e.preventDefault(); blurField(); go(idx + 1);
+    } else if (k === "ArrowLeft" || k === "ArrowUp" || k === "PageUp") {
+      e.preventDefault(); blurField(); go(idx - 1);
+    } else if (k === "Escape") {
+      e.preventDefault(); quit();
+    } else if (k === "p" || k === "P") {
+      e.preventDefault(); peek(false);
+    }
+  });
+
+  // Leaving a beat should also leave the field, so the NEXT press is not
+  // swallowed by a game he has already moved on from.
+  function blurField() {
+    var a = document.activeElement;
+    if (a && a !== document.body && a.blur) a.blur();
+  }
+
+  function quit() {
+    try { sessionStorage.removeItem(KEY); } catch (e) {}
+    document.body.classList.remove("is-presenting");
+    if (card) card.classList.remove("is-on");
+    var clean = location.pathname + location.hash;
+    try { history.replaceState({}, "", clean); } catch (e) {}
+    // Reload so every script that branched on ?present goes back to normal.
+    location.href = clean;
+  }
+
+  /* ---------------------------------------------------------------------
+     Start
+     --------------------------------------------------------------------- */
+
+  document.body.classList.add("is-presenting");
+
+  function begin() {
+    saveIdx(idx);
+    // ?room= runs its own load handler that clicks #enterBtn; give it the
+    // frame it needs before deciding whether this beat still has to open
+    // anything itself.
+    setTimeout(function () { land(idx); peek(true); }, QS.has("room") ? 500 : 0);
+  }
+
+  if (document.readyState === "complete") begin();
+  else addEventListener("load", begin);
+})();
