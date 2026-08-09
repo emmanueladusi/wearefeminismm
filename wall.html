@@ -23,11 +23,24 @@
   <meta name="twitter:image" content="https://emmanueladusi.github.io/wearefeminismm/img/og-image.png" />
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-  <link rel="stylesheet" href="css/styles.css?v=283" />
+  <link rel="stylesheet" href="css/styles.css?v=288" />
   <script>(function(){var d=document.documentElement;d.classList.add("js");setTimeout(function(){if(!d.classList.contains("reveal-ready"))d.classList.remove("js");},2500);})();</script>
 </head>
 <body class="page-flat">
   <script>document.body.classList.add("is-loading");</script>
+  <!-- Set before paint, the same way the theme/a11y toggles are: every CSS
+       rule below keys off data-wallf-mode, so if it were left to js/wallF.js
+       (which only runs after DOMContentLoaded, then awaits a network
+       fetch) the page would render with no mode at all for a moment, and a
+       returning reader would still see the entrance flash past on the way
+       to the room "remember the last room" is supposed to skip. -->
+  <script>(function(){
+    try{
+      if (/(^|[?&#])entrance\b/.test(location.search + location.hash)) { document.body.setAttribute("data-wallf-mode","field"); return; }
+      var r = localStorage.getItem("wf-wall-room");
+      document.body.setAttribute("data-wallf-mode", (r === "everything" || r === "conversations") ? r : "field");
+    }catch(e){ document.body.setAttribute("data-wallf-mode","field"); }
+  })();</script>
   <!-- WCAG 2.0 A, 2.4.1 Bypass Blocks: first thing in the tab order. -->
   <a class="skip-link" href="#main">Skip to content</a>
   <noscript><style>.preloader{display:none}</style></noscript>
@@ -113,95 +126,145 @@
   </div>
 
   <main id="main">
-
-  <!-- ===== The shared wall =====
-       Nothing here is public until a person has approved it, and no name or
-       account is ever attached. This wall starts empty. -->
-  <header class="masthead" id="top">
-    <div class="pwrap">
-      <p class="masthead__eyebrow">The Wall</p>
-      <h1 class="masthead__title">Say it where someone will answer.</h1>
-      <p class="masthead__lead">Anonymous, no account, no name. Post what you have lived through, or
-        answer someone who has. <strong>Nothing appears here until a person has read it.</strong></p>
+  <!-- ===== The shared wall, room design =====
+       Nothing here is public until a person has approved it -- there is no
+       client-reachable approve control anywhere on this page, on purpose --
+       and no name or account is ever attached. This wall starts empty.
+       js/wallF.js does the rest: the entrance is a plain statement of what
+       this is, Everything and Conversations are the two ways to read what
+       is already here, and every text field on the page routes through
+       js/wallguard.js before it ever reaches the server. -->
+  <div class="wallf" id="wallf">
+    <div class="wallf-room" aria-hidden="true">
+      <div class="wallf-room__light"></div>
+      <div class="wallf-room__grain"></div>
+      <div class="wallf-room__vig"></div>
     </div>
-  </header>
 
-  <nav class="secnav" data-secnav aria-label="Sections on this page">
-    <a href="#feed">The wall</a>
-    <a href="#write">Write something</a>
-    <a href="#rules">House rules</a>
-  </nav>
+    <div class="wallf-bar">
+      <button class="wallf-btn wallf-btn--back" type="button" id="wallfBack">&#8592; Entrance</button>
+      <nav class="wallf-modes" aria-label="Two ways to read the wall">
+        <button type="button" data-wf-mode="everything"><i class="wallf-mi wallf-mi--cards" aria-hidden="true"></i>Everything</button>
+        <button type="button" data-wf-mode="conversations"><i class="wallf-mi wallf-mi--line" aria-hidden="true"></i>Conversations</button>
+      </nav>
+      <span class="wallf-bar__spacer"></span>
+      <button class="wallf-btn" type="button" data-wf-rules>How this works</button>
+      <button class="wallf-btn wallf-btn--go" type="button" data-wf-write>Say something</button>
+    </div>
 
-  <section class="psec" id="write">
-    <div class="pwrap">
-      <div class="wgrid">
-        <div class="wgrid__main">
-          <!-- Shown when the wall has no server wired up yet. -->
-          <div class="wnotice" id="wallOffline" hidden>
-            <p data-offline-msg></p>
-          </div>
+    <div class="wallf-field" id="wallfField">
+      <canvas id="wallfCanvas" data-lenis-prevent aria-label="A field of lights, one for each post. Choose Everything or Conversations to read them as text."></canvas>
+    </div>
 
-          <form class="wcompose" id="wallCompose">
-            <label class="visually-hidden" for="wallText">Write something for the wall</label>
-            <textarea id="wallText" class="wcompose__field" rows="4" maxlength="1200"
-              placeholder="Something that happened. Something you noticed. Something you wish someone had told you."></textarea>
-            <p class="caution" id="wallCaution" role="status" hidden></p>
-            <div class="wcompose__row">
-              <p class="wcompose__note">No name is attached. You can take it down later.</p>
-              <button class="cta" type="submit">Post it</button>
-            </div>
-          </form>
-
-          <p class="wstatus" id="wallStatus" role="status" aria-live="polite"></p>
-
-          <div class="wbar" id="feed">
-            <p class="wbar__count" id="wallCount">0 posts</p>
-            <div class="wbar__sort">
-              <label for="wallSort">Sort</label>
-              <select id="wallSort">
-                <option value="new">Newest</option>
-                <option value="supported">Most helpful</option>
-              </select>
-            </div>
-          </div>
-
-          <ul class="wfeed" id="wallFeed"></ul>
-
-          <div class="wempty" id="wallEmpty" hidden>
-            <p><strong>Nothing on the wall yet.</strong></p>
-            <p>It starts empty on purpose. Whatever you write is the first thing anyone reads here.</p>
-          </div>
-
-          <noscript>
-            <div class="wempty">
-              <p><strong>The wall needs JavaScript.</strong></p>
-              <p>The rest of the site does not, so you can still read everything else with it off.</p>
-            </div>
-          </noscript>
+    <div class="wallf-door" id="wallfDoor">
+      <div class="wallf-door__in">
+        <div class="wallf-door__say">
+          <p class="wallf-door__eyebrow">The Wall &middot; wearefeminismm</p>
+          <h1>Write down what happened. Read what happened to everyone else.</h1>
+          <p class="wallf-door__lead">Anonymous. No account, no name, nothing tied to you.
+            <b>A person reads everything before it appears here.</b></p>
         </div>
-
-        <aside class="wgrid__side" id="rules" aria-label="House rules">
-          <h2 class="wside__h">How this wall works</h2>
-          <ul class="wside__list">
-            <li><strong>A person reads it first.</strong> Your post waits until it has been approved.
-              You can see your own while it waits. Nobody else can.</li>
-            <li><strong>No name, no account.</strong> Nothing you post is tied to who you are.</li>
-            <li><strong>No downvotes.</strong> You can mark a post as helpful, and that is the only
-              number on this page. There is nothing here to lose.</li>
-            <li><strong>Take it down any time.</strong> Your own posts, whenever you want.</li>
-            <li><strong>Report anything cruel.</strong> One report pulls a post off the wall
-              straight away, before anyone reviews it.</li>
-          </ul>
-          <p class="wside__warn"><strong>Do not post anything that identifies you or anyone else.</strong>
-            No full names, no schools, no handles, no phone numbers. This page checks for those and
-            will ask you twice, but it cannot catch everything.</p>
-          <p class="wside__help">If things are bad right now: <strong>Kids Help Phone</strong>, text
-            CONNECT to 686868, any hour. Black youth can text RISE to the same number. Or call 988.</p>
-        </aside>
+        <div class="wallf-door__ways">
+          <p class="wallf-door__count"><b id="doorCount">0</b>
+            <span>people have written something so far.<br>Not one of them is the only one.</span></p>
+          <button class="wallf-way wallf-way--first" type="button" data-wf-go="everything">
+            <span class="wallf-way__ico wallf-way__ico--wall" aria-hidden="true"></span>
+            <span class="wallf-way__txt"><b>Read what they wrote</b><span>All of it, newest first</span></span>
+            <span class="wallf-way__go" aria-hidden="true">&#8594;</span>
+          </button>
+          <p class="wallf-door__or">Each light out there is one of them. Click one to read just that.</p>
+        </div>
       </div>
     </div>
-  </section>
 
+    <div class="wallf-tip" id="wallfTip" aria-hidden="true"></div>
+
+    <aside class="wallf-panel" id="wallfPanel" aria-label="Reading a post" aria-hidden="true">
+      <div class="wallf-panel__head">
+        <span class="wallf-panel__kind" id="wallfPanelKind">On the wall</span>
+        <button class="wallf-panel__x" type="button" id="wallfPanelX" aria-label="Close">&#10005;</button>
+      </div>
+      <div class="wallf-panel__body" id="wallfPanelBody"></div>
+    </aside>
+
+    <!-- ===== Everything ===== -->
+    <div class="wallf-view" id="wallfEverything">
+      <div class="wallf-wall">
+        <div class="wnotice" id="wallfOffline" hidden><p data-offline-msg></p></div>
+        <div class="wallf-tally">
+          <p id="wallfCount">0 cards on the wall</p>
+          <label class="visually-hidden" for="wallfSort">Sort</label>
+          <select class="wallf-sort" id="wallfSort">
+            <option value="new">Newest first</option>
+            <option value="supported">Most helpful first</option>
+          </select>
+        </div>
+        <div class="wallf-cards" id="wallfCards"></div>
+        <div class="wempty" id="wallfEmpty" hidden>
+          <p><strong>Nothing on the wall yet.</strong></p>
+          <p>It starts empty on purpose. Whatever you write is the first thing anyone reads here.</p>
+        </div>
+        <noscript>
+          <div class="wempty">
+            <p><strong>The wall needs JavaScript.</strong></p>
+            <p>The rest of the site does not, so you can still read everything else with it off.</p>
+          </div>
+        </noscript>
+      </div>
+    </div>
+
+    <!-- ===== Conversations ===== -->
+    <div class="wallf-view" id="wallfConversations">
+      <div class="wallf-tvp" id="wallfTvp" data-lenis-prevent>
+        <div class="wallf-tworld" id="wallfTworld"><svg class="wallf-threads" id="wallfThreads" aria-hidden="true"></svg></div>
+      </div>
+      <div class="wallf-tzoom">
+        <div class="wallf-zoomer">
+          <button type="button" id="wallfZoomOut" aria-label="Zoom out">&minus;</button>
+          <button type="button" id="wallfZoomIn" aria-label="Zoom in">+</button>
+        </div>
+        <button class="wallf-btn" type="button" id="wallfFit">See the whole line</button>
+        <p class="wallf-thint">Scroll to travel along it &middot; drag to move freely</p>
+      </div>
+    </div>
+
+    <div class="wallf-veil" id="wallfVeil"></div>
+
+    <div class="wallf-sheet" id="wallfWrite" role="dialog" aria-modal="true" aria-labelledby="wallfWriteH">
+      <h2 id="wallfWriteH">Say something.</h2>
+      <p class="wallf-sheet__sub" id="wallfWriteSub">Something that happened. Something you noticed. Something you wish someone had told you.</p>
+      <label class="visually-hidden" for="wallfWriteField">Write something for the wall</label>
+      <textarea id="wallfWriteField" rows="6" maxlength="1200" placeholder="Start anywhere. No name is attached."></textarea>
+      <p class="caution wallf-caution" role="status" hidden id="wallfWriteCaution"></p>
+      <div class="wallf-sheet__row">
+        <p class="wallf-sheet__note">A person reads it before anybody else does. You can take it down later.</p>
+        <button class="wallf-btn" type="button" data-wf-close>Not now</button>
+        <button class="wallf-btn wallf-btn--go" type="button" id="wallfWriteSend">Send it</button>
+      </div>
+    </div>
+
+    <div class="wallf-sheet" id="wallfRulesSheet" role="dialog" aria-modal="true" aria-labelledby="wallfRulesH">
+      <h2 id="wallfRulesH">How this wall works</h2>
+      <ul>
+        <li><strong>A person reads it first.</strong> Your post waits until it has been approved.
+          You can see your own while it waits. Nobody else can.</li>
+        <li><strong>No name, no account.</strong> Nothing you post is tied to who you are.</li>
+        <li><strong>No downvotes.</strong> You can mark a post as helpful, and that is the only
+          number on this page. There is nothing here to lose.</li>
+        <li><strong>Take it down any time.</strong> Your own posts, whenever you want.</li>
+        <li><strong>Report anything cruel.</strong> One report pulls a post off the wall
+          straight away, before anyone reviews it.</li>
+      </ul>
+      <p class="wallf-sheet__warn"><strong>Do not post anything that identifies you or anyone else.</strong>
+        No full names, no schools, no handles, no phone numbers. This page checks for those and
+        will ask you twice, but it cannot catch everything.</p>
+      <p class="wallf-sheet__warn">If things are bad right now: <strong>Kids Help Phone</strong>, text
+        CONNECT to 686868, any hour. Black youth can text RISE to the same number. Or call 988.</p>
+      <p style="margin-top:16px"><button class="wallf-btn" type="button" data-wf-close>Back to the room</button></p>
+    </div>
+
+    <p class="visually-hidden" role="status" aria-live="polite" data-wallf-status></p>
+  </div>
   </main>
 
   <!-- ===== Footer ===== -->
@@ -227,7 +290,7 @@
   <script src="js/nav.js?v=4"></script>
   <script src="js/ui.js?v=1"></script>
   <script src="js/wallguard.js?v=2"></script>
-  <script src="js/wall.js?v=3"></script>
+  <script src="js/wallF.js?v=1"></script>
   <script src="js/transition.js?v=1"></script>
 </body>
 </html>

@@ -7260,3 +7260,441 @@ html[data-a11y] .ss-thread, html[data-a11y] .ss-slice { display: none !important
 .caution a:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
 [data-theme="dark"] .caution { background: rgba(255, 255, 255, 0.07); }
 [data-theme="dark"] .caution a { color: #ffc2ce; }
+
+/* =====================================================================
+   THE WALL, ROOM DESIGN — wall.html (js/wallF.js)
+   ---------------------------------------------------------------------
+   Ported from the F prototype (wall-protos/f-combined.html). Everything
+   below is scoped under .wallf so nothing here can leak onto another page,
+   and reuses the site's own tokens (--gold, --ease, --mono, --cream-on-dark,
+   --dim-on-dark) rather than redeclaring a parallel palette that could drift
+   from it. The two exceptions are the paper-card tones (--wf-card,
+   --wf-card-2): the site has nothing brighter than --paper, and a card
+   floating on this page's permanently dark ground needs to read as paper
+   against black, not as the site's ambient beige.
+
+   This room does NOT follow [data-theme]: the dark ground is the design,
+   the way a night sky doesn't turn into a daytime one. It DOES follow
+   [data-a11y] -- required, not optional, on a live page students use --
+   which is why every rule below reaches for var(--sans)/var(--serif)/rem
+   sizing rather than a fixed local font stack: those tokens already flip to
+   Verdana and scale 115% under accessible mode (see ~4765), so this page
+   inherits that for free instead of needing its own copy of the switch. */
+
+.wallf {
+  --wf-card: #f7f2ee;
+  --wf-card-2: #efe6df;
+  --wf-ease: var(--ease);
+  position: relative;
+  z-index: 1;   /* .wallf collapses to near-zero height (its own content is
+    position:fixed), so the site's footer sits directly beneath it in the
+    document. isolation contains this file's own z-index scale so it can
+    never fight the site's (nav's z-index:100 must always win) -- but
+    without an explicit z-index here too, position:relative + z-index:auto
+    does not outrank a later same-layer sibling, and the footer, coming
+    after <main> in the DOM, painted through the gaps between the fixed
+    room, the door, and the field. z-index:1 is enough: it only has to beat
+    the footer's static/auto stacking, not the real nav's 100. */
+  isolation: isolate;
+  color: var(--cream-on-dark);
+  overflow-x: hidden;
+}
+.wallf .visually-hidden {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+
+/* ---- the room: one dark ground behind every arrangement ---- */
+.wallf-room { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+.wallf-room__light {
+  position: absolute; inset: 0; transition: opacity 1s var(--wf-ease), background 1.2s linear;
+  background:
+    radial-gradient(120% 78% at 50% -16%, rgba(255,214,190,.26) 0%, rgba(255,190,164,.09) 34%, transparent 68%),
+    radial-gradient(72% 54% at 14% 106%, rgba(234,115,147,.14), transparent 62%),
+    radial-gradient(64% 52% at 88% 78%, rgba(120,81,127,.20), transparent 64%),
+    linear-gradient(178deg, #2a1d18 0%, #150e0e 78%);
+}
+body[data-wallf-mode="field"] .wallf-room__light {
+  background:
+    radial-gradient(84% 62% at 22% 16%, rgba(120,81,127,.34), transparent 62%),
+    radial-gradient(72% 62% at 82% 76%, rgba(234,115,147,.17), transparent 64%),
+    radial-gradient(130% 100% at 50% 50%, #150d1c 0%, #09060c 78%);
+}
+.wallf-room__grain {
+  position: absolute; inset: -15%; opacity: .38; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.78' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.wallf-room__vig { position: absolute; inset: 0; background: radial-gradient(94% 76% at 50% 44%, transparent 44%, rgba(6,3,5,.62) 100%); }
+@media (prefers-reduced-motion: reduce) { .wallf-room__grain { opacity: .2; } }
+
+/* ---- the secondary bar: docks under the site's real nav, never over it ---- */
+.wallf-bar {
+  /* sticky's `top` only constrains where the bar STOPS once scrolling would
+     carry it further up -- it does nothing to its resting position. At the
+     top of the page the real nav is position:fixed (reserves no flow
+     space), so without a real margin here this sat at y:0, directly behind
+     the nav's translucent strip, at rest. margin-top gives it a true
+     resting position below the nav; sticky then keeps it there on scroll. */
+  position: sticky; top: var(--navh, 78px); z-index: 40;
+  margin-top: var(--navh, 78px);
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 12px clamp(16px, 3.4vw, 44px);
+  background: linear-gradient(180deg, rgba(10,6,8,.86), rgba(10,6,8,.5));
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(242,233,230,.08);
+}
+.wallf-bar__spacer { margin-left: auto; }
+.wallf-btn {
+  border: 1px solid rgba(242,233,230,.2); background: rgba(255,255,255,.06); color: var(--cream-on-dark);
+  font: inherit; font-size: 12.5px; padding: 9px 15px; border-radius: 999px; cursor: pointer; white-space: nowrap;
+  transition: background .2s, border-color .2s, transform .2s var(--wf-ease);
+}
+.wallf-btn:hover { background: rgba(255,255,255,.14); transform: translateY(-1px); }
+.wallf-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.wallf-btn--go { background: var(--gold); border-color: var(--gold); color: #2a1119; font-weight: 600; }
+.wallf-btn--go:hover { background: #f28aa6; border-color: #f28aa6; }
+.wallf-btn--sm { padding: 7px 12px; font-size: 12px; }
+.wallf-modes { display: flex; gap: 3px; padding: 3px; border-radius: 999px; background: rgba(255,255,255,.06); border: 1px solid rgba(242,233,230,.14); }
+.wallf-modes button {
+  border: 0; background: none; color: rgba(242,233,230,.62); font: inherit; font-size: 12.5px;
+  padding: 7px 14px; border-radius: 999px; cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 8px;
+  transition: background .22s, color .22s;
+}
+.wallf-modes button:hover { color: var(--cream-on-dark); background: rgba(255,255,255,.08); }
+.wallf-modes button[aria-current="true"] { background: var(--wf-card); color: #231417; font-weight: 600; }
+.wallf-mi { width: 17px; height: 12px; border-radius: 2px; flex: none; position: relative; opacity: .75; }
+.wallf-modes button[aria-current="true"] .wallf-mi { opacity: 1; }
+.wallf-mi--cards::before, .wallf-mi--cards::after { content: ""; position: absolute; top: 0; width: 7px; height: 12px; border-radius: 1.5px; background: currentColor; }
+.wallf-mi--cards::before { left: 0; transform: rotate(-6deg); }
+.wallf-mi--cards::after { right: 0; transform: rotate(6deg); }
+.wallf-mi--line::before {
+  content: ""; position: absolute; inset: 0;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 17 12'%3E%3Cpath d='M1 4 Q5 9 9 4.5 T16 3' fill='none' stroke='%23000' stroke-width='1.4'/%3E%3Crect x='6' y='7' width='6' height='4' rx='1'/%3E%3C/svg%3E") center/contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 17 12'%3E%3Cpath d='M1 4 Q5 9 9 4.5 T16 3' fill='none' stroke='%23000' stroke-width='1.4'/%3E%3Crect x='6' y='7' width='6' height='4' rx='1'/%3E%3C/svg%3E") center/contain no-repeat;
+  background: currentColor;
+}
+body[data-wallf-mode="field"] .wallf-modes,
+body[data-wallf-mode="field"] .wallf-btn--back { opacity: 0; pointer-events: none; transition: opacity .4s; }
+.wallf-btn--back { transition: opacity .4s, background .2s, transform .2s var(--wf-ease); }
+@media (max-width: 760px) {
+  /* opacity:0 still reserves flex layout space, which on a narrow bar meant
+     the entrance's hidden back-button and mode-toggle were pushing "How this
+     works"/"Say something" onto a second and third row -- the bar grew to
+     three rows tall, and the door's fixed padding-top (sized for one row)
+     no longer cleared it: the headline rendered directly under the bar's
+     own backdrop-blur. Below the desktop breakpoint the fade is dropped for
+     an outright removal from flow, which is an acceptable trade against a
+     blurred-out headline. */
+  body[data-wallf-mode="field"] .wallf-modes,
+  body[data-wallf-mode="field"] .wallf-btn--back { display: none; }
+}
+
+/* ---- the field (the entrance's own arrangement) ---- */
+.wallf-field { position: fixed; inset: 0; z-index: 2; transition: opacity .55s var(--wf-ease); }
+.wallf-field canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; }
+.wallf-field canvas.is-drag { cursor: grabbing; }
+.wallf-field canvas.is-over { cursor: pointer; }
+body:not([data-wallf-mode="field"]) .wallf-field { pointer-events: none; }
+
+/* ---- the door: what this place is, said once, in plain words ---- */
+.wallf-door {
+  /* bottom:0 with no top meant this box was free to grow AS TALL AS ITS
+     CONTENT NEEDED, extending upward past the nav and bar with nothing to
+     stop it -- padding-top only added space at the box's OWN top edge,
+     which just pushed that edge even further up, making the overlap worse
+     rather than fixing it. `top` gives the box an actual ceiling (measured,
+     not guessed -- see setNavOffset in js/wallF.js), so it is properly
+     bounded to the room below the header chrome; overflow-y is the fallback
+     for the rare viewport too short to fit the entrance's text at all. */
+  position: fixed; left: 0; right: 0; bottom: 0;
+  top: calc(var(--navh, 78px) + var(--barh, 54px));
+  overflow-y: auto;
+  z-index: 6; pointer-events: none;
+  padding: clamp(20px, 4vh, 60px) clamp(20px, 5vw, 72px) clamp(40px, 8vh, 90px);
+  transition: opacity .5s var(--wf-ease), transform .6s var(--wf-ease);
+}
+.wallf-door::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(0deg, rgba(8,5,10,.86) 0%, rgba(8,5,10,.66) 44%, transparent 100%);
+}
+body:not([data-wallf-mode="field"]) .wallf-door { opacity: 0; transform: translateY(24px); pointer-events: none; }
+.wallf-door__in { max-width: 1320px; margin: 0 auto; display: flex; align-items: flex-end; justify-content: space-between; gap: 34px; flex-wrap: wrap; }
+.wallf-door__say { pointer-events: auto; flex: 1 1 380px; min-width: 0; }
+.wallf-door__eyebrow { font-family: var(--mono); font-size: 10.5px; letter-spacing: .22em; text-transform: uppercase; color: rgba(242,233,230,.5); margin-bottom: 14px; }
+.wallf-door h1 {
+  font-size: clamp(1.75rem, 3.3vw, 2.65rem); line-height: 1.14; letter-spacing: -.03em; max-width: 21ch; margin: 0;
+  background: linear-gradient(168deg, #fff 0%, #f7ebeb 66%, #dcc6ca 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  /* This h1 inherits hyphens:auto site-wide (~line 100), added for single
+     long words like "intersectionality" overflowing a 320px viewport. This
+     headline is an ordinary sentence with room to wrap at a space instead --
+     under accessible mode's wider Verdana at 115% scale it no longer fit
+     unbroken and was hyphenating mid-word ("hap-pened"), which reads as
+     broken rather than deliberate. Wrapping at the next word looks fine;
+     splitting the word does not. */
+  hyphens: none;
+}
+.wallf-door__lead { margin-top: 15px; font-size: 1rem; color: rgba(242,233,230,.76); max-width: 36ch; }
+.wallf-door__lead b { color: #fff; font-weight: 600; }
+.wallf-door__ways { display: flex; flex-direction: column; gap: 10px; pointer-events: auto; min-width: min(360px, 100%); }
+.wallf-door__count { text-align: right; margin-bottom: 14px; }
+.wallf-door__count b { display: block; font-size: clamp(2.4rem, 5vw, 3.6rem); line-height: 1; letter-spacing: -.04em; font-weight: 700; color: #fff; }
+.wallf-door__count span { display: block; margin-top: 4px; font-size: .9rem; line-height: 1.45; color: rgba(242,233,230,.68); }
+.wallf-way {
+  display: flex; align-items: center; gap: 16px; text-align: left; width: 100%;
+  border: 1px solid rgba(242,233,230,.18); background: rgba(255,255,255,.055); color: var(--cream-on-dark);
+  font: inherit; padding: 15px 18px; border-radius: 16px; cursor: pointer;
+  transition: background .25s, border-color .25s, transform .25s var(--wf-ease);
+}
+.wallf-way:hover { background: rgba(255,255,255,.12); border-color: rgba(242,233,230,.34); transform: translateY(-2px); }
+.wallf-way:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+.wallf-way__ico { flex: none; width: 44px; height: 34px; border-radius: 6px; position: relative; overflow: hidden; background: rgba(0,0,0,.3); }
+.wallf-way__ico--wall::before, .wallf-way__ico--wall::after { content: ""; position: absolute; border-radius: 1.5px; background: linear-gradient(166deg, #f7f2ee, #ddd0c7); }
+.wallf-way__ico--wall::before { left: 5px; top: 7px; width: 15px; height: 19px; transform: rotate(-5deg); }
+.wallf-way__ico--wall::after { right: 5px; top: 9px; width: 15px; height: 16px; transform: rotate(4deg); }
+.wallf-way__txt b { display: block; font-size: 1.02rem; font-weight: 600; letter-spacing: -.012em; }
+.wallf-way__txt span { display: block; font-size: .85rem; color: rgba(242,233,230,.6); margin-top: 2px; }
+.wallf-way__go { margin-left: auto; opacity: .5; font-size: 1.1rem; }
+.wallf-way--first { background: var(--gold); border-color: var(--gold); color: #2a1119; padding: 18px 20px; box-shadow: 0 14px 34px -14px rgba(234,115,147,.8); }
+.wallf-way--first:hover { background: #f28aa6; border-color: #f28aa6; }
+.wallf-way--first .wallf-way__ico { background: rgba(0,0,0,.16); }
+.wallf-way--first .wallf-way__txt b { font-size: 1.1rem; }
+.wallf-way--first .wallf-way__txt span { color: rgba(42,17,25,.72); }
+.wallf-way--first .wallf-way__go { opacity: .72; }
+.wallf-door__or { font-size: 12.5px; color: rgba(242,233,230,.5); text-align: right; margin-top: 4px; }
+
+/* hover label over a light */
+.wallf-tip {
+  position: fixed; z-index: 9; pointer-events: none; max-width: 290px;
+  padding: 12px 15px; border-radius: 12px; font-size: .9rem; line-height: 1.5;
+  background: rgba(17,10,14,.92); border: 1px solid rgba(242,233,230,.16);
+  box-shadow: 0 20px 46px -18px rgba(0,0,0,.9);
+  opacity: 0; transform: translateY(6px); transition: opacity .18s, transform .18s var(--wf-ease);
+}
+.wallf-tip.is-on { opacity: 1; transform: translateY(0); }
+.wallf-tip em { display: block; margin-top: 7px; font-style: normal; font-family: var(--mono); font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase; color: rgba(242,233,230,.45); }
+
+/* ---- the reading panel (the field's own way of reading one post) ---- */
+.wallf-panel {
+  position: fixed; top: 0; right: 0; bottom: 0; width: min(500px, 100%); z-index: 44;
+  background: linear-gradient(200deg, rgba(26,16,20,.95), rgba(13,8,11,.97));
+  border-left: 1px solid rgba(242,233,230,.13);
+  box-shadow: -40px 0 90px -30px rgba(0,0,0,.9);
+  transform: translateX(100%); transition: transform .5s var(--wf-ease);
+  display: flex; flex-direction: column;
+}
+.wallf-panel.is-on { transform: none; }
+.wallf-panel__head { display: flex; align-items: center; gap: 14px; padding: 22px clamp(20px, 3vw, 32px) 0; }
+.wallf-panel__kind { font-family: var(--mono); font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: rgba(242,233,230,.45); margin-right: auto; }
+.wallf-panel__x { border: 0; background: rgba(255,255,255,.07); color: var(--cream-on-dark); width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 16px; line-height: 1; }
+.wallf-panel__x:hover { background: rgba(255,255,255,.16); }
+.wallf-panel__body { padding: 20px clamp(20px, 3vw, 32px) 30px; overflow-y: auto; flex: 1; }
+.wallf-panel__text { font-size: 1.22rem; line-height: 1.56; letter-spacing: -.012em; color: #fdf6f4; overflow-wrap: anywhere; }
+.wallf-panel__meta { margin-top: 18px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-family: var(--mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: rgba(242,233,230,.42); }
+.wallf-panel__acts { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 22px; padding-top: 20px; border-top: 1px solid rgba(242,233,230,.12); }
+.wallf-panel h3 { margin: 30px 0 13px; font-size: 11px; font-family: var(--mono); letter-spacing: .18em; text-transform: uppercase; color: rgba(242,233,230,.45); font-weight: 400; }
+.wallf-reply { padding: 16px 18px; border-radius: 14px; background: rgba(255,255,255,.05); border: 1px solid rgba(242,233,230,.09); margin-bottom: 10px; font-size: .98rem; color: #eee2e0; }
+.wallf-reply span { display: block; margin-top: 9px; font-family: var(--mono); font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase; color: rgba(242,233,230,.4); }
+.wallf-panel__wait { display: inline-block; margin-bottom: 14px; padding: 6px 12px; border-radius: 999px; background: var(--gold-soft); color: #f6b8c9; font-family: var(--mono); font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase; }
+.wallf-answerbox { margin-top: 18px; padding: 16px 17px; border-radius: 14px; background: rgba(255,255,255,.055); border: 1px solid rgba(242,233,230,.13); }
+.wallf-answerbox textarea { width: 100%; min-height: 88px; resize: vertical; font: inherit; font-size: 1rem; line-height: 1.55; color: #fdf6f4; background: none; border: 0; padding: 0; }
+.wallf-answerbox textarea::placeholder { color: rgba(242,233,230,.36); }
+.wallf-answerbox textarea:focus { outline: none; }
+.wallf-answerbox__row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 12px; padding-top: 11px; border-top: 1px solid rgba(242,233,230,.12); }
+.wallf-answerbox__note { font-size: 11.5px; color: rgba(242,233,230,.5); margin-right: auto; }
+/* the shared safety pause, on this page's dark surfaces: the site's default
+   .caution assumes a light paper ground (dark ink on a gold-tinted panel),
+   which is close to unreadable on the panel/sheet's own near-black glass */
+.wallf-panel .caution, .wallf-sheet .caution {
+  background: rgba(255,255,255,.09); color: #fdf6f4;
+}
+.wallf-panel .caution a, .wallf-sheet .caution a { color: #ffc2ce; }
+.wallf-panel .caution a:hover, .wallf-sheet .caution a:hover { color: #fff; }
+
+/* ---- the two rooms: Everything and Conversations ---- */
+.wallf-view { position: relative; z-index: 2; opacity: 0; pointer-events: none; transition: opacity .5s var(--wf-ease); }
+.wallf-view.is-on { opacity: 1; pointer-events: auto; }
+
+/* ---- Everything ---- */
+.wallf-wall { padding: 24px clamp(20px, 5vw, 72px) 140px; max-width: 1360px; margin: 0 auto; }
+body:not([data-wallf-mode="everything"]) #wallfEverything { display: none; }
+.wallf-tally { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
+.wallf-tally p { margin: 0; font-family: var(--mono); font-size: 10.5px; letter-spacing: .2em; text-transform: uppercase; color: rgba(242,233,230,.5); }
+.wallf-sort { margin-left: auto; background: rgba(255,255,255,.07); border: 1px solid rgba(242,233,230,.22); color: var(--cream-on-dark); font: inherit; font-size: 12px; padding: 8px 12px; border-radius: 999px; cursor: pointer; }
+.wallf-cards { display: flex; align-items: flex-start; gap: clamp(18px, 2.2vw, 32px); }
+.wallf-col { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: clamp(20px, 2.4vw, 34px); }
+
+.wallf-card {
+  width: 100%; position: relative; padding: 30px 26px 18px; border-radius: 3px;
+  background: linear-gradient(168deg, var(--wf-card) 0%, var(--wf-card-2) 100%); color: var(--ink);
+  box-shadow: 0 1px 1px rgba(0,0,0,.30), 0 16px 30px -14px rgba(0,0,0,.62), 0 0 0 1px rgba(255,255,255,.18) inset;
+  transform: rotate(var(--tilt, 0deg));
+  transition: transform .5s var(--wf-ease), box-shadow .5s var(--wf-ease);
+}
+.wallf-card:hover, .wallf-card:focus-within {
+  transform: rotate(calc(var(--tilt, 0deg) * .35)) translateY(-5px) scale(1.012);
+  box-shadow: 0 2px 2px rgba(0,0,0,.26), 0 34px 56px -20px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.24) inset;
+  z-index: 3;
+}
+.wallf-card__pin { position: absolute; top: 11px; left: 50%; transform: translateX(-50%); width: 13px; height: 13px; border-radius: 50%; background: radial-gradient(circle at 34% 30%, #ffd9e3 0%, var(--gold) 46%, #a84665 100%); box-shadow: 0 2px 4px rgba(0,0,0,.42), 0 0 0 1.5px rgba(255,255,255,.5) inset; }
+.wallf-card__body { font-size: 1.05rem; line-height: 1.62; overflow-wrap: anywhere; margin: 0; }
+.wallf-card__foot { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 17px; padding-top: 12px; border-top: 1px dashed rgba(69,47,40,.24); }
+.wallf-card__when { font-family: var(--mono); font-size: 10.5px; letter-spacing: .09em; text-transform: uppercase; color: var(--ink-dim); margin-right: auto; }
+.wallf-card--pending { background: linear-gradient(168deg, #efe7e1, #e3d7cf); box-shadow: 0 1px 1px rgba(0,0,0,.22), 0 10px 22px -14px rgba(0,0,0,.5); }
+.wallf-card--pending .wallf-card__pin { background: radial-gradient(circle at 34% 30%, #efe3dd, #a2887d); }
+.wallf-card__wait { display: inline-block; margin-bottom: 12px; padding: 5px 11px; border-radius: 999px; background: rgba(69,47,40,.10); color: #6b5147; font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
+
+.wallf-pact { border: 0; background: none; cursor: pointer; font: inherit; font-size: 13px; color: var(--ink-dim); padding: 5px 9px; border-radius: 999px; transition: background .18s, color .18s; display: inline-flex; align-items: center; gap: 6px; }
+.wallf-pact:hover { background: rgba(69,47,40,.075); color: var(--ink); }
+.wallf-pact:focus-visible { outline: 2px solid var(--gold-ink); outline-offset: 1px; }
+.wallf-pact--sup.is-on { color: var(--gold-ink); font-weight: 600; }
+.wallf-pact__n { font-variant-numeric: tabular-nums; }
+
+.wallf-slips { list-style: none; margin: 16px -6px 0; padding: 0; display: grid; gap: 9px; }
+.wallf-slip { background: linear-gradient(170deg, #fdf9f6, #f0e7e0); border-radius: 2px; padding: 15px 17px; font-size: .94rem; color: #4a352e; transform: rotate(var(--tilt, 0deg)); box-shadow: 0 1px 1px rgba(0,0,0,.16), 0 8px 16px -9px rgba(0,0,0,.5); }
+.wallf-slip--pending { background: linear-gradient(170deg, #f0e8e2, #e2d7cf); }
+.wallf-slip__when { display: block; margin-top: 8px; font-family: var(--mono); font-size: 10px; letter-spacing: .09em; text-transform: uppercase; color: #8a6d63; }
+.wallf-slip__acts { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 9px; margin-left: -9px; }
+
+.wallf-replybox { margin-top: 16px; padding: 16px 17px 14px; border-radius: 2px; background: linear-gradient(170deg, #fdf9f6, #efe6df); box-shadow: 0 1px 1px rgba(0,0,0,.16), 0 8px 16px -9px rgba(0,0,0,.5); }
+.wallf-replybox textarea { width: 100%; border: 0; background: none; resize: vertical; font: inherit; font-size: .96rem; line-height: 1.6; color: var(--ink); min-height: 74px; }
+.wallf-replybox textarea::placeholder { color: #9c837a; }
+.wallf-replybox textarea:focus { outline: none; }
+.wallf-replybox__row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 10px; padding-top: 9px; border-top: 1px dashed rgba(69,47,40,.24); }
+.wallf-replybox__note { font-size: 11.5px; color: var(--ink-dim); margin-right: auto; margin: 0 auto 0 0; }
+.wallf-pin { border: 0; cursor: pointer; font: inherit; font-weight: 600; font-size: 13px; padding: 9px 16px; border-radius: 999px; background: var(--gold); color: #3a2119; box-shadow: 0 4px 12px -3px rgba(234,115,147,.7); transition: transform .22s var(--wf-ease); }
+.wallf-pin:hover { transform: translateY(-2px); }
+.wallf-ghost { border: 0; background: none; cursor: pointer; font: inherit; font-size: 13px; color: var(--ink-dim); padding: 8px 4px; }
+.wallf-ghost:hover { color: var(--ink); }
+
+.wallf-compose { width: 100%; position: relative; border-radius: 3px; padding: 30px 26px 22px; background: linear-gradient(168deg, rgba(255,247,242,.10), rgba(255,240,232,.045)); border: 1.5px dashed rgba(255,225,213,.38); transform: rotate(-.7deg); transition: border-color .35s, background .35s, transform .5s var(--wf-ease); }
+.wallf-compose:hover { border-color: rgba(255,225,213,.62); transform: rotate(-.25deg); }
+.wallf-compose.is-open { background: linear-gradient(168deg, var(--wf-card), var(--wf-card-2)); border: 0; color: var(--ink); transform: rotate(-.4deg); box-shadow: 0 1px 1px rgba(0,0,0,.30), 0 24px 44px -16px rgba(0,0,0,.66), 0 0 0 1px rgba(255,255,255,.2) inset; }
+.wallf-compose__prompt { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; border: 0; background: none; font: inherit; color: inherit; cursor: pointer; text-align: left; width: 100%; padding: 0; }
+.wallf-compose__prompt b { font-size: 1.2rem; font-weight: 600; letter-spacing: -.01em; color: #fff2ec; }
+.wallf-compose__prompt span { font-size: .9rem; color: rgba(242,233,230,.66); }
+.wallf-compose.is-open .wallf-compose__prompt { display: none; }
+.wallf-compose__form { display: none; }
+.wallf-compose.is-open .wallf-compose__form { display: block; }
+.wallf-compose__field { width: 100%; border: 0; background: none; resize: none; font: inherit; font-size: 1.05rem; line-height: 1.62; color: var(--ink); min-height: 148px; background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(1.62em - 1px), rgba(69,47,40,.12) calc(1.62em - 1px), rgba(69,47,40,.12) 1.62em); }
+.wallf-compose__field::placeholder { color: #9c837a; }
+.wallf-compose__field:focus { outline: none; }
+.wallf-compose__row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 16px; padding-top: 14px; border-top: 1px dashed rgba(69,47,40,.24); }
+.wallf-compose__note { font-size: 12.5px; color: var(--ink-dim); margin-right: auto; max-width: 26ch; }
+
+.wallf-rules { width: 100%; position: relative; padding: 28px 26px 24px; border-radius: 2px; background: linear-gradient(168deg, #f3ece6, #e6dbd2); color: var(--ink); transform: rotate(1.1deg); box-shadow: 0 1px 1px rgba(0,0,0,.26), 0 14px 26px -14px rgba(0,0,0,.6); }
+.wallf-rules::before, .wallf-rules::after { content: ""; position: absolute; top: -11px; width: 74px; height: 24px; background: linear-gradient(180deg, rgba(255,255,255,.42), rgba(226,215,205,.34)); box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+.wallf-rules::before { left: -14px; transform: rotate(-24deg); }
+.wallf-rules::after { right: -14px; transform: rotate(22deg); }
+.wallf-rules h2 { font-size: 1.05rem; font-weight: 700; margin: 0 0 14px; }
+.wallf-rules ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 11px; font-size: .93rem; color: #5a423a; }
+.wallf-rules li strong { color: var(--ink); }
+.wallf-rules__warn { margin-top: 16px; padding-left: 12px; border-left: 3px solid var(--gold); font-size: .9rem; color: #5a423a; }
+.wallf-rules__help { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(69,47,40,.16); font-size: .88rem; color: #5a423a; }
+.wallf-rules a { color: var(--gold-ink); }
+
+/* the Everything view's own empty/offline notices: reused sitewide .wnotice
+   and .wempty, which already float correctly as light paper on any ground */
+#wallfEverything .wnotice, #wallfEverything .wempty { max-width: 640px; margin-left: auto; margin-right: auto; }
+
+/* ---- Conversations ---- */
+body:not([data-wallf-mode="conversations"]) #wallfConversations { display: none; }
+.wallf-tvp { position: fixed; inset: 0; overflow: hidden; cursor: grab; touch-action: none; top: calc(var(--navh, 78px) + 54px); }
+.wallf-tvp.is-drag { cursor: grabbing; }
+.wallf-tworld { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; }
+.wallf-threads { position: absolute; left: 0; top: 0; width: 1px; height: 1px; overflow: visible; pointer-events: none; }
+.wallf-node {
+  position: absolute; width: 330px; padding: 24px 24px 16px; border-radius: 4px;
+  background: linear-gradient(168deg, var(--wf-card), var(--wf-card-2)); color: var(--ink);
+  box-shadow: 0 1px 1px rgba(0,0,0,.3), 0 20px 38px -18px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.16) inset;
+  transition: box-shadow .35s var(--wf-ease), transform .35s var(--wf-ease);
+}
+.wallf-node:hover { transform: translateY(-3px); box-shadow: 0 2px 4px rgba(0,0,0,.3), 0 34px 56px -20px rgba(0,0,0,.78), 0 0 0 1px rgba(255,255,255,.22) inset; z-index: 4; }
+.wallf-node:focus-within { outline: 2px solid var(--gold); outline-offset: 3px; }
+.wallf-node--reply { width: 274px; padding: 18px 20px 13px; background: linear-gradient(168deg, #fdf7f3, #f2eae4); }
+.wallf-node--pending { background: linear-gradient(168deg, #efe7e1, #e3d7cf); }
+.wallf-node__knot { position: absolute; top: -6px; left: 50%; transform: translateX(-50%); width: 11px; height: 11px; border-radius: 50%; background: radial-gradient(circle at 34% 30%, #ffd9e3, var(--gold) 46%, #a84665); box-shadow: 0 0 12px 2px rgba(234,115,147,.5), 0 1px 2px rgba(0,0,0,.4); }
+.wallf-node__body { font-size: 1rem; line-height: 1.58; overflow-wrap: anywhere; margin: 0; }
+.wallf-node--reply .wallf-node__body { font-size: .94rem; color: #4b382f; }
+.wallf-node__foot { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 14px; padding-top: 11px; border-top: 1px solid rgba(59,42,36,.14); }
+.wallf-node__when { font-family: var(--mono); font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-dim); margin-right: auto; }
+.wallf-node__wait { display: inline-block; margin-bottom: 11px; padding: 4px 10px; border-radius: 999px; background: rgba(59,42,36,.1); color: #6b5147; font-family: var(--mono); font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase; }
+.wallf-tworld.is-far .wallf-node__body { opacity: .34; }
+.wallf-tworld.is-far .wallf-node__foot, .wallf-tworld.is-far .wallf-node__wait { opacity: 0; }
+.wallf-tworld.is-far .wallf-node { padding: 16px; }
+
+.wallf-tzoom { position: fixed; right: clamp(16px, 3.4vw, 42px); bottom: clamp(20px, 4vh, 36px); z-index: 8; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+.wallf-thint { margin: 0; font-family: var(--mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: rgba(242,233,230,.34); }
+.wallf-zoomer { display: flex; gap: 2px; padding: 3px; border-radius: 999px; background: rgba(255,255,255,.06); border: 1px solid rgba(242,233,230,.18); }
+.wallf-zoomer button { border: 0; background: none; color: var(--cream-on-dark); font: inherit; font-size: 16px; line-height: 1; width: 32px; height: 30px; border-radius: 999px; cursor: pointer; transition: background .18s; }
+.wallf-zoomer button:hover { background: rgba(255,255,255,.14); }
+.wallf-zoomer button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+@media (max-width: 820px) { .wallf-thint { display: none; } }
+
+/* ---- shared modal ---- */
+.wallf-veil { position: fixed; inset: 0; z-index: 50; background: rgba(8,4,6,.74); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); opacity: 0; pointer-events: none; transition: opacity .4s; }
+.wallf-veil.is-on { opacity: 1; pointer-events: auto; }
+.wallf-sheet {
+  position: fixed; left: 50%; top: 50%; transform: translate(-50%, -46%) scale(.97); z-index: 51;
+  width: min(640px, calc(100vw - 28px)); max-height: calc(100vh - 56px); overflow-y: auto;
+  padding: clamp(24px, 3.4vw, 38px); border-radius: 22px;
+  background: linear-gradient(200deg, rgba(34,21,26,.97), rgba(16,10,13,.98));
+  border: 1px solid rgba(242,233,230,.14); box-shadow: 0 50px 110px -30px rgba(0,0,0,.95);
+  opacity: 0; pointer-events: none; transition: opacity .4s, transform .5s var(--wf-ease);
+}
+.wallf-sheet.is-on { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
+.wallf-sheet h2 { font-size: 1.55rem; letter-spacing: -.028em; margin: 0 0 8px; }
+.wallf-sheet__sub { font-size: .94rem; color: rgba(242,233,230,.62); margin: 0 0 20px; }
+.wallf-sheet textarea { width: 100%; min-height: 170px; resize: vertical; font: inherit; font-size: 1.05rem; line-height: 1.6; color: #fdf6f4; background: rgba(255,255,255,.05); border: 1px solid rgba(242,233,230,.16); border-radius: 14px; padding: 16px 18px; }
+.wallf-sheet textarea::placeholder { color: rgba(242,233,230,.38); }
+.wallf-sheet textarea:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(234,115,147,.2); }
+.wallf-sheet__row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 18px; }
+.wallf-sheet__note { font-size: 12.5px; color: rgba(242,233,230,.55); margin-right: auto; max-width: 30ch; }
+.wallf-sheet__warn { margin-top: 22px; padding-left: 14px; border-left: 2px solid var(--gold); font-size: .87rem; color: rgba(242,233,230,.58); }
+.wallf-sheet__warn strong { color: #ffc9d8; }
+.wallf-sheet ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 11px; font-size: .94rem; color: rgba(242,233,230,.72); }
+.wallf-sheet li strong { color: #fff; }
+.wallf-sheet a { color: #ffc9d8; }
+
+/* the resumed-visit note: quiet, brief, gone for good after one showing */
+.wallf-cue {
+  position: fixed; left: 50%; top: calc(var(--navh, 78px) + 12px); transform: translate(-50%, -8px); z-index: 41;
+  padding: 9px 16px; border-radius: 999px; font-size: 12.5px; color: rgba(242,233,230,.82);
+  background: rgba(20,12,16,.86); border: 1px solid rgba(242,233,230,.16);
+  box-shadow: 0 18px 40px -20px rgba(0,0,0,.9);
+  opacity: 0; pointer-events: none; transition: opacity .5s var(--wf-ease), transform .5s var(--wf-ease);
+  white-space: nowrap; max-width: calc(100vw - 32px); overflow: hidden; text-overflow: ellipsis;
+}
+.wallf-cue.is-on { opacity: 1; transform: translate(-50%, 0); }
+.wallf-cue b { color: #fff; font-weight: 600; }
+
+@media (max-width: 760px) {
+  .wallf-door__in { flex-direction: column; align-items: stretch; }
+  .wallf-door__count { text-align: left; }
+  .wallf-door__or { text-align: left; }
+  .wallf-door__ways { min-width: 0; }
+}
+
+/* ---- accessible mode ----
+   Required, not optional: real students use this toggle. Fonts and rem
+   sizing already inherit the site's [data-a11y] switch for free (this
+   file never sets a local font stack), so what is left is stopping this
+   page's OWN decorative motion -- the breathing lights and swaying thread
+   curves are driven by requestAnimationFrame, not CSS, so the site's
+   blanket `[data-a11y] * { transition: none }` rule cannot reach them.
+   js/wallF.js's reduced() function checks documentElement[data-a11y]
+   directly for exactly this reason. This block only needs to catch the
+   handful of true CSS transitions/animations left. */
+html[data-a11y] .wallf-card,
+html[data-a11y] .wallf-node,
+html[data-a11y] .wallf-slip,
+html[data-a11y] .wallf-compose,
+html[data-a11y] .wallf-way,
+html[data-a11y] .wallf-btn { transition: none !important; }
+html[data-a11y] .wallf-room__grain { display: none; }
+/* The entrance's "read one post" click-through stays -- it is a bonus way
+   in, reachable by mouse, on top of the "Read what they wrote" button that
+   already is fully keyboard- and screen-reader-reachable and leads to the
+   same, fully accessible Everything view. Only the decorative pulsing
+   (js/wallF.js's reduced() already stops it) and this grain texture needed
+   turning off here. */
