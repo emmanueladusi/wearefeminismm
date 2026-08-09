@@ -19,7 +19,7 @@
 
 (function () {
   // ↓↓↓ paste your deployed Apps Script /exec URL here to go live ↓↓↓
-  const DATA_URL = "";
+  const DATA_URL = "https://script.google.com/macros/s/AKfycbxFQPSSLeKquN2o3ETWxLzl9YYAeMJxrv_Sa_KUQSk9J2Ib0IicDC1rpJUhfgCruXBK/exec";
 
   const feedEl = document.getElementById("wallFeed");
   if (!feedEl) return;
