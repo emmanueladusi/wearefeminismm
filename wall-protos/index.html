@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Five walls</title>
+<style>
+:root{
+  --paper:#e2dbd8;--ink:#452f28;--ink-2:#6d564c;--ink-3:#8f7a70;
+  --gold:#ea7393;--gold-ink:#93485d;
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Monaco,monospace;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--sans);background:var(--paper);color:var(--ink);line-height:1.6;
+  padding:clamp(40px,7vw,96px) clamp(20px,6vw,80px) 160px;-webkit-font-smoothing:antialiased}
+.in{max-width:1180px;margin:0 auto}
+.eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-3)}
+h1{margin-top:16px;font-size:clamp(2.2rem,5.4vw,3.8rem);line-height:1.02;letter-spacing:-.035em;max-width:18ch}
+.lead{margin-top:20px;max-width:58ch;color:var(--ink-2);font-size:1.05rem}
+.lead b{color:var(--ink);font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(16px,2vw,24px);margin-top:clamp(16px,2vw,24px)}
+a.card--wide{margin-top:clamp(38px,5vw,62px);box-shadow:0 1px 2px rgba(69,47,40,.1),0 26px 46px -26px rgba(69,47,40,.6),0 0 0 2px var(--gold) inset}
+a.card--wide h2{font-size:1.8rem}
+a.card--wide p{max-width:78ch}
+a.card--wide b{color:var(--ink);font-weight:600}
+.swatch--wide{height:150px;display:flex;gap:10px;padding:12px;background:linear-gradient(168deg,#241813,#120c0d)}
+.sw-f__a,.sw-f__b,.sw-f__c{flex:1;border-radius:8px;position:relative;overflow:hidden}
+.sw-f__a{background:radial-gradient(70% 70% at 34% 34%,rgba(120,81,127,.7),transparent 64%),#0d0812}
+.sw-f__a::after{content:"";position:absolute;inset:0;background:
+  radial-gradient(3px 3px at 30% 42%,#fff,transparent),radial-gradient(2px 2px at 62% 26%,#ffd9e5,transparent),
+  radial-gradient(4px 4px at 72% 66%,#fff,transparent),radial-gradient(2px 2px at 44% 74%,#e9d6f0,transparent)}
+.sw-f__b{background:radial-gradient(110% 70% at 50% -12%,rgba(255,214,190,.28),transparent 62%),#1b1210}
+.sw-f__b::before,.sw-f__b::after{content:"";position:absolute;border-radius:2px;background:linear-gradient(166deg,#f7f2ee,#ddd0c7);box-shadow:0 6px 14px -5px rgba(0,0,0,.8)}
+.sw-f__b::before{left:14%;top:22%;width:32%;height:44%;transform:rotate(-4deg)}
+.sw-f__b::after{right:14%;top:32%;width:30%;height:38%;transform:rotate(5deg)}
+.sw-f__c{background:radial-gradient(90% 80% at 70% 80%,rgba(234,115,147,.24),transparent 64%),#191110}
+.sw-f__c::after{content:"";position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 126'%3E%3Cpath d='M22 44 Q46 66 70 46 T112 42' fill='none' stroke='%23ffa6be' stroke-width='2'/%3E%3Cpath d='M70 54 Q74 78 88 84' fill='none' stroke='%23ffa6be' stroke-width='1.5' opacity='.6'/%3E%3Cg fill='%23f7f2ee'%3E%3Crect x='6' y='26' width='30' height='20' rx='3'/%3E%3Crect x='56' y='28' width='28' height='18' rx='3'/%3E%3Crect x='78' y='82' width='26' height='18' rx='3'/%3E%3C/g%3E%3C/svg%3E") center/cover no-repeat}
+a.card{
+  display:block;text-decoration:none;color:inherit;padding:26px 26px 24px;border-radius:16px;
+  background:#f4efec;box-shadow:0 1px 2px rgba(69,47,40,.1),0 20px 36px -24px rgba(69,47,40,.5);
+  transition:transform .3s var(--ease),box-shadow .3s var(--ease);
+}
+a.card:hover{transform:translateY(-4px);box-shadow:0 2px 4px rgba(69,47,40,.1),0 34px 54px -26px rgba(69,47,40,.6)}
+.swatch{height:104px;border-radius:11px;margin-bottom:18px;position:relative;overflow:hidden}
+.sw-a{background:radial-gradient(120% 80% at 50% -16%,rgba(255,214,190,.4),transparent 62%),linear-gradient(170deg,#2a1d18,#150e0c)}
+.sw-a::after{content:"";position:absolute;left:22%;top:26%;width:34%;height:56%;border-radius:3px;background:linear-gradient(166deg,#f7f2ee,#e6dcd4);transform:rotate(-4deg);box-shadow:0 8px 16px -6px rgba(0,0,0,.7)}
+.sw-a::before{content:"";position:absolute;right:20%;top:32%;width:30%;height:44%;border-radius:3px;background:linear-gradient(166deg,#f2eae3,#ded2c9);transform:rotate(5deg);box-shadow:0 8px 16px -6px rgba(0,0,0,.7)}
+.sw-b{background:radial-gradient(70% 70% at 30% 30%,rgba(120,81,127,.6),transparent 62%),radial-gradient(60% 60% at 76% 70%,rgba(234,115,147,.4),transparent 62%),#0c0712}
+.sw-b::after{content:"";position:absolute;inset:0;background:
+  radial-gradient(3px 3px at 26% 40%,#fff,transparent),radial-gradient(2px 2px at 58% 28%,#ffd9e5,transparent),
+  radial-gradient(4px 4px at 70% 62%,#fff,transparent),radial-gradient(2px 2px at 40% 72%,#e9d6f0,transparent),
+  radial-gradient(2px 2px at 84% 36%,#fff,transparent)}
+.sw-c{background:linear-gradient(172deg,#3a2b25,#241a16);display:flex;align-items:center;justify-content:center}
+.sw-c::after{content:"";width:56%;height:78%;background:#f4efe9;box-shadow:0 10px 22px -8px rgba(0,0,0,.7);
+  background-image:repeating-linear-gradient(to bottom,transparent 0 13px,rgba(59,42,36,.18) 13px 14px);background-position:0 16px;background-repeat:no-repeat;background-size:70% 60%}
+.sw-d{background:radial-gradient(70% 80% at 24% 20%,rgba(234,115,147,.45),transparent 64%),radial-gradient(60% 70% at 80% 82%,rgba(120,81,127,.5),transparent 64%),#140d10;
+  display:flex;align-items:center;justify-content:center;color:#fff;font-size:19px;font-weight:600;letter-spacing:-.03em}
+.sw-e{background:linear-gradient(160deg,#eee7e2,#ded4ce)}
+.sw-e::after{content:"";position:absolute;inset:0;background-repeat:no-repeat;background-size:cover;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 104'%3E%3Cpath d='M46 40 Q86 64 126 44 T206 40' fill='none' stroke='%2393485d' stroke-width='1.6'/%3E%3Cpath d='M126 52 Q134 74 150 78' fill='none' stroke='%2393485d' stroke-width='1.2' opacity='.6'/%3E%3Cg fill='%23fffaf7'%3E%3Crect x='18' y='26' width='56' height='30' rx='5'/%3E%3Crect x='104' y='30' width='52' height='28' rx='5'/%3E%3Crect x='140' y='72' width='46' height='24' rx='5'/%3E%3Crect x='186' y='24' width='54' height='30' rx='5'/%3E%3C/g%3E%3Cg fill='%23ea7393'%3E%3Ccircle cx='46' cy='26' r='2.6'/%3E%3Ccircle cx='130' cy='30' r='2.6'/%3E%3Ccircle cx='163' cy='72' r='2.6'/%3E%3Ccircle cx='213' cy='24' r='2.6'/%3E%3C/g%3E%3C/svg%3E")}
+.n{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-ink)}
+h2{margin-top:9px;font-size:1.4rem;letter-spacing:-.025em}
+.card p{margin-top:10px;color:var(--ink-2);font-size:.95rem}
+.card .risk{margin-top:14px;padding-top:12px;border-top:1px solid rgba(69,47,40,.15);font-size:.84rem;color:var(--ink-3)}
+.card .risk b{color:var(--ink-2);font-weight:600}
+.note{margin-top:clamp(38px,5vw,60px);padding:24px 26px;border-radius:14px;background:rgba(234,115,147,.1);
+  border-left:3px solid var(--gold);max-width:66ch;font-size:.94rem;color:var(--ink-2)}
+.note strong{color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="in">
+  <p class="eyebrow">wearefeminismm &middot; The Wall</p>
+  <h1>Five walls, and one that combines three of them.</h1>
+  <p class="lead">Each one is clickable and running the same eight posts, so you are comparing feel
+    rather than mockups. Write something in any of them and you get the whole life of a post: it
+    lands marked as waiting to be read, an <b>Approve it</b> button lets you play the moderator and
+    watch it join the wall, and answering any post shows you how a thread reads in that design.</p>
+
+  <a class="card card--wide" href="f-combined.html">
+    <div class="swatch swatch--wide sw-f">
+      <span class="sw-f__a"></span><span class="sw-f__b"></span><span class="sw-f__c"></span>
+    </div>
+    <p class="n">F &middot; the one to look at first</p>
+    <h2>Entrance, then Everything or Conversations</h2>
+    <p>B, A and E built as one place instead of three. The <b>field is the entrance</b>: it opens
+      pulled back, so the first thing anybody meets is how many people are already here, and it names
+      the two ways in. Choose one and the lights fly to where the cards are about to be, so arriving
+      is visibly the same posts rearranging rather than a page load. Write in either room and it is in
+      both; approve it in one and the light stops waiting in the other. <b>It remembers the room you
+      were last in</b> and puts you straight back there, so the entrance is an arrival rather than a
+      toll gate; walking deliberately back to it clears that, and <code>?entrance</code> forces the
+      door for a demo.</p>
+    <p class="risk"><b>The entrance was rewritten after it read as confusing from the start.</b> It
+      opened on an abstract line and two abstract buttons, so the first thing anybody had to do was
+      choose between two things neither of which had been explained. It now says what the place is in
+      plain words, shows the count with the line that gives it meaning, and offers <b>a single
+      button</b>. Conversations was cut from the door entirely: it is a choice about arrangement, and
+      nobody can make that before they have read a post. It waits in the labelled toggle at the top of
+      the room you land in, found once there is a reason to want it.</p>
+    <p class="risk"><b>Rebuilt again after the first version was hard to navigate.</b> Three peer modes
+      became one entrance plus a two-way toggle, the view stopped being called <b>the wall</b> inside
+      a page called The Wall, and the scroll wheel now means the same thing everywhere: travel through
+      the posts, with zoom on the pinch gesture and on buttons. The thread also moved to the dark
+      ground, since paper-on-light halfway through broke the idea that you never left the room.</p>
+  </a>
+
+  <div class="grid">
+    <a class="card" href="a-pinwall.html">
+      <div class="swatch sw-a"></div>
+      <p class="n">A</p>
+      <h2>Pin Wall</h2>
+      <p>Takes the name literally. A dark room, one warm light, paper cards pinned at angles with
+        real shadows. Answers are smaller slips tucked underneath. The house rules are a taped index
+        card on the wall instead of a sidebar.</p>
+      <p class="risk"><b>Strongest at:</b> making it feel like a place somebody built. <b>Watch:</b> the
+        craft has to be exact or it reads as a skeuomorphic gimmick.</p>
+    </a>
+
+    <a class="card" href="b-nightfield.html">
+      <div class="swatch sw-b"></div>
+      <p class="n">B</p>
+      <h2>Night Field</h2>
+      <p>Scale as the argument. Every post is a light in a field you drag through, brightness set by
+        how many people found it helpful. It opens pulled back, so the first thing you see is how
+        many people are there.</p>
+      <p class="risk"><b>Strongest at:</b> the you are not the only one feeling, before a word is read.
+        <b>Watch:</b> it is a canvas, so the plain list next to it is load bearing, not a fallback.</p>
+    </a>
+
+    <a class="card" href="c-letters.html">
+      <div class="swatch sw-c"></div>
+      <p class="n">C</p>
+      <h2>Letters</h2>
+      <p>The quietest. One long sheet on a desk, every post set as a letter in a reading face, and
+        every date, count and button pushed out into the margin as an annotation so nothing sits
+        between you and the sentence.</p>
+      <p class="risk"><b>Strongest at:</b> treating what students write as writing. <b>Watch:</b> quiet
+        can read as unfinished if the paper and the margins are not exact.</p>
+    </a>
+
+    <a class="card" href="d-chamber.html">
+      <div class="swatch sw-d">one at a time</div>
+      <p class="n">D</p>
+      <h2>Chamber</h2>
+      <p>Immersion by subtraction. No feed and no scroll: one person's words fill the room at a size
+        you cannot skim, and the way onward does not appear for a second and a half. Answers are a
+        step down, not an indent.</p>
+      <p class="risk"><b>Strongest at:</b> people actually reading each other. <b>Watch:</b> a wall
+        you cannot scan is a wall some people will leave.</p>
+    </a>
+
+    <a class="card" href="e-thread.html">
+      <div class="swatch sw-e"></div>
+      <p class="n">E</p>
+      <h2>Thread</h2>
+      <p>The wall as one continuous thing. Posts hang off a line that zigzags down, answers hang off
+        the post they answer by a thread that sags under its own weight. Pull back and the whole
+        conversation is one woven shape.</p>
+      <p class="risk"><b>Strongest at:</b> showing that nobody here posted into a void. <b>Watch:</b>
+        spatial layouts get crowded fast once there are two hundred posts.</p>
+    </a>
+  </div>
+
+  <p class="note"><strong>What none of them change.</strong> Nothing is public until a person approves
+    it, there is no downvote anywhere, your own post is visible to you while it waits, one report
+    pulls something off immediately, and the identity warning sits next to the box you type in. The
+    private reflection wall on voice.html is still separate and is never migrated into this.<br><br>
+    <strong>The Approve it button is prototype scaffolding.</strong> On the real wall approving is a
+    person typing a word into a spreadsheet, and no visitor can reach it. It is only here so you can
+    see a post land without waiting on a moderator.</p>
+</div>
+<script src="_shared.js"></script>
+</body>
+</html>

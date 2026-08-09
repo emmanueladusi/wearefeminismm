@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Wall C · Letters</title>
+<style>
+/* ============================================================
+   C. LETTERS
+   The quietest of the five, and the one that treats what people
+   write as writing rather than as content. One long sheet of
+   paper on a desk. Every post is a letter set in a reading face
+   at reading size, and every piece of machinery -- the date, the
+   count, the buttons -- is pushed out into the margin as a
+   pencil annotation, so nothing sits between you and the
+   sentence. Answers are letters back, tucked under the one they
+   answer.
+
+   The one deliberate break from the site sheet: a serif for the
+   body. This direction only works if the words look like they
+   were written, not rendered.
+   ============================================================ */
+:root{
+  --paper:#f4efe9; --paper-edge:#e9e0d7;
+  --desk-1:#3a2b25; --desk-2:#241a16;
+  --ink:#3b2a24; --ink-2:#6d564c; --ink-3:#95806f;
+  --gold:#ea7393; --gold-ink:#93485d;
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --serif:ui-serif,Georgia,"Iowan Old Style","Times New Roman",serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Monaco,monospace;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:var(--sans);color:var(--ink);line-height:1.6;
+  background:
+    radial-gradient(120% 80% at 50% -10%, rgba(255,214,190,.10), transparent 60%),
+    linear-gradient(172deg,var(--desk-1),var(--desk-2));
+  background-attachment:fixed;
+  min-height:100vh;-webkit-font-smoothing:antialiased;
+}
+
+/* ---- the sheet ------------------------------------------------------- */
+.sheet{
+  max-width:920px;margin:0 auto;
+  background:var(--paper);
+  background-image:
+    linear-gradient(180deg,rgba(255,255,255,.55),transparent 220px),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23f)' opacity='.22'/%3E%3C/svg%3E");
+  box-shadow:0 0 0 1px rgba(0,0,0,.16), 0 40px 90px -30px rgba(0,0,0,.75);
+  padding:0 clamp(22px,5vw,66px) clamp(90px,10vw,150px);
+  min-height:100vh;
+}
+
+/* ---- masthead, letterhead ------------------------------------------- */
+.head{padding:clamp(56px,9vw,110px) 0 clamp(34px,4vw,52px);border-bottom:1px solid rgba(59,42,36,.16);position:relative}
+.head::after{ /* the second, thinner rule: a letterhead has two */
+  content:"";position:absolute;left:0;right:0;bottom:-5px;height:1px;background:rgba(59,42,36,.10);
+}
+.eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-3);margin-bottom:22px}
+.head h1{
+  font-family:var(--serif);font-weight:400;font-size:clamp(2.3rem,5.4vw,4rem);
+  line-height:1.06;letter-spacing:-.02em;max-width:17ch;
+}
+.head h1 em{font-style:italic;color:var(--gold-ink)}
+.head__lead{
+  margin-top:26px;max-width:50ch;font-size:1.02rem;color:var(--ink-2);
+}
+.head__lead b{color:var(--ink);font-weight:600}
+
+/* ---- writing a letter ----------------------------------------------- */
+.compose{padding:clamp(30px,4vw,46px) 0;border-bottom:1px solid rgba(59,42,36,.14)}
+.compose__open{
+  width:100%;text-align:left;border:0;background:none;cursor:pointer;font:inherit;color:inherit;
+  display:grid;grid-template-columns:var(--margin,130px) 1fr;gap:clamp(14px,2.4vw,32px);align-items:baseline;
+  padding:6px 0;transition:opacity .25s;
+}
+.compose__open:hover{opacity:.62}
+.compose__open .mark{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3)}
+.compose__open .say{font-family:var(--serif);font-size:clamp(1.25rem,2.4vw,1.6rem);line-height:1.35;color:var(--ink)}
+.compose__open .say span{color:var(--ink-3)}
+.compose.is-open .compose__open{display:none}
+.compose__form{display:none}
+.compose.is-open .compose__form{display:grid;grid-template-columns:var(--margin,130px) 1fr;gap:clamp(14px,2.4vw,32px)}
+.compose__side{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);line-height:1.7;padding-top:8px}
+.compose__field{
+  width:100%;border:0;background:none;resize:none;min-height:200px;
+  font-family:var(--serif);font-size:1.32rem;line-height:1.7;color:var(--ink);
+  padding:4px 0;
+}
+.compose__field::placeholder{color:var(--ink-3);font-style:italic}
+.compose__field:focus{outline:none}
+.compose__rule{height:1px;background:rgba(59,42,36,.18);margin:14px 0 16px}
+.compose__row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.compose__note{font-size:12.5px;color:var(--ink-2);margin-right:auto;max-width:34ch}
+.send{
+  border:0;cursor:pointer;font:inherit;font-weight:600;font-size:14px;color:#fff;
+  padding:12px 24px;border-radius:2px;background:var(--gold-ink);
+  transition:background .2s,transform .2s var(--ease);
+}
+.send:hover{background:#7c3a4d;transform:translateY(-1px)}
+.quiet{border:0;background:none;cursor:pointer;font:inherit;font-size:13.5px;color:var(--ink-2);text-decoration:underline;text-underline-offset:3px;padding:8px 2px}
+.quiet:hover{color:var(--ink)}
+.warn{
+  margin-top:22px;padding-left:14px;border-left:2px solid var(--gold);
+  font-size:.88rem;color:var(--ink-2);max-width:56ch;
+}
+
+/* ---- the ledger line ------------------------------------------------- */
+.ledger{
+  display:flex;align-items:baseline;gap:18px;flex-wrap:wrap;
+  padding:clamp(26px,3.4vw,40px) 0 6px;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3);
+}
+.ledger b{font-family:var(--sans);font-size:1rem;letter-spacing:0;text-transform:none;color:var(--ink);font-weight:600}
+.ledger__sorts{margin-left:auto;display:flex;gap:16px}
+.ledger__sorts button{border:0;background:none;cursor:pointer;font:inherit;color:var(--ink-3);padding:2px 0;border-bottom:1px solid transparent}
+.ledger__sorts button.is-on{color:var(--ink);border-bottom-color:var(--gold)}
+
+/* ---- a letter -------------------------------------------------------- */
+.letter{
+  display:grid;grid-template-columns:var(--margin,130px) 1fr;gap:clamp(14px,2.4vw,32px);
+  padding:clamp(34px,4.4vw,58px) 0;border-bottom:1px solid rgba(59,42,36,.13);
+}
+/* the margin: everything that is not the writing lives out here */
+.letter__margin{
+  display:flex;flex-direction:column;gap:9px;align-items:flex-start;
+  font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);
+  padding-top:.55em;
+}
+.letter__body{
+  font-family:var(--serif);font-size:clamp(1.16rem,1.9vw,1.42rem);line-height:1.66;
+  letter-spacing:-.005em;color:var(--ink);overflow-wrap:anywhere;
+  max-width:38ch;
+}
+.letter__acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:22px;margin-left:-10px}
+.act{
+  border:0;background:none;cursor:pointer;font:inherit;font-size:13px;color:var(--ink-2);
+  padding:7px 10px;border-radius:2px;transition:background .18s,color .18s;
+}
+.act:hover{background:rgba(59,42,36,.06);color:var(--ink)}
+.act:focus-visible{outline:2px solid var(--gold-ink);outline-offset:1px}
+.act--yes{color:var(--gold-ink);font-weight:600}
+.act--yes[disabled]{cursor:default;background:rgba(234,115,147,.13)}
+
+/* the helpful count as a pencil tally in the margin */
+.tallynote{display:flex;align-items:center;gap:7px;color:var(--ink-2)}
+.tallynote b{font-family:var(--sans);font-size:1.15rem;letter-spacing:-.02em;color:var(--gold-ink);font-weight:700}
+.pending-note{color:var(--gold-ink);border:1px solid rgba(234,115,147,.5);padding:4px 8px;border-radius:2px}
+
+/* The moderator's own mark, prototype only. On the real wall approving is a
+   person typing a word into a spreadsheet and no visitor can reach it; it is
+   here so a letter can be followed from writing to held to read. */
+.act--mod{color:#7c3a4d;background:rgba(234,115,147,.15);font-weight:600}
+.act--mod:hover{background:rgba(234,115,147,.26);color:#5f2a3a}
+.act--mod em{font-style:normal;font-weight:400;opacity:.65;font-size:11.5px}
+
+/* writing back, under the letter you are answering, on the same sheet */
+.writeback{margin-top:26px;padding-left:clamp(16px,2.4vw,30px);border-left:2px solid rgba(234,115,147,.34);max-width:36ch}
+.writeback textarea{
+  width:100%;border:0;background:none;resize:vertical;min-height:96px;
+  font-family:var(--serif);font-size:1.06rem;line-height:1.62;color:var(--ink);padding:0;
+}
+.writeback textarea::placeholder{color:var(--ink-3);font-style:italic}
+.writeback textarea:focus{outline:none}
+.writeback__row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:12px;padding-top:11px;border-top:1px solid rgba(59,42,36,.16)}
+.writeback__note{font-size:11.5px;color:var(--ink-2);margin-right:auto}
+.send--sm{padding:9px 17px;font-size:13px}
+
+/* answers: letters back, tucked under, held together at the left edge */
+.answers{list-style:none;margin:30px 0 0;padding-left:clamp(16px,2.4vw,30px);border-left:2px solid rgba(234,115,147,.34);display:grid;gap:24px}
+.answers li{max-width:36ch}
+.answers p{font-family:var(--serif);font-size:1.06rem;line-height:1.62;color:#4b382f}
+.answers .m{margin-top:10px;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+
+/* the closing note, the way a letter ends */
+.close{padding:clamp(44px,6vw,80px) 0 0;max-width:52ch}
+.close h2{font-family:var(--serif);font-weight:400;font-size:clamp(1.4rem,2.6vw,1.9rem);line-height:1.25;letter-spacing:-.015em;margin-bottom:18px}
+.close p{color:var(--ink-2);font-size:.98rem;margin-bottom:12px}
+.close strong{color:var(--ink)}
+.close a{color:var(--gold-ink)}
+
+@media (max-width:720px){
+  .letter,.compose__open,.compose.is-open .compose__form{grid-template-columns:1fr;gap:14px}
+  .letter__margin{flex-direction:row;flex-wrap:wrap;align-items:center;gap:14px;padding-top:0}
+  .compose__side{display:none}
+}
+.sr{position:absolute;left:-9999px}
+@keyframes settle{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.letter--new{animation:settle .6s var(--ease) both}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.001ms !important;transition-duration:.001ms !important}}
+</style>
+</head>
+<body>
+
+<div class="sheet">
+  <header class="head">
+    <p class="eyebrow">The Wall &middot; wearefeminismm</p>
+    <h1>Write it to <em>somebody</em>, not into the air.</h1>
+    <p class="head__lead">Anonymous, no account, no name. Say what you have lived through, or write
+      back to somebody who has. <b>Nothing appears here until a person has read it.</b></p>
+  </header>
+
+  <section class="compose" id="compose">
+    <button class="compose__open" type="button" id="composeOpen">
+      <span class="mark">Begin</span>
+      <span class="say">Something that happened. Something you noticed.
+        <span>Something you wish someone had told you.</span></span>
+    </button>
+
+    <form class="compose__form" id="composeForm">
+      <div class="compose__side">
+        Unsigned<br>Held for reading<br>Yours to withdraw
+      </div>
+      <div>
+        <label class="sr" for="composeField">Write something for the wall</label>
+        <textarea class="compose__field" id="composeField" rows="7" maxlength="1200"
+          placeholder="Start anywhere. Nobody is going to know it was you."></textarea>
+        <div class="compose__rule"></div>
+        <div class="compose__row">
+          <p class="compose__note">No name is attached. A person reads it before anybody else does.</p>
+          <button class="quiet" type="button" id="composeCancel">Put it away</button>
+          <button class="send" type="submit">Send it</button>
+        </div>
+        <p class="warn"><strong>Do not write anything that identifies you or anyone else.</strong>
+          No full names, no schools, no handles, no numbers. This page checks and will ask you
+          twice, but it cannot catch everything.</p>
+      </div>
+    </form>
+  </section>
+
+  <div class="ledger">
+    <b id="count">8 letters</b>
+    <span>held on this wall</span>
+    <div class="ledger__sorts">
+      <button type="button" data-sort="new" class="is-on">Newest</button>
+      <button type="button" data-sort="sup">Most answered to</button>
+    </div>
+  </div>
+
+  <main id="letters"></main>
+
+  <section class="close">
+    <h2>How this wall works, in five lines.</h2>
+    <p><strong>A person reads it first.</strong> Your letter waits until it is approved. You can see
+      your own while it waits. Nobody else can.</p>
+    <p><strong>No name, no account.</strong> Nothing here is tied to who you are.</p>
+    <p><strong>There is no way to vote somebody down.</strong> The only mark anybody can leave is
+      that something helped. There is nothing to lose here.</p>
+    <p><strong>Take it back any time.</strong> Your own letters, whenever you want.</p>
+    <p><strong>Report anything cruel.</strong> One report takes a letter off the wall straight away,
+      before anybody reviews it.</p>
+    <p style="margin-top:22px">Want somewhere nobody else can read at all? The
+      <a href="../voice.html#wall">private reflection wall</a> never leaves your device.</p>
+    <p>If things are bad right now: <strong>Kids Help Phone</strong>, text CONNECT to 686868, any
+      hour. Black youth can text RISE to the same number. Or call 988.</p>
+  </section>
+</div>
+
+<script src="_seed.js"></script>
+<script src="_shared.js"></script>
+<script>
+(function(){
+  var wrap = document.getElementById("letters");
+  var countEl = document.getElementById("count");
+  var compose = document.getElementById("compose");
+
+  var posts = WALL_SEED.map(function(p){ return Object.assign({}, p); });
+  var replies = WALL_SEED_REPLIES.map(function(p){ return Object.assign({}, p); });
+  var supported = [];
+  var sort = "new";
+  var newId = null;
+  var replyOpen = null;   // one open reply at a time
+
+  function letterHTML(p){
+    var kids = replies.filter(function(r){ return r.parentId === p.id; });
+    var on = supported.indexOf(p.id) !== -1;
+
+    var margin = p.pending
+      ? '<span class="pending-note">Held for reading</span><span>Only you can see this</span>'
+      : '<span>' + WP.esc(WP.ago(p.ago)) + '</span>' +
+        '<span class="tallynote"><b>' + p.support + '</b> found this<br>helpful</span>' +
+        (kids.length ? '<span>' + kids.length + (kids.length === 1 ? ' answer' : ' answers') + '</span>' : '');
+
+    var acts = p.pending
+      ? '<button class="act act--mod" type="button" data-approve="' + p.id + '">Approve it <em>(you are the moderator)</em></button>' +
+        '<button class="act" type="button" data-remove="' + p.id + '">Take it back</button>'
+      : '<button class="act' + (on ? " act--yes" : "") + '" type="button" data-sup="' + p.id + '"' + (on ? " disabled" : "") + '>' +
+          (on ? "You said this helped" : "This helped me") + "</button>" +
+        '<button class="act" type="button" data-reply="' + p.id + '">Write back</button>' +
+        '<button class="act" type="button" data-report="' + p.id + '">Report</button>';
+
+    var box = replyOpen === p.id
+      ? '<div class="writeback">' +
+          '<label class="sr" for="wb-' + p.id + '">Write back to this letter</label>' +
+          '<textarea id="wb-' + p.id + '" rows="3" maxlength="1200" placeholder="Say something to them."></textarea>' +
+          '<div class="writeback__row">' +
+            '<p class="writeback__note">No name is attached.</p>' +
+            '<button class="quiet" type="button" data-replycancel>Put it away</button>' +
+            '<button class="send send--sm" type="button" data-replysend="' + p.id + '">Send it back</button>' +
+          "</div></div>"
+      : "";
+
+    return '<article class="letter' + (p.id === newId ? " letter--new" : "") + '">' +
+      '<div class="letter__margin">' + margin + '</div>' +
+      '<div>' +
+        '<p class="letter__body">' + WP.esc(p.body).replace(/\n+/g,"<br>") + "</p>" +
+        '<div class="letter__acts">' + acts + "</div>" + box +
+        (kids.length
+          ? '<ul class="answers">' + kids.map(function(k){
+              return "<li><p>" + WP.esc(k.body) + "</p>" +
+                (k.pending
+                  ? '<p class="m" style="color:var(--gold-ink)">Held for reading &middot; only you can see this</p>' +
+                    '<p class="letter__acts" style="margin-top:10px">' +
+                      '<button class="act act--mod" type="button" data-approve="' + k.id + '">Approve it</button>' +
+                      '<button class="act" type="button" data-remove="' + k.id + '">Take it back</button></p>'
+                  : '<p class="m">' + WP.esc(WP.ago(k.ago)) + " &middot; written back</p>") +
+                "</li>";
+            }).join("") + "</ul>"
+          : "") +
+      "</div></article>";
+  }
+
+  function render(){
+    var list = posts.slice();
+    if (sort === "sup") list.sort(function(a,b){ return (b.support||0)-(a.support||0); });
+    else list.sort(function(a,b){ return a.ago-b.ago; });
+    list.sort(function(a,b){ return (b.pending?1:0)-(a.pending?1:0); });
+    wrap.innerHTML = list.map(letterHTML).join("");
+    var n = posts.filter(function(p){ return !p.pending; }).length;
+    countEl.textContent = n === 1 ? "1 letter" : n + " letters";
+    newId = null;
+  }
+
+  document.getElementById("composeOpen").addEventListener("click", function(){
+    compose.classList.add("is-open");
+    document.getElementById("composeField").focus();
+  });
+  document.getElementById("composeCancel").addEventListener("click", function(){
+    compose.classList.remove("is-open");
+  });
+  document.getElementById("composeForm").addEventListener("submit", function(e){
+    e.preventDefault();
+    var f = document.getElementById("composeField");
+    var text = f.value.trim(); if (!text) return;
+    var p = WP.makePost(text);
+    posts.unshift(p); newId = p.id; f.value = "";
+    compose.classList.remove("is-open");
+    render();
+  });
+
+  wrap.addEventListener("click", function(e){
+    var s = e.target.closest("[data-sup]");
+    if (s){
+      var id = s.getAttribute("data-sup");
+      if (supported.indexOf(id) !== -1) return;
+      supported.push(id);
+      var p = posts.find(function(x){ return x.id === id; });
+      if (p) p.support++;
+      render(); return;
+    }
+    /* The moderator's mark, standing in for a person typing "approved" into a
+       spreadsheet: the letter leaves the held pile and joins the sheet. */
+    var ap = e.target.closest("[data-approve]");
+    if (ap){
+      var aid = ap.getAttribute("data-approve");
+      var t = posts.concat(replies).find(function(x){ return x.id === aid; });
+      if (t){ t.pending = false; t.ago = 0; }
+      newId = aid;
+      render(); return;
+    }
+
+    var rm = e.target.closest("[data-remove]") || e.target.closest("[data-report]");
+    if (rm){
+      var rid = rm.getAttribute("data-remove") || rm.getAttribute("data-report");
+      posts = posts.filter(function(x){ return x.id !== rid; });
+      replies = replies.filter(function(x){ return x.id !== rid && x.parentId !== rid; });
+      render(); return;
+    }
+
+    if (e.target.closest("[data-replycancel]")){ replyOpen = null; render(); return; }
+
+    var send = e.target.closest("[data-replysend]");
+    if (send){
+      var target = send.getAttribute("data-replysend");
+      var fa = wrap.querySelector("#wb-" + target);
+      var txt = fa ? fa.value.trim() : "";
+      if (!txt){ if (fa) fa.focus(); return; }
+      replies.push(WP.makePost(txt, target));
+      replyOpen = null;
+      render(); return;
+    }
+
+    var rep = e.target.closest("[data-reply]");
+    if (rep){
+      var rId = rep.getAttribute("data-reply");
+      replyOpen = replyOpen === rId ? null : rId;
+      render();
+      var box = wrap.querySelector("#wb-" + rId);
+      if (box) box.focus();
+    }
+  });
+
+  document.querySelectorAll("[data-sort]").forEach(function(b){
+    b.addEventListener("click", function(){
+      sort = b.getAttribute("data-sort");
+      document.querySelectorAll("[data-sort]").forEach(function(x){ x.classList.toggle("is-on", x === b); });
+      render();
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

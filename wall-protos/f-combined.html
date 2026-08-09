@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Wall F · Field, Wall, Thread</title>
+<style>
+/* ============================================================
+   F. THE COMBINED WALL
+   Night Field as the door, Pin Wall and Thread as the two ways
+   of being inside.
+
+   The idea holding it together: there is ONE set of lights and
+   three ways of arranging them. Scattered, they are a field, and
+   the field says how many people are here before a word is read.
+   Gathered onto a wall, they are cards somebody pinned up.
+   Strung on a line, they are a conversation with its answers
+   visibly tied on. Moving between the three is not a page load,
+   it is the same lights moving, which is why the transition is
+   animated rather than cut.
+
+   One art-direction decision follows from that: THE THREAD IS
+   NOW DARK. It was paper-on-light as a standalone, and switching
+   the lights on halfway through would break the illusion that
+   you never left the room. So all three share one dark ground,
+   and the only lit thing anywhere is what somebody wrote.
+   ============================================================ */
+:root{
+  --gold:#ea7393; --gold-soft:rgba(234,115,147,.16); --gold-ink:#93485d;
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Monaco,monospace;
+  --ease:cubic-bezier(.22,1,.36,1);
+  --card:#f7f2ee; --card-2:#efe6df; --card-ink:#3c2a24; --card-dim:#7d6259;
+  --cream:#f2e9e6; --dim:#c0aca6;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  font-family:var(--sans);color:var(--cream);background:#0d0809;line-height:1.6;
+  -webkit-font-smoothing:antialiased;overflow:hidden;
+}
+body[data-mode="wall"]{overflow-y:auto;overflow-x:hidden}
+.sr{position:absolute;left:-9999px}
+
+/* ---- the room, behind all three arrangements -------------------------
+   This never changes and never reloads. It is the single strongest signal
+   that the field, the wall and the thread are one place. */
+.room{position:fixed;inset:0;z-index:0;pointer-events:none}
+.room__light{
+  position:absolute;inset:0;transition:opacity 1s var(--ease), background 1.2s linear;
+  background:
+    radial-gradient(120% 78% at 50% -16%, rgba(255,214,190,.26) 0%, rgba(255,190,164,.09) 34%, transparent 68%),
+    radial-gradient(72% 54% at 14% 106%, rgba(234,115,147,.14), transparent 62%),
+    radial-gradient(64% 52% at 88% 78%, rgba(120,81,127,.20), transparent 64%),
+    linear-gradient(178deg, #2a1d18 0%, #150e0e 78%);
+}
+body[data-mode="field"] .room__light{
+  background:
+    radial-gradient(84% 62% at 22% 16%, rgba(120,81,127,.34), transparent 62%),
+    radial-gradient(72% 62% at 82% 76%, rgba(234,115,147,.17), transparent 64%),
+    radial-gradient(130% 100% at 50% 50%, #150d1c 0%, #09060c 78%);
+}
+.room__grain{
+  position:absolute;inset:-15%;opacity:.38;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.78' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.room__vig{position:absolute;inset:0;background:radial-gradient(94% 76% at 50% 44%,transparent 44%,rgba(6,3,5,.62) 100%)}
+
+/* ---- chrome ----------------------------------------------------------
+   One bar, always in the same place, so leaving a room never means hunting
+   for the way out. */
+.bar{
+  position:fixed;top:0;left:0;right:0;z-index:12;
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  padding:clamp(14px,2vw,22px) clamp(16px,3.4vw,44px);
+  background:linear-gradient(180deg,rgba(10,6,8,.82),rgba(10,6,8,0));
+  transition:opacity .5s var(--ease);
+}
+.bar__mark{font-family:var(--mono);font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:rgba(242,233,230,.5);white-space:nowrap}
+.bar__spacer{margin-left:auto}
+.btn{
+  border:1px solid rgba(242,233,230,.2);background:rgba(255,255,255,.06);color:var(--cream);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  font:inherit;font-size:12.5px;padding:9px 15px;border-radius:999px;cursor:pointer;white-space:nowrap;
+  transition:background .2s,border-color .2s,transform .2s var(--ease);
+}
+.btn:hover{background:rgba(255,255,255,.14);transform:translateY(-1px)}
+.btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.btn--go{background:var(--gold);border-color:var(--gold);color:#2a1119;font-weight:600}
+.btn--go:hover{background:#f28aa6;border-color:#f28aa6}
+.btn--sm{padding:7px 12px;font-size:12px}
+
+/* the three arrangements, named. This is the navigation of the piece. */
+.modes{display:flex;gap:3px;padding:3px;border-radius:999px;background:rgba(255,255,255,.06);
+  border:1px solid rgba(242,233,230,.14);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.modes button{
+  border:0;background:none;color:rgba(242,233,230,.62);font:inherit;font-size:12.5px;
+  padding:7px 14px;border-radius:999px;cursor:pointer;white-space:nowrap;
+  transition:background .22s,color .22s;
+}
+.modes button:hover{color:var(--cream);background:rgba(255,255,255,.08)}
+.modes button[aria-current="true"]{background:var(--cream);color:#231417;font-weight:600}
+.modes button{display:inline-flex;align-items:center;gap:8px}
+/* A tiny picture of the arrangement, so the label is not the only clue about
+   what you are about to get. */
+.mi{width:17px;height:12px;border-radius:2px;flex:none;position:relative;opacity:.75}
+.modes button[aria-current="true"] .mi{opacity:1}
+.mi--cards::before,.mi--cards::after{content:"";position:absolute;top:0;width:7px;height:12px;border-radius:1.5px;background:currentColor}
+.mi--cards::before{left:0;transform:rotate(-6deg)}
+.mi--cards::after{right:0;transform:rotate(6deg)}
+.mi--line::before{content:"";position:absolute;inset:0;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 17 12'%3E%3Cpath d='M1 4 Q5 9 9 4.5 T16 3' fill='none' stroke='%23000' stroke-width='1.4'/%3E%3Crect x='6' y='7' width='6' height='4' rx='1'/%3E%3C/svg%3E") center/contain no-repeat;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 17 12'%3E%3Cpath d='M1 4 Q5 9 9 4.5 T16 3' fill='none' stroke='%23000' stroke-width='1.4'/%3E%3Crect x='6' y='7' width='6' height='4' rx='1'/%3E%3C/svg%3E") center/contain no-repeat;
+  background:currentColor}
+/* the entrance is a door behind you, so it only exists once you are inside */
+body[data-mode="field"] .modes,
+body[data-mode="field"] .btn--back{opacity:0;pointer-events:none;transition:opacity .4s}
+/* the entrance prints the wordmark above its own headline, so the bar's copy
+   of it is the same words twice on one screen */
+body[data-mode="field"] .bar__mark{opacity:0;transition:opacity .4s}
+.btn--back{transition:opacity .4s,background .2s,transform .2s var(--ease)}
+
+/* ---- the field -------------------------------------------------------- */
+.field{position:fixed;inset:0;z-index:2;transition:opacity .55s var(--ease)}
+.field canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab;touch-action:none}
+.field canvas.is-drag{cursor:grabbing}
+.field canvas.is-over{cursor:pointer}
+body:not([data-mode="field"]) .field{pointer-events:none}
+
+/* The door. Everything the entry has to say: what this is, how many people
+   are already here, and the two ways in. */
+.door{
+  position:fixed;left:0;right:0;bottom:0;z-index:6;pointer-events:none;
+  padding:clamp(40px,8vh,90px) clamp(20px,5vw,72px) clamp(84px,11vh,124px);
+  transition:opacity .5s var(--ease), transform .6s var(--ease);
+}
+/* A light drifting behind the headline must not cost anybody the sentence. */
+.door::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:linear-gradient(0deg,rgba(8,5,10,.86) 0%,rgba(8,5,10,.66) 44%,transparent 100%)}
+body:not([data-mode="field"]) .door{opacity:0;transform:translateY(24px);pointer-events:none}
+.door__in{max-width:1320px;margin:0 auto;display:flex;align-items:flex-end;justify-content:space-between;gap:34px;flex-wrap:wrap}
+/* The measure belongs on the headline, not on this wrapper. ch resolves
+   against the font-size of the element it is written on, so 24ch here was
+   24 characters of the wrapper's 16px body text: a 242px column with a 59px
+   headline trying to wrap inside it. */
+.door__say{pointer-events:auto;flex:1 1 380px;min-width:0}
+.door__eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:rgba(242,233,230,.5);margin-bottom:14px}
+/* Smaller than it was. This headline is now a sentence doing a job rather
+   than a title being impressive, and it has to fit on two lines. */
+.door h1{
+  font-size:clamp(1.75rem,3.3vw,2.65rem);line-height:1.14;letter-spacing:-.03em;font-weight:700;max-width:21ch;
+  background:linear-gradient(168deg,#fff 0%,#f7ebeb 66%,#dcc6ca 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.door__lead{margin-top:15px;font-size:1rem;color:rgba(242,233,230,.76);max-width:36ch}
+.door__lead b{color:#fff;font-weight:600}
+.door__ways{display:flex;flex-direction:column;gap:10px;pointer-events:auto;min-width:min(360px,100%)}
+/* The number and the line that makes it mean something. Stacked, not a flex
+   row: a row has to bottom-align a 3.6rem numeral against a sentence that
+   rewraps at every width, and it loses that fight somewhere every time. */
+.door__count{text-align:right;margin-bottom:14px}
+.door__count b{display:block;font-size:clamp(2.4rem,5vw,3.6rem);line-height:1;letter-spacing:-.04em;font-weight:700;color:#fff}
+.door__count span{display:block;margin-top:4px;font-size:.9rem;line-height:1.45;color:rgba(242,233,230,.68)}
+.way{
+  display:flex;align-items:center;gap:16px;text-align:left;width:100%;
+  border:1px solid rgba(242,233,230,.18);background:rgba(255,255,255,.055);color:var(--cream);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  font:inherit;padding:15px 18px;border-radius:16px;cursor:pointer;
+  transition:background .25s,border-color .25s,transform .25s var(--ease);
+}
+.way:hover{background:rgba(255,255,255,.12);border-color:rgba(242,233,230,.34);transform:translateY(-2px)}
+.way:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+/* One obvious way in, with the other underneath it. Two equal doors is a
+   decision you are made to take before anything has been explained.
+   These rules must sit AFTER .way: same specificity, so source order decides. */
+/* Now that it is the only one, it can carry full weight instead of merely
+   outranking a sibling. */
+.way--first{
+  background:var(--gold);border-color:var(--gold);color:#2a1119;
+  padding:18px 20px;box-shadow:0 14px 34px -14px rgba(234,115,147,.8);
+}
+.way--first:hover{background:#f28aa6;border-color:#f28aa6}
+.way--first .way__ico{background:rgba(0,0,0,.16)}
+.way--first .way__txt b{font-size:1.1rem}
+.way--first .way__txt span{color:rgba(42,17,25,.72)}
+.way--first .way__go{opacity:.72}
+.way__ico{flex:none;width:44px;height:34px;border-radius:6px;position:relative;overflow:hidden;background:rgba(0,0,0,.3)}
+.way__ico--wall::before,.way__ico--wall::after{content:"";position:absolute;border-radius:1.5px;background:linear-gradient(166deg,#f7f2ee,#ddd0c7)}
+.way__ico--wall::before{left:5px;top:7px;width:15px;height:19px;transform:rotate(-5deg)}
+.way__ico--wall::after{right:5px;top:9px;width:15px;height:16px;transform:rotate(4deg)}
+.way__ico--thread::before{content:"";position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 34'%3E%3Cpath d='M6 12 Q16 22 26 13 T40 11' fill='none' stroke='%23ea7393' stroke-width='1.4'/%3E%3Cpath d='M26 15 Q28 24 34 26' fill='none' stroke='%23ea7393' stroke-width='1' opacity='.6'/%3E%3Cg fill='%23f7f2ee'%3E%3Crect x='2' y='6' width='10' height='8' rx='1.5'/%3E%3Crect x='21' y='7' width='9' height='7' rx='1.5'/%3E%3Crect x='30' y='24' width='9' height='7' rx='1.5'/%3E%3C/g%3E%3C/svg%3E") center/contain no-repeat}
+.way__txt b{display:block;font-size:1.02rem;font-weight:600;letter-spacing:-.012em}
+.way__txt span{display:block;font-size:.85rem;color:rgba(242,233,230,.6);margin-top:2px}
+.way__go{margin-left:auto;opacity:.5;font-size:1.1rem}
+.door__or{font-size:12.5px;color:rgba(242,233,230,.5);text-align:right;margin-top:4px}
+
+/* hover label over a light */
+.tip{
+  position:fixed;z-index:9;pointer-events:none;max-width:290px;
+  padding:12px 15px;border-radius:12px;font-size:.9rem;line-height:1.5;
+  background:rgba(17,10,14,.92);border:1px solid rgba(242,233,230,.16);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  box-shadow:0 20px 46px -18px rgba(0,0,0,.9);
+  opacity:0;transform:translateY(6px);transition:opacity .18s,transform .18s var(--ease);
+}
+.tip.is-on{opacity:1;transform:translateY(0)}
+.tip em{display:block;margin-top:7px;font-style:normal;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(242,233,230,.45)}
+
+/* ---- the reading panel, used by the field ----------------------------- */
+.panel{
+  position:fixed;top:0;right:0;bottom:0;width:min(500px,100%);z-index:14;
+  background:linear-gradient(200deg,rgba(26,16,20,.95),rgba(13,8,11,.97));
+  border-left:1px solid rgba(242,233,230,.13);
+  backdrop-filter:blur(26px);-webkit-backdrop-filter:blur(26px);
+  box-shadow:-40px 0 90px -30px rgba(0,0,0,.9);
+  transform:translateX(100%);transition:transform .5s var(--ease);
+  display:flex;flex-direction:column;
+}
+.panel.is-on{transform:none}
+.panel__head{display:flex;align-items:center;gap:14px;padding:22px clamp(20px,3vw,32px) 0}
+.panel__kind{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(242,233,230,.45);margin-right:auto}
+.panel__x{border:0;background:rgba(255,255,255,.07);color:var(--cream);width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:16px;line-height:1}
+.panel__x:hover{background:rgba(255,255,255,.16)}
+.panel__body{padding:20px clamp(20px,3vw,32px) 30px;overflow-y:auto;flex:1}
+.panel__text{font-size:1.22rem;line-height:1.56;letter-spacing:-.012em;color:#fdf6f4;overflow-wrap:anywhere}
+.panel__meta{margin-top:18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(242,233,230,.42)}
+.panel__acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px;padding-top:20px;border-top:1px solid rgba(242,233,230,.12)}
+.panel h3{margin:30px 0 13px;font-size:11px;font-family:var(--mono);letter-spacing:.18em;text-transform:uppercase;color:rgba(242,233,230,.45);font-weight:400}
+.panel .reply{padding:16px 18px;border-radius:14px;background:rgba(255,255,255,.05);
+  border:1px solid rgba(242,233,230,.09);margin-bottom:10px;font-size:.98rem;color:#eee2e0}
+.panel .reply span{display:block;margin-top:9px;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(242,233,230,.4)}
+.panel__wait{display:inline-block;margin-bottom:14px;padding:6px 12px;border-radius:999px;
+  background:var(--gold-soft);color:#f6b8c9;
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase}
+.answerbox{margin-top:18px;padding:16px 17px;border-radius:14px;background:rgba(255,255,255,.055);border:1px solid rgba(242,233,230,.13)}
+.answerbox textarea{width:100%;min-height:88px;resize:vertical;font:inherit;font-size:1rem;line-height:1.55;color:#fdf6f4;background:none;border:0;padding:0}
+.answerbox textarea::placeholder{color:rgba(242,233,230,.36)}
+.answerbox textarea:focus{outline:none}
+.answerbox__row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px;padding-top:11px;border-top:1px solid rgba(242,233,230,.12)}
+.answerbox__note{font-size:11.5px;color:rgba(242,233,230,.5);margin-right:auto}
+
+/* The moderator's own pass. PROTOTYPE ONLY: on the real wall approving is a
+   person typing a word into a spreadsheet, and no visitor can reach it. */
+.btn--mod{background:rgba(234,115,147,.2);border-color:rgba(234,115,147,.55);color:#ffc9d8;font-weight:600}
+.btn--mod:hover{background:rgba(234,115,147,.32)}
+.btn--mod small{font-weight:400;opacity:.62;font-size:11px;margin-left:3px}
+
+/* ---- rooms: the wall and the thread ----------------------------------- */
+.room-view{position:relative;z-index:2;opacity:0;pointer-events:none;transition:opacity .5s var(--ease)}
+.room-view.is-on{opacity:1;pointer-events:auto}
+
+/* ---- the wall --------------------------------------------------------- */
+.wall{padding:calc(clamp(14px,2vw,22px) + 74px) clamp(20px,5vw,72px) 180px;max-width:1360px;margin:0 auto}
+body:not([data-mode="wall"]) #viewWall{display:none}
+.tally{
+  display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:24px;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:rgba(242,233,230,.5);
+}
+.tally b{font-family:var(--sans);font-size:2rem;letter-spacing:-.03em;color:#fff;font-weight:700}
+.sort{margin-left:auto;background:rgba(255,255,255,.07);border:1px solid rgba(242,233,230,.22);
+  color:var(--cream);font:inherit;font-size:12px;padding:8px 12px;border-radius:999px;cursor:pointer}
+.cards{display:flex;align-items:flex-start;gap:clamp(18px,2.2vw,32px)}
+.col{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:clamp(20px,2.4vw,34px)}
+
+.card{
+  width:100%;position:relative;padding:30px 26px 18px;border-radius:3px;
+  background:linear-gradient(168deg,var(--card) 0%,var(--card-2) 100%);color:var(--card-ink);
+  box-shadow:0 1px 1px rgba(0,0,0,.30), 0 16px 30px -14px rgba(0,0,0,.62), 0 0 0 1px rgba(255,255,255,.18) inset;
+  transform:rotate(var(--tilt,0deg));
+  transition:transform .5s var(--ease), box-shadow .5s var(--ease);
+}
+.card::after{content:"";position:absolute;inset:0;border-radius:3px;pointer-events:none;opacity:.28;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23p)' opacity='.5'/%3E%3C/svg%3E")}
+.card:hover,.card:focus-within{
+  transform:rotate(calc(var(--tilt,0deg) * .35)) translateY(-5px) scale(1.012);
+  box-shadow:0 2px 2px rgba(0,0,0,.26), 0 34px 56px -20px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.24) inset;
+  z-index:3;
+}
+.card__pin{position:absolute;top:11px;left:50%;transform:translateX(-50%);width:13px;height:13px;border-radius:50%;
+  background:radial-gradient(circle at 34% 30%, #ffd9e3 0%, var(--gold) 46%, #a84665 100%);
+  box-shadow:0 2px 4px rgba(0,0,0,.42), 0 0 0 1.5px rgba(255,255,255,.5) inset}
+.card__body{font-size:1.05rem;line-height:1.62;overflow-wrap:anywhere}
+/* Four actions and a timestamp is a lot for a 330px card, so the row is
+   tightened rather than allowed to wrap into a second line of buttons. */
+.card__foot{display:flex;align-items:center;gap:2px;flex-wrap:wrap;margin-top:17px;padding-top:12px;border-top:1px dashed rgba(69,47,40,.24)}
+.card__when{font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--card-dim);margin-right:auto;padding-right:6px}
+.card--pending{background:linear-gradient(168deg,#efe7e1,#e3d7cf);box-shadow:0 1px 1px rgba(0,0,0,.22),0 10px 22px -14px rgba(0,0,0,.5)}
+.card--pending .card__pin{background:radial-gradient(circle at 34% 30%,#efe3dd,#a2887d)}
+.card__wait{display:inline-block;margin-bottom:12px;padding:5px 11px;border-radius:999px;background:rgba(69,47,40,.10);color:#6b5147;
+  font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase}
+
+/* actions that sit ON paper, so they take the paper's ink */
+.pact{border:0;background:none;cursor:pointer;font:inherit;font-size:12.5px;color:var(--card-dim);
+  padding:5px 8px;border-radius:999px;transition:background .18s,color .18s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.pact:hover{background:rgba(69,47,40,.075);color:var(--card-ink)}
+.pact:focus-visible{outline:2px solid var(--gold-ink);outline-offset:1px}
+.pact--sup.is-on{color:var(--gold-ink);font-weight:600}
+.pact--mod{color:#7a3a4c;background:rgba(234,115,147,.16);font-weight:600;box-shadow:0 0 0 1px rgba(234,115,147,.4) inset}
+.pact--mod:hover{background:rgba(234,115,147,.28);color:#5f2a3a}
+.pact__n{font-variant-numeric:tabular-nums}
+
+.slips{list-style:none;margin:16px -6px 0;display:grid;gap:9px}
+.slip{background:linear-gradient(170deg,#fdf9f6,#f0e7e0);border-radius:2px;padding:15px 17px;font-size:.94rem;color:#4a352e;
+  transform:rotate(var(--tilt,0deg));box-shadow:0 1px 1px rgba(0,0,0,.16), 0 8px 16px -9px rgba(0,0,0,.5)}
+.slip--pending{background:linear-gradient(170deg,#f0e8e2,#e2d7cf)}
+.slip__when{display:block;margin-top:8px;font-family:var(--mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:#8a6d63}
+.slip__acts{display:flex;gap:4px;flex-wrap:wrap;margin-top:9px;margin-left:-9px}
+
+.replybox{margin-top:16px;padding:16px 17px 14px;border-radius:2px;background:linear-gradient(170deg,#fdf9f6,#efe6df);
+  box-shadow:0 1px 1px rgba(0,0,0,.16),0 8px 16px -9px rgba(0,0,0,.5)}
+.replybox textarea{width:100%;border:0;background:none;resize:vertical;font:inherit;font-size:.96rem;line-height:1.6;color:var(--card-ink);min-height:74px}
+.replybox textarea::placeholder{color:#9c837a}
+.replybox textarea:focus{outline:none}
+.replybox__row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px;padding-top:9px;border-top:1px dashed rgba(69,47,40,.24)}
+.replybox__note{font-size:11.5px;color:var(--card-dim);margin-right:auto}
+.pin-btn{border:0;cursor:pointer;font:inherit;font-weight:600;font-size:13px;padding:9px 16px;border-radius:999px;
+  background:var(--gold);color:#3a2119;box-shadow:0 4px 12px -3px rgba(234,115,147,.7);transition:transform .22s var(--ease)}
+.pin-btn:hover{transform:translateY(-2px)}
+
+/* the blank card: the wall's own way in, kept because writing ON the card is
+   most of why this arrangement feels like a place */
+.compose{width:100%;position:relative;border-radius:3px;padding:30px 26px 22px;
+  background:linear-gradient(168deg,rgba(255,247,242,.10),rgba(255,240,232,.045));
+  border:1.5px dashed rgba(255,225,213,.38);transform:rotate(-.7deg);
+  transition:border-color .35s,background .35s,transform .5s var(--ease)}
+.compose:hover{border-color:rgba(255,225,213,.62);transform:rotate(-.25deg)}
+.compose.is-open{background:linear-gradient(168deg,var(--card),var(--card-2));border:0;color:var(--card-ink);transform:rotate(-.4deg);
+  box-shadow:0 1px 1px rgba(0,0,0,.30),0 24px 44px -16px rgba(0,0,0,.66),0 0 0 1px rgba(255,255,255,.2) inset}
+.compose__prompt{display:flex;flex-direction:column;gap:8px;align-items:flex-start;border:0;background:none;font:inherit;color:inherit;cursor:pointer;text-align:left;width:100%}
+.compose__prompt b{font-size:1.2rem;font-weight:600;letter-spacing:-.01em;color:#fff2ec}
+.compose__prompt span{font-size:.9rem;color:rgba(242,233,230,.66)}
+.compose.is-open .compose__prompt{display:none}
+.compose__form{display:none}
+.compose.is-open .compose__form{display:block}
+.compose__field{width:100%;border:0;background:none;resize:none;font:inherit;font-size:1.05rem;line-height:1.62;color:var(--card-ink);min-height:148px;
+  background-image:repeating-linear-gradient(to bottom,transparent 0,transparent calc(1.62em - 1px),rgba(69,47,40,.12) calc(1.62em - 1px),rgba(69,47,40,.12) 1.62em)}
+.compose__field::placeholder{color:#9c837a}
+.compose__field:focus{outline:none}
+.compose__row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:16px;padding-top:14px;border-top:1px dashed rgba(69,47,40,.24)}
+.compose__note{font-size:12.5px;color:var(--card-dim);margin-right:auto;max-width:26ch}
+.ghost{border:0;background:none;cursor:pointer;font:inherit;font-size:13px;color:var(--card-dim);padding:8px 4px}
+.ghost:hover{color:var(--card-ink)}
+
+.rules-card{width:100%;position:relative;padding:28px 26px 24px;border-radius:2px;
+  background:linear-gradient(168deg,#f3ece6,#e6dbd2);color:var(--card-ink);transform:rotate(1.1deg);
+  box-shadow:0 1px 1px rgba(0,0,0,.26),0 14px 26px -14px rgba(0,0,0,.6)}
+.rules-card::before,.rules-card::after{content:"";position:absolute;top:-11px;width:74px;height:24px;
+  background:linear-gradient(180deg,rgba(255,255,255,.42),rgba(226,215,205,.34));box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.rules-card::before{left:-14px;transform:rotate(-24deg)}
+.rules-card::after{right:-14px;transform:rotate(22deg)}
+.rules-card h2{font-size:1.05rem;font-weight:700;margin-bottom:14px}
+.rules-card ul{list-style:none;display:grid;gap:11px;font-size:.93rem;color:#5a423a}
+.rules-card li strong{color:var(--card-ink)}
+.rules-card__warn{margin-top:16px;padding-left:12px;border-left:3px solid var(--gold);font-size:.9rem;color:#5a423a}
+.rules-card__help{margin-top:14px;padding-top:12px;border-top:1px solid rgba(69,47,40,.16);font-size:.88rem;color:#5a423a}
+.rules-card a{color:var(--gold-ink)}
+
+/* ---- the thread ------------------------------------------------------- */
+body:not([data-mode="thread"]) #viewThread{display:none}
+.tviewport{position:fixed;inset:0;overflow:hidden;cursor:grab;touch-action:none}
+.tviewport.is-drag{cursor:grabbing}
+.tworld{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
+.tthreads{position:absolute;left:0;top:0;width:1px;height:1px;overflow:visible;pointer-events:none}
+.node{
+  position:absolute;width:330px;padding:24px 24px 16px;border-radius:4px;
+  background:linear-gradient(168deg,var(--card),var(--card-2));color:var(--card-ink);
+  box-shadow:0 1px 1px rgba(0,0,0,.3), 0 20px 38px -18px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.16) inset;
+  transition:box-shadow .35s var(--ease), transform .35s var(--ease);
+}
+.node:hover{transform:translateY(-3px);box-shadow:0 2px 4px rgba(0,0,0,.3), 0 34px 56px -20px rgba(0,0,0,.78), 0 0 0 1px rgba(255,255,255,.22) inset;z-index:4}
+.node:focus-within{outline:2px solid var(--gold);outline-offset:3px}
+.node--reply{width:274px;padding:18px 20px 13px;background:linear-gradient(168deg,#fdf7f3,#f2eae4)}
+.node--pending{background:linear-gradient(168deg,#efe7e1,#e3d7cf)}
+.node__knot{position:absolute;top:-6px;left:50%;transform:translateX(-50%);width:11px;height:11px;border-radius:50%;
+  background:radial-gradient(circle at 34% 30%,#ffd9e3,var(--gold) 46%,#a84665);
+  box-shadow:0 0 12px 2px rgba(234,115,147,.5), 0 1px 2px rgba(0,0,0,.4)}
+.node__body{font-size:1rem;line-height:1.58;overflow-wrap:anywhere}
+.node--reply .node__body{font-size:.94rem;color:#4b382f}
+.node__foot{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:14px;padding-top:11px;border-top:1px solid rgba(59,42,36,.14)}
+.node__when{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--card-dim);margin-right:auto}
+.node__wait{display:inline-block;margin-bottom:11px;padding:4px 10px;border-radius:999px;background:rgba(59,42,36,.1);color:#6b5147;
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase}
+.tworld.is-far .node__body{opacity:.34}
+.tworld.is-far .node__foot,.tworld.is-far .node__wait{opacity:0}
+.tworld.is-far .node{padding:16px}
+.tzoom{position:fixed;left:clamp(16px,3.4vw,42px);bottom:clamp(74px,9vh,96px);z-index:8;
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.thint{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(242,233,230,.34);margin:0}
+/* the resumed-visit note: quiet, brief, and gone for good after one showing */
+.cue{
+  position:fixed;left:50%;top:calc(clamp(14px,2vw,22px) + 58px);transform:translate(-50%,-8px);z-index:11;
+  padding:9px 16px;border-radius:999px;font-size:12.5px;color:rgba(242,233,230,.82);
+  background:rgba(20,12,16,.86);border:1px solid rgba(242,233,230,.16);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  box-shadow:0 18px 40px -20px rgba(0,0,0,.9);
+  opacity:0;pointer-events:none;transition:opacity .5s var(--ease),transform .5s var(--ease);
+  white-space:nowrap;max-width:calc(100vw - 32px);overflow:hidden;text-overflow:ellipsis;
+}
+.cue.is-on{opacity:1;transform:translate(-50%,0)}
+.cue b{color:#fff;font-weight:600}
+.zoomer{display:flex;gap:2px;padding:3px;border-radius:999px;background:rgba(255,255,255,.06);
+  border:1px solid rgba(242,233,230,.18);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.zoomer button{border:0;background:none;color:var(--cream);font:inherit;font-size:16px;line-height:1;
+  width:32px;height:30px;border-radius:999px;cursor:pointer;transition:background .18s}
+.zoomer button:hover{background:rgba(255,255,255,.14)}
+.zoomer button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+@media (max-width:820px){.thint{display:none}}
+
+/* ---- shared modal ----------------------------------------------------- */
+.veil{position:fixed;inset:0;z-index:20;background:rgba(8,4,6,.74);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  opacity:0;pointer-events:none;transition:opacity .4s}
+.veil.is-on{opacity:1;pointer-events:auto}
+.sheet{
+  position:fixed;left:50%;top:50%;transform:translate(-50%,-46%) scale(.97);z-index:21;
+  width:min(640px,calc(100vw - 28px));max-height:calc(100vh - 56px);overflow-y:auto;
+  padding:clamp(24px,3.4vw,38px);border-radius:22px;
+  background:linear-gradient(200deg,rgba(34,21,26,.97),rgba(16,10,13,.98));
+  border:1px solid rgba(242,233,230,.14);box-shadow:0 50px 110px -30px rgba(0,0,0,.95);
+  opacity:0;pointer-events:none;transition:opacity .4s,transform .5s var(--ease);
+}
+.sheet.is-on{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+.sheet h2{font-size:1.55rem;letter-spacing:-.028em;font-weight:700;margin-bottom:8px}
+.sheet .sub{font-size:.94rem;color:rgba(242,233,230,.62);margin-bottom:20px}
+.sheet textarea{width:100%;min-height:170px;resize:vertical;font:inherit;font-size:1.05rem;line-height:1.6;color:#fdf6f4;
+  background:rgba(255,255,255,.05);border:1px solid rgba(242,233,230,.16);border-radius:14px;padding:16px 18px}
+.sheet textarea::placeholder{color:rgba(242,233,230,.38)}
+.sheet textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(234,115,147,.2)}
+.sheet__row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:18px}
+.sheet__note{font-size:12.5px;color:rgba(242,233,230,.55);margin-right:auto;max-width:30ch}
+.sheet__warn{margin-top:22px;padding-left:14px;border-left:2px solid var(--gold);font-size:.87rem;color:rgba(242,233,230,.58)}
+.sheet__warn strong{color:#ffc9d8}
+.sheet ul{list-style:none;display:grid;gap:11px;font-size:.94rem;color:rgba(242,233,230,.72)}
+.sheet li strong{color:#fff}
+.sheet a{color:#ffc9d8}
+
+@media (max-width:760px){
+  .door__in{flex-direction:column;align-items:stretch}
+  .door__count{justify-content:flex-start;text-align:left}
+  .door__or{text-align:left}
+  .door__ways{min-width:0}
+  .bar__mark{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms !important;transition-duration:.001ms !important}
+  .card,.slip,.compose,.rules-card{transform:none !important}
+}
+</style>
+</head>
+<body data-mode="field">
+<script>
+/* Read and stamped here, at the top of the body, rather than with the rest of
+   the script at the bottom: by the time the bottom runs the browser may
+   already have painted, and a returning reader would watch the entrance flash
+   past on the way to the room they were in. ?entrance forces the door back,
+   which is how the entrance gets demonstrated once it is being skipped. */
+(function(){
+  try{
+    if (/(^|[?&#])entrance\b/.test(location.search + location.hash)) return;
+    var r = localStorage.getItem("wf-wall-room");
+    if (r === "wall" || r === "thread"){
+      window.__WALL_RESUME = r;
+      document.body.setAttribute("data-mode", r);
+    }
+  }catch(e){}
+})();
+</script>
+
+<div class="room" aria-hidden="true">
+  <div class="room__light"></div><div class="room__grain"></div><div class="room__vig"></div>
+</div>
+
+<!-- one bar, always in the same place -->
+<div class="bar">
+  <span class="bar__mark">The Wall &middot; wearefeminismm</span>
+  <button class="btn btn--back" type="button" id="btnBack">&#8592; Entrance</button>
+  <!-- Two ways to read, not three places to be. The entrance is a door you
+       came through, so it is a way back, not a third peer in this switcher:
+       three choices is a menu you have to weigh, two is a toggle you flip. -->
+  <nav class="modes" id="modes" aria-label="Two ways to read the wall">
+    <button type="button" data-mode="wall"><i class="mi mi--cards" aria-hidden="true"></i>Everything</button>
+    <button type="button" data-mode="thread"><i class="mi mi--line" aria-hidden="true"></i>Conversations</button>
+  </nav>
+  <span class="bar__spacer"></span>
+  <button class="btn" type="button" id="btnRules">How this works</button>
+  <button class="btn btn--go" type="button" id="btnWrite">Say something</button>
+</div>
+
+<!-- ===== the field: the door ===== -->
+<div class="field" id="viewField">
+  <canvas id="fieldCanvas" aria-label="A field of lights, one for each post. Choose the wall or the thread to read them as text."></canvas>
+</div>
+
+<div class="door" id="door">
+  <div class="door__in">
+    <!-- The entrance's first job is to say what this place IS, in words a
+         fourteen year old reads once. It used to open on an abstract line and
+         two abstract buttons, so the first thing anybody had to do was choose
+         between two things neither of which had been explained. Now it states
+         the thing, shows the scale, and offers one obvious way in with the
+         second underneath it. The poetry did not go: it is attached to the
+         number now, where it means something. -->
+    <div class="door__say">
+      <p class="door__eyebrow">The Wall &middot; wearefeminismm</p>
+      <h1>Write down what happened. Read what happened to everyone else.</h1>
+      <p class="door__lead">Anonymous. No account, no name, nothing tied to you.
+        <b>A person reads everything before it appears here.</b></p>
+    </div>
+    <div class="door__ways">
+      <p class="door__count"><b id="doorCount">8</b>
+        <span>people have written something so far.<br>Not one of them is the only one.</span></p>
+      <!-- One button. The second door asked people to pick an arrangement
+           before they had read a single post, which is a choice you can only
+           make once you know what is inside. Conversations is still there,
+           labelled, in the toggle at the top of the room you land in: found
+           after you have a reason to want it, rather than before. -->
+      <button class="way way--first" type="button" data-go="wall">
+        <span class="way__ico way__ico--wall" aria-hidden="true"></span>
+        <span class="way__txt"><b>Read what they wrote</b><span>All of it, newest first</span></span>
+        <span class="way__go" aria-hidden="true">&#8594;</span>
+      </button>
+      <p class="door__or">Each light out there is one of them. Click one to read just that.</p>
+    </div>
+  </div>
+</div>
+
+<div class="tip" id="tip" aria-hidden="true"></div>
+
+<aside class="panel" id="panel" aria-label="Reading a post" aria-hidden="true">
+  <div class="panel__head">
+    <span class="panel__kind" id="panelKind">On the wall</span>
+    <button class="panel__x" type="button" id="panelX" aria-label="Close">&#10005;</button>
+  </div>
+  <div class="panel__body" id="panelBody"></div>
+</aside>
+
+<!-- ===== the wall ===== -->
+<div class="room-view" id="viewWall">
+  <main class="wall">
+    <div class="tally">
+      <b id="wallCount">8</b> <span>cards on the wall</span>
+      <label class="sr" for="sort">Sort</label>
+      <select class="sort" id="sort">
+        <option value="new">Newest first</option>
+        <option value="sup">Most helpful first</option>
+      </select>
+    </div>
+    <div class="cards" id="cards"></div>
+  </main>
+</div>
+
+<!-- ===== the thread ===== -->
+<div class="room-view" id="viewThread">
+  <div class="tviewport" id="tvp">
+    <div class="tworld" id="tworld"><svg class="tthreads" id="tthreads" aria-hidden="true"></svg></div>
+  </div>
+  <!-- Zoom moved out of the wheel and onto buttons, where it is visible and
+       cannot surprise anybody who only meant to scroll. -->
+  <div class="tzoom">
+    <div class="zoomer">
+      <button type="button" id="zOut" aria-label="Zoom out">&minus;</button>
+      <button type="button" id="zIn" aria-label="Zoom in">+</button>
+    </div>
+    <button class="btn" type="button" id="btnFit">See the whole line</button>
+    <p class="thint">Scroll to travel along it &middot; drag to move freely</p>
+  </div>
+</div>
+
+<!-- ===== shared modals ===== -->
+<div class="veil" id="veil"></div>
+
+<div class="sheet" id="write" role="dialog" aria-modal="true" aria-labelledby="writeH">
+  <h2 id="writeH">Say something.</h2>
+  <p class="sub" id="writeSub">Something that happened. Something you noticed. Something you wish someone had told you.</p>
+  <label class="sr" for="writeField">Write something for the wall</label>
+  <textarea id="writeField" rows="6" maxlength="1200" placeholder="Start anywhere. No name is attached."></textarea>
+  <div class="sheet__row">
+    <p class="sheet__note">A person reads it before anybody else does. You can take it down later.</p>
+    <button class="btn" type="button" data-close>Not now</button>
+    <button class="btn btn--go" type="button" id="writeSend">Send it</button>
+  </div>
+  <p class="sheet__warn"><strong>Do not write anything that identifies you or anyone else.</strong>
+    No full names, no schools, no handles, no numbers. This page checks and will ask you twice,
+    but it cannot catch everything.</p>
+</div>
+
+<div class="sheet" id="rules" role="dialog" aria-modal="true" aria-labelledby="rulesH">
+  <h2 id="rulesH">How this wall works</h2>
+  <ul>
+    <li><strong>A person reads it first.</strong> Your post waits until it is approved. You can see your own while it waits. Nobody else can.</li>
+    <li><strong>No name, no account.</strong> Nothing here is tied to who you are.</li>
+    <li><strong>No downvotes.</strong> Helpful is the only number in this room. There is nothing to lose here.</li>
+    <li><strong>Take it down any time.</strong> Your own posts, whenever you want.</li>
+    <li><strong>Report anything cruel.</strong> One report takes a post out of the room straight away.</li>
+  </ul>
+  <p class="sheet__warn"><strong>Do not write anything that identifies you or anyone else.</strong> No full names, no schools, no handles, no numbers.</p>
+  <p style="margin-top:16px;font-size:.92rem;color:rgba(242,233,230,.62)">Want somewhere nobody else can read at all? The <a href="../voice.html#wall">private reflection wall</a> never leaves your device.</p>
+  <p style="margin-top:10px;font-size:.92rem;color:rgba(242,233,230,.62)">If things are bad right now: <strong>Kids Help Phone</strong>, text CONNECT to 686868, any hour. Black youth can text RISE to the same number. Or call 988.</p>
+  <p style="margin-top:20px"><button class="btn" type="button" data-close>Back to the room</button></p>
+</div>
+
+<p class="sr" id="live" role="status" aria-live="polite"></p>
+
+<script src="_seed.js"></script>
+<script src="_shared.js"></script>
+<script>
+(function(){
+  /* ==================================================================
+     ONE STATE, THREE ARRANGEMENTS
+     Every view reads the same two arrays and calls the same four verbs
+     (submit, approve, support, drop). Nothing is duplicated per view
+     except the drawing, which is the only thing that should differ.
+     ================================================================== */
+  var posts = WALL_SEED.map(function(p){ return Object.assign({}, p); });
+  var replies = WALL_SEED_REPLIES.map(function(p){ return Object.assign({}, p); });
+  var supported = [];
+  var mode = "field";
+  var openId = null, answerFor = null, replyOpenId = null, replyTo = null;
+
+  var kidsOf = function(id){ return replies.filter(function(r){ return r.parentId === id; }); };
+  var find = function(id){ return posts.concat(replies).find(function(x){ return x.id === id; }); };
+  var publicCount = function(){ return posts.filter(function(p){ return !p.pending; }).length; };
+  var tilt = function(id, spread){ return ((WP.seedRand(id) - .5) * (spread || 2.6)).toFixed(2) + "deg"; };
+
+  /* ---------------------------- the verbs --------------------------- */
+  function submit(text, parentId){
+    var p = WP.makePost(text, parentId);
+    if (parentId) replies.push(p); else posts.unshift(p);
+    refreshAll();
+    say("Sent. It waits until a person has read it.");
+    return p;
+  }
+  /* Standing in for a person typing "approved" into a spreadsheet. This
+     button exists ONLY in the prototype; the real wall has no such path. */
+  function approve(id){
+    var t = find(id);
+    if (t){ t.pending = false; t.ago = 0; }
+    refreshAll();
+    say("Approved. It is on the wall now.");
+  }
+  function support(id){
+    if (supported.indexOf(id) !== -1) return;
+    supported.push(id);
+    var t = find(id); if (t) t.support = (t.support || 0) + 1;
+    refreshAll();
+  }
+  function drop(id){
+    posts = posts.filter(function(x){ return x.id !== id; });
+    replies = replies.filter(function(x){ return x.id !== id && x.parentId !== id; });
+    if (openId === id) closePanel();
+    refreshAll();
+  }
+  function say(msg){ document.getElementById("live").textContent = msg; }
+
+  function refreshAll(){
+    document.getElementById("doorCount").textContent = publicCount();
+    document.getElementById("wallCount").textContent = publicCount();
+    layoutField(); renderWall(); layoutThread();
+    if (mode === "thread") renderThread();   // only measurable while it is on screen
+    if (openId && document.getElementById("panel").classList.contains("is-on")) openPanel(openId);
+  }
+
+  /* ==================================================================
+     THE FIELD
+     ================================================================== */
+  var cv = document.getElementById("fieldCanvas");
+  var ctx = cv.getContext("2d");
+  var tip = document.getElementById("tip");
+  var lights = [];
+  var cam = { x:0, y:0, s:1, tx:0, ty:0, ts:1 };
+  var W = 0, H = 0, dpr = 1, t = 0, hover = null, dragging = false, moved = 0;
+  var morphing = false;   // true while the lights are in flight between arrangements
+
+  function vw(){ return window.innerWidth || document.documentElement.clientWidth || 1280; }
+  function vh(){ return window.innerHeight || document.documentElement.clientHeight || 800; }
+
+  function resize(){
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = cv.clientWidth || vw(); H = cv.clientHeight || vh();
+    cv.width = W * dpr; cv.height = H * dpr;
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+
+  /* Phyllotaxis, not random scatter: eight random points clump, and a clump
+     reads as a mistake. The spiral spaces them evenly at 8 posts or 800. */
+  function layoutField(){
+    var keep = {};
+    lights.forEach(function(l){ keep[l.post.id] = l; });
+    lights = [];
+    var GOLD = 2.39996323;
+    posts.forEach(function(p, i){
+      var a = i * GOLD, r = 168 * Math.sqrt(i + .6);
+      var l = keep[p.id] || { x:0, y:0 };
+      l.post = p;
+      l.fx = Math.cos(a)*r + (WP.seedRand(p.id + "x") - .5) * 66;
+      l.fy = Math.sin(a)*r*.74 + (WP.seedRand(p.id + "y") - .5) * 66;
+      l.ph = WP.seedRand(p.id + "p") * 6.28;
+      l.kids = kidsOf(p.id);
+      if (!keep[p.id]) { l.x = l.fx; l.y = l.fy; }
+      lights.push(l);
+      l.kids.forEach(function(k, j){
+        var ka = WP.seedRand(k.id) * 6.28 + j * 1.9, kr = 62 + WP.seedRand(k.id + "r") * 26;
+        var kl = keep[k.id] || { x:0, y:0 };
+        kl.post = k; kl.parent = l; kl.small = true; kl.kids = [];
+        kl.fx = l.fx + Math.cos(ka)*kr; kl.fy = l.fy + Math.sin(ka)*kr*.8;
+        kl.ph = WP.seedRand(k.id + "p") * 6.28;
+        if (!keep[k.id]) { kl.x = kl.fx; kl.y = kl.fy; }
+        lights.push(kl);
+      });
+    });
+  }
+
+  // brightness is helpfulness: the wall lights itself and nobody dims anybody
+  function radius(l){
+    if (l.post.pending) return 5.5;
+    if (l.small) return 3.4;
+    return 4.6 + Math.min(9, Math.sqrt(l.post.support || 0) * 1.7);
+  }
+  function toScreen(l){ return { x:(l.x - cam.x) * cam.s + W/2, y:(l.y - cam.y) * cam.s + H/2 }; }
+  function toWorld(sx, sy){ return { x:(sx - W/2)/cam.s + cam.x, y:(sy - H/2)/cam.s + cam.y }; }
+
+  function drawField(){
+    ctx.clearRect(0,0,W,H);
+    if (!WP.reduced()) t += .009;
+
+    ctx.lineWidth = 1;
+    lights.forEach(function(l){
+      if (!l.parent) return;
+      var a = toScreen(l.parent), b = toScreen(l);
+      var g = ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+      g.addColorStop(0,"rgba(234,115,147,.30)");
+      g.addColorStop(1,"rgba(234,115,147,.04)");
+      ctx.strokeStyle = g;
+      ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+    });
+
+    lights.forEach(function(l){
+      var p = toScreen(l);
+      if (p.x < -160 || p.x > W+160 || p.y < -160 || p.y > H+160) return;
+      var breathe = 1 + Math.sin(t * 1.4 + l.ph) * .07;
+      var r = radius(l) * cam.s * breathe;
+      var isHover = hover === l, warm = l.post.pending;
+      var R = r * 5.2;
+      var core = warm ? "234,115,147" : (l.small ? "205,175,225" : "255,236,246");
+      var glow = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,R);
+      glow.addColorStop(0,"rgba(" + core + "," + (isHover ? .52 : .30) + ")");
+      glow.addColorStop(.34,"rgba(" + core + ",.075)");
+      glow.addColorStop(1,"rgba(" + core + ",0)");
+      ctx.fillStyle = glow;
+      ctx.beginPath(); ctx.arc(p.x,p.y,R,0,6.283); ctx.fill();
+
+      ctx.fillStyle = warm ? "rgba(255,206,222,.95)" : "rgba(255,252,255," + (isHover ? 1 : .92) + ")";
+      ctx.beginPath(); ctx.arc(p.x,p.y,Math.max(1.2,r*.5),0,6.283); ctx.fill();
+
+      if (warm){
+        ctx.strokeStyle = "rgba(234,115,147," + (.42 + Math.sin(t*2.2)*.24) + ")";
+        ctx.lineWidth = 1.4;
+        ctx.beginPath(); ctx.arc(p.x,p.y,r*2.6,0,6.283); ctx.stroke();
+      }
+      if (isHover){
+        ctx.strokeStyle = "rgba(255,255,255,.5)"; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.arc(p.x,p.y,r*2.9,0,6.283); ctx.stroke();
+      }
+    });
+  }
+
+  function hitTest(mx,my){
+    var best = null, bestD = 30;
+    lights.forEach(function(l){
+      var p = toScreen(l);
+      var d = Math.hypot(p.x-mx, p.y-my) - radius(l)*cam.s;
+      if (d < bestD){ bestD = d; best = l; }
+    });
+    return best;
+  }
+
+  cv.addEventListener("pointermove", function(e){
+    if (mode !== "field") return;
+    if (dragging){
+      moved += Math.abs(e.movementX) + Math.abs(e.movementY);
+      cam.tx -= e.movementX / cam.s; cam.ty -= e.movementY / cam.s;
+      cam.x = cam.tx; cam.y = cam.ty;
+      return;
+    }
+    var l = hitTest(e.clientX, e.clientY);
+    hover = l;
+    cv.classList.toggle("is-over", !!l);
+    if (l){
+      var txt = l.post.body;
+      tip.innerHTML = WP.esc(txt.length > 130 ? txt.slice(0,130) + "…" : txt) +
+        "<em>" + (l.post.pending ? "waiting to be read"
+          : (l.small ? "an answer" : l.post.support + " found this helpful")) + " &middot; click to read</em>";
+      tip.classList.add("is-on");
+      tip.style.left = Math.min(e.clientX + 18, vw() - 312) + "px";
+      tip.style.top = Math.min(e.clientY + 18, vh() - 140) + "px";
+    } else tip.classList.remove("is-on");
+  });
+  cv.addEventListener("pointerdown", function(e){
+    if (mode !== "field") return;
+    dragging = true; moved = 0; cv.setPointerCapture(e.pointerId); cv.classList.add("is-drag");
+  });
+  cv.addEventListener("pointerup", function(e){
+    if (mode !== "field") return;
+    dragging = false; cv.classList.remove("is-drag");
+    if (moved < 5){ var l = hitTest(e.clientX,e.clientY); if (l) openPanel(l.post.id); }
+  });
+  /* Same rule as the thread: a plain wheel moves you through the lights, and
+     zoom is the pinch gesture the OS already sends as ctrl+wheel. */
+  cv.addEventListener("wheel", function(e){
+    if (mode !== "field") return;
+    e.preventDefault();
+    if (e.ctrlKey || e.metaKey){
+      cam.ts = Math.max(.34, Math.min(2.4, cam.ts * (e.deltaY > 0 ? .92 : 1.09)));
+      return;
+    }
+    cam.tx += (Math.abs(e.deltaX) < 1 ? 0 : e.deltaX) / cam.s;
+    cam.ty += e.deltaY / cam.s;
+    cam.x = cam.tx; cam.y = cam.ty;
+  }, {passive:false});
+
+  /* ==================================================================
+     THE MORPH
+     The whole argument of this design is that the field, the wall and the
+     thread are the same lights arranged differently. If moving between
+     them were a page load, that argument would be a caption instead of
+     something you can see. So the lights fly to roughly where the cards
+     are about to be, and hand over mid-flight.
+     ================================================================== */
+  function wallTargets(){
+    // roughly where the columns will put things, in screen space
+    var n = colCount(), gut = Math.min(72, vw() * .05);
+    var colW = (vw() - gut*2) / n;
+    var out = {}, i = 0;
+    posts.forEach(function(p){
+      var c = (i + 1) % n, row = Math.floor((i + 1) / n);
+      out[p.id] = { x: gut + colW * (c + .5), y: 210 + row * 230 };
+      kidsOf(p.id).forEach(function(k, j){
+        out[k.id] = { x: gut + colW * (c + .5) + 24, y: 210 + row * 230 + 110 + j * 26 };
+      });
+      i++;
+    });
+    return out;
+  }
+  function threadTargets(){
+    var out = {}, n = Math.max(posts.length, 2);
+    var span = vw() - 200;
+    posts.forEach(function(p, i){
+      var x = 100 + (span * i) / (n - 1);
+      var y = vh()/2 + Math.sin(i * .85) * Math.min(150, vh() * .2);
+      out[p.id] = { x:x, y:y };
+      kidsOf(p.id).forEach(function(k, j){
+        out[k.id] = { x:x + 30, y:y + 120 + j * 60 };
+      });
+    });
+    return out;
+  }
+
+  function goTo(next){
+    if (next === mode || morphing) return;
+    var panelWasOpen = document.getElementById("panel").classList.contains("is-on");
+    if (panelWasOpen) closePanel();
+    tip.classList.remove("is-on"); hover = null;
+
+    document.querySelectorAll("#modes button").forEach(function(b){
+      b.setAttribute("aria-current", b.getAttribute("data-mode") === next ? "true" : "false");
+    });
+
+    if (WP.reduced()){ land(next); return; }
+
+    if (next === "field"){
+      // the room empties, then the lights come back to their own arrangement
+      setRoom(null);
+      lights.forEach(function(l){ l.tx = l.fx; l.ty = l.fy; });
+      mode = "field"; document.body.setAttribute("data-mode","field");
+      morphing = true;
+      document.getElementById("viewField").style.opacity = "1";
+      setTimeout(function(){ morphing = false; }, 700);
+      // this path returns before land(), so the memory is cleared by hand here
+      remember(null);
+      say("Back at the entrance.");
+      return;
+    }
+
+    /* Room to room is a lateral move, not an arrival, so it does NOT get the
+       light flight. Half a second of unreadable lights every time somebody
+       flips the toggle is the difference between a switch and a journey, and
+       only one of those is something you want to do twice. */
+    if (mode !== "field"){
+      setRoom(null);
+      morphing = true;
+      setTimeout(function(){ land(next); morphing = false; }, 200);
+      return;
+    }
+
+    // the entrance -> a room: fly the lights to where the cards are about to be
+    setRoom(null);
+    var targets = next === "wall" ? wallTargets() : threadTargets();
+    lights.forEach(function(l){
+      var s = targets[l.post.id];
+      if (!s) return;
+      var w = toWorld(s.x, s.y);
+      l.tx = w.x; l.ty = w.y;
+    });
+    morphing = true;
+    document.getElementById("viewField").style.opacity = "1";
+    setTimeout(function(){ document.getElementById("viewField").style.opacity = "0"; }, 340);
+    setTimeout(function(){ land(next); morphing = false; }, 560);
+  }
+
+  function land(next){
+    mode = next;
+    document.body.setAttribute("data-mode", next);
+    document.querySelectorAll("#modes button").forEach(function(b){
+      b.setAttribute("aria-current", b.getAttribute("data-mode") === next ? "true" : "false");
+    });
+    setRoom(next === "wall" ? "viewWall" : next === "thread" ? "viewThread" : null);
+    document.getElementById("viewField").style.opacity = next === "field" ? "1" : "0";
+    if (next === "wall"){ window.scrollTo(0,0); say("The wall. Every post, pinned up."); }
+    /* Land readable, not fitted. Fitting the whole ribbon puts eight posts
+       across at about a fifth scale, which is a diagram of a conversation
+       rather than a conversation. The field already made the scale argument;
+       this room's job is the words. "See the whole line" is one click away. */
+    if (next === "thread"){
+      /* Re-render now that the room is actually on screen. A hidden element
+         measures 0, so every card built while the thread was display:none
+         reported no height and every thread was drawn leaving the wrong
+         point. Heights have to be taken when there are heights to take. */
+      renderThread();
+      var first = laid[0];
+      if (first) tCenterOn(first.x + first.w/2, first.y + 140, .92);
+      say("The thread. Every answer tied to what it answers.");
+    }
+    if (next === "field"){ lights.forEach(function(l){ l.tx = l.fx; l.ty = l.fy; }); say("The entrance."); }
+    remember(next === "field" ? null : next);
+  }
+
+  /* ---- remembering the room ---------------------------------------------
+     The entrance is worth passing through once. Passing through it every
+     visit turns an arrival into a toll gate, so a returning reader is put
+     straight back where they were.
+
+     Deliberately walking BACK to the entrance clears the memory. If you went
+     to the trouble of returning to the door and stopping there, the door is
+     where you meant to be, and the next visit should open on it.
+
+     Only the name of a room is ever stored. Nothing anybody wrote goes into
+     storage, which matters on a page whose whole promise is that it keeps no
+     account of you. Private-mode browsers throw on write, so every call is
+     wrapped: forgetting is an acceptable outcome here, breaking is not. */
+  var ROOM_KEY = "wf-wall-room";
+  function remember(room){
+    try { room ? localStorage.setItem(ROOM_KEY, room) : localStorage.removeItem(ROOM_KEY); }
+    catch (e) {}
+  }
+  function setRoom(id){
+    ["viewWall","viewThread"].forEach(function(v){
+      document.getElementById(v).classList.toggle("is-on", v === id);
+    });
+  }
+
+  document.getElementById("modes").addEventListener("click", function(e){
+    var b = e.target.closest("[data-mode]"); if (b) goTo(b.getAttribute("data-mode"));
+  });
+  document.getElementById("btnBack").addEventListener("click", function(){ goTo("field"); });
+  document.getElementById("door").addEventListener("click", function(e){
+    var b = e.target.closest("[data-go]"); if (b) goTo(b.getAttribute("data-go"));
+  });
+
+  /* ==================================================================
+     THE PANEL (the field's way of reading one post)
+     ================================================================== */
+  var panel = document.getElementById("panel"), panelBody = document.getElementById("panelBody");
+  function openPanel(id){
+    var p = find(id); if (!p) return closePanel();
+    openId = id;
+    var kids = kidsOf(id), on = supported.indexOf(id) !== -1, isReply = !!p.parentId;
+    document.getElementById("panelKind").textContent =
+      p.pending ? "Yours, waiting" : (isReply ? "An answer" : "On the wall");
+    panelBody.innerHTML =
+      (p.pending ? '<span class="panel__wait">Waiting to be read &middot; only you can see this</span>' : "") +
+      '<p class="panel__text">' + WP.esc(p.body).replace(/\n+/g,"<br>") + "</p>" +
+      '<p class="panel__meta"><span>' + WP.esc(WP.ago(p.ago)) + "</span>" +
+        (p.pending ? "" : "<span>&middot;</span><span>" + (p.support||0) + " found this helpful</span>") + "</p>" +
+      '<div class="panel__acts">' +
+        (p.pending
+          ? '<button class="btn btn--mod" type="button" data-approve="' + id + '">Approve it<small>you are the moderator</small></button>' +
+            '<button class="btn" type="button" data-drop="' + id + '">Take it down</button>'
+          : '<button class="btn' + (on ? "" : " btn--go") + '" type="button" data-sup="' + id + '"' + (on ? " disabled" : "") + '>' +
+              (on ? "Marked helpful" : "This helped") + "</button>" +
+            (isReply ? "" : '<button class="btn" type="button" id="answerBtn">Answer this</button>') +
+            '<button class="btn" type="button" data-drop="' + id + '">Report</button>') +
+      "</div>" +
+      (answerFor === id
+        ? '<div class="answerbox">' +
+            '<label class="sr" for="answerField">Write an answer</label>' +
+            '<textarea id="answerField" rows="3" maxlength="1200" placeholder="Say something to them."></textarea>' +
+            '<div class="answerbox__row"><p class="answerbox__note">No name is attached.</p>' +
+            '<button class="btn btn--sm" type="button" id="answerCancel">Cancel</button>' +
+            '<button class="btn btn--go btn--sm" type="button" id="answerSend">Send the answer</button></div></div>'
+        : "") +
+      (kids.length
+        ? "<h3>" + kids.length + (kids.length === 1 ? " answer" : " answers") + "</h3>" +
+          kids.map(function(k){
+            return '<div class="reply">' + WP.esc(k.body) +
+              "<span>" + (k.pending ? "waiting to be read &middot; only you can see this" : WP.esc(WP.ago(k.ago))) + "</span>" +
+              (k.pending
+                ? '<p style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">' +
+                  '<button class="btn btn--mod btn--sm" type="button" data-approve="' + k.id + '">Approve it</button>' +
+                  '<button class="btn btn--sm" type="button" data-drop="' + k.id + '">Take it down</button></p>'
+                : "") + "</div>";
+          }).join("")
+        : "");
+    panel.classList.add("is-on"); panel.setAttribute("aria-hidden","false");
+    var l = lights.find(function(x){ return x.post.id === id; });
+    if (l && mode === "field"){
+      cam.tx = l.x + (220 / cam.ts); cam.ty = l.y;
+      cam.ts = Math.max(cam.ts, 1.15);
+    }
+  }
+  function closePanel(){
+    openId = null; answerFor = null;
+    panel.classList.remove("is-on"); panel.setAttribute("aria-hidden","true");
+  }
+  document.getElementById("panelX").addEventListener("click", closePanel);
+
+  panelBody.addEventListener("click", function(e){
+    var el;
+    if ((el = e.target.closest("[data-sup]"))) { support(el.getAttribute("data-sup")); return; }
+    if ((el = e.target.closest("[data-approve]"))) {
+      var aid = el.getAttribute("data-approve"), a = find(aid);
+      var back = a && a.parentId ? a.parentId : aid;
+      approve(aid); openPanel(back); return;
+    }
+    if ((el = e.target.closest("[data-drop]"))) {
+      var did = el.getAttribute("data-drop"), d = find(did);
+      var parent = d && d.parentId ? d.parentId : null;
+      drop(did); if (parent) openPanel(parent);
+      return;
+    }
+    if (e.target.id === "answerBtn"){ answerFor = openId; openPanel(openId); document.getElementById("answerField").focus(); return; }
+    if (e.target.id === "answerCancel"){ answerFor = null; openPanel(openId); return; }
+    if (e.target.id === "answerSend"){
+      var f = document.getElementById("answerField"), txt = f ? f.value.trim() : "";
+      if (!txt){ if (f) f.focus(); return; }
+      var parentId = answerFor; answerFor = null;
+      submit(txt, parentId); openPanel(parentId);
+    }
+  });
+
+  /* ==================================================================
+     THE WALL
+     ================================================================== */
+  var cardsEl = document.getElementById("cards");
+  var sortEl = document.getElementById("sort");
+
+  /* A width of 0 is a real reading: a frame laid out before it has a size.
+     Falling through to one column would deal every card into a single strip
+     and leave it there. Assume wide, let the first resize correct it. */
+  function colCount(){
+    var w = vw();
+    return w >= 1080 ? 3 : (w >= 680 ? 2 : 1);
+  }
+
+  function slipHTML(r){
+    if (r.pending){
+      return '<li class="slip slip--pending" style="--tilt:' + tilt(r.id,1.4) + '">' +
+        WP.esc(r.body).replace(/\n+/g,"<br>") +
+        '<span class="slip__when">Waiting to be read &middot; only you can see this</span>' +
+        '<div class="slip__acts">' +
+          '<button class="pact pact--mod" type="button" data-approve="' + r.id + '">Approve it</button>' +
+          '<button class="pact" type="button" data-drop="' + r.id + '">Take it down</button></div></li>';
+    }
+    return '<li class="slip" style="--tilt:' + tilt(r.id,1.4) + '">' +
+      WP.esc(r.body).replace(/\n+/g,"<br>") +
+      '<span class="slip__when">' + WP.esc(WP.ago(r.ago)) + ' &middot; a reply</span></li>';
+  }
+
+  function cardHTML(p){
+    var kids = kidsOf(p.id), on = supported.indexOf(p.id) !== -1;
+    if (p.pending){
+      return '<article class="card card--pending" style="--tilt:' + tilt(p.id) + '">' +
+        '<span class="card__pin"></span>' +
+        '<span class="card__wait">Waiting to be read &middot; only you can see this</span>' +
+        '<p class="card__body">' + WP.esc(p.body).replace(/\n+/g,"<br>") + "</p>" +
+        '<div class="card__foot"><span class="card__when">just now</span>' +
+        '<button class="pact pact--mod" type="button" data-approve="' + p.id + '">Approve it</button>' +
+        '<button class="pact" type="button" data-drop="' + p.id + '">Take it down</button></div></article>';
+    }
+    var box = replyOpenId === p.id
+      ? '<div class="replybox">' +
+          '<label class="sr" for="rb-' + p.id + '">Write an answer</label>' +
+          '<textarea id="rb-' + p.id + '" rows="3" maxlength="1200" placeholder="Say something to them."></textarea>' +
+          '<div class="replybox__row"><p class="replybox__note">No name is attached.</p>' +
+          '<button class="ghost" type="button" data-replycancel>Cancel</button>' +
+          '<button class="pin-btn" type="button" data-replysend="' + p.id + '">Pin the answer</button></div></div>'
+      : "";
+    return '<article class="card" style="--tilt:' + tilt(p.id) + '">' +
+      '<span class="card__pin"></span>' +
+      '<p class="card__body">' + WP.esc(p.body).replace(/\n+/g,"<br>") + "</p>" +
+      '<div class="card__foot">' +
+        '<span class="card__when">' + WP.esc(WP.ago(p.ago)) + "</span>" +
+        '<button class="pact pact--sup' + (on ? " is-on" : "") + '" type="button" data-sup="' + p.id + '"' + (on ? " disabled" : "") + '>' +
+          '<span aria-hidden="true">&#9825;</span><span class="pact__n">' + (p.support||0) + "</span>" +
+          '<span class="sr">people found this helpful. Mark as helpful</span></button>' +
+        '<button class="pact" type="button" data-reply="' + p.id + '">Answer' + (kids.length ? ' <span class="pact__n">' + kids.length + "</span>" : "") + "</button>" +
+        '<button class="pact" type="button" data-drop="' + p.id + '">Report</button>' +
+      "</div>" + box +
+      (kids.length ? '<ul class="slips">' + kids.map(slipHTML).join("") + "</ul>" : "") +
+    "</article>";
+  }
+
+  function composeCard(){
+    return '<div class="compose" id="compose">' +
+      '<button class="compose__prompt" type="button" id="composeOpen">' +
+        "<b>Take a blank card</b>" +
+        "<span>Something that happened. Something you noticed. Something you wish someone had told you.</span>" +
+      "</button>" +
+      '<form class="compose__form" id="composeForm">' +
+        '<label class="sr" for="composeField">Write something for the wall</label>' +
+        '<textarea class="compose__field" id="composeField" rows="6" maxlength="1200" placeholder="Start anywhere."></textarea>' +
+        '<div class="compose__row"><p class="compose__note">No name is attached. You can take it down later.</p>' +
+        '<button class="ghost" type="button" id="composeCancel">Put it back</button>' +
+        '<button class="pin-btn" type="submit">Pin it up</button></div>' +
+      "</form></div>";
+  }
+
+  function rulesCard(){
+    return '<aside class="rules-card"><h2>How this wall works</h2><ul>' +
+      "<li><strong>A person reads it first.</strong> Your card waits until it is approved. You can see your own while it waits. Nobody else can.</li>" +
+      "<li><strong>No name, no account.</strong> Nothing here is tied to who you are.</li>" +
+      "<li><strong>No downvotes.</strong> Helpful is the only number on this wall.</li>" +
+      "<li><strong>Take it down any time.</strong> Your own cards, whenever you want.</li>" +
+      "<li><strong>Report anything cruel.</strong> One report takes a card off the wall straight away.</li>" +
+      '</ul><p class="rules-card__warn"><strong>Do not write anything that identifies you or anyone else.</strong> ' +
+      "No full names, no schools, no handles, no numbers.</p>" +
+      '<p class="rules-card__help">If things are bad right now: <strong>Kids Help Phone</strong>, text CONNECT to 686868, any hour. ' +
+      "Black youth can text RISE to the same number. Or call 988.</p></aside>";
+  }
+
+  function renderWall(){
+    var list = posts.slice();
+    if (sortEl.value === "sup") list.sort(function(a,b){ return (b.support||0)-(a.support||0); });
+    else list.sort(function(a,b){ return a.ago - b.ago; });
+    list.sort(function(a,b){ return (b.pending?1:0)-(a.pending?1:0); });
+
+    var items = [composeCard()].concat(list.map(cardHTML)).concat([rulesCard()]);
+    var n = colCount(), cols = [];
+    for (var c = 0; c < n; c++) cols.push([]);
+    items.forEach(function(html, k){ cols[k % n].push(html); });   // dealt, not stacked
+    cardsEl.innerHTML = cols.map(function(col){ return '<div class="col">' + col.join("") + "</div>"; }).join("");
+    wireCompose();
+  }
+
+  function wireCompose(){
+    var compose = document.getElementById("compose");
+    if (!compose) return;
+    document.getElementById("composeOpen").addEventListener("click", function(){
+      compose.classList.add("is-open"); document.getElementById("composeField").focus();
+    });
+    document.getElementById("composeCancel").addEventListener("click", function(){ compose.classList.remove("is-open"); });
+    document.getElementById("composeForm").addEventListener("submit", function(e){
+      e.preventDefault();
+      var f = document.getElementById("composeField"), txt = f.value.trim();
+      if (!txt) return;
+      submit(txt, "");
+    });
+  }
+
+  cardsEl.addEventListener("click", function(e){
+    var el;
+    if ((el = e.target.closest("[data-sup]"))) { support(el.getAttribute("data-sup")); return; }
+    if ((el = e.target.closest("[data-approve]"))) { approve(el.getAttribute("data-approve")); return; }
+    if ((el = e.target.closest("[data-drop]"))) { drop(el.getAttribute("data-drop")); return; }
+    if (e.target.closest("[data-replycancel]")) { replyOpenId = null; renderWall(); return; }
+    if ((el = e.target.closest("[data-replysend]"))) {
+      var target = el.getAttribute("data-replysend");
+      var fa = cardsEl.querySelector("#rb-" + target), txt = fa ? fa.value.trim() : "";
+      if (!txt){ if (fa) fa.focus(); return; }
+      replyOpenId = null; submit(txt, target); return;
+    }
+    if ((el = e.target.closest("[data-reply]"))) {
+      var rid = el.getAttribute("data-reply");
+      replyOpenId = replyOpenId === rid ? null : rid;
+      renderWall();
+      var box = cardsEl.querySelector("#rb-" + rid);
+      if (box) box.focus();
+    }
+  });
+  sortEl.addEventListener("change", renderWall);
+
+  /* ==================================================================
+     THE THREAD
+     ================================================================== */
+  var tvp = document.getElementById("tvp"), tworld = document.getElementById("tworld"), tsvg = document.getElementById("tthreads");
+  var laid = [], tcam = { x:0, y:0, s:1, tx:0, ty:0, ts:1 }, tdrag = false;
+
+  /* The line runs ACROSS, not down. A vertical braid is the obvious shape and
+     the wrong one: stacked downward it makes a strip three times taller than
+     it is wide, so pulling back on a landscape screen shrinks it to a ribbon
+     down one edge with two thirds of the room empty. */
+  function layoutThread(){
+    laid = [];
+    posts.forEach(function(p, i){
+      var x = i * 430;
+      var y = Math.sin(i * .85) * 190 + (WP.seedRand(p.id) - .5) * 70;
+      var node = { post:p, x:x, y:y, w:330, root:true };
+      laid.push(node);
+      kidsOf(p.id).forEach(function(k, j){
+        laid.push({ post:k, x: x + 42 + (WP.seedRand(k.id) - .5) * 60, y: y + 300 + j * 170, w:274, parent:node });
+      });
+    });
+  }
+
+  function nodeHTML(n){
+    var p = n.post, on = supported.indexOf(p.id) !== -1;
+    return '<article class="node' + (n.root ? "" : " node--reply") + (p.pending ? " node--pending" : "") +
+      '" data-id="' + p.id + '" style="left:' + n.x + "px;top:" + n.y + "px;width:" + n.w + 'px">' +
+      '<span class="node__knot"></span>' +
+      (p.pending ? '<span class="node__wait">Waiting to be read &middot; only you</span>' : "") +
+      '<p class="node__body">' + WP.esc(p.body).replace(/\n+/g,"<br>") + "</p>" +
+      '<div class="node__foot">' +
+        '<span class="node__when">' + WP.esc(p.pending ? "just now" : WP.ago(p.ago)) + (n.root ? "" : " &middot; an answer") + "</span>" +
+        (p.pending
+          ? '<button class="pact pact--mod" type="button" data-approve="' + p.id + '">Approve it</button>' +
+            '<button class="pact" type="button" data-drop="' + p.id + '">Take it down</button>'
+          : '<button class="pact pact--sup' + (on ? " is-on" : "") + '" type="button" data-sup="' + p.id + '"' + (on ? " disabled" : "") + '>' +
+              '<span aria-hidden="true">&#9825;</span><span class="pact__n">' + (p.support||0) + "</span>" +
+              '<span class="sr">people found this helpful. Mark as helpful</span></button>' +
+            (n.root ? '<button class="pact" type="button" data-reply="' + p.id + '">Answer</button>' : "") +
+            '<button class="pact" type="button" data-drop="' + p.id + '">Report</button>') +
+      "</div></article>";
+  }
+
+  function renderThread(){
+    tworld.querySelectorAll(".node").forEach(function(el){ el.remove(); });
+    tworld.insertAdjacentHTML("beforeend", laid.map(nodeHTML).join(""));
+    laid.forEach(function(n){
+      var el = tworld.querySelector('.node[data-id="' + n.post.id + '"]');
+      n.h = el ? el.offsetHeight : 140;
+    });
+    drawThreads();
+  }
+
+  /* A thread sags. A straight line between two boxes is a diagram; a curve
+     hanging under its own weight is a thing in a room. */
+  function drawThreads(){
+    var d = [], roots = laid.filter(function(n){ return n.root; }), i;
+    for (i = 0; i < roots.length - 1; i++){
+      var a = roots[i], b = roots[i+1];
+      d.push(hang(a.x + a.w/2, a.y + (a.h||140), b.x + b.w/2, b.y, .30, i, false));
+    }
+    laid.filter(function(n){ return n.parent; }).forEach(function(n, j){
+      var p = n.parent;
+      d.push(hang(p.x + p.w/2, p.y + (p.h||140), n.x + n.w/2, n.y, .22, j + 40, true));
+    });
+    tsvg.innerHTML = d.join("");
+  }
+  function hang(x1,y1,x2,y2,k,seed,thin){
+    var mx = (x1+x2)/2, my = (y1+y2)/2;
+    var span = Math.hypot(x2-x1, y2-y1);
+    var sway = WP.reduced() ? 0 : Math.sin(t * .7 + seed) * 7;
+    return '<path d="M' + x1 + "," + y1 + " Q" + (mx + sway) + "," + (my + span*k) + " " + x2 + "," + y2 + '" ' +
+      'fill="none" stroke="rgba(255,166,190,' + (thin ? .40 : .58) + ')" stroke-width="' + (thin ? 1.2 : 1.8) + '" stroke-linecap="round"/>';
+  }
+
+  function tCenterOn(wx, wy, s){
+    if (s) tcam.ts = s;
+    tcam.tx = vw()/2 - wx * tcam.ts;
+    tcam.ty = vh()/2 - wy * tcam.ts;
+  }
+  function fitThread(){
+    var minX = 1e9, minY = 1e9, maxX = -1e9, maxY = -1e9;
+    laid.forEach(function(n){
+      minX = Math.min(minX, n.x); maxX = Math.max(maxX, n.x + n.w);
+      minY = Math.min(minY, n.y); maxY = Math.max(maxY, n.y + (n.h||140));
+    });
+    var w = maxX-minX, h = maxY-minY;
+    tcam.ts = Math.max(.22, Math.min((vw()-120)/w, (vh()-260)/h, 1));
+    tCenterOn((minX+maxX)/2, (minY+maxY)/2);
+  }
+
+  tvp.addEventListener("pointerdown", function(e){
+    if (e.target.closest("button")) return;
+    tdrag = true; tvp.setPointerCapture(e.pointerId); tvp.classList.add("is-drag");
+  });
+  tvp.addEventListener("pointermove", function(e){
+    if (!tdrag) return;
+    tcam.tx += e.movementX; tcam.ty += e.movementY;
+    tcam.x = tcam.tx; tcam.y = tcam.ty;
+  });
+  tvp.addEventListener("pointerup", function(){ tdrag = false; tvp.classList.remove("is-drag"); });
+  /* THE WHEEL SCROLLS. It used to zoom here and on the field while it scrolled
+     on the wall, which is three different meanings for the same gesture inside
+     one page: the single biggest reason this space felt unlearnable. Now a
+     plain wheel always travels through the posts. Because this line runs
+     across rather than down, a mouse wheel's vertical delta is mapped to
+     travel ALONG the line, which is the direction there is more to see in.
+     Zoom is still there, on the gesture the OS already means it by: a trackpad
+     pinch arrives as ctrl+wheel. */
+  tvp.addEventListener("wheel", function(e){
+    e.preventDefault();
+    if (e.ctrlKey || e.metaKey){
+      var ns = Math.max(.22, Math.min(1.7, tcam.ts * (e.deltaY > 0 ? .92 : 1.09)));
+      var wx = (e.clientX - tcam.tx)/tcam.ts, wy = (e.clientY - tcam.ty)/tcam.ts;
+      tcam.ts = ns; tcam.tx = e.clientX - wx*ns; tcam.ty = e.clientY - wy*ns;
+      return;
+    }
+    if (Math.abs(e.deltaX) < 1) tcam.tx -= e.deltaY;          // wheel-only mouse
+    else { tcam.tx -= e.deltaX; tcam.ty -= e.deltaY; }        // trackpad, both axes
+    tcam.x = tcam.tx; tcam.y = tcam.ty;
+  }, {passive:false});
+
+  // a card reached by keyboard pulls the camera to itself
+  tworld.addEventListener("focusin", function(e){
+    var card = e.target.closest(".node"); if (!card) return;
+    var n = laid.find(function(x){ return x.post.id === card.getAttribute("data-id"); });
+    if (n) tCenterOn(n.x + n.w/2, n.y + (n.h||140)/2, Math.max(tcam.ts, .9));
+  });
+
+  tworld.addEventListener("click", function(e){
+    var el;
+    if ((el = e.target.closest("[data-sup]"))) { support(el.getAttribute("data-sup")); return; }
+    if ((el = e.target.closest("[data-approve]"))) { approve(el.getAttribute("data-approve")); return; }
+    if ((el = e.target.closest("[data-drop]"))) { drop(el.getAttribute("data-drop")); return; }
+    if ((el = e.target.closest("[data-reply]"))) { openWrite(el.getAttribute("data-reply")); }
+  });
+
+  /* ==================================================================
+     THE SHARED MODAL
+     ================================================================== */
+  var veil = document.getElementById("veil"), write = document.getElementById("write");
+  function openWrite(target){
+    replyTo = target || null;
+    var p = replyTo ? find(replyTo) : null;
+    // an answer box that does not name what it answers is a second front door
+    document.getElementById("writeH").textContent = p ? "Answer them." : "Say something.";
+    document.getElementById("writeSub").textContent = p
+      ? "You are answering: " + (p.body.length > 110 ? p.body.slice(0,110) + "…" : p.body)
+      : "Something that happened. Something you noticed. Something you wish someone had told you.";
+    document.getElementById("writeSend").textContent = p ? "Send the answer" : "Send it";
+    veil.classList.add("is-on"); write.classList.add("is-on");
+    setTimeout(function(){ document.getElementById("writeField").focus(); }, 120);
+  }
+  function closeSheets(){
+    veil.classList.remove("is-on");
+    document.querySelectorAll(".sheet").forEach(function(s){ s.classList.remove("is-on"); });
+  }
+  document.getElementById("btnWrite").addEventListener("click", function(){
+    // on the wall, the blank card is the wall's own way in
+    if (mode === "wall"){
+      var c = document.getElementById("compose");
+      if (c){ c.classList.add("is-open"); c.scrollIntoView({behavior: WP.reduced() ? "auto" : "smooth", block:"center"});
+              document.getElementById("composeField").focus(); return; }
+    }
+    openWrite(null);
+  });
+  document.getElementById("btnFit").addEventListener("click", fitThread);
+  function zoomBy(f){
+    var ns = Math.max(.22, Math.min(1.7, tcam.ts * f));
+    var cx = vw()/2, cy = vh()/2;                       // zoom about the middle of the room
+    var wx = (cx - tcam.tx)/tcam.ts, wy = (cy - tcam.ty)/tcam.ts;
+    tcam.ts = ns; tcam.tx = cx - wx*ns; tcam.ty = cy - wy*ns;
+  }
+  document.getElementById("zIn").addEventListener("click", function(){ zoomBy(1.25); });
+  document.getElementById("zOut").addEventListener("click", function(){ zoomBy(.8); });
+  document.getElementById("btnRules").addEventListener("click", function(){
+    veil.classList.add("is-on"); document.getElementById("rules").classList.add("is-on");
+  });
+  veil.addEventListener("click", closeSheets);
+  document.body.addEventListener("click", function(e){ if (e.target.closest("[data-close]")) closeSheets(); });
+  document.getElementById("writeSend").addEventListener("click", function(){
+    var f = document.getElementById("writeField"), txt = f.value.trim();
+    if (!txt) return;
+    var p = submit(txt, replyTo);
+    f.value = ""; closeSheets();
+    if (mode === "field") setTimeout(function(){ openPanel(replyTo || p.id); }, 380);
+    replyTo = null;
+  });
+  document.addEventListener("keydown", function(e){
+    if (e.key !== "Escape") return;
+    if (document.querySelector(".sheet.is-on")) closeSheets();
+    else if (panel.classList.contains("is-on")) closePanel();
+    else if (mode !== "field") goTo("field");
+  });
+
+  /* ==================================================================
+     ONE LOOP
+     ================================================================== */
+  function tick(){
+    var k = WP.reduced() ? 1 : .09;
+    lights.forEach(function(l){
+      if (l.tx === undefined) { l.tx = l.fx; l.ty = l.fy; }
+      l.x += (l.tx - l.x) * k;
+      l.y += (l.ty - l.y) * k;
+    });
+    cam.x += (cam.tx - cam.x) * k;
+    cam.y += (cam.ty - cam.y) * k;
+    cam.s += (cam.ts - cam.s) * k;
+    if (mode === "field" || morphing) drawField();
+
+    if (mode === "thread"){
+      if (!WP.reduced()) { t += .016; drawThreads(); }
+      var tk = WP.reduced() ? 1 : .1;
+      tcam.x += (tcam.tx - tcam.x) * tk;
+      tcam.y += (tcam.ty - tcam.y) * tk;
+      tcam.s += (tcam.ts - tcam.s) * tk;
+      tworld.style.transform = "translate(" + tcam.x + "px," + tcam.y + "px) scale(" + tcam.s + ")";
+      tworld.classList.toggle("is-far", tcam.s < .62);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  var rt;
+  window.addEventListener("resize", function(){
+    resize();
+    clearTimeout(rt);
+    rt = setTimeout(function(){
+      if (colCount() !== cardsEl.children.length) renderWall();
+      if (mode === "thread") fitThread();
+    }, 180);
+  });
+
+  /* ---------------------------- start ---------------------------- */
+  resize(); layoutField(); renderWall(); layoutThread(); renderThread();
+
+  var resume = window.__WALL_RESUME;
+  if (resume){
+    /* No light flight on the way in. The morph is an arrival, and coming back
+       to a room you were already in is not one. */
+    land(resume);
+    cam.s = cam.ts = .62;
+    cue();
+  } else {
+    cam.s = 1.5; cam.ts = .62;  // opens by pulling back: the lights first, then the words
+  }
+  tick();
+
+  /* Said once, the first time the entrance is skipped, and never again. A
+     reader who comes back to a room they recognise does not need telling
+     twice, and the way back is a labelled button four inches away. */
+  function cue(){
+    var seen;
+    try { seen = localStorage.getItem("wf-wall-cued"); } catch (e) { seen = "1"; }
+    if (seen) return;
+    try { localStorage.setItem("wf-wall-cued", "1"); } catch (e) {}
+    var el = document.createElement("p");
+    el.className = "cue";
+    el.innerHTML = "Back where you left off. <b>&#8592; Entrance</b> takes you out to the field again.";
+    document.body.appendChild(el);
+    setTimeout(function(){ el.classList.add("is-on"); }, 60);
+    setTimeout(function(){ el.classList.remove("is-on"); }, 7000);
+    setTimeout(function(){ el.remove(); }, 7800);
+  }
+})();
+</script>
+</body>
+</html>

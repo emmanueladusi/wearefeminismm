@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Wall A · Pin Wall</title>
+<style>
+/* ============================================================
+   A. THE PIN WALL
+   Take the name literally. A dark room, one warm light, and a
+   real wall you are looking at. Every post is a card somebody
+   walked up and pinned there: paper, weight, a shadow that
+   touches the plaster, a slight angle because no hand is
+   straight. Reading it should feel like standing in front of
+   something, not scrolling a table.
+   ============================================================ */
+:root{
+  --paper:#e2dbd8; --ink:#452f28; --gold:#ea7393; --gold-ink:#93485d;
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Monaco,monospace;
+  --ease:cubic-bezier(.22,1,.36,1);
+  --card:#f7f2ee; --card-2:#efe6df;
+  --wall-1:#2a1d18; --wall-2:#170f0d;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:var(--sans); color:#f0e6e1; line-height:1.6;
+  background:var(--wall-2); min-height:100vh; overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---- the room -------------------------------------------------------
+   Three stacked layers make the plaster read as a surface rather than a
+   flat colour: a warm key light from above, a coarse noise for the
+   render of the plaster, and a vignette that keeps the eye centre-wall. */
+.room{position:fixed;inset:0;z-index:0;pointer-events:none}
+.room__light{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(120% 78% at 50% -14%, rgba(255,214,190,.30) 0%, rgba(255,190,164,.10) 34%, transparent 68%),
+    radial-gradient(70% 50% at 12% 108%, rgba(234,115,147,.13), transparent 62%),
+    linear-gradient(178deg, var(--wall-1) 0%, var(--wall-2) 82%);
+}
+.room__grain{
+  position:absolute;inset:-20%;opacity:.42;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.78' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.room__vig{
+  position:absolute;inset:0;
+  background:radial-gradient(88% 70% at 50% 42%, transparent 42%, rgba(0,0,0,.52) 100%);
+}
+
+/* ---- masthead, painted on the wall ---------------------------------- */
+.top{position:relative;z-index:2;padding:clamp(52px,9vh,104px) clamp(20px,6vw,72px) 0;max-width:1360px;margin:0 auto}
+.eyebrow{
+  font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  color:rgba(255,224,214,.58);margin-bottom:18px;
+}
+.top h1{
+  font-size:clamp(2.6rem,6.4vw,5.2rem);line-height:.98;letter-spacing:-.035em;font-weight:700;
+  max-width:15ch;
+  /* the light falls on the letters too */
+  background:linear-gradient(178deg,#fff6f1 0%,#e8cec4 62%,#c3a49a 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  text-shadow:0 1px 0 rgba(0,0,0,.25);
+}
+.top__lead{
+  margin-top:22px;max-width:52ch;font-size:1.0625rem;color:rgba(246,229,222,.80);
+}
+.top__lead b{color:#fff;font-weight:600}
+
+/* ---- the wall itself ------------------------------------------------- */
+.wall{position:relative;z-index:2;padding:clamp(38px,6vh,64px) clamp(20px,6vw,72px) 190px;max-width:1360px;margin:0 auto}
+
+/* Masonry, but built in script rather than with CSS columns. Columns fill
+   top to bottom, which would put the second-newest card halfway down the
+   page and make "newest first" a lie. Cards are dealt across the columns
+   instead, so reading order runs left to right the way the eye expects. */
+.cards{display:flex;align-items:flex-start;gap:clamp(20px,2.4vw,34px)}
+.col{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:clamp(22px,2.6vw,36px)}
+
+.card{
+  width:100%;
+  position:relative;padding:30px 26px 18px;border-radius:3px;
+  background:linear-gradient(168deg,var(--card) 0%,var(--card-2) 100%);
+  color:#3c2a24;
+  /* two shadows: the contact shadow where the paper meets plaster, and the
+     soft cast from the key light above */
+  box-shadow:
+    0 1px 1px rgba(0,0,0,.30),
+    0 16px 30px -14px rgba(0,0,0,.62),
+    0 0 0 1px rgba(255,255,255,.18) inset;
+  transform:rotate(var(--tilt,0deg));
+  transition:transform .5s var(--ease), box-shadow .5s var(--ease);
+  will-change:transform;
+}
+.card::after{ /* paper tooth */
+  content:"";position:absolute;inset:0;border-radius:3px;pointer-events:none;
+  opacity:.30;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23p)' opacity='.5'/%3E%3C/svg%3E");
+}
+.card:hover,.card:focus-within{
+  transform:rotate(calc(var(--tilt,0deg) * .35)) translateY(-5px) scale(1.012);
+  box-shadow:
+    0 2px 2px rgba(0,0,0,.26),
+    0 34px 56px -20px rgba(0,0,0,.70),
+    0 0 0 1px rgba(255,255,255,.24) inset;
+  z-index:3;
+}
+/* the pin */
+.card__pin{
+  position:absolute;top:11px;left:50%;transform:translateX(-50%);
+  width:13px;height:13px;border-radius:50%;
+  background:radial-gradient(circle at 34% 30%, #ffd9e3 0%, var(--gold) 46%, #a84665 100%);
+  box-shadow:0 2px 4px rgba(0,0,0,.42), 0 0 0 1.5px rgba(255,255,255,.5) inset;
+}
+.card__body{font-size:1.0625rem;line-height:1.62;overflow-wrap:anywhere}
+.card__foot{
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  margin-top:18px;padding-top:12px;border-top:1px dashed rgba(69,47,40,.24);
+}
+.card__when{font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:#7d6259;margin-right:auto}
+.act{
+  border:0;background:none;cursor:pointer;font:inherit;font-size:13px;color:#7d6259;
+  padding:5px 9px;border-radius:999px;transition:background .2s,color .2s;
+  display:inline-flex;align-items:center;gap:6px;
+}
+.act:hover{background:rgba(69,47,40,.075);color:#3c2a24}
+.act:focus-visible{outline:2px solid var(--gold-ink);outline-offset:1px}
+.act--sup.is-on{color:var(--gold-ink);font-weight:600}
+.act--sup.is-on .glyph{transform:scale(1.18)}
+.glyph{display:inline-block;transition:transform .3s var(--ease)}
+.act__n{font-variant-numeric:tabular-nums}
+
+/* replies: smaller slips tucked under the card, half-overlapped, so a
+   thread reads as a small pile rather than an indent level */
+.slips{list-style:none;margin:16px -6px 0;display:grid;gap:9px}
+.slip{
+  background:linear-gradient(170deg,#fdf9f6,#f0e7e0);
+  border-radius:2px;padding:15px 17px;font-size:.94rem;color:#4a352e;
+  transform:rotate(var(--tilt,0deg));
+  box-shadow:0 1px 1px rgba(0,0,0,.16), 0 8px 16px -9px rgba(0,0,0,.5);
+}
+.slip__when{display:block;margin-top:8px;font-family:var(--mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:#8a6d63}
+.slip--pending{background:linear-gradient(170deg,#f0e8e2,#e2d7cf)}
+.slip__acts{display:flex;gap:4px;flex-wrap:wrap;margin-top:9px;margin-left:-9px}
+
+/* The moderator's own button. It exists ONLY in these prototypes: on the real
+   wall approving happens in a spreadsheet, by a person, and no visitor can
+   reach it. It is here so the full life of a card can be seen in one sitting:
+   write it, watch it wait, approve it, watch it land on the wall. */
+.act--mod{
+  color:#7a3a4c;background:rgba(234,115,147,.16);font-weight:600;
+  box-shadow:0 0 0 1px rgba(234,115,147,.4) inset;
+}
+.act--mod:hover{background:rgba(234,115,147,.28);color:#5f2a3a}
+.act--mod::after{content:" (you are the moderator)";font-weight:400;opacity:.62;font-size:11.5px}
+
+/* writing an answer, on a slip, under the card it answers */
+.replybox{margin-top:16px;padding:16px 17px 14px;border-radius:2px;
+  background:linear-gradient(170deg,#fdf9f6,#efe6df);
+  box-shadow:0 1px 1px rgba(0,0,0,.16),0 8px 16px -9px rgba(0,0,0,.5)}
+.replybox textarea{
+  width:100%;border:0;background:none;resize:vertical;font:inherit;font-size:.96rem;line-height:1.6;
+  color:#3c2a24;min-height:74px;
+}
+.replybox textarea::placeholder{color:#9c837a}
+.replybox textarea:focus{outline:none}
+.replybox__row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px;padding-top:9px;border-top:1px dashed rgba(69,47,40,.24)}
+.replybox__note{font-size:11.5px;color:#7d6259;margin-right:auto}
+.pin-btn--sm{padding:8px 15px;font-size:13px}
+
+/* waiting: the card is real but it is turned toward you only */
+.card--pending{background:linear-gradient(168deg,#efe7e1,#e3d7cf);box-shadow:0 1px 1px rgba(0,0,0,.22),0 10px 22px -14px rgba(0,0,0,.5)}
+.card--pending .card__pin{background:radial-gradient(circle at 34% 30%,#efe3dd,#a2887d);}
+.card__wait{
+  display:inline-block;margin-bottom:12px;padding:5px 11px;border-radius:999px;
+  background:rgba(69,47,40,.10);color:#6b5147;
+  font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+}
+
+/* ---- the blank card you write on ------------------------------------- */
+.compose{
+  width:100%;
+  position:relative;border-radius:3px;padding:30px 26px 22px;
+  background:linear-gradient(168deg,rgba(255,247,242,.10),rgba(255,240,232,.045));
+  border:1.5px dashed rgba(255,225,213,.38);
+  transform:rotate(-.7deg);
+  transition:border-color .35s,background .35s,transform .5s var(--ease);
+}
+.compose:hover{border-color:rgba(255,225,213,.6);transform:rotate(-.25deg)}
+.compose.is-open{
+  background:linear-gradient(168deg,var(--card),var(--card-2));border:0;color:#3c2a24;
+  transform:rotate(-.4deg);
+  box-shadow:0 1px 1px rgba(0,0,0,.30),0 24px 44px -16px rgba(0,0,0,.66),0 0 0 1px rgba(255,255,255,.2) inset;
+}
+.compose__prompt{
+  display:flex;flex-direction:column;gap:8px;align-items:flex-start;
+  border:0;background:none;font:inherit;color:inherit;cursor:pointer;text-align:left;width:100%;
+}
+.compose__prompt b{font-size:1.25rem;font-weight:600;letter-spacing:-.01em;color:#fff2ec}
+.compose__prompt span{font-size:.92rem;color:rgba(246,229,222,.66)}
+.compose.is-open .compose__prompt{display:none}
+.compose__form{display:none}
+.compose.is-open .compose__form{display:block}
+.compose__field{
+  width:100%;border:0;background:none;resize:none;font:inherit;font-size:1.0625rem;line-height:1.62;
+  color:#3c2a24;min-height:150px;
+  /* ruled paper: the line sits on the text baseline rhythm */
+  background-image:repeating-linear-gradient(to bottom,transparent 0,transparent calc(1.62em - 1px),rgba(69,47,40,.12) calc(1.62em - 1px),rgba(69,47,40,.12) 1.62em);
+}
+.compose__field::placeholder{color:#9c837a}
+.compose__field:focus{outline:none}
+.compose__row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:16px;padding-top:14px;border-top:1px dashed rgba(69,47,40,.24)}
+.compose__note{font-size:12.5px;color:#7d6259;margin-right:auto;max-width:26ch}
+.pin-btn{
+  border:0;cursor:pointer;font:inherit;font-weight:600;font-size:14px;
+  padding:11px 20px;border-radius:999px;background:var(--gold);color:#3a2119;
+  box-shadow:0 4px 12px -3px rgba(234,115,147,.7);
+  transition:transform .22s var(--ease),box-shadow .22s;
+}
+.pin-btn:hover{transform:translateY(-2px);box-shadow:0 10px 20px -6px rgba(234,115,147,.85)}
+.pin-btn:active{transform:translateY(0)}
+.ghost-btn{border:0;background:none;cursor:pointer;font:inherit;font-size:13.5px;color:#7d6259;padding:9px 4px}
+.ghost-btn:hover{color:#3c2a24}
+
+/* ---- the taped index card of house rules ----------------------------- */
+.rules{
+  width:100%;
+  position:relative;padding:28px 26px 24px;border-radius:2px;
+  background:linear-gradient(168deg,#f3ece6,#e6dbd2);color:#3c2a24;
+  transform:rotate(1.1deg);
+  box-shadow:0 1px 1px rgba(0,0,0,.26),0 14px 26px -14px rgba(0,0,0,.6);
+}
+.rules::before,.rules::after{ /* tape */
+  content:"";position:absolute;top:-11px;width:74px;height:24px;
+  background:linear-gradient(180deg,rgba(255,255,255,.42),rgba(226,215,205,.34));
+  box-shadow:0 1px 2px rgba(0,0,0,.2);
+}
+.rules::before{left:-14px;transform:rotate(-24deg)}
+.rules::after{right:-14px;transform:rotate(22deg)}
+.rules h2{font-size:1.05rem;font-weight:700;letter-spacing:-.01em;margin-bottom:14px}
+.rules ul{list-style:none;display:grid;gap:11px;font-size:.93rem;color:#5a423a}
+.rules li strong{color:#3c2a24}
+.rules__warn{
+  margin-top:16px;padding-left:12px;border-left:3px solid var(--gold);
+  font-size:.9rem;color:#5a423a;
+}
+.rules__help{margin-top:14px;padding-top:12px;border-top:1px solid rgba(69,47,40,.16);font-size:.88rem;color:#5a423a}
+.rules a{color:var(--gold-ink)}
+
+/* the wall's own count, chalked on the plaster above the cards */
+.tally{
+  display:flex;align-items:baseline;gap:12px;margin-bottom:26px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:rgba(255,224,214,.5);
+}
+.tally b{font-family:var(--sans);font-size:2.1rem;letter-spacing:-.03em;color:#fff2ec;font-weight:700}
+.sort{margin-left:auto;background:rgba(255,255,255,.07);border:1px solid rgba(255,225,213,.22);
+  color:#f0e6e1;font:inherit;font-size:12px;padding:8px 12px;border-radius:999px;cursor:pointer}
+.sort:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+.sr{position:absolute;left:-9999px}
+
+/* a card being pinned up */
+@keyframes pinUp{
+  0%{opacity:0;transform:translateY(34px) rotate(-6deg) scale(.94)}
+  60%{opacity:1;transform:translateY(-4px) rotate(calc(var(--tilt,0deg) + 1.5deg)) scale(1.01)}
+  100%{opacity:1;transform:translateY(0) rotate(var(--tilt,0deg)) scale(1)}
+}
+.card--new{animation:pinUp .72s var(--ease) both}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms !important;transition-duration:.001ms !important}
+  .card,.slip,.compose,.rules{transform:none !important}
+}
+</style>
+</head>
+<body>
+
+<div class="room" aria-hidden="true">
+  <div class="room__light"></div>
+  <div class="room__grain"></div>
+  <div class="room__vig"></div>
+</div>
+
+<header class="top">
+  <p class="eyebrow">The Wall &middot; wearefeminismm</p>
+  <h1>Somebody already wrote it down.</h1>
+  <p class="top__lead">Anonymous, no account, no name. Pin up what you have lived through, or
+    answer somebody who has. <b>Nothing goes on this wall until a person has read it.</b></p>
+</header>
+
+<main class="wall">
+  <div class="tally">
+    <b id="count">8</b> <span>cards on the wall</span>
+    <label for="sort" style="position:absolute;left:-9999px">Sort</label>
+    <select class="sort" id="sort">
+      <option value="new">Newest first</option>
+      <option value="sup">Most helpful first</option>
+    </select>
+  </div>
+
+  <div class="cards" id="cards"></div>
+</main>
+
+<script src="_seed.js"></script>
+<script src="_shared.js"></script>
+<script>
+(function(){
+  var wrap = document.getElementById("cards");
+  var countEl = document.getElementById("count");
+  var sortEl = document.getElementById("sort");
+
+  var posts = WALL_SEED.map(function(p){ return Object.assign({}, p); });
+  var replies = WALL_SEED_REPLIES.map(function(p){ return Object.assign({}, p); });
+  var supported = [];
+  var newIds = [];
+  var replyOpen = null;   // one answer box at a time: half-written answers get lost
+
+  /* A tilt that never changes between renders. Random-per-paint would make
+     the whole wall twitch every time somebody taps a heart. */
+  function tilt(id, spread){
+    return ((WP.seedRand(id) - .5) * (spread || 2.6)).toFixed(2) + "deg";
+  }
+
+  function rulesCard(){
+    return '<aside class="rules">' +
+      '<h2>How this wall works</h2>' +
+      '<ul>' +
+      '<li><strong>A person reads it first.</strong> Your card waits until it is approved. You can see your own while it waits. Nobody else can.</li>' +
+      '<li><strong>No name, no account.</strong> Nothing here is tied to who you are.</li>' +
+      '<li><strong>No downvotes.</strong> Helpful is the only number on this wall. There is nothing to lose here.</li>' +
+      '<li><strong>Take it down any time.</strong> Your own cards, whenever you want.</li>' +
+      '<li><strong>Report anything cruel.</strong> One report takes a card off the wall straight away.</li>' +
+      '</ul>' +
+      '<p class="rules__warn"><strong>Do not write anything that identifies you or anyone else.</strong> No full names, no schools, no handles, no numbers. This page checks and will ask you twice, but it cannot catch everything.</p>' +
+      '<p class="rules__help">If things are bad right now: <strong>Kids Help Phone</strong>, text CONNECT to 686868, any hour. Black youth can text RISE to the same number. Or call 988.</p>' +
+      '</aside>';
+  }
+
+  function composeCard(){
+    return '<div class="compose" id="compose">' +
+      '<button class="compose__prompt" type="button" id="composeOpen">' +
+        '<b>Take a blank card</b>' +
+        '<span>Something that happened. Something you noticed. Something you wish someone had told you.</span>' +
+      '</button>' +
+      '<form class="compose__form" id="composeForm">' +
+        '<label for="composeField" style="position:absolute;left:-9999px">Write something for the wall</label>' +
+        '<textarea class="compose__field" id="composeField" rows="6" maxlength="1200" placeholder="Start anywhere."></textarea>' +
+        '<div class="compose__row">' +
+          '<p class="compose__note">No name is attached. You can take it down later.</p>' +
+          '<button class="ghost-btn" type="button" id="composeCancel">Put it back</button>' +
+          '<button class="pin-btn" type="submit">Pin it up</button>' +
+        '</div>' +
+      '</form>' +
+    '</div>';
+  }
+
+  function slipHTML(r){
+    if (r.pending){
+      return '<li class="slip slip--pending" style="--tilt:' + tilt(r.id, 1.4) + '">' +
+        WP.esc(r.body).replace(/\n+/g,"<br>") +
+        '<span class="slip__when">Waiting to be read &middot; only you can see this</span>' +
+        '<div class="slip__acts">' +
+          '<button class="act act--mod" type="button" data-approve="' + r.id + '">Approve it</button>' +
+          '<button class="act" type="button" data-remove="' + r.id + '">Take it down</button>' +
+        '</div></li>';
+    }
+    return '<li class="slip" style="--tilt:' + tilt(r.id, 1.4) + '">' +
+      WP.esc(r.body).replace(/\n+/g,"<br>") +
+      '<span class="slip__when">' + WP.esc(WP.ago(r.ago)) + ' &middot; a reply</span></li>';
+  }
+
+  function cardHTML(p){
+    var kids = replies.filter(function(r){ return r.parentId === p.id; });
+    var on = supported.indexOf(p.id) !== -1;
+    var isNew = newIds.indexOf(p.id) !== -1;
+    var box = replyOpen === p.id
+      ? '<div class="replybox">' +
+          '<label class="sr" for="rb-' + p.id + '">Write an answer</label>' +
+          '<textarea id="rb-' + p.id + '" rows="3" maxlength="1200" placeholder="Say something to them."></textarea>' +
+          '<div class="replybox__row">' +
+            '<p class="replybox__note">No name is attached.</p>' +
+            '<button class="ghost-btn" type="button" data-replycancel>Cancel</button>' +
+            '<button class="pin-btn pin-btn--sm" type="button" data-replysend="' + p.id + '">Pin the answer</button>' +
+          '</div></div>'
+      : "";
+
+    if (p.pending){
+      return '<article class="card card--pending' + (isNew ? " card--new" : "") + '" style="--tilt:' + tilt(p.id) + '">' +
+        '<span class="card__pin"></span>' +
+        '<span class="card__wait">Waiting to be read &middot; only you can see this</span>' +
+        '<p class="card__body">' + WP.esc(p.body).replace(/\n+/g,"<br>") + '</p>' +
+        '<div class="card__foot"><span class="card__when">just now</span>' +
+        '<button class="act act--mod" type="button" data-approve="' + p.id + '">Approve it</button>' +
+        '<button class="act" type="button" data-remove="' + p.id + '">Take it down</button></div>' +
+      '</article>';
+    }
+    return '<article class="card' + (isNew ? " card--new" : "") + '" style="--tilt:' + tilt(p.id) + '">' +
+      '<span class="card__pin"></span>' +
+      '<p class="card__body">' + WP.esc(p.body).replace(/\n+/g,"<br>") + '</p>' +
+      '<div class="card__foot">' +
+        '<span class="card__when">' + WP.esc(WP.ago(p.ago)) + '</span>' +
+        '<button class="act act--sup' + (on ? " is-on" : "") + '" type="button" data-sup="' + p.id + '"' + (on ? " disabled" : "") + '>' +
+          '<span class="glyph" aria-hidden="true">&#9825;</span><span class="act__n">' + p.support + '</span>' +
+          '<span style="position:absolute;left:-9999px">people found this helpful. Mark as helpful</span>' +
+        '</button>' +
+        '<button class="act" type="button" data-reply="' + p.id + '">Answer' + (kids.length ? ' <span class="act__n">' + kids.length + '</span>' : '') + '</button>' +
+        '<button class="act" type="button" data-report="' + p.id + '">Report</button>' +
+      '</div>' + box +
+      (kids.length ? '<ul class="slips">' + kids.map(slipHTML).join("") + '</ul>' : '') +
+    '</article>';
+  }
+
+  function render(){
+    var list = posts.slice();
+    if (sortEl.value === "sup") list.sort(function(a,b){ return (b.support||0)-(a.support||0); });
+    else list.sort(function(a,b){ return a.ago - b.ago; });
+    // pending cards always sit at the front, where their writer can see them
+    list.sort(function(a,b){ return (b.pending?1:0)-(a.pending?1:0); });
+
+    var items = [composeCard()].concat(list.map(cardHTML)).concat([rulesCard()]);
+    var n = colCount();
+    var cols = [];
+    for (var c = 0; c < n; c++) cols.push([]);
+    items.forEach(function(html, k){ cols[k % n].push(html); });   // dealt, not stacked
+
+    wrap.innerHTML = cols.map(function(col){
+      return '<div class="col">' + col.join("") + "</div>";
+    }).join("");
+    countEl.textContent = posts.filter(function(p){ return !p.pending; }).length;
+    wire();
+    newIds = [];
+  }
+
+  /* A width of 0 is a real reading: a page laid out before the frame has a
+     size. Falling through to one column there would deal every card into a
+     single strip and leave it that way. Assume the wide case and let the
+     first resize correct it. */
+  function colCount(){
+    var w = window.innerWidth || document.documentElement.clientWidth || 1200;
+    return w >= 1080 ? 3 : (w >= 680 ? 2 : 1);
+  }
+
+  var rt;
+  window.addEventListener("resize", function(){
+    clearTimeout(rt);
+    rt = setTimeout(function(){
+      if (colCount() !== wrap.children.length) render();
+    }, 180);
+  });
+
+  function wire(){
+    var compose = document.getElementById("compose");
+    document.getElementById("composeOpen").addEventListener("click", function(){
+      compose.classList.add("is-open");
+      document.getElementById("composeField").focus();
+    });
+    document.getElementById("composeCancel").addEventListener("click", function(){
+      compose.classList.remove("is-open");
+    });
+    document.getElementById("composeForm").addEventListener("submit", function(e){
+      e.preventDefault();
+      var f = document.getElementById("composeField");
+      var text = f.value.trim();
+      if (!text) return;
+      var p = WP.makePost(text);
+      posts.unshift(p);
+      newIds.push(p.id);
+      render();
+    });
+  }
+
+  wrap.addEventListener("click", function(e){
+    var s = e.target.closest("[data-sup]");
+    if (s){
+      var id = s.getAttribute("data-sup");
+      if (supported.indexOf(id) !== -1) return;
+      supported.push(id);
+      var p = posts.find(function(x){ return x.id === id; });
+      if (p) p.support++;
+      render();
+      return;
+    }
+    /* The moderator's pass, standing in for a person typing "approved" into a
+       spreadsheet. The card loses its dashed edge and joins the wall. */
+    var ap = e.target.closest("[data-approve]");
+    if (ap){
+      var aid = ap.getAttribute("data-approve");
+      var t = posts.concat(replies).find(function(x){ return x.id === aid; });
+      if (t){ t.pending = false; t.ago = 0; }
+      newIds.push(aid);
+      render();
+      return;
+    }
+
+    var rm = e.target.closest("[data-remove]");
+    if (rm){
+      var rid = rm.getAttribute("data-remove");
+      posts = posts.filter(function(x){ return x.id !== rid; });
+      replies = replies.filter(function(x){ return x.id !== rid; });
+      render();
+      return;
+    }
+    var rp = e.target.closest("[data-report]");
+    if (rp){
+      var pid = rp.getAttribute("data-report");
+      posts = posts.filter(function(x){ return x.id !== pid; });
+      replies = replies.filter(function(x){ return x.parentId !== pid; });
+      render();
+      return;
+    }
+
+    if (e.target.closest("[data-replycancel]")){ replyOpen = null; render(); return; }
+
+    var send = e.target.closest("[data-replysend]");
+    if (send){
+      var target = send.getAttribute("data-replysend");
+      var fa = wrap.querySelector("#rb-" + target);
+      var txt = fa ? fa.value.trim() : "";
+      if (!txt) { if (fa) fa.focus(); return; }
+      var r = WP.makePost(txt, target);
+      replies.push(r);
+      replyOpen = null;
+      newIds.push(target);
+      render();
+      return;
+    }
+
+    var re = e.target.closest("[data-reply]");
+    if (re){
+      var rId = re.getAttribute("data-reply");
+      replyOpen = replyOpen === rId ? null : rId;
+      render();
+      var box = wrap.querySelector("#rb-" + rId);
+      if (box) box.focus();
+    }
+  });
+
+  sortEl.addEventListener("change", render);
+  render();
+})();
+</script>
+</body>
+</html>

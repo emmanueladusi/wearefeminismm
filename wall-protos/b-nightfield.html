@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Wall B · Night Field</title>
+<style>
+/* ============================================================
+   B. NIGHT FIELD
+   The argument here is scale. A feed shows you one post at a
+   time and quietly tells you that you are one person with one
+   problem. Pull the camera back and you see the field: every
+   light is somebody who wrote something down, and the first
+   thing the page says, before any words are read, is how many
+   of them there are. Brightness is how many people found a
+   light helpful, so the wall lights itself.
+   ============================================================ */
+:root{
+  --gold:#ea7393; --ease:cubic-bezier(.22,1,.36,1);
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Monaco,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  font-family:var(--sans);color:#efe6ef;background:#0a0710;overflow:hidden;
+  -webkit-font-smoothing:antialiased;line-height:1.6;
+}
+canvas{position:fixed;inset:0;width:100%;height:100%;display:block;cursor:grab;touch-action:none}
+canvas.is-drag{cursor:grabbing}
+canvas.is-over{cursor:pointer}
+
+/* deep field behind the canvas so the dark is never flat black */
+.sky{position:fixed;inset:0;z-index:-1;
+  background:
+    radial-gradient(80% 60% at 22% 18%, rgba(120,81,127,.30), transparent 62%),
+    radial-gradient(70% 60% at 82% 74%, rgba(234,115,147,.16), transparent 64%),
+    radial-gradient(120% 100% at 50% 50%, #140c1a 0%, #08050c 76%);
+}
+
+/* ---- masthead, floating over the field ------------------------------- */
+.hud{position:fixed;top:0;left:0;right:0;z-index:5;padding:clamp(22px,3.4vw,44px);pointer-events:none}
+/* A light drifting behind the headline must not cost anybody the sentence. */
+.hud::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:linear-gradient(180deg,rgba(8,5,12,.72) 0%,rgba(8,5,12,.42) 52%,transparent 100%)}
+.hud__in{max-width:1400px;margin:0 auto;display:flex;gap:24px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:rgba(239,230,239,.5)}
+.hud h1{
+  margin-top:12px;font-size:clamp(1.9rem,3.4vw,3.1rem);line-height:1.02;letter-spacing:-.035em;font-weight:700;
+  max-width:16ch;
+  background:linear-gradient(170deg,#fff 0%,#e7d3e6 60%,#b294b3 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.hud__lead{margin-top:14px;max-width:44ch;font-size:.98rem;color:rgba(239,230,239,.68)}
+.hud__lead b{color:#fff;font-weight:600}
+.hud__count{text-align:right;pointer-events:auto}
+.hud__count b{display:block;font-size:clamp(2.6rem,5vw,4.2rem);line-height:1;letter-spacing:-.04em;font-weight:700;color:#fff}
+.hud__count span{font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:rgba(239,230,239,.5)}
+
+/* ---- controls -------------------------------------------------------- */
+.tools{position:fixed;left:clamp(16px,3.4vw,44px);bottom:clamp(16px,3vw,34px);z-index:6;display:flex;gap:8px;flex-wrap:wrap}
+.tool{
+  border:1px solid rgba(239,230,239,.2);background:rgba(255,255,255,.06);color:#efe6ef;
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  font:inherit;font-size:13px;padding:10px 15px;border-radius:999px;cursor:pointer;
+  transition:background .2s,border-color .2s,transform .2s var(--ease);
+}
+.tool:hover{background:rgba(255,255,255,.13);transform:translateY(-1px)}
+.tool:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.tool--go{background:var(--gold);border-color:var(--gold);color:#2a1119;font-weight:600}
+.tool--go:hover{background:#f28aa6;border-color:#f28aa6}
+.hint{position:fixed;right:clamp(16px,3.4vw,44px);bottom:clamp(16px,3vw,34px);z-index:6;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(239,230,239,.34)}
+@media (max-width:760px){.hint{display:none}}
+
+/* ---- hover label ----------------------------------------------------- */
+.tip{
+  position:fixed;z-index:7;pointer-events:none;max-width:290px;
+  padding:12px 15px;border-radius:12px;font-size:.9rem;line-height:1.5;
+  background:rgba(19,12,24,.9);border:1px solid rgba(239,230,239,.16);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  box-shadow:0 20px 46px -18px rgba(0,0,0,.9);
+  opacity:0;transform:translateY(6px);transition:opacity .18s,transform .18s var(--ease);
+}
+.tip.is-on{opacity:1;transform:translateY(0)}
+.tip em{display:block;margin-top:7px;font-style:normal;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(239,230,239,.45)}
+
+/* ---- reading panel --------------------------------------------------- */
+.panel{
+  position:fixed;top:0;right:0;bottom:0;width:min(500px,100%);z-index:20;
+  background:linear-gradient(200deg,rgba(24,15,30,.94),rgba(12,8,16,.97));
+  border-left:1px solid rgba(239,230,239,.13);
+  backdrop-filter:blur(26px);-webkit-backdrop-filter:blur(26px);
+  box-shadow:-40px 0 90px -30px rgba(0,0,0,.9);
+  transform:translateX(100%);transition:transform .5s var(--ease);
+  display:flex;flex-direction:column;
+}
+.panel.is-on{transform:none}
+.panel__head{display:flex;align-items:center;gap:14px;padding:22px clamp(20px,3vw,32px) 0}
+.panel__kind{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(239,230,239,.45);margin-right:auto}
+.panel__x{border:0;background:rgba(255,255,255,.07);color:#efe6ef;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:16px;line-height:1}
+.panel__x:hover{background:rgba(255,255,255,.15)}
+.panel__body{padding:20px clamp(20px,3vw,32px) 30px;overflow-y:auto;flex:1}
+.panel__text{font-size:1.24rem;line-height:1.56;letter-spacing:-.012em;color:#fbf5fb;overflow-wrap:anywhere}
+.panel__meta{margin-top:18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(239,230,239,.42)}
+.panel__acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px;padding-top:20px;border-top:1px solid rgba(239,230,239,.12)}
+.panel h3{margin:32px 0 14px;font-size:11px;font-family:var(--mono);letter-spacing:.18em;text-transform:uppercase;color:rgba(239,230,239,.45);font-weight:400}
+.reply{padding:16px 18px;border-radius:14px;background:rgba(255,255,255,.05);
+  border:1px solid rgba(239,230,239,.09);margin-bottom:10px;font-size:.98rem;color:#e8dfe8}
+.reply span{display:block;margin-top:9px;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(239,230,239,.4)}
+.panel__wait{display:inline-block;margin-bottom:14px;padding:6px 12px;border-radius:999px;
+  background:rgba(234,115,147,.16);color:#f6b8c9;
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase}
+
+/* The moderator's own button, prototype only: on the real wall approving
+   happens in a spreadsheet, by a person, and no visitor can reach it. It is
+   here so one sitting can cover the whole life of a post. */
+.tool--mod{background:rgba(234,115,147,.2);border-color:rgba(234,115,147,.55);color:#ffc9d8;font-weight:600}
+.tool--mod:hover{background:rgba(234,115,147,.32)}
+.tool--mod small{display:block;font-weight:400;opacity:.6;font-size:10px;letter-spacing:.04em}
+
+/* answering, inside the panel, so the answer is written where it is read */
+.answerbox{margin-top:18px;padding:16px 17px;border-radius:14px;
+  background:rgba(255,255,255,.055);border:1px solid rgba(239,230,239,.13)}
+.answerbox textarea{
+  width:100%;min-height:88px;resize:vertical;font:inherit;font-size:1rem;line-height:1.55;
+  color:#fbf5fb;background:none;border:0;padding:0;
+}
+.answerbox textarea::placeholder{color:rgba(239,230,239,.36)}
+.answerbox textarea:focus{outline:none}
+.answerbox__row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px;
+  padding-top:11px;border-top:1px solid rgba(239,230,239,.12)}
+.answerbox__note{font-size:11.5px;color:rgba(239,230,239,.5);margin-right:auto}
+.tool--sm{padding:8px 13px;font-size:12.5px}
+
+/* ---- compose --------------------------------------------------------- */
+.veil{position:fixed;inset:0;z-index:30;background:rgba(6,4,9,.72);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  opacity:0;pointer-events:none;transition:opacity .4s}
+.veil.is-on{opacity:1;pointer-events:auto}
+.write{
+  position:fixed;left:50%;top:50%;transform:translate(-50%,-46%) scale(.97);z-index:31;
+  width:min(620px,calc(100vw - 32px));max-height:calc(100vh - 64px);overflow-y:auto;
+  padding:clamp(24px,3.4vw,38px);border-radius:22px;
+  background:linear-gradient(200deg,rgba(30,19,37,.96),rgba(15,9,20,.98));
+  border:1px solid rgba(239,230,239,.14);
+  box-shadow:0 50px 110px -30px rgba(0,0,0,.95);
+  opacity:0;pointer-events:none;transition:opacity .4s,transform .5s var(--ease);
+}
+.write.is-on{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+.write h2{font-size:1.6rem;letter-spacing:-.025em;font-weight:700;margin-bottom:8px}
+.write p.sub{font-size:.94rem;color:rgba(239,230,239,.62);margin-bottom:20px}
+.write textarea{
+  width:100%;min-height:170px;resize:vertical;font:inherit;font-size:1.06rem;line-height:1.6;
+  color:#fbf5fb;background:rgba(255,255,255,.05);border:1px solid rgba(239,230,239,.16);
+  border-radius:14px;padding:16px 18px;
+}
+.write textarea::placeholder{color:rgba(239,230,239,.38)}
+.write textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(234,115,147,.2)}
+.write__row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:18px}
+.write__note{font-size:12.5px;color:rgba(239,230,239,.55);margin-right:auto;max-width:30ch}
+.write__rules{margin-top:22px;padding-top:18px;border-top:1px solid rgba(239,230,239,.12);
+  font-size:.86rem;color:rgba(239,230,239,.55)}
+.write__rules strong{color:#f6b8c9}
+
+/* ---- the list fallback ----------------------------------------------
+   A field of lights is a canvas, and a canvas is nothing to a keyboard or
+   a screen reader. So the same wall is always available as a plain list,
+   one button away, not buried in a settings menu. */
+.list{position:fixed;inset:0;z-index:25;overflow-y:auto;background:#0c0812;
+  padding:clamp(24px,5vw,72px) clamp(20px,5vw,72px) 120px;display:none}
+.list.is-on{display:block}
+.list__in{max-width:760px;margin:0 auto}
+.list h2{font-size:clamp(1.6rem,3vw,2.3rem);letter-spacing:-.03em;margin-bottom:8px}
+.list p.sub{color:rgba(239,230,239,.6);margin-bottom:30px}
+.list article{padding:24px 0;border-top:1px solid rgba(239,230,239,.12)}
+.list article p{font-size:1.1rem;line-height:1.6}
+.list article .m{margin-top:12px;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(239,230,239,.42)}
+.list .reply{margin-top:12px}
+
+.sr{position:absolute;left:-9999px}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.001ms !important}}
+</style>
+</head>
+<body>
+<div class="sky" aria-hidden="true"></div>
+<canvas id="field" aria-label="A field of lights. Each light is one post on the wall. Use the read as a list button for a text version."></canvas>
+
+<div class="hud">
+  <div class="hud__in">
+    <div>
+      <p class="eyebrow">The Wall &middot; wearefeminismm</p>
+      <h1>None of these are the only one.</h1>
+      <p class="hud__lead">Every light is one person who wrote something down. Drag to move through
+        it, click a light to read it. <b>Nothing appears here until a person has read it.</b></p>
+    </div>
+    <div class="hud__count"><b id="count">8</b><span>voices lit</span></div>
+  </div>
+</div>
+
+<div class="tools">
+  <button class="tool tool--go" type="button" id="openWrite">Add yours</button>
+  <button class="tool" type="button" id="openList">Read as a list</button>
+  <button class="tool" type="button" id="recenter">Pull back</button>
+</div>
+<p class="hint">Drag to move &middot; scroll to zoom</p>
+
+<div class="tip" id="tip" aria-hidden="true"></div>
+
+<!-- reading panel -->
+<aside class="panel" id="panel" aria-label="Reading a post" aria-hidden="true">
+  <div class="panel__head">
+    <span class="panel__kind" id="panelKind">On the wall</span>
+    <button class="panel__x" type="button" id="panelX" aria-label="Close">&#10005;</button>
+  </div>
+  <div class="panel__body" id="panelBody"></div>
+</aside>
+
+<!-- compose -->
+<div class="veil" id="veil"></div>
+<div class="write" id="write" role="dialog" aria-modal="true" aria-labelledby="writeH">
+  <h2 id="writeH">Add a light.</h2>
+  <p class="sub">Something that happened. Something you noticed. Something you wish someone had told you.</p>
+  <label class="sr" for="writeField">Write something for the wall</label>
+  <textarea id="writeField" rows="6" maxlength="1200" placeholder="Start anywhere. No name is attached."></textarea>
+  <div class="write__row">
+    <p class="write__note">A person reads it before anybody else does. You can take it down later.</p>
+    <button class="tool" type="button" id="writeCancel">Not now</button>
+    <button class="tool tool--go" type="button" id="writeSend">Send it</button>
+  </div>
+  <p class="write__rules"><strong>Do not write anything that identifies you or anyone else.</strong>
+    No full names, no schools, no handles, no numbers. This page checks and will ask you twice,
+    but it cannot catch everything.</p>
+</div>
+
+<!-- list fallback -->
+<div class="list" id="list" aria-label="The wall as a list">
+  <div class="list__in">
+    <h2>The wall, as a list.</h2>
+    <p class="sub">The same posts, in plain text, sorted newest first.</p>
+    <div id="listBody"></div>
+    <p style="margin-top:34px"><button class="tool" type="button" id="closeList">Back to the field</button></p>
+  </div>
+</div>
+
+<script src="_seed.js"></script>
+<script src="_shared.js"></script>
+<script>
+(function(){
+  var cv = document.getElementById("field");
+  var ctx = cv.getContext("2d");
+  var tip = document.getElementById("tip");
+  var panel = document.getElementById("panel");
+  var panelBody = document.getElementById("panelBody");
+  var panelKind = document.getElementById("panelKind");
+
+  var posts = WALL_SEED.map(function(p){ return Object.assign({}, p); });
+  var replies = WALL_SEED_REPLIES.map(function(p){ return Object.assign({}, p); });
+  var supported = [];
+  var nodes = [];
+  var answerFor = null;   // which light the open answer box belongs to
+  var openId = null;      // which light the panel is currently showing
+
+  /* Phyllotaxis, not random scatter. Eight random points clump, and a clump
+     reads as a mistake; the sunflower spiral spaces them evenly at any count,
+     which matters because this field has to look right at 8 posts and at 800. */
+  function layout(){
+    nodes = [];
+    var GOLD = 2.39996323;
+    posts.forEach(function(p, i){
+      var a = i * GOLD, r = 168 * Math.sqrt(i + .6);
+      var jx = (WP.seedRand(p.id + "x") - .5) * 66;
+      var jy = (WP.seedRand(p.id + "y") - .5) * 66;
+      var n = {
+        post:p, x:Math.cos(a)*r + jx, y:Math.sin(a)*r*.74 + jy,
+        kids: replies.filter(function(r2){ return r2.parentId === p.id; }),
+        ph: WP.seedRand(p.id + "p") * 6.28,
+      };
+      nodes.push(n);
+      // replies orbit the light they answer
+      n.kids.forEach(function(k, j){
+        var ka = WP.seedRand(k.id) * 6.28 + j * 1.9;
+        var kr = 62 + WP.seedRand(k.id + "r") * 26;
+        nodes.push({ post:k, parent:n, x:n.x + Math.cos(ka)*kr, y:n.y + Math.sin(ka)*kr*.8,
+          kids:[], ph: WP.seedRand(k.id + "p") * 6.28, small:true });
+      });
+    });
+  }
+
+  /* Brightness is helpfulness: the wall lights itself and nobody dims anybody.
+     Kept deliberately tight. The first pass let a well-supported post reach a
+     150px halo, at which point eight posts read as coloured fog rather than as
+     eight people. A star has to stay a star. */
+  function radius(n){
+    if (n.post.pending) return 5.5;
+    if (n.small) return 3.4;
+    return 4.6 + Math.min(9, Math.sqrt(n.post.support || 0) * 1.7);
+  }
+
+  var cam = { x:0, y:0, s:1, tx:0, ty:0, ts:1 };
+  var dpr = 1, W = 0, H = 0, t = 0, hover = null, dragging = false, moved = 0;
+
+  function resize(){
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = cv.clientWidth; H = cv.clientHeight;
+    cv.width = W * dpr; cv.height = H * dpr;
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  window.addEventListener("resize", resize);
+
+  function toScreen(n){
+    return { x: (n.x - cam.x) * cam.s + W/2, y: (n.y - cam.y) * cam.s + H/2 };
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    t += WP.reduced() ? 0 : .009;
+
+    // threads from a post to the answers it drew
+    ctx.lineWidth = 1;
+    nodes.forEach(function(n){
+      if (!n.parent) return;
+      var a = toScreen(n.parent), b = toScreen(n);
+      var g = ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+      g.addColorStop(0,"rgba(234,115,147,.30)");
+      g.addColorStop(1,"rgba(234,115,147,.04)");
+      ctx.strokeStyle = g;
+      ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+    });
+
+    nodes.forEach(function(n){
+      var p = toScreen(n);
+      if (p.x < -140 || p.x > W+140 || p.y < -140 || p.y > H+140) return;
+      var breathe = 1 + Math.sin(t * 1.4 + n.ph) * .07;
+      var r = radius(n) * cam.s * breathe;
+      var isHover = hover === n;
+      var warm = n.post.pending;
+
+      // halo
+      var R = r * 5.2;
+      var glow = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,R);
+      var core = warm ? "234,115,147" : (n.small ? "205,175,225" : "255,236,246");
+      glow.addColorStop(0,"rgba(" + core + "," + (isHover ? .52 : .30) + ")");
+      glow.addColorStop(.34,"rgba(" + core + ",.075)");
+      glow.addColorStop(1,"rgba(" + core + ",0)");
+      ctx.fillStyle = glow;
+      ctx.beginPath(); ctx.arc(p.x,p.y,R,0,6.283); ctx.fill();
+
+      // core
+      ctx.fillStyle = warm ? "rgba(255,206,222,.95)" : "rgba(255,252,255," + (isHover ? 1 : .92) + ")";
+      ctx.beginPath(); ctx.arc(p.x,p.y,Math.max(1.2,r*.5),0,6.283); ctx.fill();
+
+      // a post still waiting to be read wears a ring, so its writer can find it
+      if (warm){
+        ctx.strokeStyle = "rgba(234,115,147," + (.42 + Math.sin(t*2.2)*.24) + ")";
+        ctx.lineWidth = 1.4;
+        ctx.beginPath(); ctx.arc(p.x,p.y,r*2.6,0,6.283); ctx.stroke();
+      }
+      if (isHover){
+        ctx.strokeStyle = "rgba(255,255,255,.5)"; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.arc(p.x,p.y,r*2.9,0,6.283); ctx.stroke();
+      }
+    });
+  }
+
+  function tick(){
+    // eased camera, so pulling back reads as a move rather than a jump cut
+    var k = WP.reduced() ? 1 : .09;
+    cam.x += (cam.tx - cam.x) * k;
+    cam.y += (cam.ty - cam.y) * k;
+    cam.s += (cam.ts - cam.s) * k;
+    draw();
+    requestAnimationFrame(tick);
+  }
+
+  function hitTest(mx,my){
+    var best = null, bestD = 30;
+    nodes.forEach(function(n){
+      var p = toScreen(n);
+      var d = Math.hypot(p.x-mx, p.y-my) - radius(n)*cam.s;
+      if (d < bestD){ bestD = d; best = n; }
+    });
+    return best;
+  }
+
+  cv.addEventListener("pointermove", function(e){
+    if (dragging){
+      moved += Math.abs(e.movementX) + Math.abs(e.movementY);
+      cam.tx -= e.movementX / cam.s; cam.ty -= e.movementY / cam.s;
+      cam.x = cam.tx; cam.y = cam.ty;
+      return;
+    }
+    var n = hitTest(e.clientX, e.clientY);
+    hover = n;
+    cv.classList.toggle("is-over", !!n);
+    if (n){
+      var txt = n.post.body;
+      tip.innerHTML = WP.esc(txt.length > 130 ? txt.slice(0,130) + "…" : txt) +
+        "<em>" + (n.post.pending ? "waiting to be read" :
+          (n.small ? "an answer" : n.post.support + " found this helpful")) + " &middot; click to read</em>";
+      tip.classList.add("is-on");
+      var tw = 300;
+      tip.style.left = Math.min(e.clientX + 18, window.innerWidth - tw - 12) + "px";
+      tip.style.top = Math.min(e.clientY + 18, window.innerHeight - 130) + "px";
+    } else tip.classList.remove("is-on");
+  });
+  cv.addEventListener("pointerdown", function(e){ dragging = true; moved = 0; cv.setPointerCapture(e.pointerId); cv.classList.add("is-drag"); });
+  cv.addEventListener("pointerup", function(e){
+    dragging = false; cv.classList.remove("is-drag");
+    if (moved < 5){ var n = hitTest(e.clientX,e.clientY); if (n) open(n); }
+  });
+  cv.addEventListener("wheel", function(e){
+    e.preventDefault();
+    cam.ts = Math.max(.34, Math.min(2.4, cam.ts * (e.deltaY > 0 ? .9 : 1.11)));
+  }, {passive:false});
+
+  /* ---- reading ---- */
+  function open(n){
+    var p = n.post;
+    var on = supported.indexOf(p.id) !== -1;
+    panelKind.textContent = p.pending ? "Yours, waiting" : (n.small ? "An answer" : "On the wall");
+    panelBody.innerHTML =
+      (p.pending ? '<span class="panel__wait">Waiting to be read &middot; only you can see this</span>' : "") +
+      '<p class="panel__text">' + WP.esc(p.body).replace(/\n+/g,"<br>") + "</p>" +
+      '<p class="panel__meta"><span>' + WP.esc(WP.ago(p.ago)) + "</span>" +
+        (p.pending ? "" : "<span>&middot;</span><span>" + p.support + " found this helpful</span>") + "</p>" +
+      '<div class="panel__acts">' +
+        (p.pending
+          ? '<button class="tool tool--mod" type="button" data-approve="' + p.id + '">Approve it<small>you are the moderator</small></button>' +
+            '<button class="tool" type="button" data-remove="' + p.id + '">Take it down</button>'
+          : '<button class="tool' + (on ? "" : " tool--go") + '" type="button" data-sup="' + p.id + '"' + (on ? " disabled" : "") + '>' +
+            (on ? "Marked helpful" : "This helped") + "</button>" +
+            (n.small ? "" : '<button class="tool" type="button" id="answerBtn">Answer this</button>') +
+            '<button class="tool" type="button" data-report="' + p.id + '">Report</button>') +
+      "</div>" +
+      (answerFor === p.id
+        ? '<div class="answerbox">' +
+            '<label class="sr" for="answerField">Write an answer</label>' +
+            '<textarea id="answerField" rows="3" maxlength="1200" placeholder="Say something to them."></textarea>' +
+            '<div class="answerbox__row">' +
+              '<p class="answerbox__note">No name is attached.</p>' +
+              '<button class="tool tool--sm" type="button" id="answerCancel">Cancel</button>' +
+              '<button class="tool tool--go tool--sm" type="button" id="answerSend">Send the answer</button>' +
+            "</div></div>"
+        : "") +
+      (n.kids && n.kids.length
+        ? "<h3>" + n.kids.length + (n.kids.length === 1 ? " answer" : " answers") + "</h3>" +
+          n.kids.map(function(k){
+            return '<div class="reply">' + WP.esc(k.body) +
+              "<span>" + (k.pending ? "Waiting to be read &middot; only you can see this" : WP.esc(WP.ago(k.ago))) + "</span>" +
+              (k.pending
+                ? '<p style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">' +
+                  '<button class="tool tool--mod tool--sm" type="button" data-approve="' + k.id + '">Approve it</button>' +
+                  '<button class="tool tool--sm" type="button" data-remove="' + k.id + '">Take it down</button></p>'
+                : "") +
+              "</div>";
+          }).join("")
+        : "");
+    openId = p.id;
+    panel.classList.add("is-on"); panel.setAttribute("aria-hidden","false");
+    // frame the light you are reading, off to the left of the panel
+    cam.tx = n.x + (220 / cam.ts); cam.ty = n.y;
+    cam.ts = Math.max(cam.ts, 1.15);
+    hover = null; tip.classList.remove("is-on");
+  }
+  // reopen whatever the panel was showing, after the field behind it changed
+  function reopen(id){
+    var n = nodes.find(function(x){ return x.post.id === (id || openId); });
+    if (n) open(n); else closePanel();
+  }
+  function closePanel(){ openId = null; answerFor = null; panel.classList.remove("is-on"); panel.setAttribute("aria-hidden","true"); }
+  document.getElementById("panelX").addEventListener("click", closePanel);
+
+  panelBody.addEventListener("click", function(e){
+    var s = e.target.closest("[data-sup]");
+    if (s){
+      var id = s.getAttribute("data-sup");
+      supported.push(id);
+      var p = posts.concat(replies).find(function(x){ return x.id === id; });
+      if (p) p.support++;
+      layout(); renderList();
+      var n = nodes.find(function(x){ return x.post.id === id; });
+      if (n) open(n);
+      return;
+    }
+    /* The moderator's pass, standing in for a person typing "approved" into a
+       spreadsheet. The light stops being warm and joins the field. */
+    var ap = e.target.closest("[data-approve]");
+    if (ap){
+      var aid = ap.getAttribute("data-approve");
+      var t = posts.concat(replies).find(function(x){ return x.id === aid; });
+      if (t){ t.pending = false; t.ago = 0; }
+      layout(); renderList(); recount();
+      reopen(t && t.parentId ? t.parentId : aid);
+      return;
+    }
+
+    var rm = e.target.closest("[data-remove]") || e.target.closest("[data-report]");
+    if (rm){
+      var rid = rm.getAttribute("data-remove") || rm.getAttribute("data-report");
+      var wasReply = replies.some(function(x){ return x.id === rid; });
+      var parentId = wasReply ? replies.find(function(x){ return x.id === rid; }).parentId : null;
+      posts = posts.filter(function(x){ return x.id !== rid; });
+      replies = replies.filter(function(x){ return x.id !== rid && x.parentId !== rid; });
+      layout(); renderList(); recount();
+      if (wasReply) reopen(parentId); else closePanel();
+      return;
+    }
+
+    if (e.target.id === "answerBtn"){ answerFor = openId; reopen(); document.getElementById("answerField").focus(); return; }
+    if (e.target.id === "answerCancel"){ answerFor = null; reopen(); return; }
+    if (e.target.id === "answerSend"){
+      var fa = document.getElementById("answerField");
+      var txt = fa ? fa.value.trim() : "";
+      if (!txt) { if (fa) fa.focus(); return; }
+      var parent = answerFor;
+      replies.push(WP.makePost(txt, parent));
+      answerFor = null;
+      layout(); renderList();
+      reopen(parent);
+      return;
+    }
+  });
+
+  /* ---- writing ---- */
+  var veil = document.getElementById("veil"), write = document.getElementById("write");
+  function openWrite(){
+    veil.classList.add("is-on"); write.classList.add("is-on");
+    setTimeout(function(){ document.getElementById("writeField").focus(); }, 120);
+  }
+  function closeWrite(){ veil.classList.remove("is-on"); write.classList.remove("is-on"); }
+  document.getElementById("openWrite").addEventListener("click", openWrite);
+  document.getElementById("writeCancel").addEventListener("click", closeWrite);
+  veil.addEventListener("click", closeWrite);
+  document.getElementById("writeSend").addEventListener("click", function(){
+    var f = document.getElementById("writeField");
+    var text = f.value.trim(); if (!text) return;
+    var p = WP.makePost(text);
+    posts.unshift(p); f.value = ""; closeWrite();
+    layout(); renderList(); recount();
+    var n = nodes.find(function(x){ return x.post.id === p.id; });
+    if (n) setTimeout(function(){ open(n); }, 420);
+  });
+
+  document.addEventListener("keydown", function(e){
+    if (e.key === "Escape"){ closeWrite(); closePanel(); document.getElementById("list").classList.remove("is-on"); }
+  });
+
+  document.getElementById("recenter").addEventListener("click", function(){
+    cam.tx = 0; cam.ty = 0; cam.ts = .62; closePanel();
+  });
+
+  /* ---- list fallback ---- */
+  var listEl = document.getElementById("list"), listBody = document.getElementById("listBody");
+  /* The list is not a courtesy copy, it is the version that works without a
+     pointer, so everything the field can do has to be reachable from here
+     too, the moderator's pass included. */
+  function renderList(){
+    function mod(x){
+      return x.pending
+        ? '<p style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">' +
+          '<button class="tool tool--mod tool--sm" type="button" data-approve="' + x.id + '">Approve it</button>' +
+          '<button class="tool tool--sm" type="button" data-remove="' + x.id + '">Take it down</button></p>'
+        : "";
+    }
+    listBody.innerHTML = posts.map(function(p){
+      var kids = replies.filter(function(r){ return r.parentId === p.id; });
+      return "<article><p>" + WP.esc(p.body) + "</p>" +
+        '<p class="m">' + WP.ago(p.ago) + (p.pending ? " &middot; waiting to be read" : " &middot; " + p.support + " found this helpful") + "</p>" +
+        mod(p) +
+        kids.map(function(k){
+          return '<div class="reply">' + WP.esc(k.body) +
+            "<span>" + (k.pending ? "waiting to be read" : WP.ago(k.ago) + " &middot; an answer") + "</span>" + mod(k) + "</div>";
+        }).join("") +
+        "</article>";
+    }).join("");
+  }
+  /* Same handlers, reached from the list. */
+  listBody.addEventListener("click", function(e){
+    var ap = e.target.closest("[data-approve]"), rm = e.target.closest("[data-remove]");
+    if (!ap && !rm) return;
+    var id = (ap || rm).getAttribute(ap ? "data-approve" : "data-remove");
+    if (ap){
+      var t = posts.concat(replies).find(function(x){ return x.id === id; });
+      if (t){ t.pending = false; t.ago = 0; }
+    } else {
+      posts = posts.filter(function(x){ return x.id !== id; });
+      replies = replies.filter(function(x){ return x.id !== id && x.parentId !== id; });
+    }
+    layout(); renderList(); recount();
+  });
+  document.getElementById("openList").addEventListener("click", function(){ renderList(); listEl.classList.add("is-on"); });
+  document.getElementById("closeList").addEventListener("click", function(){ listEl.classList.remove("is-on"); });
+
+  function recount(){ document.getElementById("count").textContent = posts.filter(function(p){ return !p.pending; }).length; }
+
+  resize(); layout(); renderList(); recount();
+  cam.s = cam.ts = 1.5; cam.ts = .62;   // opens by pulling back: the field first, then the words
+  tick();
+})();
+</script>
+</body>
+</html>
