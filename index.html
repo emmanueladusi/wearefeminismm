@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script>(function(){try{var t=localStorage.getItem("wf-theme");var d=t?t==="dark":matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.setAttribute("data-theme",d?"dark":"light");if(localStorage.getItem("wf-a11y"))document.documentElement.setAttribute("data-a11y","");}catch(e){}})();</script>
+  <script>(function(){try{var t=localStorage.getItem("wf-theme");var d=t==="dark";document.documentElement.setAttribute("data-theme",d?"dark":"light");if(localStorage.getItem("wf-a11y"))document.documentElement.setAttribute("data-a11y","");}catch(e){}})();</script>
   <title>wearefeminismm · Every voice deserves to be heard</title>
   <meta name="description" content="A space for students, especially girls and Black girls, to learn about feminism, share real experiences anonymously, and stand behind each other. Student-led, always anonymous." />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
@@ -26,7 +26,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=263" />
+  <link rel="stylesheet" href="css/styles.css?v=283" />
   <script>(function(){var d=document.documentElement;d.classList.add("js");setTimeout(function(){if(!d.classList.contains("reveal-ready"))d.classList.remove("js");},2500);})();</script>
 </head>
 <body>
@@ -78,7 +78,7 @@
       <a href="learn.html">Learn</a>
       <a href="community.html">Community</a>
       <a href="play.html">Play</a>
-      <a href="voice.html">Your voice</a>
+      <a href="wall.html">The Wall</a>
     </nav>
     <div class="nav__right">
       <span class="nav__tools"><button class="nav__toggle" id="darkToggle" type="button" title="Dark mode" aria-label="Dark mode" aria-pressed="false" data-magnetic><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.5 6.5 0 0 0 9.8 9.8z"/></svg></button>
@@ -117,9 +117,9 @@
           <span class="menu__label">Play</span>
           <span class="menu__go" aria-hidden="true">&#8594;</span>
         </a></li>
-        <li><a class="menu__row" href="voice.html">
+        <li><a class="menu__row" href="wall.html">
           <span class="menu__num" aria-hidden="true">05</span>
-          <span class="menu__label">Your voice</span>
+          <span class="menu__label">The Wall</span>
           <span class="menu__go" aria-hidden="true">&#8594;</span>
         </a></li>
         <li><a class="menu__row" href="sources.html">
@@ -156,10 +156,12 @@
       <div class="brandmark__ctas">
         <span>
           <a href="learn.html" class="cta" data-magnetic>Start learning <span class="cta__arrow">→</span></a>
-          <a href="voice.html#wall" class="cta cta--quiet" data-magnetic>Share your story <span class="cta__arrow">→</span></a>
+          <a href="wall.html" class="cta cta--quiet" data-magnetic>Share your story <span class="cta__arrow">→</span></a>
         </span>
       </div>
-      <p class="brandmark__note">Reflections you write stay on your own device. Nothing is uploaded, and no one else can read them.</p>
+      <!-- The device-only privacy note was removed on 2026-08-08: it sat directly
+           under a CTA that now goes to the PUBLIC wall, so it promised the
+           opposite of what that button does. -->
     </div>
   </section>
 
@@ -174,7 +176,7 @@
        and fade to 0.62 as a section passes the viewport centre) is off on the
        home page. The colour morph, the progress line and the kinetic
        headlines all still run; only the per-section scale/fade is gone.
-       learn.html and voice.html still opt in. -->
+       learn.html still opts in. -->
   <section class="paths" id="paths" data-bg="#e2dbd8" data-thread-start>
     <p class="eyebrow reveal">Start wherever you want</p>
     <!-- an ordered list, so the "three moves" sequence is carried by the
@@ -192,7 +194,7 @@
         </a>
       </li>
       <li class="paths__item reveal">
-        <a href="voice.html#wall" class="pathway">
+        <a href="wall.html" class="pathway">
           <span class="pathway__num" aria-hidden="true">02</span>
           <div class="pathway__body">
             <h2>Share <em>your</em> story</h2>
@@ -285,7 +287,7 @@
       </article>
       <!-- ========== END SWAP BLOCK ========== -->
 
-      <p class="popculture__foot reveal">002 goes up next week. If you know something that belongs here, tell me. <a class="piece__suggest" href="voice.html#wall">Put it on the wall →</a></p>
+      <p class="popculture__foot reveal">002 goes up next week. If you know something that belongs here, tell me. <a class="piece__suggest" href="wall.html">Put it on the wall →</a></p>
       <p class="piece__credits reveal">Photo: Maya Angelou reciting "On the Pulse of Morning" at the 1993 presidential inauguration. White House Photograph Office, public domain, via Wikimedia Commons.</p>
     </div>
   </section>
@@ -350,12 +352,12 @@
   <script src="js/brandmarkCycle.js?v=905"></script>
   <script src="js/signature.js?v=1"></script>
   <script src="js/polish.js?v=82"></script>
-  <script src="js/main.js?v=88"></script>
+  <script src="js/main.js?v=89"></script>
   <script src="js/homescroll.js?v=1"></script>
   <script src="js/inkpiece.js?v=1"></script>
   <script src="js/cover.js?v=1"></script>
   <script src="js/scrollStroke.js?v=1"></script>
-  <script src="js/theme.js?v=2"></script>
+  <script src="js/theme.js?v=4"></script>
   <script src="js/nav.js?v=4"></script>
   <script src="js/transition.js?v=1"></script>
 </body>

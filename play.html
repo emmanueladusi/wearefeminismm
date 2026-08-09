@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script>(function(){try{var t=localStorage.getItem("wf-theme");var d=t?t==="dark":matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.setAttribute("data-theme",d?"dark":"light");if(localStorage.getItem("wf-a11y"))document.documentElement.setAttribute("data-a11y","");}catch(e){}})();</script>
+  <script>(function(){try{var t=localStorage.getItem("wf-theme");var d=t==="dark";document.documentElement.setAttribute("data-theme",d?"dark":"light");if(localStorage.getItem("wf-a11y"))document.documentElement.setAttribute("data-a11y","");}catch(e){}})();</script>
   <title>wearefeminismm · Play</title>
   <meta name="description" content="A new round of feminism cards every day, a streak worth keeping, then travel back to 1912." />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
@@ -23,9 +23,10 @@
   <meta name="twitter:image" content="https://emmanueladusi.github.io/wearefeminismm/img/og-image.png" />
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-  <link rel="stylesheet" href="css/styles.css?v=263" />
+  <link rel="stylesheet" href="css/styles.css?v=283" />
   <link rel="stylesheet" href="css/daily.css?v=3" />
   <link rel="stylesheet" href="css/wordle.css?v=3" />
+  <link rel="stylesheet" href="css/crossword.css?v=1" />
   <link rel="stylesheet" href="css/arcade.css?v=2" />
   <script>(function(){var d=document.documentElement;d.classList.add("js");setTimeout(function(){if(!d.classList.contains("reveal-ready"))d.classList.remove("js");},2500);})();</script>
 </head>
@@ -58,7 +59,7 @@
       <a href="learn.html">Learn</a>
       <a href="community.html">Community</a>
       <a href="play.html" aria-current="page">Play</a>
-      <a href="voice.html">Your voice</a>
+      <a href="wall.html">The Wall</a>
     </nav>
     <div class="nav__right">
       <span class="nav__tools"><button class="nav__toggle" id="darkToggle" type="button" title="Dark mode" aria-label="Dark mode" aria-pressed="false" data-magnetic><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.5 6.5 0 0 0 9.8 9.8z"/></svg></button>
@@ -97,9 +98,9 @@
           <span class="menu__label">Play</span>
           <span class="menu__go" aria-hidden="true">&#8594;</span>
         </a></li>
-        <li><a class="menu__row" href="voice.html">
+        <li><a class="menu__row" href="wall.html">
           <span class="menu__num" aria-hidden="true">05</span>
-          <span class="menu__label">Your voice</span>
+          <span class="menu__label">The Wall</span>
           <span class="menu__go" aria-hidden="true">&#8594;</span>
         </a></li>
         <li><a class="menu__row" href="sources.html">
@@ -129,7 +130,7 @@
       <h1 class="poster">
         <span class="poster__line"><span class="pw" style="--w:0">New</span> <span class="pw pw--gold" style="--w:1"><em>every day.</em></span></span>
       </h1>
-      <p class="masthead__lead">Three short things: a word whose length changes every morning, five cards to call, and a trip back to 1912. Pick one, keep a streak, come back tomorrow.</p>
+      <p class="masthead__lead">Four short things: a word whose length changes every morning, five cards to call, a mini crossword built from what you've read here, and a trip back to 1912. Pick one, keep a streak, come back tomorrow.</p>
     </div>
   </header>
 
@@ -158,6 +159,15 @@
             <h3 class="acard__t">The Daily</h3>
             <p class="acard__sub">5 cards &middot; about a minute</p>
             <p class="acard__d">Myths to catch, posts to read closely, questions to answer. Every card tells you why.</p>
+            <span class="acard__go">Play <span class="cta__arrow" aria-hidden="true">&rarr;</span></span>
+          </button>
+
+          <button class="acard" type="button" data-opens="thecrossword" data-title="The Crossword">
+            <span class="acard__badge" data-badge hidden></span>
+            <span class="acard__k">Solve</span>
+            <h3 class="acard__t">The Crossword</h3>
+            <p class="acard__sub">New grid every day</p>
+            <p class="acard__d">Every answer is something you could have read on this site: a name, a year, a word.</p>
             <span class="acard__go">Play <span class="cta__arrow" aria-hidden="true">&rarr;</span></span>
           </button>
 
@@ -203,6 +213,17 @@
     </div>
   </section>
 
+  <!-- ===== The Crossword =====
+       js/crosswordData.js is GENERATED (tools/gen_crossword.py) from answers
+       and clues drawn from this site's own content, so every solve doubles
+       as a recap of what's on Learn, Community and the Time Machine. -->
+  <section class="xwrap" id="thecrossword" hidden>
+    <div class="xwrap__inner">
+      <p class="xwrap__eyebrow">Solve &middot; new grid every day</p>
+      <div id="crossword"></div>
+    </div>
+  </section>
+
   <section class="ym" id="machine" aria-label="The year machine" hidden>
     <div class="ym__inner">
       <p class="eyebrow eyebrow--light">Activity · about two minutes</p>
@@ -231,7 +252,7 @@
       <div class="ym__foot" id="ymFoot" hidden>
         <p class="ym__summary" id="ymSummary"></p>
         <p class="ym__foot-line">All of that is one lifetime. One girl, waiting. You made it back to 2026.</p>
-        <a class="ym__cta" href="voice.html#wall">Write a private reflection <span class="cta__arrow">↓</span></a>
+        <a class="ym__cta" href="wall.html">Put it on the wall <span class="cta__arrow">↓</span></a>
       </div>
     </div>
   </section>
@@ -267,17 +288,19 @@
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
   <script src="js/scroll.js?v=79"></script>
   <script src="js/polish.js?v=82"></script>
-  <script src="js/main.js?v=88"></script>
+  <script src="js/main.js?v=89"></script>
   <script src="js/quizQuestions.js?v=1"></script>
   <script src="js/mythCards.js?v=1"></script>
   <script src="js/biasCards.js?v=1"></script>
   <script src="js/daily.js?v=2"></script>
   <script src="js/wordList.js?v=2"></script>
   <script src="js/wordle.js?v=1"></script>
+  <script src="js/crosswordData.js?v=1"></script>
+  <script src="js/crossword.js?v=1"></script>
   <script src="js/inkgarden.js?v=1"></script>
-  <script src="js/yearmachine.js?v=5"></script>
+  <script src="js/yearmachine.js?v=6"></script>
   <script src="js/arcade.js?v=1"></script>
-  <script src="js/theme.js?v=2"></script>
+  <script src="js/theme.js?v=4"></script>
   <script src="js/nav.js?v=4"></script>
   <script src="js/ui.js?v=1"></script>
   <script src="js/transition.js?v=1"></script>

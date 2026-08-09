@@ -148,6 +148,19 @@ img{max-width:100%;display:block}
 .portal__lead{max-width:56ch;color:var(--ink-dim);font-size:1.02rem}
 .portal__ctas{display:flex;flex-wrap:wrap;gap:14px;margin-top:28px;position:relative;z-index:1}
 
+/* Accessible mode never enters the 3D gallery. openGallery() reroutes every
+   way in (button, hung prints, HUD, ?room= link) to the calm version; this
+   just stops the page offering a door it will not open. "Read the calm
+   version" is then the only action, so it stops being the quiet one. */
+.portal__a11y,.onlycalm{display:none}
+html[data-a11y] .only3d{display:none}
+html[data-a11y] .onlycalm{display:inline}
+html[data-a11y] .portal .btn--coin{display:none}
+html[data-a11y] .portal__a11y{
+  display:block;flex:1 1 100%;max-width:56ch;margin-top:2px;
+  font-size:.92rem;line-height:1.6;color:var(--ink-dim)}
+html[data-a11y] .portal .btn--flow{border-color:var(--gold);font-weight:600}
+
 /* =====================================================================
    THE WALL AT THE ENTRANCE
    Six works hung along one line, not six rows in a list. Widths and
@@ -2222,9 +2235,13 @@ body.perfopen .perfpanel{display:block}
 <section class="entrance" aria-label="Gallery entrance">
   <div class="portal" id="portal">
     <p class="eyebrow eyebrow--light">Part two · the history · now an exhibition</p>
-    <h1>Enter <em>the gallery.</em></h1>
+    <!-- Two headings, one shown at a time. Accessible mode removes the door,
+         so it must not still say "Enter" — and swapping the words in CSS
+         rather than JS means it follows the toggle live, both ways. -->
+    <h1><span class="only3d">Enter <em>the gallery.</em></span><span class="onlycalm">The gallery, <em>in writing.</em></span></h1>
     <p class="portal__lead">Three lenses on one word. Four waves across 178 years. Six scholars whose
-      work carries it. Every piece hangs in its own room, and you choose where to go.</p>
+      work carries it. <span class="only3d">Every piece hangs in its own room, and you choose where
+      to go.</span><span class="onlycalm">Every piece is written out in full below.</span></p>
 
     <div class="portal__ctas">
       <button class="btn btn--coin" id="enterBtn">
@@ -2243,6 +2260,11 @@ body.perfopen .perfpanel{display:block}
         <span class="btn__fill" aria-hidden="true"></span>
         <svg class="btn__arr btn__arr--out" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
       </button>
+      <!-- Shown only under accessible mode, where the Enter button is hidden.
+           A button that quietly disappears leaves people wondering what they
+           missed, so the page says what it did and how to undo it. -->
+      <p class="portal__a11y">Accessible mode is on, so the 3D gallery is turned off. Everything in
+        it is written out below. Use the accessibility button in the header to turn it back on.</p>
     </div>
 
     <!-- The six chapters, hung. They used to be six identical rounded rows
@@ -2887,6 +2909,16 @@ function answerQuiz(w,btn,i,optsEl,verdictEl){
    ===================================================================== */
 function openGallery(chapterId){
   const g = $('#gallery');
+  /* Accessible mode does not enter the 3D gallery at all. The guard lives
+     HERE rather than on the Enter button because the button is only one of
+     the ways in: the six hung prints, the HUD and the ?room= deep link all
+     land on this function too, and hiding a button would have left every
+     other route open. Calm mode holds the same words, so this reroutes to
+     the matching section instead of refusing. */
+  if (document.documentElement.hasAttribute('data-a11y')){
+    enterCalm(chapterId ? 'flat-'+(chapterId==='lenses'?'lenses':chapterId) : null);
+    return;
+  }
   if (document.body.classList.contains('flatmode')){ // calm mode: jump to the flat anchor instead
     location.hash = '#flat-'+(chapterId==='lenses'?'lenses':chapterId);
     return;

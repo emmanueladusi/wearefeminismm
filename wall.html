@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>(function(){try{var t=localStorage.getItem("wf-theme");var d=t==="dark";document.documentElement.setAttribute("data-theme",d?"dark":"light");if(localStorage.getItem("wf-a11y"))document.documentElement.setAttribute("data-a11y","");}catch(e){}})();</script>
+  <title>wearefeminismm · The Wall</title>
+  <meta name="description" content="A shared, moderated wall where students can say what they have lived through and answer each other. Anonymous, no account, and nothing appears until a person has read it." />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <meta name="theme-color" content="#452f28" />
+  <!-- Open Graph / social share -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="wearefeminismm" />
+  <meta property="og:title" content="wearefeminismm · The Wall" />
+  <meta property="og:description" content="A shared, moderated wall for students. Anonymous, no account, nothing public until a person has read it." />
+  <meta property="og:url" content="https://emmanueladusi.github.io/wearefeminismm/wall.html" />
+  <meta property="og:image" content="https://emmanueladusi.github.io/wearefeminismm/img/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="wearefeminismm · The Wall" />
+  <meta name="twitter:description" content="A shared, moderated wall for students. Anonymous, no account." />
+  <meta name="twitter:image" content="https://emmanueladusi.github.io/wearefeminismm/img/og-image.png" />
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+  <link rel="stylesheet" href="css/styles.css?v=283" />
+  <script>(function(){var d=document.documentElement;d.classList.add("js");setTimeout(function(){if(!d.classList.contains("reveal-ready"))d.classList.remove("js");},2500);})();</script>
+</head>
+<body class="page-flat">
+  <script>document.body.classList.add("is-loading");</script>
+  <!-- WCAG 2.0 A, 2.4.1 Bypass Blocks: first thing in the tab order. -->
+  <a class="skip-link" href="#main">Skip to content</a>
+  <noscript><style>.preloader{display:none}</style></noscript>
+
+  <!-- Preloader: violet curtain with counter, lifts when the page is ready -->
+  <div class="preloader" id="preloader" aria-hidden="true">
+    <div class="preloader__inner">
+      <p class="preloader__mark">wearefeminismm</p>
+      <div class="preloader__bar"><div class="preloader__bar-fill" id="preBar"></div></div>
+      <p class="preloader__count"><span id="preCount">0</span>%</p>
+    </div>
+  </div>
+
+  <!-- Custom cursor (fine pointers only) -->
+  <div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
+  <div class="cursor-ring" id="cursorRing" aria-hidden="true"></div>
+
+  <!-- (Cursor-reactive fluid banner lives on Home only.) -->
+
+  <!-- ===== Nav ===== -->
+  <header class="nav" id="nav">
+    <a class="nav__logo" href="index.html" data-magnetic>wearefeminismm</a>
+    <nav class="nav__links" aria-label="Primary">
+      <a href="index.html">Home</a>
+      <a href="learn.html">Learn</a>
+      <a href="community.html">Community</a>
+      <a href="play.html">Play</a>
+      <a href="wall.html" aria-current="page">The Wall</a>
+    </nav>
+    <div class="nav__right">
+      <span class="nav__tools"><button class="nav__toggle" id="darkToggle" type="button" title="Dark mode" aria-label="Dark mode" aria-pressed="false" data-magnetic><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.5 6.5 0 0 0 9.8 9.8z"/></svg></button>
+      <button class="nav__toggle" id="a11yToggle" type="button" title="Accessible mode" aria-label="Accessible mode" aria-pressed="false" data-magnetic><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="7.3" r="1.4" fill="currentColor"/><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M7.6 10.2h8.8M12 10.6v4.2m0 0-1.9 3.2m1.9-3.2 1.9 3.2"/></svg></button></span>
+      <button class="nav__menu-btn" id="navBurger" type="button" aria-expanded="false" aria-controls="navMenu" data-magnetic>
+        <span class="nav__menu-word">Menu</span>
+        <span class="nav__menu-bars" aria-hidden="true"><span></span><span></span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Overlay menu: a single panel that carries the whole site, the way in
+       and the way to reach us. Numbered rows so the order is legible. -->
+  <div class="menu" id="navMenu" hidden>
+    <div class="menu__scrim" data-menu-close></div>
+    <nav class="menu__panel" aria-label="Site">
+      <button class="menu__close" type="button" aria-label="Close menu" data-menu-close>&#10005;</button>
+      <ul class="menu__list">
+        <li><a class="menu__row" href="index.html">
+          <span class="menu__num" aria-hidden="true">01</span>
+          <span class="menu__label">Home</span>
+          <span class="menu__go" aria-hidden="true">&#8594;</span>
+        </a></li>
+        <li><a class="menu__row" href="learn.html">
+          <span class="menu__num" aria-hidden="true">02</span>
+          <span class="menu__label">Learn</span>
+          <span class="menu__go" aria-hidden="true">&#8594;</span>
+        </a></li>
+        <li><a class="menu__row" href="community.html">
+          <span class="menu__num" aria-hidden="true">03</span>
+          <span class="menu__label">Community</span>
+          <span class="menu__go" aria-hidden="true">&#8594;</span>
+        </a></li>
+        <li><a class="menu__row" href="play.html">
+          <span class="menu__num" aria-hidden="true">04</span>
+          <span class="menu__label">Play</span>
+          <span class="menu__go" aria-hidden="true">&#8594;</span>
+        </a></li>
+        <li><a class="menu__row" href="wall.html" aria-current="page">
+          <span class="menu__num" aria-hidden="true">05</span>
+          <span class="menu__label">The Wall</span>
+          <span class="menu__go" aria-hidden="true">&#8594;</span>
+        </a></li>
+        <li><a class="menu__row" href="sources.html">
+          <span class="menu__num" aria-hidden="true">06</span>
+          <span class="menu__label">Sources</span>
+          <span class="menu__go" aria-hidden="true">&#8594;</span>
+        </a></li>
+      </ul>
+      <div class="menu__foot">
+        <a class="menu__ig" href="https://instagram.com/ourfeministspacee" target="_blank" rel="noopener">@ourfeministspacee</a>
+        <p class="menu__fine">Anonymous, always. You never have to share your name.</p>
+      </div>
+    </nav>
+  </div>
+
+  <main id="main">
+
+  <!-- ===== The shared wall =====
+       Nothing here is public until a person has approved it, and no name or
+       account is ever attached. This wall starts empty. -->
+  <header class="masthead" id="top">
+    <div class="pwrap">
+      <p class="masthead__eyebrow">The Wall</p>
+      <h1 class="masthead__title">Say it where someone will answer.</h1>
+      <p class="masthead__lead">Anonymous, no account, no name. Post what you have lived through, or
+        answer someone who has. <strong>Nothing appears here until a person has read it.</strong></p>
+    </div>
+  </header>
+
+  <nav class="secnav" data-secnav aria-label="Sections on this page">
+    <a href="#feed">The wall</a>
+    <a href="#write">Write something</a>
+    <a href="#rules">House rules</a>
+  </nav>
+
+  <section class="psec" id="write">
+    <div class="pwrap">
+      <div class="wgrid">
+        <div class="wgrid__main">
+          <!-- Shown when the wall has no server wired up yet. -->
+          <div class="wnotice" id="wallOffline" hidden>
+            <p data-offline-msg></p>
+          </div>
+
+          <form class="wcompose" id="wallCompose">
+            <label class="visually-hidden" for="wallText">Write something for the wall</label>
+            <textarea id="wallText" class="wcompose__field" rows="4" maxlength="1200"
+              placeholder="Something that happened. Something you noticed. Something you wish someone had told you."></textarea>
+            <p class="caution" id="wallCaution" role="status" hidden></p>
+            <div class="wcompose__row">
+              <p class="wcompose__note">No name is attached. You can take it down later.</p>
+              <button class="cta" type="submit">Post it</button>
+            </div>
+          </form>
+
+          <p class="wstatus" id="wallStatus" role="status" aria-live="polite"></p>
+
+          <div class="wbar" id="feed">
+            <p class="wbar__count" id="wallCount">0 posts</p>
+            <div class="wbar__sort">
+              <label for="wallSort">Sort</label>
+              <select id="wallSort">
+                <option value="new">Newest</option>
+                <option value="supported">Most helpful</option>
+              </select>
+            </div>
+          </div>
+
+          <ul class="wfeed" id="wallFeed"></ul>
+
+          <div class="wempty" id="wallEmpty" hidden>
+            <p><strong>Nothing on the wall yet.</strong></p>
+            <p>It starts empty on purpose. Whatever you write is the first thing anyone reads here.</p>
+          </div>
+
+          <noscript>
+            <div class="wempty">
+              <p><strong>The wall needs JavaScript.</strong></p>
+              <p>The rest of the site does not, so you can still read everything else with it off.</p>
+            </div>
+          </noscript>
+        </div>
+
+        <aside class="wgrid__side" id="rules" aria-label="House rules">
+          <h2 class="wside__h">How this wall works</h2>
+          <ul class="wside__list">
+            <li><strong>A person reads it first.</strong> Your post waits until it has been approved.
+              You can see your own while it waits. Nobody else can.</li>
+            <li><strong>No name, no account.</strong> Nothing you post is tied to who you are.</li>
+            <li><strong>No downvotes.</strong> You can mark a post as helpful, and that is the only
+              number on this page. There is nothing here to lose.</li>
+            <li><strong>Take it down any time.</strong> Your own posts, whenever you want.</li>
+            <li><strong>Report anything cruel.</strong> One report pulls a post off the wall
+              straight away, before anyone reviews it.</li>
+          </ul>
+          <p class="wside__warn"><strong>Do not post anything that identifies you or anyone else.</strong>
+            No full names, no schools, no handles, no phone numbers. This page checks for those and
+            will ask you twice, but it cannot catch everything.</p>
+          <p class="wside__help">If things are bad right now: <strong>Kids Help Phone</strong>, text
+            CONNECT to 686868, any hour. Black youth can text RISE to the same number. Or call 988.</p>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  </main>
+
+  <!-- ===== Footer ===== -->
+  <footer class="footer" data-bg="#e2dbd8" data-scene>
+    <p class="footer__mark">wearefeminismm</p>
+    <p class="footer__mission">Anonymous, moderated, and empty until you write on it.</p>
+    
+    <a class="footer__ig" href="https://instagram.com/ourfeministspacee" target="_blank" rel="noopener" data-magnetic>@ourfeministspacee on Instagram →</a>
+    <p class="footer__fine">Made with care. Your words are anonymous, and you never have to share your name.</p>
+    <p class="footer__refs"><a href="sources.html">Every claim on this site, and where it comes from &#8594;</a></p>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script src="js/scroll.js?v=79"></script>
+  <script src="js/aigspeed.js?v=94"></script>
+  <script src="js/polish.js?v=82"></script>
+  <script src="js/main.js?v=89"></script>
+  <script src="js/cards.js?v=93"></script>
+  <script src="js/echeading.js?v=1"></script>
+  <script src="js/theme.js?v=4"></script>
+  <script src="js/nav.js?v=4"></script>
+  <script src="js/ui.js?v=1"></script>
+  <script src="js/wallguard.js?v=2"></script>
+  <script src="js/wall.js?v=2"></script>
+  <script src="js/transition.js?v=1"></script>
+</body>
+</html>

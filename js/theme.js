@@ -1,7 +1,8 @@
 /* Dark mode + accessible mode (nav toggles).
-   - Dark mode follows the OS by default and can be flipped manually; the choice
-     is remembered. The no-flash <head> script sets the initial state so there's
-     no light flash on load; this only wires the buttons and keeps them synced.
+   - The site opens in LIGHT mode. Dark is opt-in via the nav toggle and the
+     choice is remembered; the OS colour scheme is deliberately not consulted.
+     The no-flash <head> script sets the initial state before first paint, so
+     this file only wires the buttons and keeps them synced.
    - Accessible mode forces reduced motion, higher contrast, larger + plainer
      text (all via CSS on <html data-a11y>), remembered too. */
 (function () {
@@ -54,14 +55,11 @@
   if (darkBtn) darkBtn.addEventListener("click", function () { setDark(!isDark()); });
   if (a11yBtn) a11yBtn.addEventListener("click", function () { setA11y(!isA11y()); });
 
-  // keep following the OS while the visitor hasn't made an explicit choice
-  try {
-    var mq = window.matchMedia("(prefers-color-scheme: dark)");
-    (mq.addEventListener ? mq.addEventListener.bind(mq, "change") : mq.addListener.bind(mq))(function (e) {
-      var saved; try { saved = localStorage.getItem(LS_THEME); } catch (x) {}
-      if (!saved) setDark(e.matches);
-    });
-  } catch (e) {}
+  /* The site no longer follows the OS colour scheme. Light is the default and
+     dark is something the visitor turns on, so there is nothing to listen to:
+     an OS-preference listener here would have flipped the page to dark under
+     someone who never asked for it, undoing the default set by the no-flash
+     script in each page's <head>. */
 
   sync();
 })();

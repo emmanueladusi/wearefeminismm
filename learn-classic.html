@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script>(function(){try{var t=localStorage.getItem("wf-theme");var d=t?t==="dark":matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.setAttribute("data-theme",d?"dark":"light");if(localStorage.getItem("wf-a11y"))document.documentElement.setAttribute("data-a11y","");}catch(e){}})();</script>
+  <script>(function(){try{var t=localStorage.getItem("wf-theme");var d=t==="dark";document.documentElement.setAttribute("data-theme",d?"dark":"light");if(localStorage.getItem("wf-a11y"))document.documentElement.setAttribute("data-a11y","");}catch(e){}})();</script>
   <title>wearefeminism · Learn</title>
   <meta name="description" content="Feminism, Black feminism, and intersectionality, explained with respect for your intelligence. Part of a student-led, anonymous learning space." />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
@@ -23,7 +23,7 @@
   <meta name="twitter:image" content="https://emmanueladusi.github.io/wearefeminismm/img/og-image.png" />
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-  <link rel="stylesheet" href="css/styles.css?v=263" />
+  <link rel="stylesheet" href="css/styles.css?v=283" />
   <script>(function(){var d=document.documentElement;d.classList.add("js");setTimeout(function(){if(!d.classList.contains("reveal-ready"))d.classList.remove("js");},2500);})();</script>
 </head>
 <body>
@@ -65,7 +65,7 @@
       <a href="learn.html" aria-current="page">Learn</a>
       <a href="community.html">Community</a>
       <a href="play.html">Play</a>
-      <a href="voice.html">Your voice</a>
+      <a href="wall.html">The Wall</a>
     </nav>
     <div class="nav__right">
       <span class="nav__tools"><button class="nav__toggle" id="darkToggle" type="button" title="Dark mode" aria-label="Dark mode" aria-pressed="false" data-magnetic><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.5 6.5 0 0 0 9.8 9.8z"/></svg></button>
@@ -104,9 +104,9 @@
           <span class="menu__label">Play</span>
           <span class="menu__go" aria-hidden="true">&#8594;</span>
         </a></li>
-        <li><a class="menu__row" href="voice.html">
+        <li><a class="menu__row" href="wall.html">
           <span class="menu__num" aria-hidden="true">05</span>
-          <span class="menu__label">Your voice</span>
+          <span class="menu__label">The Wall</span>
           <span class="menu__go" aria-hidden="true">&#8594;</span>
         </a></li>
         <li><a class="menu__row" href="sources.html">
@@ -185,6 +185,32 @@
         </div>
       </div>
       <p class="sparkcard__mission">That number is the assignment. Everything on this page is the answer.</p>
+    </div>
+  </section>
+
+  <!-- ===== The bookend: what students said AFTER using the site =====
+       Same instrument as the pulse card above, read a second time. It is a
+       separate survey of a different group, so the two cards are deliberately
+       NOT presented as one before-and-after number: there is no matched
+       baseline, and claiming a change we did not measure is the sort of thing
+       sources.html exists to prevent. Counts come from js/results.js. -->
+  <section class="afterpulse" id="after-pulse" data-bg="#dbd2ce">
+    <div class="sparkcard aftercard">
+      <p class="eyebrow">Result · the survey after viewing</p>
+      <h2 class="sparkcard__q">And once they had <em>actually used it?</em></h2>
+      <ul class="rlist" id="resultsList"></ul>
+
+      <!-- shown only if the live endpoint is unreachable, so the card never
+           sits empty; mirrors the pulse card's fallback -->
+      <div class="sparkfb" id="resultsFallback" hidden>
+        <p data-results-msg role="status" aria-live="polite"></p>
+        <button class="dirbtn" type="button" data-results-retry>Retry</button>
+      </div>
+
+      <div class="sparkcard__foot">
+        <div class="sparkcard__counts" id="resultsFoot">Loading responses…</div>
+      </div>
+      <p class="sparkcard__mission">The first card is the problem. This one is the marking.</p>
     </div>
   </section>
 
@@ -774,7 +800,7 @@
   <script src="js/morph.js?v=80"></script>
   <script src="js/journey.js?v=80"></script>
   <script src="js/polish.js?v=82"></script>
-  <script src="js/main.js?v=88"></script>
+  <script src="js/main.js?v=89"></script>
   <script src="js/timeline.js?v=5"></script>
   <!-- thread.js is Learn-only: here it draws the timeline's gold spine
        through every .th-anchor (the perf pass dropped it site-wide on the
@@ -787,7 +813,8 @@
   <script src="js/tlstage.js?v=2"></script>
   <script src="js/learnHero.js?v=1"></script>
   <script src="js/spark.js?v=91"></script>
-  <script src="js/theme.js?v=2"></script>
+  <script src="js/results.js?v=10"></script>
+  <script src="js/theme.js?v=4"></script>
   <script src="js/nav.js?v=4"></script>
   <script src="js/transition.js?v=1"></script>
 </body>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script>(function(){try{var t=localStorage.getItem("wf-theme");var d=t?t==="dark":matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.setAttribute("data-theme",d?"dark":"light");if(localStorage.getItem("wf-a11y"))document.documentElement.setAttribute("data-a11y","");}catch(e){}})();</script>
+  <script>(function(){try{var t=localStorage.getItem("wf-theme");var d=t==="dark";document.documentElement.setAttribute("data-theme",d?"dark":"light");if(localStorage.getItem("wf-a11y"))document.documentElement.setAttribute("data-a11y","");}catch(e){}})();</script>
   <title>wearefeminism · Learn</title>
   <meta name="description" content="Feminism, Black feminism, and intersectionality, explained with respect for your intelligence. Part of a student-led, anonymous learning space." />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
@@ -23,7 +23,7 @@
   <meta name="twitter:image" content="https://emmanueladusi.github.io/wearefeminismm/img/og-image.png" />
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-  <link rel="stylesheet" href="css/styles.css?v=263" />
+  <link rel="stylesheet" href="css/styles.css?v=283" />
   <!-- webfonts the gallery needs; the rest of Learn is unaffected -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -149,7 +149,14 @@
    heading sits on paper, so it measured 2.14:1 against the 3:1 WCAG 2.0 AA
    asks of large text. --gold-ink is 5.3:1 on cream and flips back to the
    bright gold on the dark theme, where that one is the readable one. */
-#wfgallery .portal h1 em{font-style:italic;color:#8a5e10}#wfgallery .portal__lead{max-width:56ch;color:var(--ink-dim);font-size:1.02rem}#wfgallery .portal__ctas{display:flex;flex-wrap:wrap;gap:14px;margin-top:28px;position:relative;z-index:1}/* =====================================================================
+#wfgallery .portal h1 em{font-style:italic;color:#8a5e10}#wfgallery .portal__lead{max-width:56ch;color:var(--ink-dim);font-size:1.02rem}#wfgallery .portal__ctas{display:flex;flex-wrap:wrap;gap:14px;margin-top:28px;position:relative;z-index:1}/* Accessible mode never enters the 3D gallery. openGallery() reroutes every
+   way in (button, hung prints, HUD, ?room= link) to the calm version; this
+   just stops the page offering a door it will not open. "Read the calm
+   version" is then the only action, so it stops being the quiet one. */
+#wfgallery .portal__a11y,
+#wfgallery .onlycalm{display:none}html[data-a11y] #wfgallery .only3d{display:none}html[data-a11y] #wfgallery .onlycalm{display:inline}html[data-a11y] #wfgallery .portal .btn--coin{display:none}html[data-a11y] #wfgallery .portal__a11y{
+  display:block;flex:1 1 100%;max-width:56ch;margin-top:2px;
+  font-size:.92rem;line-height:1.6;color:var(--ink-dim)}html[data-a11y] #wfgallery .portal .btn--flow{border-color:var(--gold);font-weight:600}/* =====================================================================
    THE WALL AT THE ENTRANCE
    Six works hung along one line, not six rows in a list. Widths and
    heights are irregular by design: a row of equal cards is the thing
@@ -1604,7 +1611,7 @@ body.powersave #wfgallery .roomnav{cursor:auto}/* the toggle, and the notice tha
       <a href="learn.html" aria-current="page">Learn</a>
       <a href="community.html">Community</a>
       <a href="play.html">Play</a>
-      <a href="voice.html">Your voice</a>
+      <a href="wall.html">The Wall</a>
     </nav>
     <div class="nav__right">
       <span class="nav__tools"><button class="nav__toggle" id="darkToggle" type="button" title="Dark mode" aria-label="Dark mode" aria-pressed="false" data-magnetic><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.5 6.5 0 0 0 9.8 9.8z"/></svg></button>
@@ -1643,9 +1650,9 @@ body.powersave #wfgallery .roomnav{cursor:auto}/* the toggle, and the notice tha
           <span class="menu__label">Play</span>
           <span class="menu__go" aria-hidden="true">&#8594;</span>
         </a></li>
-        <li><a class="menu__row" href="voice.html">
+        <li><a class="menu__row" href="wall.html">
           <span class="menu__num" aria-hidden="true">05</span>
-          <span class="menu__label">Your voice</span>
+          <span class="menu__label">The Wall</span>
           <span class="menu__go" aria-hidden="true">&#8594;</span>
         </a></li>
         <li><a class="menu__row" href="sources.html">
@@ -1727,6 +1734,7 @@ body.powersave #wfgallery .roomnav{cursor:auto}/* the toggle, and the notice tha
     </div>
   </section>
 
+
   <!-- ===== The exhibition. Replaces the three-lens section, the
        timeline and the resources list: same content, one source
        object, walked instead of scrolled. Everything above this
@@ -1745,9 +1753,13 @@ body.powersave #wfgallery .roomnav{cursor:auto}/* the toggle, and the notice tha
 <section class="entrance" id="exhibition" aria-label="Gallery entrance">
   <div class="portal" id="portal">
     <p class="eyebrow eyebrow--light">Part two · the history · now an exhibition</p>
-    <h1>Enter <em>the gallery.</em></h1>
+    <!-- Two headings, one shown at a time. Accessible mode removes the door,
+         so it must not still say "Enter" — and swapping the words in CSS
+         rather than JS means it follows the toggle live, both ways. -->
+    <h1><span class="only3d">Enter <em>the gallery.</em></span><span class="onlycalm">The gallery, <em>in writing.</em></span></h1>
     <p class="portal__lead">Three lenses on one word. Four waves across 178 years. Six scholars whose
-      work carries it. Every piece hangs in its own room, and you choose where to go.</p>
+      work carries it. <span class="only3d">Every piece hangs in its own room, and you choose where
+      to go.</span><span class="onlycalm">Every piece is written out in full below.</span></p>
 
     <div class="portal__ctas">
       <button class="btn btn--coin" id="enterBtn">
@@ -1766,6 +1778,11 @@ body.powersave #wfgallery .roomnav{cursor:auto}/* the toggle, and the notice tha
         <span class="btn__fill" aria-hidden="true"></span>
         <svg class="btn__arr btn__arr--out" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
       </button>
+      <!-- Shown only under accessible mode, where the Enter button is hidden.
+           A button that quietly disappears leaves people wondering what they
+           missed, so the page says what it did and how to undo it. -->
+      <p class="portal__a11y">Accessible mode is on, so the 3D gallery is turned off. Everything in
+        it is written out below. Use the accessibility button in the header to turn it back on.</p>
     </div>
 
     <!-- The six chapters, hung. They used to be six identical rounded rows
@@ -2412,6 +2429,16 @@ function answerQuiz(w,btn,i,optsEl,verdictEl){
    ===================================================================== */
 function openGallery(chapterId){
   const g = $('#gallery');
+  /* Accessible mode does not enter the 3D gallery at all. The guard lives
+     HERE rather than on the Enter button because the button is only one of
+     the ways in: the six hung prints, the HUD and the ?room= deep link all
+     land on this function too, and hiding a button would have left every
+     other route open. Calm mode holds the same words, so this reroutes to
+     the matching section instead of refusing. */
+  if (document.documentElement.hasAttribute('data-a11y')){
+    enterCalm(chapterId ? 'flat-'+(chapterId==='lenses'?'lenses':chapterId) : null);
+    return;
+  }
   if (document.body.classList.contains('flatmode')){ // calm mode: jump to the flat anchor instead
     location.hash = '#flat-'+(chapterId==='lenses'?'lenses':chapterId);
     return;
@@ -5730,6 +5757,32 @@ if(QS.get('deck')) addEventListener('load',()=>{
 
   </script>
 
+  <!-- ===== The bookend: what students said AFTER using the site =====
+       Same instrument as the pulse card above, read a second time. It is a
+       separate survey of a different group, so the two cards are deliberately
+       NOT presented as one before-and-after number: there is no matched
+       baseline, and claiming a change we did not measure is the sort of thing
+       sources.html exists to prevent. Counts come from js/results.js. -->
+  <section class="afterpulse" id="after-pulse" data-bg="#dbd2ce">
+    <div class="sparkcard aftercard">
+      <p class="eyebrow">Result · the survey after viewing</p>
+      <h2 class="sparkcard__q">And once they had <em>actually used it?</em></h2>
+      <ul class="rlist" id="resultsList"></ul>
+
+      <!-- shown only if the live endpoint is unreachable, so the card never
+           sits empty; mirrors the pulse card's fallback -->
+      <div class="sparkfb" id="resultsFallback" hidden>
+        <p data-results-msg role="status" aria-live="polite"></p>
+        <button class="dirbtn" type="button" data-results-retry>Retry</button>
+      </div>
+
+      <div class="sparkcard__foot">
+        <div class="sparkcard__counts" id="resultsFoot">Loading responses…</div>
+      </div>
+      <p class="sparkcard__mission">The first card is the problem. This one is the marking.</p>
+    </div>
+  </section>
+
   <!-- ===== Footer ===== -->
   <footer class="footer" data-bg="#e2dbd8" data-scene>
     <p class="footer__mark">wearefeminismm</p>
@@ -5747,7 +5800,7 @@ if(QS.get('deck')) addEventListener('load',()=>{
   <script src="js/morph.js?v=80"></script>
   <script src="js/journey.js?v=80"></script>
   <script src="js/polish.js?v=82"></script>
-  <script src="js/main.js?v=88"></script>
+  <script src="js/main.js?v=89"></script>
   <script src="js/timeline.js?v=5"></script>
   <!-- thread.js is Learn-only: here it draws the timeline's gold spine
        through every .th-anchor (the perf pass dropped it site-wide on the
@@ -5755,7 +5808,8 @@ if(QS.get('deck')) addEventListener('load',()=>{
   <script src="js/thread.js?v=118"></script>
   <script src="js/learnHero.js?v=1"></script>
   <script src="js/spark.js?v=91"></script>
-  <script src="js/theme.js?v=2"></script>
+  <script src="js/results.js?v=10"></script>
+  <script src="js/theme.js?v=4"></script>
   <script src="js/nav.js?v=4"></script>
   <script src="js/transition.js?v=1"></script>
 </body>

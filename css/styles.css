@@ -1737,7 +1737,29 @@ body.is-loading .h7__desc, body.is-loading .h7__ctas { animation-play-state: pau
   box-shadow: 0 8px 24px rgba(69, 47, 40, 0.18);
 }
 
-.ec-card-panel h3 { color: var(--accent); }
+/* "Community" was breaking mid-word ("Communit" / "y"): the panel scales off
+   the CARD's width (a vw-driven clamp), but this h3 was sized off the
+   VIEWPORT's own vw clamp at line ~1780 — two different rulers, so at
+   ordinary widths the word didn't fit the box its font thought it did.
+   Worse in accessible mode, which both scales every rem 115% AND swaps in
+   Verdana, a visibly wider face, at the same title. Sizing by cqw instead of
+   the viewport ties the font directly to the box actually holding it, so
+   there is no separate rem floor left to overflow that box regardless of
+   root scaling or typeface. container-type lives on .ec-card-panel (not the
+   card itself), so cqw already excludes the .ec-card-front's own padding. */
+.ec-card-panel { container-type: inline-size; }
+/* .ec-card h3 (below) sets its own font-size at equal specificity to a plain
+   ".ec-card-panel h3" — same (0,1,1) — so source order alone decided the
+   winner, and it was winning. ".ec-card .ec-card-panel h3" outranks it on
+   specificity instead of position, so this holds regardless of where either
+   rule sits in the file. */
+.ec-card .ec-card-panel h3 {
+  color: var(--accent);
+  white-space: nowrap;
+  overflow-wrap: normal;
+  hyphens: none;
+  font-size: min(1.7rem, 15.5cqw);
+}
 
 .ec-card-index {
   font-family: var(--mono);
@@ -6019,40 +6041,17 @@ html[data-theme="dark"] .menu__row[aria-current="page"] .menu__label { color: va
 .choice__d { font-size: var(--t-small); color: var(--ink-dim); line-height: 1.6; margin: 0; }
 .choice__go { margin-top: auto; font-size: var(--t-small); font-weight: 700; border-bottom: 2px solid var(--gold); padding-bottom: 3px; align-self: flex-start; }
 
-/* ---------- directory (Community) ---------- */
-.dirbar { display: grid; gap: 12px; margin-top: 22px; }
-.dirsearch { display: flex; gap: 10px; flex-wrap: wrap; }
-.dirsearch input[type="search"] {
-  flex: 1 1 240px;
-  min-height: 44px;
-  padding: 10px 14px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: var(--paper);
-  color: var(--ink);
-  font: inherit;
+/* ---------- shared pill + pill button ----------
+   Community no longer uses either (its cards lead with the name and its
+   filters are .chip), but learn.html still does: .tag on the word-wall cards
+   and .dirbtn on the spark Retry button. They live here, outside the
+   directory block, so a change to Community cannot silently restyle Learn. */
+.tag {
+  font-family: var(--mono); font-size: 0.66rem;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  padding: 4px 9px; border-radius: 999px;
+  border: 1px solid var(--line); color: var(--ink-dim);
 }
-.dirsearch input[type="search"]:focus-visible { outline: 2px solid var(--gold-ink); outline-offset: 1px; }
-[data-theme="dark"] .dirsearch input[type="search"] { background: rgba(255,255,255,0.06); }
-
-.dirfilters { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
-.dirfield { display: flex; flex-direction: column; gap: 5px; }
-.dirfield label {
-  font-family: var(--mono); font-size: var(--t-label);
-  text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-dim);
-}
-.dirfield select {
-  min-height: 44px;
-  padding: 9px 12px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: var(--paper);
-  color: var(--ink);
-  font: inherit;
-}
-[data-theme="dark"] .dirfield select { background: rgba(255,255,255,0.06); }
-.dirfield select:focus-visible { outline: 2px solid var(--gold-ink); outline-offset: 1px; }
-
 .dirbtn {
   min-height: 44px;
   padding: 10px 16px;
@@ -6064,56 +6063,243 @@ html[data-theme="dark"] .menu__row[aria-current="page"] .menu__label { color: va
 }
 .dirbtn:hover { border-color: var(--gold); }
 .dirbtn:focus-visible { outline: 2px solid var(--gold-ink); outline-offset: 2px; }
-.dirbtn[aria-pressed="true"] { border-color: var(--gold); background: var(--gold-soft); font-weight: 700; }
+
+/* ---------- directory (Community) ----------
+   Two controls, not seven: a search field and a row of chips. The chips are
+   the primary way in, so they are large, tappable and carry their own count;
+   search is the fallback for someone who already knows a name. */
+.dirbar { display: grid; gap: 18px; margin-top: 22px; }
+
+.dirsearch { position: relative; display: flex; max-width: 420px; }
+.dirsearch__icon {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  color: var(--ink-dim); pointer-events: none;
+}
+.dirsearch input[type="search"] {
+  flex: 1 1 auto;
+  min-height: 46px;
+  padding: 10px 14px 10px 42px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+}
+.dirsearch input[type="search"]:focus-visible { outline: 2px solid var(--gold-ink); outline-offset: 1px; }
+[data-theme="dark"] .dirsearch input[type="search"] { background: rgba(255,255,255,0.06); }
+
+.dirchips { display: grid; gap: 9px; }
+.dirchips__legend {
+  margin: 0;
+  font-family: var(--mono); font-size: var(--t-label);
+  text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-dim);
+}
+.dirchips__row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+/* A chip states its own consequence. The count is not decoration: it is the
+   reason nobody taps into an empty page. */
+.chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  min-height: 44px;
+  padding: 9px 15px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: none; color: inherit; font: inherit;
+  font-size: var(--t-small);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, color 0.2s, opacity 0.2s;
+}
+.chip:hover:not(:disabled) { border-color: var(--gold); }
+.chip:focus-visible { outline: 2px solid var(--gold-ink); outline-offset: 2px; }
+.chip[aria-pressed="true"] {
+  border-color: var(--gold);
+  background: var(--gold-soft);
+  color: var(--ink);
+  font-weight: 700;
+}
+.chip__n {
+  font-family: var(--mono); font-size: 0.72rem;
+  min-width: 1.6em; padding: 2px 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  color: var(--ink-dim);
+  text-align: center;
+}
+.chip[aria-pressed="true"] .chip__n { color: var(--gold-ink); }
+/* an active toggle reads as "tap to remove", not as a count */
+.chip--clear .chip__n { font-size: 0.66rem; letter-spacing: 0; }
+.chip:disabled { opacity: 0.4; cursor: not-allowed; }
+/* disabled controls are exempt from 1.4.3, but accessible mode exists for
+   people who need the extra legibility, so lift them there */
+html[data-a11y] .chip:disabled { opacity: 0.62; }
+.chip.is-empty .chip__n { text-decoration: line-through; }
+
+.dirreset {
+  min-height: 44px; padding: 9px 6px;
+  border: 0; background: none; color: var(--ink-dim);
+  font: inherit; font-size: var(--t-small);
+  text-decoration: underline; text-underline-offset: 3px;
+  cursor: pointer;
+}
+.dirreset:hover { color: var(--gold-ink); }
+.dirreset:focus-visible { outline: 2px solid var(--gold-ink); outline-offset: 2px; border-radius: 6px; }
 
 .dirstatus {
   display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: baseline;
-  margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line);
+  margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line);
   font-size: var(--t-small); color: var(--ink-dim);
 }
 .dirstatus b { color: var(--ink); }
 
-.dirgrid {
+/* ---------- the wall ----------
+   Nine bordered boxes in a tidy grid read as a spreadsheet, and these
+   organizations are the point of the page. So each is a printed poster: its
+   own ink floods the tile, the name is set large, and the sizes are uneven so
+   the grid never settles into a rhythm.
+
+   Every tile carries its own background, so the wall looks identical in light
+   and dark mode and never depends on the page behind it. The inks are chosen
+   deep enough that cream type clears 4.5:1 on all nine (worst 5.88:1). */
+/* NO grid-auto-flow:dense here, deliberately. Dense packs a prettier wall, but
+   it reorders: it pulled 06 and 08 up into gaps ahead of 05 and 07, so the
+   printed numbers ran 01 02 03 04 06 08 05 07 and the tab order jumped around
+   the screen (WCAG 2.4.3). The three wide tiles sit at 01, 05 and 07, which
+   tiles four columns exactly in source order, so no packing hint is needed. */
+.dirwall {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  /* rows breathe unevenly on a three-row cycle, so the wall has a rhythm
+     without any tile having to jump its place in the reading order */
+  grid-auto-rows: minmax(212px, auto) minmax(176px, auto) minmax(240px, auto);
+  gap: 10px;
   margin-top: 18px;
   list-style: none; padding: 0;
 }
-.orgcard {
-  display: flex; flex-direction: column; gap: 10px;
+.orgtile--wide { grid-column: span 2; }
+
+.orgtile {
+  position: relative;
+  display: flex; flex-direction: column; gap: 9px;
   padding: 20px;
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg, 18px);
-  transition: border-color 0.25s;
+  border-radius: 14px;
+  background: var(--org, var(--violet));
+  color: #f6f1ea;
+  overflow: hidden;
+  transition: transform 0.28s cubic-bezier(.2,.7,.3,1), box-shadow 0.28s;
 }
-.orgcard:hover { border-color: var(--gold); }
-.orgcard__top { display: flex; flex-wrap: wrap; gap: 8px; }
-.tag {
-  font-family: var(--mono); font-size: 0.66rem;
-  text-transform: uppercase; letter-spacing: 0.1em;
-  padding: 4px 9px; border-radius: 999px;
-  border: 1px solid var(--line); color: var(--ink-dim);
+/* A printed sheet catches light: without this the tiles read as flat swatches.
+   The highlight is capped at 0.07 because it sits UNDER the type and lightens
+   the ink beneath it. At the 0.16 it started on, the ochre tile's secondary
+   text fell to 3.28:1 in that corner even though it measured 4.74:1 against
+   the flat colour. The dark side can be as strong as it likes: darkening the
+   background only ever raises contrast with cream type. */
+.orgtile::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(120% 80% at 12% 0%, rgba(255,255,255,0.07), transparent 60%),
+    radial-gradient(90% 70% at 100% 100%, rgba(0,0,0,0.28), transparent 55%);
 }
-.tag--cost { border-color: var(--gold); color: var(--gold-ink); }
-.orgcard__name { margin: 0; font-family: var(--serif); font-size: 1.15rem; font-weight: 700; line-height: 1.25; }
-.orgcard__desc { margin: 0; font-size: var(--t-small); color: var(--ink-dim); line-height: 1.6; }
-.orgcard__facts { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-size: var(--t-small); }
-.orgcard__facts dt { font-family: var(--mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-dim); }
-.orgcard__facts dd { margin: 0; color: var(--ink-dim); }
-.orgcard__go {
-  margin-top: auto; align-self: flex-start;
-  font-size: var(--t-small); font-weight: 700;
-  border-bottom: 2px solid var(--gold); padding-bottom: 3px;
-  text-decoration: none; color: inherit;
+.orgtile > * { position: relative; z-index: 1; }
+
+/* No opacity on any of this type. Fading it looked right and measured wrong:
+   opacity multiplies the contrast down, so 0.72 on cream took the numeral to
+   3.5:1 on the rust tile. Hierarchy here comes from size, weight and tracking,
+   and every colour is one of the two verified inks. */
+.orgtile__num {
+  font-family: var(--mono); font-size: 0.7rem; font-weight: 700;
+  letter-spacing: 0.16em; color: #e3d9ca;
 }
-.orgcard__go:hover { color: var(--gold-ink); }
-.orgcard__go:focus-visible { outline: 2px solid var(--gold-ink); outline-offset: 3px; }
-.orgcard__verified { font-size: 0.72rem; color: var(--ink-dim); }
+.orgtile__name {
+  margin: 0;
+  font-family: var(--serif); font-weight: 700;
+  font-size: clamp(1.3rem, 1.02rem + 0.85vw, 1.95rem);
+  line-height: 1.06; letter-spacing: -0.018em;
+  text-wrap: balance;
+}
+.orgtile--wide .orgtile__name { font-size: clamp(1.55rem, 1.05rem + 1.6vw, 2.7rem); }
+/* the link wraps the name only, then stretches over the whole tile, so the
+   accessible name stays "Nia Centre for the Arts" and not the entire card */
+.orgtile__link { color: inherit; text-decoration: none; }
+.orgtile__link::after { content: ""; position: absolute; inset: 0; z-index: 2; }
+.orgtile:focus-within { outline: 3px solid var(--ink); outline-offset: 3px; }
+.orgtile__link:focus-visible { outline: none; }
+
+.orgtile__desc {
+  margin: 0; max-width: 46ch;
+  font-size: 0.86rem; line-height: 1.55; color: #e3d9ca;
+}
+.orgtile__meta {
+  margin: 12px 0 0;
+  font-family: var(--mono); font-size: 0.68rem;
+  letter-spacing: 0.06em; color: #e3d9ca;
+}
+.orgtile__free { color: #fff; font-weight: 700; }
+/* pushed to the floor of the tile, so every poster ends on the same beat */
+.orgtile__go {
+  margin-top: auto; padding-top: 10px;
+  font-size: 0.8rem; font-weight: 700; color: #f6f1ea;
+  opacity: 0; transform: translateY(4px);
+  transition: opacity 0.24s, transform 0.24s;
+}
+.orgtile__checked {
+  font-family: var(--mono); font-size: 0.62rem;
+  letter-spacing: 0.04em; color: #e3d9ca;
+}
+@media (hover: hover) {
+  .orgtile:hover { transform: translateY(-4px); box-shadow: 0 14px 30px rgba(0,0,0,0.3); }
+  .orgtile:hover .orgtile__go, .orgtile:focus-within .orgtile__go {
+    opacity: 1; transform: none;
+  }
+}
+/* a tile that only reveals its call to action on hover would hide it from
+   touch and from keyboard, so outside hover it is simply always there */
+@media (hover: none) { .orgtile__go { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .orgtile, .orgtile__go { transition: none; }
+  .orgtile:hover { transform: none; }
+  .orgtile__go { opacity: 1; transform: none; }
+}
+html[data-a11y] .orgtile { transition: none; }
+html[data-a11y] .orgtile:hover { transform: none; }
+html[data-a11y] .orgtile__go { opacity: 1; transform: none; }
+
+/* Below four columns the wide tiles stop spanning. A two-unit tile cannot tile
+   three or two columns in source order without leaving holes mid-wall, and the
+   only ways out are dense packing (which reorders) or gaps. The row rhythm
+   keeps the wall from flattening instead. */
+@media (max-width: 1080px) {
+  .dirwall { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .orgtile--wide { grid-column: span 1; }
+  .orgtile--wide .orgtile__name { font-size: clamp(1.3rem, 1.02rem + 0.85vw, 1.95rem); }
+}
+@media (max-width: 780px) {
+  .dirwall {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: minmax(186px, auto) minmax(158px, auto) minmax(206px, auto);
+  }
+}
+@media (max-width: 520px) {
+  .dirwall { grid-template-columns: 1fr; grid-auto-rows: auto; gap: 8px; }
+  .orgtile { padding: 18px; }
+}
 
 .dirempty { margin-top: 22px; padding: 26px; border: 1px dashed var(--line); border-radius: var(--r-lg, 18px); }
 .dirempty p { margin: 0 0 12px; }
 .dirempty p:last-child { margin-bottom: 0; }
+
+/* On a phone the chips are the page, so they must not push the first
+   organization off the bottom. Tighter chrome, 44px touch targets kept. */
+@media (max-width: 640px) {
+  #directory { padding-top: clamp(28px, 4vh, 44px); }
+  .dirbar { gap: 14px; margin-top: 16px; }
+  .dirsearch { max-width: none; }
+  .dirchips { gap: 7px; }
+  .dirchips__row { gap: 6px; }
+  .chip { padding: 8px 12px; gap: 6px; }
+  .dirchips--extra { margin-top: -2px; }
+  .dirstatus { margin-top: 14px; }
+  .dirgrid { margin-top: 14px; }
+}
 
 /* honest empty state block, reused for events */
 .emptynote {
@@ -6231,6 +6417,74 @@ html[data-theme="dark"] .menu__row[aria-current="page"] .menu__label { color: va
 }
 
 /* ---------- survey fallback panel ---------- */
+/* ---------- the "after" card ----------
+   Same card chrome as the pulse sparkline, but this one is not thread-drawn
+   and holds three rows instead of one big number, so it does not need the
+   pulse card's 260vh sticky runway. */
+.afterpulse { padding: clamp(60px, 10vh, 120px) 24px; }
+.aftercard { position: static; width: 560px; }
+.rlist { list-style: none; margin: 0; padding: 0; display: grid; gap: 30px; }
+.rrow { display: grid; }
+.rrow + .rrow { padding-top: 30px; border-top: 1px solid var(--line); }
+
+/* Two greens per theme, because this card is near-white in light mode and
+   near-black in dark: one hardcoded value cannot serve both. --res-ink is
+   text and clears 4.5:1; --res-line is the stroke and clears 3:1 (WCAG
+   1.4.11). The bright green this used to paint inline measured 1.91:1 on the
+   light card, failing even the relaxed large-text bar. */
+.rrow--up   { --res-ink: #157a41; --res-line: #188a4a; }
+.rrow--down { --res-ink: #a3252f; --res-line: #b52d38; }
+.rrow--tie  { --res-ink: #5c4b78; --res-line: #6b5a86; }
+html[data-theme="dark"] .rrow--up   { --res-ink: #6ee79f; --res-line: #4ade80; }
+html[data-theme="dark"] .rrow--down { --res-ink: #ff9d9d; --res-line: #f87171; }
+html[data-theme="dark"] .rrow--tie  { --res-ink: #c3b4e0; --res-line: #a897c9; }
+
+/* the number leads, with its label sitting on the same baseline */
+.rrow__head {
+  margin: 0 0 2px;
+  display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 12px;
+}
+.rrow__pct {
+  font-family: var(--serif); font-size: clamp(3rem, 11vw, 4.4rem);
+  font-weight: 700; line-height: 0.95; letter-spacing: -0.03em;
+  color: var(--res-ink);
+  /* it counts 0 to 94 as the line draws: fixed-width digits stop the number
+     twitching, and the reserved width stops the label sliding left */
+  font-variant-numeric: tabular-nums; min-width: 3.5ch;
+}
+.rrow__label { font-size: var(--t-small); font-weight: 700; color: var(--ink-dim); }
+
+/* the plot is the positioning context for the bead that rides the line's tip */
+.rrow__plot { position: relative; display: block; width: 100%; }
+.rrow__chart { display: block; height: 74px; width: 100%; }
+/* its own stroke, because .sparkline-path is opacity:0 !important on purpose */
+.rrow__path {
+  fill: none; stroke-width: 5;
+  stroke-linecap: round; stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;   /* preserveAspectRatio=none would squash it */
+  stroke: var(--res-line);
+  filter: drop-shadow(0 0 9px color-mix(in srgb, var(--res-line) 55%, transparent));
+}
+.rrow__bead {
+  position: absolute; left: 0; top: 0;
+  width: 11px; height: 11px; margin: -5.5px 0 0 -5.5px;
+  border-radius: 50%;
+  background: var(--res-line);
+  box-shadow: 0 0 12px 3px color-mix(in srgb, var(--res-line) 45%, transparent);
+  opacity: 0; pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) { .rrow__bead { display: none; } }
+html[data-a11y] .rrow__bead { display: none; }
+
+/* the statement itself is no longer printed: the label beside the number says
+   it in four words, and the full wording goes to screen readers instead */
+.rrow__n {
+  margin: 2px 0 0; font-family: var(--mono); font-size: 0.68rem;
+  letter-spacing: 0.05em; color: var(--ink-dim);
+}
+#resultsFoot em { font-style: normal; color: var(--gold-ink); }
+@media (max-width: 560px) { .rrow__chart { height: 56px; } }
+
 .sparkfb {
   display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
   margin-top: 14px; padding: 14px 16px;
@@ -6388,13 +6642,13 @@ html[data-theme="dark"] .menu__row[aria-current="page"] .menu__label { color: va
   line-height: 1.7;
 }
 
-/* directory view toggle group */
-.dirtoggle { display: flex; gap: 6px; }
-.dirfield-label {
-  font-family: var(--mono); font-size: var(--t-label);
-  text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-dim);
-}
 .dirstatus__note { margin: 0; max-width: 60ch; }
+/* the provenance note reads as a footnote under the wall rather than as a
+   third header above it, where it made the controls outweigh the content */
+.dirfoot {
+  margin: 18px 0 0; max-width: 68ch;
+  font-size: var(--t-small); line-height: 1.6; color: var(--ink-dim);
+}
 /* the pillar deck is a small closing note now, not the page's centrepiece */
 #pillars { padding-top: clamp(40px, 6vh, 72px); }
 
@@ -6845,3 +7099,164 @@ html[data-a11y] .ss-thread, html[data-a11y] .ss-slice { display: none !important
 }
 .skip-link:focus { transform: translateY(0); outline: 3px solid var(--gold); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) { .skip-link { transition: none; } }
+
+/* ---------- the shared wall (wall.html) ----------
+   Reddit's structure, without the part of Reddit that ranks people against
+   each other: threads and sorting, but no downvote and no score to lose. The
+   only number on the page counts up. */
+.wgrid {
+  display: grid; gap: 30px;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 320px);
+  align-items: start;
+  margin-top: 22px;
+}
+.wgrid__side {
+  position: sticky; top: 96px;
+  padding: 22px; border: 1px solid var(--line); border-radius: var(--r-lg, 18px);
+}
+.wside__h { margin: 0 0 12px; font-family: var(--serif); font-size: 1.05rem; font-weight: 700; }
+.wside__list { margin: 0; padding-left: 18px; display: grid; gap: 9px;
+  font-size: var(--t-small); line-height: 1.55; color: var(--ink-dim); }
+.wside__list strong { color: var(--ink); }
+.wside__warn, .wside__private, .wside__help {
+  margin: 14px 0 0; font-size: var(--t-small); line-height: 1.55; color: var(--ink-dim);
+}
+.wside__warn { padding-left: 12px; border-left: 3px solid var(--gold); }
+.wside__help { padding-top: 12px; border-top: 1px solid var(--line); }
+
+.wnotice {
+  padding: 14px 16px; margin-bottom: 16px;
+  border: 1px dashed var(--line); border-radius: 12px;
+  font-size: var(--t-small); line-height: 1.55; color: var(--ink-dim);
+}
+.wnotice p { margin: 0; }
+
+.wcompose { display: grid; gap: 10px; }
+.wcompose__field {
+  width: 100%; min-height: 118px; padding: 14px 16px;
+  border: 1px solid var(--line); border-radius: 14px;
+  background: var(--paper); color: var(--ink); font: inherit; line-height: 1.55;
+  resize: vertical;
+}
+[data-theme="dark"] .wcompose__field { background: rgba(255,255,255,0.06); }
+.wcompose__field:focus-visible { outline: 2px solid var(--gold-ink); outline-offset: 1px; }
+.wcompose__row { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; }
+.wcompose__note { margin: 0; font-size: var(--t-small); color: var(--ink-dim); }
+.wstatus { margin: 10px 0 0; font-size: var(--t-small); color: var(--ink-dim); min-height: 1.4em; }
+
+.wbar {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  margin-top: 26px; padding-top: 14px; border-top: 1px solid var(--line);
+  font-size: var(--t-small); color: var(--ink-dim);
+}
+.wbar__count { margin: 0; font-weight: 700; color: var(--ink); }
+.wbar__sort { display: flex; align-items: center; gap: 8px; }
+.wbar__sort select {
+  min-height: 38px; padding: 6px 10px; border: 1px solid var(--line);
+  border-radius: 999px; background: var(--paper); color: var(--ink); font: inherit;
+  font-size: var(--t-small);
+}
+[data-theme="dark"] .wbar__sort select { background: rgba(255,255,255,0.06); }
+
+.wfeed, .wthread { list-style: none; margin: 0; padding: 0; }
+.wfeed { display: grid; gap: 12px; margin-top: 16px; }
+.wpost {
+  padding: 18px 20px; border: 1px solid var(--line); border-radius: 14px;
+}
+/* your own post, still waiting on a human: visibly not on the wall yet */
+.wpost--pending { border-style: dashed; }
+.wpost__flag {
+  margin: 0 0 8px; font-family: var(--mono); font-size: 0.66rem;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold-ink);
+}
+.wpost__body { margin: 0; line-height: 1.6; color: var(--ink); overflow-wrap: anywhere; }
+.wpost__foot {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-top: 12px;
+}
+.wpost__when {
+  font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.05em;
+  color: var(--ink-dim); margin-right: 4px;
+}
+.wact {
+  min-height: 36px; padding: 6px 12px;
+  border: 1px solid var(--line); border-radius: 999px;
+  background: none; color: inherit; font: inherit; font-size: var(--t-small);
+  cursor: pointer; transition: border-color 0.2s, background 0.2s;
+}
+.wact:hover:not(:disabled) { border-color: var(--gold); }
+.wact:focus-visible { outline: 2px solid var(--gold-ink); outline-offset: 2px; }
+.wact__n { font-family: var(--mono); font-size: 0.72rem; }
+.wact--support.is-on, .wact--support:disabled {
+  border-color: var(--gold); background: var(--gold-soft); color: var(--gold-ink);
+  cursor: default; opacity: 1;
+}
+.wact--quiet { border-color: transparent; color: var(--ink-dim); }
+.wact--quiet:hover { color: var(--gold-ink); }
+
+/* replies are indented once and only once: a thread that steps right on every
+   level runs out of page on a phone before it runs out of conversation */
+.wthread { margin-top: 12px; display: grid; gap: 10px; padding-left: 16px; border-left: 2px solid var(--line); }
+.wthread .wpost { padding: 14px 16px; }
+
+.wreply { margin-top: 12px; }
+.wreply__field {
+  width: 100%; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px;
+  background: var(--paper); color: var(--ink); font: inherit; line-height: 1.55; resize: vertical;
+}
+[data-theme="dark"] .wreply__field { background: rgba(255,255,255,0.06); }
+.wreply__actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; }
+
+.wempty {
+  margin-top: 16px; padding: 26px;
+  border: 1px dashed var(--line); border-radius: var(--r-lg, 18px);
+}
+.wempty p { margin: 0 0 10px; }
+.wempty p:last-child { margin-bottom: 0; }
+
+@media (max-width: 900px) {
+  .wgrid { grid-template-columns: 1fr; }
+  /* the rules move ABOVE the feed on a phone rather than to the bottom of the
+     page, because they are the terms someone should read before they write */
+  .wgrid__side { position: static; order: -1; }
+}
+
+/* voice.html is no longer in the nav: it is the private companion to the
+   shared wall, reached from it. This line is how someone who lands here
+   knows which of the two walls they are on. */
+.wall-section__x {
+  max-width: 56ch; margin: 10px 0 0;
+  font-size: var(--t-small); line-height: 1.6; color: var(--dim-on-dark, var(--ink-dim));
+}
+.wall-section__x a { color: inherit; border-bottom: 2px solid var(--gold); }
+
+/* ---------- the wall's safety pause ----------
+   This had NO rules at all, so the crisis message rendered as plain body
+   copy, visually identical to the form hint two lines below it. On the one
+   screen where the site has to interrupt someone, it did not look like an
+   interruption. It is louder than the private wall's version on purpose:
+   this wall posts in public, so the pause has more to stop. */
+.caution {
+  margin: 0;
+  padding: 14px 16px;
+  border-left: 4px solid var(--gold-ink);
+  border-radius: 0 12px 12px 0;
+  background: var(--gold-soft);
+  color: var(--ink);
+  font-size: var(--t-small);
+  line-height: 1.6;
+}
+.caution[hidden] { display: none; }
+.caution strong { font-weight: 700; }
+/* The helplines are the actionable part, so they read as the actionable part.
+   NOT --gold-ink: that token is tuned against the page, and on this tinted
+   panel it composites to 4.09:1, just under. Darkened to clear 4.5 on the
+   panel's own background (4.86:1). */
+.caution a {
+  color: #7d3448; font-weight: 700;
+  border-bottom: 2px solid currentColor;
+  text-decoration: none;
+}
+.caution a:hover { color: var(--ink); }
+.caution a:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+[data-theme="dark"] .caution { background: rgba(255, 255, 255, 0.07); }
+[data-theme="dark"] .caution a { color: #ffc2ce; }

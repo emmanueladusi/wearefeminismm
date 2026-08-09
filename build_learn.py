@@ -221,6 +221,21 @@ def main():
     learn = learn.replace('href="#whatis"', 'href="#exhibition"')
     learn = learn.replace('href="#timeline"', 'href="#exhibition"')
 
+    # --- lift the "after" result card out of its authored position ----------
+    # It is written in learn-classic.html directly under the pulse card, which
+    # is where that page wants it. On this page it belongs UNDER the gallery,
+    # as the closing note once you have walked the exhibition. It is authored
+    # in one place and moved here rather than duplicated, so the two pages can
+    # never drift apart.
+    after = ''
+    m = re.search(r'[ \t]*<!-- ===== The bookend:.*?</section>\n', learn, re.S)
+    if m:
+        after = m.group(0)
+        learn = learn[:m.start()] + learn[m.end():]
+    else:
+        print('build_learn: WARNING — "after" result card not found in '
+              'learn-classic.html; learn.html will ship without it')
+
     # --- body: replace #whatis through the end of #resources ---------------
     start = learn.index('<!-- ===== Learn: three lenses on feminism.')
     end = learn.index('<!-- ===== Footer ===== -->')
@@ -232,7 +247,8 @@ def main():
         '       The previous version of this page is kept whole at\n'
         '       learn-classic.html. ===== -->\n'
         '  <div id="wfgallery">\n' + body.strip() + '\n  </div>\n\n'
-        '  <script>\n' + js + '\n  </script>\n\n  ')
+        '  <script>\n' + js + '\n  </script>\n\n'
+        + (after + '\n' if after else '') + '  ')
     learn = learn[:start] + block + learn[end:]
 
     # tlstage.js turns the timeline's four chapters into one stage. This page

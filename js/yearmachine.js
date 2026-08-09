@@ -1,4 +1,4 @@
-/* The year machine (voice.html) — the visitor types their age and is SENT
+/* The year machine (play.html) — the visitor types their age and is SENT
    BACK: a full-screen takeover where the year itself ticks from 2026 down to
    1912, landing on "It's 1912. You're 16." Then the takeover lifts and the
    milestones unroll, each stamped with how old they'd be when the right
