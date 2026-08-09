@@ -1,0 +1,229 @@
+/* ================================================================
+   THE RESEARCH SLIDES (js/slides.js) — the opening of the talk.
+   Only ever on screen under ?present. Scoped under .sl.
+
+   These deliberately use the site's own tokens and typography rather
+   than looking like a slide deck: the talk moves from these straight
+   into the site, and the seam should not show.
+
+   THE ONE RULE IN HERE: the text layer never depends on an animation
+   to be visible. Everything that moves is decoration, so a stalled
+   animation clock can cost a wave or a dot, never a slide.
+   ================================================================ */
+
+.sl {
+  position: fixed;
+  inset: 0;
+  z-index: 8500; /* over the site, under the presenter's peek card (9000) */
+  display: grid;
+  place-items: center;
+  --pad: clamp(28px, 7vw, 90px);
+  padding: var(--pad);
+  background: var(--paper);
+  overflow: hidden; /* the drifting waves run wider than the frame */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.32s ease, visibility 0s linear 0.32s;
+}
+.sl.is-on {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.32s ease, visibility 0s;
+}
+
+/* The site keeps scrolling underneath while a slide is up; lock it so a
+   stray trackpad nudge does not move the page he is about to reveal. */
+body.sl-up { overflow: hidden; }
+
+/* ---------- the decoration layer ---------- */
+
+/* Absolutely positioned, so it leaves the grid entirely and .sl__body stays
+   the only in-flow item and stays centred. */
+.sl__decor {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* THE WAVES — the four waves of feminism, which is how this site tells the
+   history the research sits inside. The only looping thing here, kept faint
+   and kept away from the text. */
+.sl__waves {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: min(42vh, 310px);
+}
+.sl__wg {
+  animation: slDrift var(--dur, 40s) linear infinite;
+  will-change: transform;
+}
+@keyframes slDrift {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-360px); } /* exactly one period, so it seams invisibly */
+}
+
+/* THE THREAD — the site's own gold thread, grown one mark per beat.
+
+   Inset to the same padding as the text rather than run full bleed, for two
+   reasons: it starts where the headline starts, which reads as composed
+   instead of incidental; and the final mark of every deck sits at exactly
+   100%, so full bleed sliced it in half against the edge of the screen. */
+.sl__wire {
+  position: absolute;
+  left: var(--pad);
+  right: var(--pad);
+  bottom: 12%;
+  height: 1px;
+  background: var(--gold-soft);
+}
+.sl__wirefill {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, transparent, var(--gold) 22%, var(--gold));
+  transition: width 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sl__marks { position: absolute; left: var(--pad); right: var(--pad); bottom: 12%; height: 1px; }
+.sl__mark {
+  position: absolute;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  margin: -3.5px 0 0 -3.5px;
+  border-radius: 50%;
+  background: var(--gold);
+  opacity: 0;
+  transform: scale(0.3);
+  transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.sl__mark.is-on { opacity: 1; transform: scale(1); }
+
+/* THE BLOOM — on the last slide only, one point becomes many. */
+.sl__bloom { position: absolute; left: var(--pad); right: var(--pad); bottom: 12%; height: 0; }
+.sl__dot {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  margin-left: -3px;
+  border-radius: 50%;
+  background: var(--gold);
+  opacity: 0;
+  transform: scale(0.2);
+  transition: opacity 0.6s ease var(--d, 0ms),
+              transform 0.6s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0ms);
+}
+.sl.is-bloom .sl__dot { opacity: 0.62; transform: scale(1); }
+
+/* ---------- the text ---------- */
+
+.sl__body { position: relative; z-index: 1; width: 100%; max-width: min(1100px, 100%); }
+
+/* The measure lives on .sl__t, not here: a max-width in `ch` resolves against
+   the element's OWN font-size, so putting a headline measure on this wrapper
+   would size it from the 1rem body text and strangle a 5rem headline. */
+.sl__in { width: 100%; text-align: left; }
+
+/* Entrance: one small rise, once. Nothing loops, nothing draws the eye back
+   while he is talking over it.
+
+   DELIBERATELY no animation-delay and no fill mode. A staggered version needs
+   `both` (or `backwards`) to hold each child at opacity 0 through its delay,
+   and anything that pins text to a keyframe means a stalled animation clock
+   shows a BLANK slide on the projector. Here the resting state is the visible
+   one: if the animation never runs at all, the slide simply appears. */
+.sl__in.is-in {
+  animation: slRise 0.44s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes slRise {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.sl__k {
+  margin: 0 0 clamp(14px, 2vw, 26px);
+  font-family: var(--mono);
+  font-size: clamp(0.7rem, 0.4vw + 0.62rem, 0.86rem);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold-ink);
+}
+
+/* Sized for a ROOM, not a reader at a desk: this is read from the back row at
+   a glance, so it runs a good deal larger than any heading on the site.
+   rem-dominant clamp with vw as trim, so it still scales with a bumped-up
+   browser font size instead of collapsing the hierarchy. */
+.sl__t {
+  margin: 0;
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: clamp(2.7rem, 4.2vw + 1.5rem, 7rem);
+  line-height: 1.03;
+  letter-spacing: -0.022em;
+  color: var(--ink);
+  /* "intersectionality" is core vocabulary here and a projector is narrow */
+  overflow-wrap: break-word;
+  max-width: 15ch;
+}
+
+/* The research question cannot be shortened without changing what it says, so
+   it gets its own size rather than being cut. */
+.sl__in--long .sl__t {
+  font-size: clamp(1.9rem, 2.9vw + 1.15rem, 4.6rem);
+  line-height: 1.13;
+  max-width: 21ch;
+}
+
+.sl__s {
+  margin: clamp(18px, 2.4vw, 34px) 0 0;
+  font-size: clamp(1.08rem, 0.85vw + 0.92rem, 1.9rem);
+  line-height: 1.45;
+  color: var(--ink-dim);
+  max-width: 40ch;
+}
+
+.sl__c {
+  margin: clamp(20px, 2.6vw, 38px) 0 0;
+  font-family: var(--mono);
+  font-size: clamp(0.68rem, 0.3vw + 0.62rem, 0.8rem);
+  letter-spacing: 0.12em;
+  color: var(--ink-dim);
+}
+
+/* The address on the closing card. Larger than a citation because this is the
+   one line in the whole talk the room may want to write down, and it stays on
+   screen through the questions. */
+.sl__u {
+  margin: clamp(20px, 2.6vw, 36px) 0 0;
+  font-family: var(--mono);
+  font-size: clamp(0.82rem, 0.45vw + 0.72rem, 1.05rem);
+  letter-spacing: 0.06em;
+  line-height: 1.6;
+  color: var(--gold-ink);
+  overflow-wrap: break-word;
+}
+
+/* ---------- stillness on request ----------
+   Everything below freezes motion but leaves every element in its VISIBLE
+   resting state: the waves stop drifting, the thread jumps to length, the
+   marks and the bloom appear without travelling. Nothing disappears. */
+
+@media (prefers-reduced-motion: reduce) {
+  .sl { transition: none; }
+  .sl__in.is-in { animation: none; }
+  .sl__wg { animation: none; }
+  .sl__wirefill,
+  .sl__mark,
+  .sl__dot { transition: none; }
+}
+html[data-a11y] .sl { transition: none; }
+html[data-a11y] .sl__in.is-in { animation: none; }
+html[data-a11y] .sl__wg { animation: none; }
+html[data-a11y] .sl__wirefill,
+html[data-a11y] .sl__mark,
+html[data-a11y] .sl__dot { transition: none; }

@@ -29,22 +29,51 @@
      query to carry when ARRIVING at this beat from another page.
      --------------------------------------------------------------------- */
 
+  /* The slides (js/slides.js) are spliced in at three points, wherever the
+     talk has nothing on the site to stand on: the research opening, the
+     scratched prototypes in the middle, and the whole ending.
+
+     They are read from a global rather than written here so that deleting
+     js/slides.js after the presentation needs no edit to this file: every
+     deck comes back empty and the talk runs straight through the site,
+     exactly as it did before the slides existed. */
+  function deck(name, p, t) {
+    var list = (window.PRESENT_DECKS || {})[name] || [];
+    return list.map(function (s, i) {
+      // `t` still has to be a real selector on that page: a slide beat skips
+      // scrolling while it is up, but the beat is also what the talk lands on
+      // if the slides file is gone.
+      return { p: p, t: t, deck: name, slide: i, say: s.say || name + " slide " + (i + 1) };
+    });
+  }
+
   var BEATS = [
-    { p: "index.html", t: "#brandmark", say: "Opening · the double m, who I am, the research" },
+    { p: "index.html", t: "#brandmark", say: "Opening · the double m in the wordmark" }
+  ]
+  .concat(deck("opening", "index.html", "#brandmark"))
+  .concat([
     { p: "index.html", t: "#brandmark", say: "Here's a look · replay the reveal", prep: replayHero },
     { p: "index.html", t: "#popculture", say: "Piece of the month" },
     { p: "index.html", t: "#about", say: "About me, and why it's last" },
-    { p: "learn.html", t: "#boring-pulse", say: "82 surveyed · 44% said boring · and the second finding" },
-    { p: "learn.html", t: "#exhibition", say: "The prototypes I scratched, then my brother's idea" },
-    { p: "learn.html", t: "#gallery", say: "The gallery opens · Afrocentric method, Asante", gal: true, prep: enterGallery },
+    { p: "learn.html", t: "#boring-pulse", say: "82 surveyed · 44% said boring · and the second finding" }
+  ])
+  .concat(deck("process", "learn.html", "#boring-pulse"))
+  .concat([
+    { p: "learn.html", t: "#gallery", say: "The gallery opens · the payoff", gal: true, prep: enterGallery },
     { p: "learn.html", t: "#gallery", say: "Scholars · Dr. Munroe", gal: true, url: "room=scholars", prep: goScholars },
     { p: "learn.html", t: "#after-pulse", say: "44% became 6%" },
     { p: "play.html", t: "#thecrossword", say: "Learning gets tested · wordle and crossword", prep: openCrossword },
     { p: "community.html", t: "#directory", say: "Organizations girls can actually reach" },
     { p: "community.html", t: "#recommend", say: "Submit a group and be featured" },
-    { p: "wall.html", t: "#wallf", say: "Your own wall, moderated", prep: enterWall },
-    { p: "index.html", t: "#brandmark", say: "Next steps, reflection, I am. You are. We are." }
-  ];
+    { p: "wall.html", t: "#wallf", say: "Your own wall, moderated", prep: enterWall }
+  ])
+  .concat(deck("closing", "index.html", "#brandmark"));
+
+  // With no slides file at all this must still end somewhere sane rather than
+  // finishing on the wall.
+  if (!BEATS[BEATS.length - 1].deck) {
+    BEATS.push({ p: "index.html", t: "#brandmark", say: "Next steps, reflection, I am. You are. We are." });
+  }
 
   /* ---------------------------------------------------------------------
      Where are we
@@ -130,9 +159,10 @@
   function scrollTo(sel) {
     var el = document.querySelector(sel);
     if (!el) return;
-    // While the gallery is open it covers the viewport, so scrolling the
-    // document underneath it would move nothing anyone can see.
+    // While the gallery or a research slide covers the viewport, scrolling the
+    // document underneath would move nothing anyone can see.
     if (isGalleryOpen()) return;
+    if (document.body.classList.contains("sl-up")) return;
     if (window.__lenis) window.__lenis.scrollTo(el, { offset: 0 });
     else el.scrollIntoView({ behavior: "smooth", block: "start" });
     // The colour backdrop caches section offsets; a jump that changed page
@@ -159,6 +189,14 @@
   function land(i) {
     var b = BEATS[i];
     var wait = 0;
+
+    // The research slides cover the viewport, so they follow the same rule the
+    // gallery does: any beat that is not a slide beat has to put them away
+    // first, or the talk narrates the site from behind them.
+    if (window.__slides) {
+      if (b.slide != null) window.__slides.show(b.deck, b.slide);
+      else window.__slides.hide();
+    }
 
     // #gallery is position:fixed inset:0 AND locks documentElement overflow
     // while open, so any beat that is not a gallery beat has to close it
@@ -259,6 +297,10 @@
     try { sessionStorage.removeItem(KEY); } catch (e) {}
     document.body.classList.remove("is-presenting");
     if (card) card.classList.remove("is-on");
+    // The reload below drops the slides anyway, but not instantly: without
+    // this, Escape leaves a full-screen slide on the projector for as long as
+    // the navigation takes.
+    if (window.__slides) window.__slides.hide();
     var clean = location.pathname + location.hash;
     try { history.replaceState({}, "", clean); } catch (e) {}
     // Reload so every script that branched on ?present goes back to normal.
