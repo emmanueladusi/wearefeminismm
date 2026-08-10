@@ -13,7 +13,7 @@ the slide deck ever disagree, trust the deck.)
 This pass rewrites the text below to match the script you sent — your wording,
 not mine, edited only for the odd typo. Two beats came out because nothing in
 your script narrates them anymore. See **Changes made** at the end for exactly
-what moved and one thing still marked as undecided in your own script.
+what moved.
 
 ---
 
@@ -106,6 +106,9 @@ cycle through a Black Feminist literature, artwork, or creative piece.
 > The photo takes a second to assemble itself out of ink as it arrives — that is
 > deliberate, not a loading glitch. Give it that second before you start talking
 > over it, same as the wordmark above.
+
+There is also a spot right here for you to make a submission, and be featured on
+the website!
 
 **\*SLIDE CHANGE\*** → *scrolls to About*
 
@@ -258,15 +261,15 @@ on the 94% card. The card itself still exists on the live site for anyone who
 scrolls there on their own; I just don't hold the talk on it anymore. Say the
 word if you want it back in the sequence.
 
-**3. The Community "submission" beat is also off the tour, for the same reason.**
-Your script doesn't narrate "Submit a group we should add" on Community anymore.
-Instead, on the Home/piece-of-month part of your script, there's a line that
-still says **"There is also a xxxx tab, for you to make a submission..."** — the
-"xxxx" reads like you hadn't landed on what to call it yet. I didn't invent a
-name for it. The Community page still has that section built and working
-(`#recommend`, from your very first ask to make submissions clearer) — it's just
-not a stop on the presenter tour right now. Tell me what you want that line to
-say and where, and I'll wire the beat back in.
+**3. The Community "submission" beat is off the tour** — your script doesn't
+narrate "Submit a group we should add" on Community anymore. In its place, the
+"xxxx tab" line from your Home/piece-of-month section now has a real answer: a
+**"Submit your entry here"** link sits right under the piece of the month,
+mailto to `wearefeminismm@gmail.com`, next to the existing "Suggest a piece"
+link. Same beat as the piece of the month (no new slide change needed — your
+script doesn't put one there either). The Community `#recommend` section is
+still built and working for anyone who finds it on their own; it's just not a
+tour stop right now.
 
 **4. The key-message slide text changed to match.** The big slide used to read
 "The wearefeminismm community started from me." It now reads "The wearefeminismm
