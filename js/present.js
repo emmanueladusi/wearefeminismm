@@ -66,10 +66,8 @@
   .concat([
     { p: "learn.html", t: "#gallery", say: "The gallery opens · the payoff", gal: true, prep: enterGallery },
     { p: "learn.html", t: "#gallery", say: "Scholars · Dr. Munroe", gal: true, url: "room=scholars", prep: goScholars },
-    { p: "learn.html", t: "#after-pulse", say: "44% became 6%" },
     { p: "play.html", t: "#theword", say: "Learning gets tested · the daily word", prep: openWord },
     { p: "community.html", t: "#directory", say: "Organizations girls can actually reach" },
-    { p: "community.html", t: "#recommend", say: "Submit a group and be featured" },
     { p: "wall.html", t: "#wallf", say: "Your own wall, moderated", prep: enterWall }
   ])
   .concat(deck("closing", "index.html", "#brandmark"));

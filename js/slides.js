@@ -126,11 +126,11 @@
       say: "The solution" },
 
     { k: "Key message",
-      t: "The wearefeminismm community started *from me.*",
+      t: "The wearefeminismm community is the *change* I wanted to see.",
       lay: "centre",
       invert: true,
       enter: "zoom",
-      s: "Last year I said change needs to start somewhere, and that it was me. This year it is a community.",
+      s: "Last year I said change needs to start somewhere, and that it was me. This year, the community itself is that change.",
       bloom: true,
       say: "Key message, then the site takes over" }
   ];

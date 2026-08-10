@@ -6,18 +6,14 @@ is set to. Nothing to toggle — just open the link.
 
 **→** or **Space** or clicker forward = next · **←** = back · **P** = peek at where you are · **Esc** = exit
 
-**29 presses.** Beat 0 is where you start, before you press anything. (Verified
+**27 presses.** Beat 0 is where you start, before you press anything. (Verified
 directly against the running code, not counted by hand — if this number and
 the slide deck ever disagree, trust the deck.)
 
-**(pause)** markers are new this pass, at your ask. They are not stage directions
-for anything to *happen* — nothing changes on screen during one. They mark the
-spots that most reward just letting the sentence sit for a second before you
-move to the next one, mostly right after a number, a punchline, or the end of
-a story beat.
-
-Five edits are folded into the text below and flagged where they occur. See
-**Changes made** at the end for the full list and why.
+This pass rewrites the text below to match the script you sent — your wording,
+not mine, edited only for the odd typo. Two beats came out because nothing in
+your script narrates them anymore. See **Changes made** at the end for exactly
+what moved and one thing still marked as undecided in your own script.
 
 ---
 
@@ -47,7 +43,7 @@ feminism because it helps me contribute to the solution.
 **\*SLIDE CHANGE\*** → *the research question*
 
 My qualitative research question was simple: "How does the understanding of
-feminism affect the experiences of young girls within the TDSB ages 13-19"
+feminism affect the experiences of young girls within the TDSB ages 13-19?"
 
 After conducting interviews, and making a video essay, my findings indicated two
 main themes:
@@ -80,17 +76,17 @@ I connected these findings to the MYSP focusing on the Belong and Thrive pillars
 with my most prominent solution being: give students the chance to lead and get
 involved, with teacher involvement being mandatory.
 
-**\*SLIDE CHANGE\*** → *The wearefeminismm community started from me.*
+**\*SLIDE CHANGE\*** → *The wearefeminismm community is the change I wanted to see.*
 
 Last year, I had started my presentation with the words 'Change needs to start
-from somewhere, and that's me!' This year, my key message is: wearefeminismm
-community started from me.
+from somewhere, and that's me!' This year, my key message is: the wearefeminismm
+community is the change I wanted to see.
 
 **(pause)**
 
 When considering what product to create in action research, I wanted to create
-something that someone could look at once, and be blown away. I was able to make
-that as you can see from my website.
+something that someone could look at once, and be blown away, and as per usual,
+I delivered.
 
 **\*SLIDE CHANGE\*** → **slides drop. The site appears and the wordmark builds itself**
 
@@ -121,30 +117,27 @@ project isn't about me, it's about building a community.
 
 **(pause — this one plays on its own, let it finish)**
 
-**\*SLIDE CHANGE\*** → **the 44% pulse card**
+For my learning page, I thought, what would be the best way to teach about
+feminism?
 
-Since my website originated from research, I embedded statistics to represent my
-participants' perspectives that I captured on pre-survey.
+**\*SLIDE CHANGE\*** → **the 44% pulse card**
 
 I surveyed 82 people, and 44% of those people said they find learning on topics
 about feminism boring.
 
 **(pause)**
 
-My second finding, people just didn't know enough about
-feminism, or where to find more resources regarding the topic.
-
-For my learning page, I thought, what would be the best way to teach about
-feminism?
+My second finding, people just didn't know enough about feminism, or where to
+find more resources regarding the topic.
 
 **\*SLIDE CHANGE\*** → *A wave. A timeline. A game.* (each one draws its own shape)
 
-I had run through many prototypes, at first I thought let me just do an
-interactive wave, and then I scratched it, and then I thought let me do an
-interactive timeline, and then I scratched it, and then I thought I hit gold when
-I thought about making a game, guess what! I scratched it! Each time I had started
-over, it was because I wasn't content, it wasn't the way I wanted to teach people
-about the topic.
+To fill in these gaps, I had run through many prototypes, at first I thought let
+me just do an interactive wave, and then I scratched it, and then I thought let
+me do an interactive timeline, and then I scratched it, and then I thought I hit
+gold when I thought about making a game, guess what! I scratched it! Each time I
+had started over, it was because I wasn't content, it wasn't the way I wanted to
+teach people about the topic.
 
 **\*SLIDE CHANGE\*** → *So I asked someone.*
 
@@ -156,63 +149,43 @@ said just use art pieces, and then right there, it clicked.
 
 **\*SLIDE CHANGE\*** → *Art locates African people as subjects, not objects.* (Asante, 1980)
 
-> This slide is the introduction you asked for — it makes the case for the
-> gallery BEFORE the gallery itself is on screen. Read the next paragraph while
-> this is still up. The actual gallery only opens on the press after that, timed
-> to "That right there, tackled my finding" below. That gap is intentional: talk
-> about the gallery first, then step into it.
-
 I came to the conclusion that at that very moment there was no better way for me
 to teach people about feminism than through using an Afrocentric method: An Art
 Gallery. Art is central to Afrocentricity as Molefi Kete Asante (1980), one of the
 leading Afrocentric scholars, noted that art is important in locating Africans as
-subjects, rather than objects of cultural and historical experiences.
+subjects, rather than objects of cultural and historical experiences. That right
+there, tackled my finding on the presurvey.
 
 **(pause)**
 
 **\*SLIDE CHANGE\*** → **the gallery opens. This is the payoff, give it a second**
 
-That right there, tackled my finding on the presurvey.
+Within my art gallery, I addressed my second presurvey finding. It is informative,
+featuring a part that talks about the different types of feminism, the different
+waves, and providing resources from scholars if people are interested in learning
+more,
 
 **\*SLIDE CHANGE\*** → *the scholars room. Dr. Munroe's card carries a gold ring and a "Featured" tag — she is the one you are about to name*
 
-Within my art gallery, I addressed my second presurvey finding. It is informative,
-providing resources from scholars if people are interested in learning more, with
-our very own Dr. Munroe being featured in it.
-
-**\*SLIDE CHANGE\*** → **leaves the gallery, lands on the 94% card**
-
-As that 44% from earlier, turned into a whopping 94% who agreed they no longer
-find it boring.
-
-> **Flagged, not fixed — see note 5 below before you say a number here.** Your
-> notes say "there's still that two percent to be filled," but the card on
-> screen shows 94% agreed / roughly 6% did not. I did not change your line to
-> match a number I cannot verify — see note 5 for exactly what I found and
-> what your options are.
+with our very own Dr. Munroe being featured in it. Not only does my art gallery
+make feminism interactive and engaging to learn about, there are resources that
+are right in front of you so you cannot miss it.
 
 **\*SLIDE CHANGE\*** → **the Play page, the Word opens**
 
-Not only does my website make it interactive and engaging to learn about, there
-are resources that are right in front of you so you cannot miss it. My website
-doesn't ignore that learning needs to be tested, it features games including a
-feminism themed wordle and a crossword!
+My website doesn't ignore that learning needs to be tested, it features games
+including a feminism themed wordle and a crossword!
 
-> Today's word is pinned to **PRESENTATION** — see note 6. If you type it out
+> Today's word is pinned to **WEAREFEMINISMM** — see note 5. If you type it out
 > live, that is what will appear on screen, on purpose.
 
 **\*SLIDE CHANGE\*** → **the Community page, the organizations wall**
 
-You'll be able to take a look at organizations that girls can access.
-
-**\*SLIDE CHANGE\*** → *scrolls to "Submit a group we should add."*
-
-There is also a spot right here for you to make a submission, and be featured on
-the website!
+You'll be able to take a look at organizations that girls can access,
 
 **\*SLIDE CHANGE\*** → **The Wall**
 
-And you have your own wall so you can talk about your experiences in schools. It
+and you have your own wall so you can talk about your experiences in schools. It
 is moderated, so that we can maintain a safe space.
 
 **\*SLIDE CHANGE\*** → *A resource every school can use.*
@@ -236,11 +209,10 @@ think of the BEST idea ever, and forget it the next second.
 
 **(pause)**
 
-However, overall, I
-enjoyed building this action research product, as I see it could make a
-difference. The action research turned out how I had planned, but being a greedy
-person, I always want to do more, and I always want to make the biggest difference
-I can make.
+However, overall, I enjoyed building this action research product, as I see it
+could make a difference. The action research turned out how I had planned, but
+being a greedy person, I always want to do more, and I always want to make the
+biggest difference I can make.
 
 **\*SLIDE CHANGE\*** → *I would have run a workshop.*
 
@@ -248,10 +220,6 @@ When I collected my feedback, something I wished I did differently was host a
 workshop so I could get more opinions. Yes, surveys are much easier to send out,
 and you can get them done quicker, but I feel a workshop allows for people to
 really say what they want to say.
-
-**(pause)**
-
-I also want to thank my pod leads, as well, for pushing this the whole way through.
 
 **\*SLIDE CHANGE\*** → *I am. You are. We are.* (the lights bloom)
 
@@ -265,72 +233,64 @@ I am. You are. We are.
 Thank you for listening, and once again, my name is Emmanuel Adusi, similar to the
 name of my website, with two m's.
 
+I would like to thank my pod leaders, Ms. Newell, Dr. Hardware, and Dr. Walker,
+and every other RA here as well. Without you guys, this would not be possible.
+
 > **Leave this last slide up.** It carries the address, your Instagram handle, and
-> now a QR code, so it holds through the applause and any questions — someone can
+> a QR code, so it holds through the applause and any questions — someone can
 > scan straight to the site without typing anything.
 
 ---
 
 ## Changes made
 
-**1. The submission line moved from Home to Community.** The place someone
-actually submits is the "Submit a group we should add" section on Community —
-its heading now says "Submit" outright, and the email link is the lead option
-(it used to be second, behind Instagram).
+**1. Rewritten to match your script.** The wording throughout is yours, from the
+version you sent, not the version I drafted last pass — I only touched the odd
+typo ("Iam. Youare." → "I am. You are.", a stray open-parenthesis, a missing
+period). If a sentence here reads differently from what you meant, it's because
+I read it differently than you intended, not because I changed your meaning on
+purpose — tell me and I'll fix it.
 
-**2. Dr. Munroe moved ahead of the 44%-to-94% line.** The scholars are a room
-inside the gallery and the 94% card sits below the gallery on the page. Gallery
-→ scholars → out to the number, one direction, no backtracking.
+**2. The 44%-to-94% card is no longer on the tour.** Your new script doesn't say
+a number there at all — it goes straight from Dr. Munroe to the Wordle beat. I
+dropped that beat from presenter mode to match: pressing forward no longer stops
+on the 94% card. The card itself still exists on the live site for anyone who
+scrolls there on their own; I just don't hold the talk on it anymore. Say the
+word if you want it back in the sequence.
 
-**3. One sentence is now redundant and has been cut.** "However, I just cannot
-talk, without showing you my learning page, so let's take a look at it
-together!" — you have been on the Learn page for several beats by then.
+**3. The Community "submission" beat is also off the tour, for the same reason.**
+Your script doesn't narrate "Submit a group we should add" on Community anymore.
+Instead, on the Home/piece-of-month part of your script, there's a line that
+still says **"There is also a xxxx tab, for you to make a submission..."** — the
+"xxxx" reads like you hadn't landed on what to call it yet. I didn't invent a
+name for it. The Community page still has that section built and working
+(`#recommend`, from your very first ask to make submissions clearer) — it's just
+not a stop on the presenter tour right now. Tell me what you want that line to
+say and where, and I'll wire the beat back in.
 
-**4. Wordle replaced crossword on the Play beat.** Same spoken line (it still
-mentions both games exist), the slide behind it just opens The Word now instead
-of The Crossword.
+**4. The key-message slide text changed to match.** The big slide used to read
+"The wearefeminismm community started from me." It now reads "The wearefeminismm
+community is the *change* I wanted to see," to match the line in your script.
 
-**5. The "two percent" line — investigated, not guessed.** You asked me to check
-whether the number on screen was wrong. What I found: the 94% card is not
-actually connected to live data at all right now — it shows a fixed, dated
-snapshot (94% agreed, from 30 of 32 responses, recorded 7 August 2026), the same
-way the site's own code labels it as "unconfirmed." Inside that snapshot, 2 of
-the 32 responses were neutral rather than disagreeing — so "2" is a real number
-in your data, but it is a headcount of people, not a percentage. The percentage
-math on screen (94% agree, so roughly 6% do not) is internally consistent with
-that same data. I did not put a number in your mouth I could not verify. Two real
-options, your call:
-&nbsp;&nbsp;**a.** Say "six percent," matching the number the room is looking at.
-&nbsp;&nbsp;**b.** Say "two students," referring to the actual headcount, not a percent.
-I have not touched the spoken line above — it currently says "94% who agreed,"
-which is accurate and doesn't fight the card. Decide which follow-up line you
-want and I'll drop it in.
-If you'd rather the card show a truly live, current number instead of this
-snapshot, that's the same kind of fix as connecting the Wall — deploying
-`tools/results-endpoint.gs` against your post-survey response sheet. Say the
-word and I'll walk you through it exactly like we did for the Wall.
+**5. Wordle is pinned to WEAREFEMINISMM**, not the normal daily rotation — carried
+over from the last pass, unchanged here. **To revert:** `js/wordle.js`,
+`FORCE_WORD` near the top, set it to `null`. Tell me when.
 
-**6. Wordle is pinned to PRESENTATION.** Every visitor to the Play page gets
-this word instead of the normal daily rotation, starting now, on purpose, until
-you tell me to change it back. This affects the LIVE site for everyone, not
-just you during the talk — anyone who plays Wordle today gets PRESENTATION.
-**To revert:** one line in `js/wordle.js` — find `FORCE_WORD` near the top and
-set it to `null`. Tell me when and I'll do it and redeploy.
+**6. The pod-leader thank-you moved to the very end**, after "with two m's," with
+their actual names now in it — your script puts it there, not before "I am. You
+are. We are." like the last draft had it.
 
-**7. Maya Angelou's photo is fixed to fully resolve on arrival.** It was a real
-bug, not just timing luck: the photo assembles itself based on how centred the
-tile is in your screen, and the ordinary scroll lands it top-aligned instead —
-so it could arrive still mid-dither. The presentation now scrolls to the exact
-position that resolves it, the same way it would resolve for a visitor who
-scrolled there normally.
+**7. Two sentences were folded together where your script does that.** The MYSP
+"Belong and Thrive" pillars and "let students lead" solution now read as one
+continuous thought in your script rather than two separate ones — I kept them as
+two slide changes on screen (the site already draws them as two distinct
+slides, Belong/Thrive then the arrow for "lead"), but the spoken line between them
+carries straight through with no pause forcing a break, same as you wrote it.
 
-**8. A QR code was added to the closing slide**, next to the printed address —
-verified to actually decode to the site (checked twice, on two different
-tools, since the first check gave a false negative from a flaky decoder, not a
-bad code).
-
-**9. The crossword got a "Reveal a letter" button**, for anyone who gets stuck —
-still counts as solved, still keeps the streak.
+**8. "What would be the best way to teach feminism?" moved earlier**, onto the
+Learn-page-hero beat, right where your script puts a slide change before the
+82-people stat — instead of sitting with the prototypes paragraph like the last
+draft had it.
 
 ## If you lose your place
 
