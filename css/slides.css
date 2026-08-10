@@ -456,6 +456,69 @@ body.sl-up { overflow: hidden; }
 .sl[data-lay="fill"] .sl__s,
 .sl[data-lay="fill"] .sl__c { max-width: 44ch; margin-inline: auto; }
 
+/* PORTRAIT — a photograph running the full height of the frame on the right,
+   dissolving into the paper rather than sitting in a box, with the name beside
+   it. Used once, on the introduction.
+
+   The photo is positioned against .sl, not placed in the grid, because it has
+   to bleed off the top, bottom and right edges, which a centred padded grid
+   item cannot do. It sits above the grain and the waves but below the text
+   (.sl__body is z-index 1), so nothing is ever drawn over a face. */
+.sl__photo {
+  position: absolute;
+  right: 0;
+  /* Vertically centred by auto margins between top:0 and bottom:0, NOT by a
+     translate: the entrance already owns transform, and a centring translate
+     there would be wiped the moment it animated. */
+  top: 0;
+  bottom: 0;
+  margin-block: auto;
+  /* Height-led with the photograph's true ratio, so it is never cropped. A
+     full-height box on a portrait image cropped hard from the sides and cut
+     into his face as soon as the column narrowed. */
+  height: min(74vh, 640px);
+  aspect-ratio: 933 / 1400;
+  width: auto;
+  overflow: hidden;
+  z-index: 0;
+  /* One elliptical mask rather than fades per edge: every side dissolves into
+     the page, so it reads as printed onto the paper rather than pasted on top,
+     and it needs no mask-compositing to do it. */
+  -webkit-mask-image: radial-gradient(124% 92% at 76% 50%, #000 62%, transparent 94%);
+  mask-image: radial-gradient(124% 92% at 76% 50%, #000 62%, transparent 94%);
+  transition: opacity 0.85s ease, transform 1.15s cubic-bezier(0.22, 1, 0.36, 1),
+              filter 0.85s ease;
+}
+.sl__photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;         /* never distort a face to fill a box */
+  object-position: 50% 24%;  /* his eyes stay in the upper third at any crop */
+}
+/* Start state only. Resting is visible, so a dead transition costs the
+   entrance and never the photograph. */
+.sl__photo.is-armed {
+  transition: none;
+  opacity: 0;
+  transform: scale(1.05) translateX(4%);
+  filter: blur(9px);
+}
+
+.sl[data-lay="portrait"] .sl__body {
+  justify-self: start;
+  max-width: min(62%, 720px);
+}
+.sl[data-lay="portrait"] .sl__in { text-align: left; }
+
+/* Narrow screens drop the photograph rather than stack it. This is a
+   projector layout; a shrunken portrait above a headline is worse than no
+   portrait, and putting the text on top of it would put type over a face. */
+@media (max-width: 820px) {
+  .sl__photo { display: none; }
+  .sl[data-lay="portrait"] .sl__body { justify-self: center; max-width: 100%; }
+}
+
 /* SPLIT — two columns: the frame around the idea on the left, the idea itself
    on the right. Explicit placement rather than source order, so the eyebrow,
    support and citation stack in the narrow column while the headline spans

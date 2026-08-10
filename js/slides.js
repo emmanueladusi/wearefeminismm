@@ -69,7 +69,8 @@
     { k: "Action research 2026",
       t: "Emmanuel Adusi",
       enter: "zoom",
-      lay: "centre",
+      lay: "portrait",
+      img: "img/emmanuel-portrait.jpg",
       s: "Heading to the University of Waterloo this fall for Honours Mathematics.",
       kind: "big",
       say: "Good morning, who I am" },
@@ -491,6 +492,32 @@
       // to. It swaps the tokens locally, so every colour on the slide (type,
       // accent, thread, grain, vignette) follows without being restated.
       root.classList.toggle("is-invert", !!s.invert);
+
+      /* The portrait. Rebuilt per slide rather than hidden and shown, so a
+         deck with several photos later cannot leave the wrong face on screen.
+         It is a sibling of .sl__body, not a child, because it runs the full
+         height of the frame and bleeds off the edge, which nothing inside a
+         centred, padded text block can do.
+
+         Armed and released the same way the words are, with its own class and
+         a reflow rather than a timer, so the resting state is the visible one:
+         if the transition never runs, the photo is simply there. */
+      var oldPhoto = root.querySelector(".sl__photo");
+      if (oldPhoto) oldPhoto.remove();
+      if (s.img) {
+        var fig = document.createElement("div");
+        fig.className = "sl__photo";
+        /* One source, deliberately no srcset. The photo is display:none below
+           820px, so there is no small-screen case to serve a smaller file to,
+           and the responsive version actively hurt: the browser chose the
+           narrow candidate and upscaled a 372px image into a 605px box, which
+           is visibly soft on a projector. One 144KB file, always crisp. */
+        fig.innerHTML = '<img src="' + s.img + '" alt="" decoding="async">';
+        root.appendChild(fig);
+        fig.classList.add("is-armed");
+        void fig.offsetWidth;
+        fig.classList.remove("is-armed");
+      }
     }
 
     root.classList.add("is-on");
