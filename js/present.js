@@ -64,8 +64,7 @@
   ])
   .concat(deck("process", "learn.html", "#boring-pulse"))
   .concat([
-    { p: "learn.html", t: "#gallery", say: "The gallery opens · the payoff", gal: true, prep: enterGallery },
-    { p: "learn.html", t: "#gallery", say: "Scholars · Dr. Munroe", gal: true, url: "room=scholars", prep: goScholars },
+    { p: "learn.html", t: "#gallery", say: "The gallery opens, straight to Dr. Munroe", gal: true, url: "room=scholars", prep: goScholars },
     { p: "play.html", t: "#theword", say: "Learning gets tested · the daily word", prep: openWord },
     { p: "community.html", t: "#directory", say: "Organizations girls can actually reach", prep: spotlightOrg },
     { p: "wall.html", t: "#wallf", say: "Your own wall, moderated", prep: enterWall }
@@ -149,22 +148,11 @@
     return -1;
   }
 
-  function enterGallery() {
-    // Gallery.html checks `!e.isTrusted` and enters synchronously on a
-    // synthetic click, skipping its coin-flip delay. Nothing to wait for
-    // beyond the ~900ms clip-path open.
-    if (!isGalleryOpen()) {
-      var btn = document.getElementById("enterBtn");
-      if (btn) btn.click();
-      return 900;
-    }
-    // Already open means we arrived BACKWARD from the scholars room. Put the
-    // gallery back on its opening room, or he introduces the gallery over a
-    // room the talk has not reached yet.
-    if (typeof window.setChapter === "function") window.setChapter("directory");
-    return 300;
-  }
-
+  // Opens the gallery straight into the scholars room, Dr. Munroe's card
+  // (gold ring, "Featured" tag) visible as the room resolves — used to be a
+  // separate beat after a generic "gallery opens" one, merged into a single
+  // press per his ask: the payoff of stepping into the gallery IS her card,
+  // not a beat of the empty default room first.
   function goScholars() {
     if (typeof window.openGallery === "function") {
       window.openGallery("scholars");
