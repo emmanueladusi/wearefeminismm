@@ -271,7 +271,11 @@
                "px;--d:" + (i * 34) + 'ms"></i>';
     });
 
-    return '<div class="sl__decor" aria-hidden="true">' + svg +
+    // Grain and vignette first, so they are the ground everything else sits
+    // on: the waves, the thread and the bloom all stay crisp on top of them.
+    return '<div class="sl__decor" aria-hidden="true">' +
+             '<i class="sl__grain"></i>' +
+             '<i class="sl__vig"></i>' + svg +
              '<i class="sl__sweep"></i>' +
              '<div class="sl__wire"><i class="sl__wirefill"></i></div>' +
              '<div class="sl__marks"></div>' +
