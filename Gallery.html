@@ -2937,8 +2937,14 @@ function openGallery(chapterId){
     g.classList.add('open'); S.open=true;
     document.documentElement.style.overflow='hidden';
     startBG();
-    // hybrid: grow out of the portal card
-    if (!S.prefersReduced){
+    // hybrid: grow out of the portal card. Skipped while presenting
+    // (js/present.js carries ?present on every URL it drives) — the talk has
+    // already spent a beat introducing the gallery by then (the Asante slide
+    // carries this gallery's own artwork), so a second ~900ms reveal here
+    // would repeat that beat rather than add to it. QS is declared further
+    // down this same script but already initialised by the time any click
+    // or ?room= load handler can call this function.
+    if (!S.prefersReduced && !QS.has('present')){
       const r = $('#portal').getBoundingClientRect();
       const cx = ((r.left+r.width/2)/innerWidth*100).toFixed(1)+'% ';
       const cy = ((r.top+r.height/2)/innerHeight*100).toFixed(1)+'%';

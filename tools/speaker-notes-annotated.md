@@ -12,10 +12,10 @@ the slide deck ever disagree, trust the deck.)
 
 The piece of the month now lands a little higher and keeps scrolling on its
 own toward the prose. The Asante slide now carries the gallery's own
-artwork, so the gallery beat right after it opens straight into the scholars
-room — Dr. Munroe resolves into view as it opens, not a generic room first.
-One org on the Community wall (Black Women's Institute for Health) grows and
-lifts when that beat lands. See **Changes made** for the full list.
+artwork, so the gallery beat right after it skips its opening reveal
+entirely and lands straight on Dr. Munroe, her profile already expanding on
+its own. One org on the Community wall (Black Women's Institute for Health)
+grows and lifts when that beat lands. See **Changes made** for the full list.
 
 ---
 
@@ -163,7 +163,7 @@ there, tackled my finding on the presurvey.
 
 **(pause)**
 
-**\*SLIDE CHANGE\*** → **the gallery opens straight into the scholars room. Dr. Munroe's card carries a gold ring and a "Featured" tag, resolving into view as the room opens — give it a second. No separate "gallery opens" beat anymore: the Asante slide's artwork already did that introducing**
+**\*SLIDE CHANGE\*** → **straight to Dr. Munroe — no opening reveal first. The gallery appears already on her card (gold ring, "Featured" tag), and her profile opens on its own, the same panel a visitor gets from clicking her portrait**
 
 Within my art gallery, I addressed my second presurvey finding. It is informative,
 featuring a part that talks about the different types of feminism, the different
@@ -300,14 +300,19 @@ toward the quote and note, so you don't have to press again just to bring the
 rest of the piece into view. The submission line ("Submit your entry here")
 sits on this same beat, right where your script puts it.
 
-**10. The Asante slide carries the gallery's own artwork, and the gallery
-beat goes straight to Dr. Munroe.** The photo you wanted on that slide turned
-out to already be a site asset — `img/art/learn-hero.jpg`, the same collage
-that opens the Learn page, rights already held. No file needed. With the
-slide itself now carrying that image, the live gallery opening is not
-repeated as its own beat: pressing next off Asante opens the gallery directly
-into the scholars room, Dr. Munroe's gold-ring "Featured" card resolving into
-view as the room opens. This is what brought the count to 26.
+**10. The Asante slide carries the gallery's own artwork, the gallery skips
+its opening reveal, and Dr. Munroe's profile expands on its own.** The photo
+you wanted on that slide turned out to already be a site asset —
+`img/art/learn-hero.jpg`, the same collage that opens the Learn page, rights
+already held. No file needed. Two more rounds on the beat right after it:
+first, no separate "gallery opens" beat — pressing next off Asante opens the
+gallery directly onto Dr. Munroe. Then you said you didn't want the gallery
+to visibly open at all before showing her — the ~900ms portal-grow reveal is
+now skipped whenever presenting (`Gallery.html`'s `openGallery()` checks for
+`?present` in the URL), so the gallery is simply already there, on her card.
+Last, her card is clicked automatically, opening the same expanded profile
+panel a visitor gets from clicking her portrait — you don't have to click it
+yourself mid-talk. This is what brought the count to 26.
 
 **11. One organization spotlights.** Black Women's Institute for Health grows
 and lifts above its neighbours on the Community beat — a presenter-only

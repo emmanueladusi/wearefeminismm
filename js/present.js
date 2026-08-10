@@ -149,14 +149,19 @@
   }
 
   // Opens the gallery straight into the scholars room, Dr. Munroe's card
-  // (gold ring, "Featured" tag) visible as the room resolves. No separate
-  // "gallery opens" beat before this one: the Asante slide now carries the
-  // gallery's own artwork as its image, so that slide IS the introduction —
-  // a second, live opening reveal right after it would repeat the beat.
+  // (gold ring, "Featured" tag) visible as the room resolves, then clicks
+  // her card itself to open her expanded profile — the same #detail panel a
+  // visitor gets from clicking her portrait (Gallery.html's wireOpen/
+  // detailScholar). No separate "gallery opens" beat before this one, and no
+  // portal-grow reveal either: Gallery.html's openGallery() skips its own
+  // ~900ms animation whenever ?present is in the URL, since the Asante slide
+  // already introduced the gallery with its own artwork.
   function goScholars() {
     if (typeof window.openGallery === "function") {
       window.openGallery("scholars");
-      return 900;
+      var card = document.querySelector('.piece--scholar[data-pid="s3"]');
+      if (card) card.click();
+      return 200;
     }
     // No global? Fall back to the gallery's own ?room= deep link, which does
     // exactly this on load and is a documented, already-tested path.
