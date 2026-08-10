@@ -57,34 +57,63 @@
   transition: opacity 0.32s ease, visibility 0s, background-color 0.5s ease;
 }
 
-/* ---------- inverted slides ----------
-   Four slides render on the opposite ground to the rest, as punctuation: the
+/* ---------- punctuation slides ----------
+   Four slides render on a different ground from the rest, as punctuation: the
    second finding, the key message, Asante, and "We are." Redefining the site
    tokens locally means the type, the accent, the thread, the marks, the grain
    and the vignette all follow on their own.
 
-   Now that .sl's own default is unconditionally light, "opposite" has only
-   one direction, so this is a single block rather than one per document
-   theme: these are the same dark-ground values the base .sl held before the
-   accessibility swap, kept as-is because dark-on-dark contrast was never the
-   complaint — light-background-as-a-whole was. */
+   NOT A DARK GROUND. It was, briefly — a near-black brown, the same dark
+   surface the base .sl used before "always light" — and that was flagged as
+   its own accessibility problem, separately from the base-slide dark-default
+   question. So this is a second light surface, not a second theme: a warm
+   rose wash, distinct enough from the base paper to register as a shift, with
+   the SAME dark ink and the SAME darkened accent the base slide uses, at
+   equal or better contrast (9.49:1 ink, 8.14:1 accent, both past AAA — see
+   the base .sl block above for how those numbers were chosen). The class name
+   stays is-invert because it still marks "the slide that departs from the
+   others"; only what it inverts TO changed. */
 .sl.is-invert {
-  --paper: #211713;
-  --paper-soft: #382f2b;
-  --ink: rgba(226, 219, 216, 0.94);
-  --ink-dim: rgba(226, 219, 216, 0.7);
-  --gold-ink: var(--gold);        /* 6.16:1 on this ground */
+  --paper: #f3dbe2;
+  --paper-soft: #e9c8d3;
+  --ink: #452f28;
+  --ink-dim: #3b2721;
+  --gold-ink: #602f3d;       /* 8.14:1 on this paper */
   --gold-soft: rgba(234, 115, 147, 0.22);
-  --line: rgba(226, 219, 216, 0.16);
-  --grain-o: 0.05;
-  --vig-col: rgba(0, 0, 0, 0.34);
-  --vig-stop: 40%;
-  --sweep-a: 0.075;
+  --line: rgba(69, 47, 40, 0.16);
+  --grain-o: 0.035;
+  --vig-col: rgba(69, 47, 40, 0.06);
+  --vig-stop: 46%;
+  --sweep-a: 0.05;
 }
 
 /* The site keeps scrolling underneath while a slide is up; lock it so a
    stray trackpad nudge does not move the page he is about to reveal. */
 body.sl-up { overflow: hidden; }
+
+/* ---------- partner credit ----------
+   TDSB and the Centre of Excellence for Black Student Achievement, on every
+   slide, every deck, not just one. Sits in the corner rather than the foot
+   band the thread/waves/marks already own (that band is centred and full
+   width; this stays clear of it by living in the padding gutter outside it).
+   z-index 2, one above .sl__body's own 1, so it can never end up sitting
+   behind a slide that happens to run text wide enough to reach the corner. */
+.sl__partners {
+  position: absolute;
+  right: var(--pad);
+  bottom: clamp(14px, 2vw, 22px);
+  z-index: 2;
+  height: clamp(30px, 3.6vw, 42px);
+  width: auto;
+  opacity: 0.92;
+  pointer-events: none;
+}
+@media (max-width: 640px) {
+  /* The foot band gets crowded on a narrow window; a presentation is a
+     projector layout first, so this is the one place that is allowed to
+     just get smaller rather than earning a whole stacked mobile treatment. */
+  .sl__partners { height: 22px; bottom: 10px; right: 12px; }
+}
 
 /* ---------- the decoration layer ---------- */
 
@@ -503,9 +532,11 @@ body.sl-up { overflow: hidden; }
   transition: opacity 0.85s ease, transform 1.15s cubic-bezier(0.22, 1, 0.36, 1),
               filter 0.85s ease, box-shadow 0.85s ease;
 }
-.sl.is-invert .sl__photo {
-  box-shadow: 0 0 0 1px var(--line), 0 22px 46px -18px rgba(0, 0, 0, 0.7);
-}
+/* No is-invert override here anymore: both grounds are light now (see the
+   punctuation-slides note above), so the one soft shadow the base rule
+   already sets is correct for either. Kept as a comment, not deleted
+   silently, since the next person reading this file will otherwise wonder
+   where the dark-ground shadow rule went. */
 .sl__photo img {
   display: block;
   width: 100%;

@@ -76,13 +76,13 @@
   }
 
   /* ---------- presentation-day override -----------------------------------
-     Pinned by hand for the live talk: every visitor gets PRESENTATION instead
-     of whatever the normal rotation would deal, regardless of the real date.
-     Deliberately bypasses WORDS and its 4-8 letter filter (line 29) rather
-     than being added to the pool, since this is a one-off, not a real day's
-     word that should ever come up again in the rotation.
+     Pinned by hand for the live talk: every visitor gets WEAREFEMINISMM
+     instead of whatever the normal rotation would deal, regardless of the
+     real date. Deliberately bypasses WORDS and its 4-8 letter filter (line
+     29) rather than being added to the pool, since this is a one-off, not a
+     real day's word that should ever come up again in the rotation.
      SET TO null TO GO BACK TO NORMAL. That is the only edit this needs. */
-  var FORCE_WORD = { w: "PRESENTATION", m: "What you are in the middle of right now." };
+  var FORCE_WORD = { w: "WEAREFEMINISMM", m: "The name of this site. Two m's, on purpose." };
 
   var day = dayIndex();
   var TARGET = FORCE_WORD ? FORCE_WORD.w : wordFor(day).w;

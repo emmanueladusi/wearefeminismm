@@ -1099,7 +1099,14 @@
     const preset = document.body.getAttribute("data-wallf-mode");
     const resume = (preset === "everything" || preset === "conversations") ? preset : null;
 
-    await load();
+    // The room itself renders and the camera/canvas loop starts BEFORE the
+    // fetch, not after. `await load()` used to sit ahead of all of this, so
+    // the whole page was blank for however long the Apps Script cold start
+    // took -- often a real, human-noticeable pause, not a rounding error.
+    // `posts` starts as [], which every render path already has to handle
+    // (a genuinely new wall is also empty), so there is no unsafe state here
+    // to render, only an early one. `load()` below fills it in and the single
+    // renderAll() afterward is what makes the arrival visible.
     renderAll();
 
     if (resume) {
@@ -1110,6 +1117,8 @@
       cam.s = 1.5; cam.ts = 0.62;
     }
     tick();
+
+    if (await load()) renderAll();
 
     setInterval(async () => { if (await load()) renderAll(); }, 30000);
   })();

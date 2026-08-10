@@ -326,7 +326,13 @@
     root = document.createElement("div");
     root.className = "sl";
     root.setAttribute("aria-hidden", "true"); // presenter surface, not page content
-    root.innerHTML = decorMarkup() + '<div class="sl__body"></div>';
+    // Built once, here, rather than per-slide in show(): a credit mark that
+    // belongs to the deck as a whole, not to any one idea in it, so it has to
+    // survive every show() call untouched rather than being re-authored
+    // seventeen times from slide data that has no reason to carry it.
+    root.innerHTML = decorMarkup() + '<div class="sl__body"></div>' +
+      '<img class="sl__partners" src="img/partner-logos.png" ' +
+      'alt="Toronto District School Board and Centre of Excellence for Black Student Achievement">';
     document.body.appendChild(root);
     body = root.querySelector(".sl__body");
   }
