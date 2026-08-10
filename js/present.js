@@ -67,7 +67,7 @@
     { p: "learn.html", t: "#gallery", say: "The gallery opens · the payoff", gal: true, prep: enterGallery },
     { p: "learn.html", t: "#gallery", say: "Scholars · Dr. Munroe", gal: true, url: "room=scholars", prep: goScholars },
     { p: "play.html", t: "#theword", say: "Learning gets tested · the daily word", prep: openWord },
-    { p: "community.html", t: "#directory", say: "Organizations girls can actually reach" },
+    { p: "community.html", t: "#directory", say: "Organizations girls can actually reach", prep: spotlightOrg },
     { p: "wall.html", t: "#wallf", say: "Your own wall, moderated", prep: enterWall }
   ])
   .concat(deck("closing", "index.html", "#brandmark"));
@@ -125,9 +125,27 @@
     var host = document.querySelector(".piece__photo[data-ink]");
     if (!host) return 0;
     var r = host.getBoundingClientRect();
-    var targetY = Math.max(0, window.scrollY + r.top - (innerHeight - r.height) / 2);
+    // Higher than true centre (32% down rather than 50%), so there is room
+    // left below the photo for the page to keep moving into on its own.
+    var targetY = Math.max(0, window.scrollY + r.top - (innerHeight - r.height) * 0.32);
     if (window.__lenis) window.__lenis.scrollTo(targetY, { offset: 0 });
     else window.scrollTo({ top: targetY, behavior: "smooth" });
+
+    // The page then keeps scrolling on its own toward the piece's prose,
+    // rather than sitting still until the next press — give the photo a
+    // moment to resolve out of ink first. Guarded against a beat change in
+    // the meantime: if he has already pressed on by the time this fires,
+    // `idx` has moved past the value it was called for, and pulling the
+    // page back down here would fight whatever beat he is actually on.
+    var thisBeat = idx;
+    setTimeout(function () {
+      if (idx !== thisBeat) return;
+      var prose = document.querySelector(".piece__prose");
+      if (!prose) return;
+      if (window.__lenis) window.__lenis.scrollTo(prose, { offset: 0 });
+      else prose.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 1800);
+
     return -1;
   }
 
@@ -167,6 +185,18 @@
     var card = document.querySelector('[data-opens="theword"]');
     var panel = document.getElementById("theword");
     if (card && panel && panel.hidden) { card.click(); return 240; }
+    return 0;
+  }
+
+  /* One tile on the org wall — Black Women's Institute for Health, marked
+     with a `data-spotlight` attribute in the HTML rather than matched by
+     name here, so swapping which org gets highlighted is a one-line edit in
+     community.html, not a text-match to keep in sync. Every arrival at this
+     beat is a fresh page load (the adjacent beats are on different pages),
+     so there is no stray state to clear on the way out. */
+  function spotlightOrg() {
+    var tile = document.querySelector(".orgtile[data-spotlight]");
+    if (tile) tile.classList.add("is-spotlit");
     return 0;
   }
 

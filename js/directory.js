@@ -116,6 +116,10 @@
       size: "std",
       url: "https://bwhealthinstitute.com/",
       lastVerified: "7 August 2026",
+      // Read by present.js's spotlightOrg() to find the one card the talk
+      // highlights live. Move this flag to a different org instead of
+      // matching by name elsewhere, so there is exactly one place it is set.
+      spotlight: true,
     },
     {
       name: "Black Women in Motion",
@@ -305,7 +309,8 @@
        accessible name stays short; CSS then stretches that one link across
        the whole tile, which is what makes the poster clickable. */
     return (
-      '<li class="orgtile orgtile--' + o.size + '" style="--org:' + o.accent + '">' +
+      '<li class="orgtile orgtile--' + o.size + '" style="--org:' + o.accent + '"' +
+      (o.spotlight ? " data-spotlight" : "") + ">" +
       '<span class="orgtile__num" aria-hidden="true">' + num(i) + "</span>" +
       '<h3 class="orgtile__name"><a class="orgtile__link" href="' + esc(o.url) +
       '" target="_blank" rel="noopener">' + esc(o.name) +

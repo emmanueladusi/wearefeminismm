@@ -6265,6 +6265,21 @@ html[data-a11y] .orgtile { transition: none; }
 html[data-a11y] .orgtile:hover { transform: none; }
 html[data-a11y] .orgtile__go { opacity: 1; transform: none; }
 
+/* The presenter spotlight. Scale rather than a grid-span change: grid-column/
+   row are not smoothly animatable, so growing a tile's track would snap
+   instead of expand. A transform stays in the tile's own cell and lifts on
+   top of its neighbours instead, which also means normal layout never
+   reflows and nothing else on the wall has to move. Presenter-only — this
+   class is never added except by js/present.js's spotlightOrg(). */
+.orgtile.is-spotlit {
+  transform: scale(1.14);
+  z-index: 5;
+  box-shadow: 0 0 0 3px var(--gold), 0 26px 60px -16px rgba(0, 0, 0, 0.55);
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.6s;
+}
+@media (prefers-reduced-motion: reduce) { .orgtile.is-spotlit { transition: none; } }
+html[data-a11y] .orgtile.is-spotlit { transition: none; }
+
 /* Below four columns the wide tiles stop spanning. A two-unit tile cannot tile
    three or two columns in source order without leaving holes mid-wall, and the
    only ways out are dense packing (which reorders) or gaps. The row rhythm
