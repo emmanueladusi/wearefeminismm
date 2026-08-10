@@ -55,6 +55,11 @@
     { p: "index.html", t: "#brandmark", say: "Here's a look · replay the reveal", prep: replayHero },
     { p: "index.html", t: "#popculture", say: "Piece of the month" },
     { p: "index.html", t: "#about", say: "About me, and why it's last" },
+    // js/learnHero.js plays itself on load, unprompted, so no prep step: the
+    // real navigation hardNav() does for a cross-page beat is itself the cue.
+    // Landing straight on #boring-pulse (the old first beat here) meant the
+    // page scrolled past the hero before anyone saw it play.
+    { p: "learn.html", t: "#top", say: "The Learn page hero" },
     { p: "learn.html", t: "#boring-pulse", say: "82 surveyed · 44% said boring · and the second finding" }
   ])
   .concat(deck("process", "learn.html", "#boring-pulse"))
@@ -62,7 +67,7 @@
     { p: "learn.html", t: "#gallery", say: "The gallery opens · the payoff", gal: true, prep: enterGallery },
     { p: "learn.html", t: "#gallery", say: "Scholars · Dr. Munroe", gal: true, url: "room=scholars", prep: goScholars },
     { p: "learn.html", t: "#after-pulse", say: "44% became 6%" },
-    { p: "play.html", t: "#thecrossword", say: "Learning gets tested · wordle and crossword", prep: openCrossword },
+    { p: "play.html", t: "#theword", say: "Learning gets tested · the daily word", prep: openWord },
     { p: "community.html", t: "#directory", say: "Organizations girls can actually reach" },
     { p: "community.html", t: "#recommend", say: "Submit a group and be featured" },
     { p: "wall.html", t: "#wallf", say: "Your own wall, moderated", prep: enterWall }
@@ -135,9 +140,9 @@
     return !!(g && g.classList.contains("open"));
   }
 
-  function openCrossword() {
-    var card = document.querySelector('[data-opens="thecrossword"]');
-    var panel = document.getElementById("thecrossword");
+  function openWord() {
+    var card = document.querySelector('[data-opens="theword"]');
+    var panel = document.getElementById("theword");
     if (card && panel && panel.hidden) { card.click(); return 240; }
     return 0;
   }

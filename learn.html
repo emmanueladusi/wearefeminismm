@@ -23,7 +23,7 @@
   <meta name="twitter:image" content="https://emmanueladusi.github.io/wearefeminismm/img/og-image.png" />
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-  <link rel="stylesheet" href="css/styles.css?v=289" />
+  <link rel="stylesheet" href="css/styles.css?v=290" />
   <!-- webfonts the gallery needs; the rest of Learn is unaffected -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -139,7 +139,10 @@
    metaphor is finally consistent, and the intro centres over it. */
 #wfgallery .portal{position:relative;overflow:visible;border-radius:0;
   color:var(--ink);padding:clamp(20px,3vw,40px) 0 0;
-  background:none;box-shadow:none;text-align:center}#wfgallery .portal .eyebrow--light{color:var(--ink-dim)}#wfgallery .portal .eyebrow,
+  background:none;box-shadow:none;text-align:center;cursor:pointer}/* Real controls opt back OUT of the door cursor, so they still read as their
+   own thing rather than as one more spot on an already-clickable poster. */
+#wfgallery .portal__ctas,
+#wfgallery .portal a{cursor:auto}#wfgallery .portal .eyebrow--light{color:var(--ink-dim)}#wfgallery .portal .eyebrow,
 #wfgallery .portal h1,
 #wfgallery .portal__lead,
 #wfgallery .portal__ctas{
@@ -823,9 +826,12 @@ body.touchmode #wfgallery .lobby__floor{
   transition:border-color .2s,background .2s}#wfgallery .quiz__opt:hover{border-color:var(--violet);background:rgba(74,53,104,.06)}#wfgallery .quiz__opt.right{border-color:#3e7d4f;background:rgba(62,125,79,.12)}#wfgallery .quiz__opt.wrong{border-color:#a04545;background:rgba(160,69,69,.1)}#wfgallery .quiz__verdict{margin-top:12px;font-size:.9rem;min-height:1.4em}#wfgallery .quiz__verdict b{color:var(--violet)}/* room titles floating in space */
 #wfgallery .roomtitle{position:absolute;left:50%;top:50%;width:min(680px,80vw);text-align:center;pointer-events:none;
   transform:translate(-50%,-50%) translate3d(var(--px,0px),var(--py,0px),var(--pz,0px))}#wfgallery .roomtitle .eyebrow{color:var(--gold);letter-spacing:0.055em}#wfgallery .roomtitle h2{font-family:var(--serif);font-weight:600;font-size:clamp(1.9rem,4.4vw,3.2rem);color:var(--cream);line-height:1.06;margin-top:10px}#wfgallery .roomtitle h2 em{font-style:italic;color:var(--gold)}#wfgallery .roomtitle p{color:var(--dim);margin-top:12px;font-size:.98rem}/* the scholars room is the busiest, so its heading block stays compact */
-#wfgallery .room[data-type="scholars"] .roomtitle{width:min(560px,72vw)}#wfgallery .room[data-type="scholars"] .roomtitle h2{font-size:clamp(1.5rem,3vw,2.2rem)}#wfgallery .room[data-type="scholars"] .roomtitle p{font-size:.88rem;margin-top:8px}/* scholars */
+#wfgallery .room[data-type="scholars"] .roomtitle{width:min(560px,72vw)}#wfgallery .room[data-type="scholars"] .roomtitle h2{font-size:clamp(1.5rem,3vw,2.2rem);font-weight:400}#wfgallery .room[data-type="scholars"] .roomtitle p{font-size:.88rem;margin-top:8px}/* scholars */
 #wfgallery .piece--scholar{width:min(230px,17vw)}#wfgallery .piece--scholar .frame{padding:12px}#wfgallery .piece--scholar:hover .frame,
-#wfgallery .piece--scholar:focus-visible .frame{transform:translateZ(0) scale(1.02)}#wfgallery .scholar__photo{aspect-ratio:3/2;border-radius:8px;overflow:hidden;background:var(--violet-deep);margin-bottom:10px}#wfgallery .scholar__photo img{width:100%;height:100%;object-fit:cover}#wfgallery .scholar__name{font-family:var(--serif);font-weight:600;font-size:1.05rem}#wfgallery .scholar__role{color:var(--ink-dim);font-size:.78rem;margin-top:4px}/* ---------- room 00 · THE EXHIBITION REEL --------------------------
+#wfgallery .piece--scholar:focus-visible .frame{transform:translateZ(0) scale(1.02)}/* Munroe, named by hand in the talk. A ring rather than a bigger card, so she
+   still tiles in her ordinary slot. */
+#wfgallery .piece--scholar.is-featured .frame{box-shadow:0 0 0 2px var(--gold),0 14px 30px -14px rgba(0,0,0,.5)}#wfgallery .scholar__tag{color:var(--gold);font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;
+  text-transform:uppercase;margin:8px 0 0}#wfgallery .scholar__photo{aspect-ratio:3/2;border-radius:8px;overflow:hidden;background:var(--violet-deep);margin-bottom:10px}#wfgallery .scholar__photo img{width:100%;height:100%;object-fit:cover}#wfgallery .scholar__name{font-family:var(--serif);font-weight:600;font-size:1.05rem}#wfgallery .scholar__role{color:var(--ink-dim);font-size:.78rem;margin-top:4px}/* ---------- room 00 · THE EXHIBITION REEL --------------------------
    Six room covers on one controlled horizontal reel. Exactly one is
    active and dominant; its neighbours are cropped by the viewport edges
    so the exhibition reads as continuing past the frame. This replaces
@@ -4538,9 +4544,14 @@ function buildScholarRoom(world){
   world.appendChild(t);
   const rail = el('div','rail');
   SCHOLARS.items.forEach((sc,i)=>{
-    const p = el('article','piece piece--scholar');
+    // Tanitiã Munroe (s3) is the one scholar Emmanuel names by hand in the
+    // talk ("our very own Dr. Munroe"), so her card carries a small marker
+    // the other five do not. A ring on the frame plus a printed tag, not a
+    // resize or a reorder: she still sits in her ordinary 3x2 slot.
+    const featured = sc.id==='s3';
+    const p = el('article','piece piece--scholar'+(featured?' is-featured':''));
     p.setAttribute('role','button'); p.tabIndex=0; p.dataset.pid=sc.id;
-    p.setAttribute('aria-label',sc.name+', '+sc.role+'. Open the portrait.');
+    p.setAttribute('aria-label',sc.name+', '+sc.role+(featured?'. Featured in the talk.':'')+'. Open the portrait.');
     /* Fixed 3×2 cells with guaranteed clearance. Depth varies per COLUMN
        only (never per row), so the two rows keep a constant on-screen
        gap and the 1.02 hover scale can never reach a neighbour. */
@@ -4551,6 +4562,7 @@ function buildScholarRoom(world){
     p.style.setProperty('--pz', (col===1? -40 : -150)+'px');
     p.style.setProperty('--pry', ((1-col)*6)+'deg');
     p.innerHTML='<div class="frame"><div class="scholar__photo"><img src="'+IMG(sc.img)+'" alt="'+sc.name+'" loading="lazy" style="object-position:'+sc.pos+'"/></div>'+
+      (featured?'<p class="scholar__tag">Featured</p>':'')+
       '<h3 class="scholar__name">'+sc.name+'</h3><p class="scholar__role">'+sc.role+'</p>'+
       '<p class="piece__hint">open the portrait</p></div>';
     wireOpen(p, ()=>detailScholar(sc));
@@ -5262,6 +5274,17 @@ $('#enterBtn').addEventListener('click', e => {
   if (!e.isTrusted){ enterTheGallery(); return; }
   flipEntryCoin(enterTheGallery);
 });
+// Click-through: the door used to be exactly the width of the button, so a
+// click anywhere else on the entrance (the heading, the lead line, the empty
+// space around them) did nothing. This does the same trusted-click coin flip
+// for a click ANYWHERE in the portal, and steps out of the way of anything
+// actually interactive in it: the two real buttons, and any link inside the
+// lead copy, keep behaving exactly as they already did.
+$('#portal').addEventListener('click', e => {
+  if (S.open) return;
+  if (e.target.closest('.portal__ctas, a')) return;
+  flipEntryCoin(enterTheGallery);
+});
 /* the linework is drawn on once, on the way in. One timer, no loop. */
 let lineDrawT = null;
 function drawLines(){
@@ -5815,6 +5838,6 @@ if(QS.get('deck')) addEventListener('load',()=>{
   <script src="js/nav.js?v=4"></script>
   <script src="js/transition.js?v=1"></script>
   <script src="js/slides.js?v=14"></script>
-  <script src="js/present.js?v=2"></script>
+  <script src="js/present.js?v=3"></script>
 </body>
 </html>

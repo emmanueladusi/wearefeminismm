@@ -2088,10 +2088,12 @@ body.is-loading .h7__desc, body.is-loading .h7__ctas { animation-play-state: pau
   /* 58px was too small for this payload. The old code encoded 15 characters;
      the replacement encodes a full https URL, so it carries more modules in the
      same square and needs the extra pixels to stay readable by a phone held at
-     an angle. Verified decoding down to 58px, so 76px is deliberate headroom. */
-  width: 76px; height: auto; display: block;
+     an angle. Verified decoding down to 58px, 76px was the first deliberate
+     headroom pass; sized up again to scan from a seat, not just a held phone,
+     for the live talk. */
+  width: 148px; height: auto; display: block;
   background: #fff;               /* white quiet zone so it scans on a dark card too */
-  padding: 4px; border-radius: 6px;
+  padding: 8px; border-radius: 8px;
 }
 @media (max-width: 460px) { .sparkcard__qr-label { display: none; } }
 .sparkcard__counts b { color: var(--ink); }
