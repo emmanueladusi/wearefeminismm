@@ -249,26 +249,51 @@ body.sl-up { overflow: hidden; }
 .sl__sweep {
   position: absolute;
   inset: 0;
-  background: linear-gradient(104deg,
-    transparent 36%, var(--gold-soft) 50%, transparent 64%);
+  /* A wide, low band with no hard shoulder. The first version put a single
+     colour stop between two transparents 28% apart, which gave it visible
+     edges and read as a bar crossing the slide rather than as light. Five
+     stops spread across 80% of the width, peaking at a tenth of the accent,
+     so it is a change in the air and not an object travelling over the type.
+     Literal rgba, not the token: --gold-soft is tuned for surfaces and is
+     roughly twice this strength. */
+  background: linear-gradient(100deg,
+    rgba(234, 115, 147, 0)    10%,
+    rgba(234, 115, 147, 0.04) 30%,
+    rgba(234, 115, 147, 0.09) 50%,
+    rgba(234, 115, 147, 0.04) 70%,
+    rgba(234, 115, 147, 0)    90%);
   opacity: 0;
   pointer-events: none;
 }
-.sl__sweep.is-go { animation: slSweep 0.66s ease-out; }
+/* The same alpha reads dimmer against the near-black ground, so dark gets a
+   little more to land in the same place perceptually. */
+html[data-theme="dark"] .sl__sweep {
+  background: linear-gradient(100deg,
+    rgba(234, 115, 147, 0)    10%,
+    rgba(234, 115, 147, 0.06) 30%,
+    rgba(234, 115, 147, 0.13) 50%,
+    rgba(234, 115, 147, 0.06) 70%,
+    rgba(234, 115, 147, 0)    90%);
+}
+/* Slower and eased at both ends, so it arrives and leaves rather than
+   snapping past. */
+.sl__sweep.is-go { animation: slSweep 0.95s ease-in-out; }
 /* Alternate the direction by slide, so back-to-back changes are not the same
    gesture twice. Set from the beat index, not from a counter here, so stepping
    BACKWARD through the talk sweeps the way that slide always sweeps. */
 .sl__sweep.is-rev.is-go { animation-name: slSweepRev; }
 
+/* Shorter travel and a peak well under full, so the band never fully asserts
+   itself: it swells and goes. */
 @keyframes slSweep {
-  0%   { opacity: 0; transform: translateX(-38%); }
-  40%  { opacity: 1; }
-  100% { opacity: 0; transform: translateX(42%); }
+  0%   { opacity: 0; transform: translateX(-26%); }
+  45%  { opacity: 0.62; }
+  100% { opacity: 0; transform: translateX(28%); }
 }
 @keyframes slSweepRev {
-  0%   { opacity: 0; transform: translateX(38%); }
-  40%  { opacity: 1; }
-  100% { opacity: 0; transform: translateX(-42%); }
+  0%   { opacity: 0; transform: translateX(26%); }
+  45%  { opacity: 0.62; }
+  100% { opacity: 0; transform: translateX(-28%); }
 }
 
 .sl__k {
