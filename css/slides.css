@@ -24,11 +24,59 @@
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.32s ease, visibility 0s linear 0.32s;
+
+  /* Texture settings live here as tokens rather than in the rules that use
+     them, so an inverted slide can take the other side's whole surface by
+     redefining four values instead of restating every gradient. */
+  --grain-o: 0.035;
+  --vig-col: rgba(69, 47, 40, 0.055);
+  --vig-stop: 46%;
+  --sweep-a: 0.038;
+}
+html[data-theme="dark"] .sl {
+  --grain-o: 0.05;
+  --vig-col: rgba(0, 0, 0, 0.34);
+  --vig-stop: 40%;
+  --sweep-a: 0.075;
 }
 .sl.is-on {
   opacity: 1;
   visibility: visible;
-  transition: opacity 0.32s ease, visibility 0s;
+  /* The ground washes rather than snaps, which matters on the four slides
+     that flip to the opposite theme mid-talk. */
+  transition: opacity 0.32s ease, visibility 0s, background-color 0.5s ease;
+}
+
+/* ---------- inverted slides ----------
+   Four slides render on the opposite ground to the rest, as punctuation: the
+   second finding, the key message, Asante, and "We are." Redefining the site
+   tokens locally means the type, the accent, the thread, the marks, the grain
+   and the vignette all follow on their own. */
+.sl.is-invert {
+  --paper: #211713;
+  --paper-soft: #382f2b;
+  --ink: rgba(226, 219, 216, 0.94);
+  --ink-dim: rgba(226, 219, 216, 0.7);
+  --gold-ink: #ea7393;       /* 6.16:1 on this ground */
+  --gold-soft: rgba(234, 115, 147, 0.22);
+  --line: rgba(226, 219, 216, 0.16);
+  --grain-o: 0.05;
+  --vig-col: rgba(0, 0, 0, 0.34);
+  --vig-stop: 40%;
+  --sweep-a: 0.075;
+}
+html[data-theme="dark"] .sl.is-invert {
+  --paper: #e2dbd8;
+  --paper-soft: #d4ccc8;
+  --ink: #452f28;
+  --ink-dim: #3b2721;
+  --gold-ink: #93485d;       /* 4.62:1 on paper; the raw accent is 2.08:1 */
+  --gold-soft: rgba(234, 115, 147, 0.16);
+  --line: rgba(69, 47, 40, 0.18);
+  --grain-o: 0.035;
+  --vig-col: rgba(69, 47, 40, 0.055);
+  --vig-stop: 46%;
+  --sweep-a: 0.038;
 }
 
 /* The site keeps scrolling underneath while a slide is up; lock it so a
@@ -59,11 +107,11 @@ body.sl-up { overflow: hidden; }
   position: absolute;
   inset: 0;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  opacity: 0.035;
+  /* Grain shows more readily on a dark ground, and dark also needs more help
+     looking like a surface rather than a void, so the token carries more
+     there. Inverted slides pick that up on their own. */
+  opacity: var(--grain-o);
 }
-/* Grain shows more readily on a dark ground, but dark also needs more help
-   looking like a surface rather than a void, so it goes slightly up. */
-html[data-theme="dark"] .sl__grain { opacity: 0.05; }
 
 /* VIGNETTE settles the corners so the eye stays where the words are. Barely
    anything on paper; dark carries considerably more, because a large flat
@@ -72,11 +120,7 @@ html[data-theme="dark"] .sl__grain { opacity: 0.05; }
   position: absolute;
   inset: 0;
   background: radial-gradient(122% 96% at 50% 44%,
-    rgba(69, 47, 40, 0) 46%, rgba(69, 47, 40, 0.055) 100%);
-}
-html[data-theme="dark"] .sl__vig {
-  background: radial-gradient(122% 96% at 50% 44%,
-    rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.34) 100%);
+    transparent var(--vig-stop), var(--vig-col) 100%);
 }
 
 /* THE WAVES — the four waves of feminism, which is how this site tells the
@@ -291,14 +335,9 @@ html[data-theme="dark"] .sl__vig {
   position: absolute;
   inset: 0;
   background: radial-gradient(120% 92% at 34% 52%,
-    rgba(234, 115, 147, 0.038), rgba(234, 115, 147, 0) 66%);
+    rgba(234, 115, 147, var(--sweep-a)), rgba(234, 115, 147, 0) 66%);
   opacity: 0;
   pointer-events: none;
-}
-/* The same alpha reads dimmer against the near-black ground. */
-html[data-theme="dark"] .sl__sweep {
-  background: radial-gradient(120% 92% at 34% 52%,
-    rgba(234, 115, 147, 0.075), rgba(234, 115, 147, 0) 66%);
 }
 /* Long and eased at both ends: it should be over before anyone works out what
    moved. */
@@ -308,11 +347,7 @@ html[data-theme="dark"] .sl__sweep {
    index, so a slide always warms from the side it always warms from. */
 .sl__sweep.is-rev {
   background: radial-gradient(120% 92% at 66% 52%,
-    rgba(234, 115, 147, 0.038), rgba(234, 115, 147, 0) 66%);
-}
-html[data-theme="dark"] .sl__sweep.is-rev {
-  background: radial-gradient(120% 92% at 66% 52%,
-    rgba(234, 115, 147, 0.075), rgba(234, 115, 147, 0) 66%);
+    rgba(234, 115, 147, var(--sweep-a)), rgba(234, 115, 147, 0) 66%);
 }
 
 @keyframes slGlow {
@@ -384,16 +419,64 @@ html[data-theme="dark"] .sl__sweep.is-rev {
 .sl__in--marked .sl__t { line-height: 1.16; }
 .sl__in--marked.sl__in--big .sl__t { line-height: 1.14; }
 
-/* The one slide that breaks the left-aligned rhythm. It is the line the whole
-   talk is built towards, so it should not look like the four before it. */
-.sl__in--poster { text-align: center; }
-.sl__in--poster .sl__t {
-  font-size: clamp(3rem, 6.4vw + 1.4rem, 9.5rem);
-  line-height: 0.98;
-  letter-spacing: -0.032em;
+/* ---------- the five compositions ----------
+   The real reason the deck read flat was not the motion or the texture: every
+   slide was the same shape. Text block on the left, decoration at the foot,
+   seventeen times. Varying the entrance changed how a slide arrived but not
+   what it looked like once it had. So the composition itself now moves.
+
+   Assigned so no two slides in a row share one. Layout is keyed off the root's
+   data-lay, because two of these move the whole block within the frame rather
+   than rearranging what is inside it. */
+
+/* LEFT is the default and needs no rules; it is what everything above builds. */
+
+/* CENTRE — a title card. Narrower measure, because centred text is harder to
+   track across a long line. */
+.sl[data-lay="centre"] .sl__in { text-align: center; }
+.sl[data-lay="centre"] .sl__t,
+.sl[data-lay="centre"] .sl__s { margin-left: auto; margin-right: auto; }
+.sl[data-lay="centre"] .sl__t { max-width: 17ch; }
+.sl[data-lay="centre"] .sl__s { max-width: 46ch; }
+
+/* BOTTOM — the block sits on the floor of the frame with the room above it
+   empty. Reads as considered rather than as a slide that ran short. */
+.sl[data-lay="bottom"] .sl__body { align-self: end; }
+
+/* FILL — the headline takes the whole frame. Used on the two slides that are
+   pure statement, so the type is the entire composition. */
+.sl[data-lay="fill"] .sl__in { text-align: center; }
+.sl[data-lay="fill"] .sl__t {
+  font-size: clamp(3rem, 7vw + 1.3rem, 10.5rem);
+  line-height: 0.94;
+  letter-spacing: -0.035em;
   max-width: none;
+  margin-inline: auto;
 }
-.sl__in--poster .sl__s { margin-left: auto; margin-right: auto; }
+.sl[data-lay="fill"] .sl__s,
+.sl[data-lay="fill"] .sl__c { max-width: 44ch; margin-inline: auto; }
+
+/* SPLIT — two columns: the frame around the idea on the left, the idea itself
+   on the right. Explicit placement rather than source order, so the eyebrow,
+   support and citation stack in the narrow column while the headline spans
+   all three rows beside them. */
+@media (min-width: 900px) {
+  .sl[data-lay="split"] .sl__in {
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.7fr);
+    column-gap: clamp(28px, 4.5vw, 72px);
+    align-items: start;
+  }
+  .sl[data-lay="split"] .sl__k { grid-column: 1; grid-row: 1; }
+  .sl[data-lay="split"] .sl__s { grid-column: 1; grid-row: 2; margin-top: 0; }
+  .sl[data-lay="split"] .sl__c { grid-column: 1; grid-row: 3; }
+  .sl[data-lay="split"] .sl__t {
+    grid-column: 2;
+    grid-row: 1 / span 3;
+    max-width: none;
+    margin: 0;
+  }
+}
 
 .sl__s {
   margin: clamp(18px, 2.4vw, 34px) 0 0;

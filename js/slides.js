@@ -69,24 +69,28 @@
     { k: "Action research 2026",
       t: "Emmanuel Adusi",
       enter: "zoom",
+      lay: "centre",
       s: "Heading to the University of Waterloo this fall for Honours Mathematics.",
       kind: "big",
       say: "Good morning, who I am" },
 
     { k: "Why me",
       t: "I do not face what *they* face.",
+      lay: "left",
       enter: "rise",
       s: "17 years old. 1.5 generation Nigerian-Canadian. I research this because I can be part of the solution.",
       say: "Positionality, why I took this on" },
 
     { k: "The research question",
       t: "How does the *understanding of feminism* affect the experiences of young girls within the TDSB, ages 13 to 19?",
+      lay: "bottom",
       enter: "slide",
       long: true,
       say: "The research question" },
 
     { k: "Finding one",
       t: "It was not talked about *at home.*",
+      lay: "left",
       enter: "fall",
       s: "Especially in African households. My own father told me that in his homeland, Nigeria, they do not believe in it.",
       c: "Salami, 2020, p. 59",
@@ -94,15 +98,17 @@
 
     { k: "Finding two",
       t: "It is *misunderstood.*",
+      lay: "fill",
+      invert: true,
       enter: "flip",
       draw: ["tangle"],
       s: "Feminism gets misinterpreted, so it gets dismissed before anyone looks at it properly.",
       c: "Brand, 2018, p. 12",
-      kind: "big",
       say: "Finding two, misunderstood" },
 
     { k: "Connected to the MYSP",
       t: "Belong. *Thrive.*",
+      lay: "centre",
       enter: "rise",
       draw: ["rise"],
       s: "The two pillars this work sits under.",
@@ -111,6 +117,7 @@
 
     { k: "The solution",
       t: "Let students *lead.*",
+      lay: "bottom",
       enter: "slide",
       draw: ["arrow"],
       s: "Give them the chance to get involved, and make teacher involvement mandatory.",
@@ -119,6 +126,8 @@
 
     { k: "Key message",
       t: "The wearefeminismm community started *from me.*",
+      lay: "centre",
+      invert: true,
       enter: "zoom",
       s: "Last year I said change needs to start somewhere, and that it was me. This year it is a community.",
       bloom: true,
@@ -135,6 +144,7 @@
   var PROCESS = [
     { k: "Building the product",
       t: "A *wave.* A *timeline.* A *game.*",
+      lay: "left",
       enter: "fall",
       draw: ["wave", "tick", "dash"],
       s: "Three prototypes. I scratched all three, because none of them taught this the way I wanted it taught.",
@@ -142,6 +152,7 @@
 
     { k: "What action research taught me",
       t: "So I *asked* someone.",
+      lay: "centre",
       enter: "flip",
       s: "The best way to get an idea is to ask another person for one. I asked my brother. He said: use art.",
       kind: "big",
@@ -149,6 +160,8 @@
 
     { k: "Why art",
       t: "Art locates African people as *subjects,* not objects.",
+      lay: "split",
+      invert: true,
       enter: "slide",
       s: "Art is central to Afrocentricity. That is the method this gallery is built on.",
       c: "Asante, 1980",
@@ -164,18 +177,21 @@
   var CLOSING = [
     { k: "Next steps",
       t: "A resource *every school* can use.",
+      lay: "left",
       enter: "rise",
       s: "Not just mine to show. Something classrooms across the TDSB can pick up and teach with.",
       say: "Next steps, a resource for schools" },
 
     { k: "Next steps",
       t: "*Workshops,* with this as the main attraction.",
+      lay: "bottom",
       enter: "fall",
       s: "Somewhere people stay engaged, because there is something in front of them to actually use.",
       say: "Workshops" },
 
     { k: "The process",
       t: "An emotional roller *coaster.*",
+      lay: "centre",
       enter: "slide",
       draw: ["coaster"],
       s: "Some days the ideas would not stop coming. Other days I had the best one I have ever had and lost it a second later.",
@@ -183,6 +199,7 @@
 
     { k: "What I would do differently",
       t: "I would have run a *workshop.*",
+      lay: "left",
       enter: "flip",
       s: "A survey is faster to send out. A workshop is where people actually say what they mean.",
       say: "What I would do differently" },
@@ -191,15 +208,17 @@
     // the left-aligned rhythm, because it is the line the whole thing was
     // building towards and it should not look like the four before it.
     { t: "I am. You are. *We are.*",
+      lay: "fill",
+      invert: true,
       enter: "zoom",
       s: "wearefeminismm is a community.",
-      kind: "poster",
       bloom: true,
       say: "I am. You are. We are." },
 
     { k: "Thank you",
       t: "Emmanuel Adusi",
       enter: "rise",
+      lay: "centre",
       s: "Two m's. The same as the community.",
       u: "emmanueladusi.github.io/wearefeminismm &middot; @ourfeministspacee",
       kind: "big",
@@ -403,6 +422,7 @@
       body.innerHTML =
         '<div class="sl__in' + (s.long ? " sl__in--long" : "") +
              (s.kind ? " sl__in--" + s.kind : "") +
+             " sl__in--lay-" + (s.lay || "left") +
              // A mark hangs below its word, so a marked headline that wraps
              // needs the extra leading or the mark crowds the line beneath it.
              (s.draw ? " sl__in--marked" : "") +
@@ -460,6 +480,17 @@
       // slide happens to be last, so it lands on the two lines that actually
       // say it: "started from me", and "I am. You are. We are."
       root.classList.toggle("is-bloom", !!s.bloom);
+
+      // Layout lives on the ROOT, not on .sl__in, because two of the five
+      // compositions move the whole text block within the frame rather than
+      // rearranging its insides, and .sl__body is the grid item that has to
+      // be re-aligned to do that.
+      root.dataset.lay = s.lay || "left";
+
+      // A few slides render on the opposite ground to the one the site is set
+      // to. It swaps the tokens locally, so every colour on the slide (type,
+      // accent, thread, grain, vignette) follows without being restated.
+      root.classList.toggle("is-invert", !!s.invert);
     }
 
     root.classList.add("is-on");
