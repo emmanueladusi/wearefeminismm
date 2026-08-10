@@ -11,10 +11,11 @@ directly against the running code, not counted by hand — if this number and
 the slide deck ever disagree, trust the deck.)
 
 The piece of the month now lands a little higher and keeps scrolling on its
-own toward the prose. The gallery beat goes straight into the scholars room —
-Dr. Munroe resolves into view as it opens, one press after the art slide, not
-two. One org on the Community wall (Black Women's Institute for Health) grows
-and lifts when that beat lands. See **Changes made** for the full list.
+own toward the prose. The Asante slide now carries the gallery's own
+artwork, so the gallery beat right after it opens straight into the scholars
+room — Dr. Munroe resolves into view as it opens, not a generic room first.
+One org on the Community wall (Black Women's Institute for Health) grows and
+lifts when that beat lands. See **Changes made** for the full list.
 
 ---
 
@@ -151,7 +152,7 @@ said just use art pieces, and then right there, it clicked.
 
 **(pause)**
 
-**\*SLIDE CHANGE\*** → *Art locates African people as subjects, not objects.* (Asante, 1980)
+**\*SLIDE CHANGE\*** → *Art locates African people as subjects, not objects.* (Asante, 1980) **— the gallery's own artwork now sits on this slide, the collage of two figures reaching across a sunflower, the same image that opens the Learn page**
 
 I came to the conclusion that at that very moment there was no better way for me
 to teach people about feminism than through using an Afrocentric method: An Art
@@ -162,14 +163,14 @@ there, tackled my finding on the presurvey.
 
 **(pause)**
 
-**\*SLIDE CHANGE\*** → **the gallery opens straight into the scholars room. Dr. Munroe's card carries a gold ring and a "Featured" tag, resolving into view as the room opens — give it a second**
+**\*SLIDE CHANGE\*** → **the gallery opens straight into the scholars room. Dr. Munroe's card carries a gold ring and a "Featured" tag, resolving into view as the room opens — give it a second. No separate "gallery opens" beat anymore: the Asante slide's artwork already did that introducing**
 
 Within my art gallery, I addressed my second presurvey finding. It is informative,
 featuring a part that talks about the different types of feminism, the different
 waves, and providing resources from scholars if people are interested in learning
-more, with our very own Dr. Munroe being featured in it. Not only does my art
-gallery make feminism interactive and engaging to learn about, there are resources
-that are right in front of you so you cannot miss it.
+more, with our very own Dr. Munroe being featured in it. Not only does my art gallery
+make feminism interactive and engaging to learn about, there are resources that
+are right in front of you so you cannot miss it.
 
 **\*SLIDE CHANGE\*** → **the Play page, the Word opens**
 
@@ -299,27 +300,20 @@ toward the quote and note, so you don't have to press again just to bring the
 rest of the piece into view. The submission line ("Submit your entry here")
 sits on this same beat, right where your script puts it.
 
-**10. The gallery beat and the scholars beat are now one beat.** Pressing next
-off the Asante slide opens the gallery directly into the scholars room —
-Dr. Munroe's card is what resolves into view as it opens, not a generic room
-first. This is what dropped the count to 26 presses. The "gallery opens, give
-it a second" framing moved onto this same beat.
+**10. The Asante slide carries the gallery's own artwork, and the gallery
+beat goes straight to Dr. Munroe.** The photo you wanted on that slide turned
+out to already be a site asset — `img/art/learn-hero.jpg`, the same collage
+that opens the Learn page, rights already held. No file needed. With the
+slide itself now carrying that image, the live gallery opening is not
+repeated as its own beat: pressing next off Asante opens the gallery directly
+into the scholars room, Dr. Munroe's gold-ring "Featured" card resolving into
+view as the room opens. This is what brought the count to 26.
 
 **11. One organization spotlights.** Black Women's Institute for Health grows
 and lifts above its neighbours on the Community beat — a presenter-only
 effect, set by a `spotlight` flag on that one entry in `js/directory.js`. Say
 the word if you want a different organization highlighted instead; it's a
 one-line change.
-
-**Still open: the art-gallery slide photo.** You attached two photos and asked
-for the first (the collage of two figures reaching toward a sunflower) on the
-Asante "why art" slide. I can see it in the chat, but I don't have a way to
-pull an attached image onto disk from here — I need the actual file. Save it
-somewhere on this Mac (Downloads is easiest) and tell me the filename, or drag
-it into the project folder yourself, and I'll wire it in. **The second photo
-(the profile-silhouette collage) carries a visible PeopleImages.com watermark
-— that means it's an unlicensed stock preview, not something to publish on a
-live site. I won't use that one unless you have a licensed copy.**
 
 ## If you lose your place
 

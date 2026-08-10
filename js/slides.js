@@ -161,13 +161,16 @@
 
     { k: "Why art",
       t: "Art locates African people as *subjects,* not objects.",
-      lay: "split",
+      lay: "portrait",
       invert: true,
       enter: "slide",
       s: "Art is central to Afrocentricity. That is the method this gallery is built on.",
       c: "Asante, 1980",
       long: true,
-      say: "Asante, the Afrocentric method" }
+      img: "img/art/learn-hero.jpg",
+      imgRatio: "750 / 500",
+      imgHeight: "min(34vh, 320px)",
+      say: "Asante, the Afrocentric method — the gallery's own artwork" }
   ];
 
   /* CLOSING — the whole ending. Next steps, the reflection, the feedback and
@@ -519,6 +522,12 @@
       if (s.img) {
         var fig = document.createElement("div");
         fig.className = "sl__photo";
+        // Ratio is per-slide: Emmanuel's own portrait is 933/1400, but a
+        // slide can carry a landscape piece instead (the gallery's own
+        // artwork, on the Asante slide). CSS falls back to the portrait
+        // ratio when a slide sets none.
+        if (s.imgRatio) fig.style.setProperty("--photo-ratio", s.imgRatio);
+        if (s.imgHeight) fig.style.setProperty("--photo-h", s.imgHeight);
         /* One source, deliberately no srcset. The photo is display:none below
            820px, so there is no small-screen case to serve a smaller file to,
            and the responsive version actively hurt: the browser chose the

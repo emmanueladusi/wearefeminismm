@@ -149,10 +149,10 @@
   }
 
   // Opens the gallery straight into the scholars room, Dr. Munroe's card
-  // (gold ring, "Featured" tag) visible as the room resolves — used to be a
-  // separate beat after a generic "gallery opens" one, merged into a single
-  // press per his ask: the payoff of stepping into the gallery IS her card,
-  // not a beat of the empty default room first.
+  // (gold ring, "Featured" tag) visible as the room resolves. No separate
+  // "gallery opens" beat before this one: the Asante slide now carries the
+  // gallery's own artwork as its image, so that slide IS the introduction —
+  // a second, live opening reveal right after it would repeat the beat.
   function goScholars() {
     if (typeof window.openGallery === "function") {
       window.openGallery("scholars");

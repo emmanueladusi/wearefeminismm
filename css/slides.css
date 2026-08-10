@@ -514,9 +514,13 @@ body.sl-up { overflow: hidden; }
   margin-block: auto;
   /* Height-led with the photograph's true ratio, so it is never cropped. A
      full-height box on a portrait image cropped hard from the sides and cut
-     into his face as soon as the column narrowed. */
-  height: min(46vh, 380px);
-  aspect-ratio: 933 / 1400;
+     into his face as soon as the column narrowed. Both custom properties are
+     set per-slide in JS (js/slides.js); the fallbacks here are Emmanuel's own
+     portrait, the first photo this rule was built for. A landscape image
+     (the gallery's own artwork, on the Asante slide) sets a shorter --photo-h
+     too, or its true width would crowd the text column. */
+  height: var(--photo-h, min(46vh, 380px));
+  aspect-ratio: var(--photo-ratio, 933 / 1400);
   width: auto;
   overflow: hidden;
   z-index: 0;
