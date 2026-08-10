@@ -456,17 +456,23 @@ body.sl-up { overflow: hidden; }
 .sl[data-lay="fill"] .sl__s,
 .sl[data-lay="fill"] .sl__c { max-width: 44ch; margin-inline: auto; }
 
-/* PORTRAIT — a photograph running the full height of the frame on the right,
-   dissolving into the paper rather than sitting in a box, with the name beside
-   it. Used once, on the introduction.
+/* PORTRAIT — a framed photograph on the right, with the name beside it. Used
+   once, on the introduction.
 
-   The photo is positioned against .sl, not placed in the grid, because it has
-   to bleed off the top, bottom and right edges, which a centred padded grid
-   item cannot do. It sits above the grain and the waves but below the text
-   (.sl__body is z-index 1), so nothing is ever drawn over a face. */
+   The photo is positioned against .sl, not placed in the grid, because it
+   sits at a fixed inset from the frame's edge rather than flush against it,
+   which needs the whole slide as its containing box, not a centred grid cell.
+   It sits above the grain and the waves but below the text (.sl__body is
+   z-index 1), so nothing is ever drawn over a face.
+
+   A CARD now, not a bleed: a border and a cast shadow read as an object
+   placed on the page, which asked for room around it on every side rather
+   than running to the glass. Smaller and inset from the edge, closer to the
+   centre of the frame, for the same reason — a floating card needs air, a
+   bleed does not. */
 .sl__photo {
   position: absolute;
-  right: 0;
+  right: clamp(64px, 11vw, 150px);
   /* Vertically centred by auto margins between top:0 and bottom:0, NOT by a
      translate: the entrance already owns transform, and a centring translate
      there would be wiped the moment it animated. */
@@ -476,25 +482,31 @@ body.sl-up { overflow: hidden; }
   /* Height-led with the photograph's true ratio, so it is never cropped. A
      full-height box on a portrait image cropped hard from the sides and cut
      into his face as soon as the column narrowed. */
-  height: min(74vh, 640px);
+  height: min(46vh, 380px);
   aspect-ratio: 933 / 1400;
   width: auto;
   overflow: hidden;
   z-index: 0;
-  /* One elliptical mask rather than fades per edge: every side dissolves into
-     the page, so it reads as printed onto the paper rather than pasted on top,
-     and it needs no mask-compositing to do it. */
-  -webkit-mask-image: radial-gradient(124% 92% at 76% 50%, #000 62%, transparent 94%);
-  mask-image: radial-gradient(124% 92% at 76% 50%, #000 62%, transparent 94%);
+  border-radius: 14px;
+  border: 3px solid var(--paper);
+  /* A ring OUTSIDE the paper border, not a second border: stacking two solid
+     borders reads as a picture frame's beveled edge, and box-shadow can carry
+     a hairline with zero layout width, which a border cannot. */
+  box-shadow: 0 0 0 1px var(--line), 0 22px 46px -18px rgba(20, 12, 10, 0.45);
   transition: opacity 0.85s ease, transform 1.15s cubic-bezier(0.22, 1, 0.36, 1),
-              filter 0.85s ease;
+              filter 0.85s ease, box-shadow 0.85s ease;
+}
+html[data-theme="dark"] .sl__photo {
+  box-shadow: 0 0 0 1px var(--line), 0 22px 46px -18px rgba(0, 0, 0, 0.7);
 }
 .sl__photo img {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;         /* never distort a face to fill a box */
-  object-position: 50% 24%;  /* his eyes stay in the upper third at any crop */
+  /* Centred rather than eyes-in-the-upper-third: a framed card is read as a
+     portrait, and a portrait crop keeps the subject in the middle of it. */
+  object-position: 50% 32%;
 }
 /* Start state only. Resting is visible, so a dead transition costs the
    entrance and never the photograph. */
@@ -503,11 +515,12 @@ body.sl-up { overflow: hidden; }
   opacity: 0;
   transform: scale(1.05) translateX(4%);
   filter: blur(9px);
+  box-shadow: 0 0 0 1px var(--line), 0 22px 46px -18px rgba(20, 12, 10, 0);
 }
 
 .sl[data-lay="portrait"] .sl__body {
   justify-self: start;
-  max-width: min(62%, 720px);
+  max-width: min(58%, 680px);
 }
 .sl[data-lay="portrait"] .sl__in { text-align: left; }
 
