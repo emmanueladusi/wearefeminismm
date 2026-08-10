@@ -1,5 +1,5 @@
 /* ============================================================================
-   Ink Garden — the piece of the week assembles out of dithered ink
+   Ink Garden — the piece of the month assembles out of dithered ink
    ----------------------------------------------------------------------------
    One moment, one element: the photo tile inside #popculture. As the section
    scrolls up into view the photograph builds itself out of ordered-dither ink,
