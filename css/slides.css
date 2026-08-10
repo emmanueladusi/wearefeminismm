@@ -25,15 +25,24 @@
   visibility: hidden;
   transition: opacity 0.32s ease, visibility 0s linear 0.32s;
 
-  /* Texture settings live here as tokens rather than in the rules that use
-     them, so an inverted slide can take the other side's whole surface by
-     redefining four values instead of restating every gradient. */
-  --grain-o: 0.035;
-  --vig-col: rgba(69, 47, 40, 0.055);
-  --vig-stop: 46%;
-  --sweep-a: 0.038;
-}
-html[data-theme="dark"] .sl {
+  /* THE SLIDES ARE ALWAYS DARK, on purpose, regardless of html[data-theme].
+     He presents in dark (the accent pops, it reads better projected) but
+     wants site VISITORS, and the live site itself in between beats, to stay
+     light. Before this, one global toggle drove both, so turning on "his"
+     dark mode for the talk also darkened every real page the talk visits.
+     Redefining the token set locally is the same trick .is-invert already
+     uses; these values are exactly what used to live behind
+     html[data-theme="dark"], now unconditional. Anything not redefined here
+     (--gold, for instance) is identical in both themes already, so it is
+     left to inherit. */
+  --paper: #211713;
+  --paper-soft: #382f2b;
+  --ink: rgba(226, 219, 216, 0.94);
+  --ink-dim: rgba(226, 219, 216, 0.7);
+  --violet: #a88f8d;
+  --gold-ink: var(--gold);        /* 6.16:1 on this ground */
+  --gold-soft: rgba(234, 115, 147, 0.22);
+  --line: rgba(226, 219, 216, 0.16);
   --grain-o: 0.05;
   --vig-col: rgba(0, 0, 0, 0.34);
   --vig-stop: 40%;
@@ -51,21 +60,13 @@ html[data-theme="dark"] .sl {
    Four slides render on the opposite ground to the rest, as punctuation: the
    second finding, the key message, Asante, and "We are." Redefining the site
    tokens locally means the type, the accent, the thread, the marks, the grain
-   and the vignette all follow on their own. */
+   and the vignette all follow on their own.
+
+   Now that .sl's own default is unconditionally dark, "opposite" has only one
+   direction, so this is a single block rather than one per document theme:
+   these are the exact light-mode values the base .sl used to inherit from
+   html[data-theme] being unset. */
 .sl.is-invert {
-  --paper: #211713;
-  --paper-soft: #382f2b;
-  --ink: rgba(226, 219, 216, 0.94);
-  --ink-dim: rgba(226, 219, 216, 0.7);
-  --gold-ink: #ea7393;       /* 6.16:1 on this ground */
-  --gold-soft: rgba(234, 115, 147, 0.22);
-  --line: rgba(226, 219, 216, 0.16);
-  --grain-o: 0.05;
-  --vig-col: rgba(0, 0, 0, 0.34);
-  --vig-stop: 40%;
-  --sweep-a: 0.075;
-}
-html[data-theme="dark"] .sl.is-invert {
   --paper: #e2dbd8;
   --paper-soft: #d4ccc8;
   --ink: #452f28;
@@ -492,12 +493,15 @@ body.sl-up { overflow: hidden; }
   /* A ring OUTSIDE the paper border, not a second border: stacking two solid
      borders reads as a picture frame's beveled edge, and box-shadow can carry
      a hairline with zero layout width, which a border cannot. */
-  box-shadow: 0 0 0 1px var(--line), 0 22px 46px -18px rgba(20, 12, 10, 0.45);
+  /* .sl is unconditionally dark by default (see above), so this is the
+     stronger, dark-ground shadow unconditionally too. Only a slide that is
+     ALSO .is-invert sits on paper, where the softer shadow belongs. */
+  box-shadow: 0 0 0 1px var(--line), 0 22px 46px -18px rgba(0, 0, 0, 0.7);
   transition: opacity 0.85s ease, transform 1.15s cubic-bezier(0.22, 1, 0.36, 1),
               filter 0.85s ease, box-shadow 0.85s ease;
 }
-html[data-theme="dark"] .sl__photo {
-  box-shadow: 0 0 0 1px var(--line), 0 22px 46px -18px rgba(0, 0, 0, 0.7);
+.sl.is-invert .sl__photo {
+  box-shadow: 0 0 0 1px var(--line), 0 22px 46px -18px rgba(20, 12, 10, 0.45);
 }
 .sl__photo img {
   display: block;
