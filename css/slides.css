@@ -234,7 +234,7 @@ body.sl-up { overflow: hidden; }
               transform 0.46s cubic-bezier(0.22, 1, 0.36, 1) var(--d),
               filter 0.46s ease var(--d);
 }
-.sl__k, .sl__s, .sl__c, .sl__u {
+.sl__k, .sl__s, .sl__c, .sl__u, .sl__qr {
   --d: calc(var(--i, 0) * 34ms);
   transition: opacity 0.5s ease var(--d),
               transform 0.5s cubic-bezier(0.22, 1, 0.36, 1) var(--d);
@@ -244,7 +244,8 @@ body.sl-up { overflow: hidden; }
 .sl__in.is-armed .sl__k,
 .sl__in.is-armed .sl__s,
 .sl__in.is-armed .sl__c,
-.sl__in.is-armed .sl__u {
+.sl__in.is-armed .sl__u,
+.sl__in.is-armed .sl__qr {
   transition: none;
   opacity: 0;
   transform: translateY(0.38em);
@@ -589,6 +590,22 @@ body.sl-up { overflow: hidden; }
   overflow-wrap: break-word;
 }
 
+/* Scan-to-open, under the printed address rather than replacing it: the room
+   is a mix of "I'll scan it now" and "I'll type it in tomorrow", so both
+   stay. White quiet zone baked INTO the PNG (not left to this padding),
+   because the file is what a phone camera actually reads; this box just
+   keeps it off the card's own background and gives it a hairline edge to sit
+   inside. Centred under .sl__u, since .sl__in--centre is what this card uses. */
+.sl__qr {
+  margin: 20px auto 0;
+  width: fit-content;
+  padding: 8px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.sl__qr img { display: block; width: 108px; height: 108px; }
+
 /* ---------- stillness on request ----------
    Everything below freezes motion but leaves every element in its VISIBLE
    resting state: the waves stop drifting, the thread jumps to length, the
@@ -599,7 +616,7 @@ body.sl-up { overflow: hidden; }
   .sl__wg { animation: none; }
   .sl__sweep.is-go { animation: none; }
   .sl__w,
-  .sl__k, .sl__s, .sl__c, .sl__u,
+  .sl__k, .sl__s, .sl__c, .sl__u, .sl__qr,
   .sl__mk path,
   .sl__wirefill, .sl__mark, .sl__dot { transition: none; }
   /* Neutralise the armed state outright. Without this the words would still
@@ -610,7 +627,8 @@ body.sl-up { overflow: hidden; }
   .sl__in.is-armed .sl__k,
   .sl__in.is-armed .sl__s,
   .sl__in.is-armed .sl__c,
-  .sl__in.is-armed .sl__u { opacity: 1; transform: none; filter: blur(0); }
+  .sl__in.is-armed .sl__u,
+  .sl__in.is-armed .sl__qr { opacity: 1; transform: none; filter: blur(0); }
   .sl__in.is-armed .sl__mk path { stroke-dashoffset: 0; }
 }
 html[data-a11y] .sl { transition: none; }
@@ -618,7 +636,7 @@ html[data-a11y] .sl__wg { animation: none; }
 html[data-a11y] .sl__sweep.is-go { animation: none; }
 html[data-a11y] .sl__w,
 html[data-a11y] .sl__k, html[data-a11y] .sl__s,
-html[data-a11y] .sl__c, html[data-a11y] .sl__u,
+html[data-a11y] .sl__c, html[data-a11y] .sl__u, html[data-a11y] .sl__qr,
 html[data-a11y] .sl__mk path,
 html[data-a11y] .sl__wirefill,
 html[data-a11y] .sl__mark,
@@ -627,5 +645,6 @@ html[data-a11y] .sl__in.is-armed .sl__w,
 html[data-a11y] .sl__in.is-armed .sl__k,
 html[data-a11y] .sl__in.is-armed .sl__s,
 html[data-a11y] .sl__in.is-armed .sl__c,
-html[data-a11y] .sl__in.is-armed .sl__u { opacity: 1; transform: none; filter: blur(0); }
+html[data-a11y] .sl__in.is-armed .sl__u,
+html[data-a11y] .sl__in.is-armed .sl__qr { opacity: 1; transform: none; filter: blur(0); }
 html[data-a11y] .sl__in.is-armed .sl__mk path { stroke-dashoffset: 0; }

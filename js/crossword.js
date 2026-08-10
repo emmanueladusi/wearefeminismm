@@ -91,6 +91,10 @@
         '<div class="xw__grid" id="xwGrid" style="--gh:' + PZ.h + ';--gw:' + PZ.w + '"></div>' +
       '</div>' +
       '<p class="xw__active" id="xwActive" aria-live="polite"></p>' +
+      '<div class="xw__hints">' +
+        '<button class="xw__hintbtn" id="xwHint" type="button">Reveal a letter</button>' +
+        '<span class="xw__hintnote">Stuck on one? Reveal the selected square. It still counts as solved.</span>' +
+      '</div>' +
       '<div class="xw__clues" id="xwClues"></div>' +
       '<div class="xw__foot" id="xwFoot" hidden></div>' +
     '</div>';
@@ -99,6 +103,7 @@
   var activeEl = document.getElementById("xwActive");
   var cluesEl = document.getElementById("xwClues");
   var footEl = document.getElementById("xwFoot");
+  var hintEl = document.getElementById("xwHint");
 
   var inputs = {}; // "r,x" -> input element
 
@@ -219,6 +224,22 @@
     li.click();
   });
 
+  // Reveal a letter: fills whichever cell is currently selected with its
+  // correct answer and moves on, the same path a typed letter takes. It
+  // still checks completion and still counts as solved for the streak, since
+  // the goal here is "not stuck", not "caught cheating".
+  hintEl.addEventListener("click", function () {
+    var inp = inputs[curCellKey];
+    var cell = cellOf[curCellKey];
+    if (!inp || !cell || inp.disabled) return;
+    inp.value = cell.solution;
+    inp.closest(".xw__cell").classList.add("is-hinted");
+    state.letters[curCellKey] = cell.solution;
+    write(state);
+    checkComplete();
+    advanceAfterInput(curCellKey);
+  });
+
   function stepWithin(key, dir) {
     // dir +1/-1 along the current word's axis
     var dr = curEntry.d === "A" ? 0 : 1, dc = curEntry.d === "A" ? 1 : 0;
@@ -327,6 +348,7 @@
     write(state);
 
     Object.keys(inputs).forEach(function (k) { inputs[k].disabled = true; inputs[k].closest(".xw__cell").classList.add("is-solved"); });
+    hintEl.hidden = true;
 
     footEl.hidden = false;
     footEl.innerHTML =
@@ -339,6 +361,7 @@
 
   if (state.done) {
     Object.keys(inputs).forEach(function (k) { inputs[k].disabled = true; inputs[k].closest(".xw__cell").classList.add("is-solved"); });
+    hintEl.hidden = true;
     footEl.hidden = false;
     footEl.innerHTML =
       '<p class="xw__verdict is-yes">Solved.</p>' +

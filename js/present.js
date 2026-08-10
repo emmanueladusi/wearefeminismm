@@ -53,7 +53,7 @@
   .concat(deck("opening", "index.html", "#brandmark"))
   .concat([
     { p: "index.html", t: "#brandmark", say: "Here's a look · replay the reveal", prep: replayHero },
-    { p: "index.html", t: "#popculture", say: "Piece of the month" },
+    { p: "index.html", t: "#popculture", say: "Piece of the month", prep: centerPiece },
     { p: "index.html", t: "#about", say: "About me, and why it's last" },
     // js/learnHero.js plays itself on load, unprompted, so no prep step: the
     // real navigation hardNav() does for a cross-page beat is itself the cue.
@@ -106,6 +106,31 @@
 
   function replayHero() {
     if (window.__heroReplay) window.__heroReplay();
+  }
+
+  /* js/inkpiece.js resolves the Maya Angelou photo out of dithered ink
+     PURELY off scroll position: its own progress function reads 1.0 only
+     once the tile's centre reaches the middle of the viewport, and the
+     ordinary scrollTo() every other beat uses aligns a section's TOP to the
+     viewport's top instead. That mismatch meant this beat could land with
+     the photo still mid-dither, exactly what he flagged.
+
+     The fix does not touch inkpiece.js at all: it scrolls to the position
+     that makes inkpiece's OWN math read "resolved", so the same file that
+     already reveals the picture on a normal visitor's scroll reveals it here
+     too, at rest instead of caught mid-transition.
+
+     Returns -1, the same sentinel hardNav() uses for "this prep already did
+     the navigating" — here it means "this prep already did the scrolling",
+     so land() must not also run its own generic scrollTo(b.t) afterward. */
+  function centerPiece() {
+    var host = document.querySelector(".piece__photo[data-ink]");
+    if (!host) return 0;
+    var r = host.getBoundingClientRect();
+    var targetY = Math.max(0, window.scrollY + r.top - (innerHeight - r.height) / 2);
+    if (window.__lenis) window.__lenis.scrollTo(targetY, { offset: 0 });
+    else window.scrollTo({ top: targetY, behavior: "smooth" });
+    return -1;
   }
 
   function enterGallery() {

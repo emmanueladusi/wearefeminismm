@@ -222,6 +222,7 @@
       lay: "centre",
       s: "Two m's. The same as the community.",
       u: "emmanueladusi.github.io/wearefeminismm &middot; @ourfeministspacee",
+      qr: "img/site-qr.png",
       kind: "big",
       say: "Thank you · leave this up for questions" }
   ];
@@ -435,6 +436,11 @@
           // `u` is the only field allowed raw markup, for the &middot; between
           // the address and the handle. It is authored here, never user input.
           (s.u ? '<p class="sl__u" style="--i:' + step() + '">' + s.u + "</p>" : "") +
+          // The one image field, deliberately narrow: it exists only for the
+          // closing card, to scan the site rather than type the address
+          // printed right above it.
+          (s.qr ? '<div class="sl__qr" style="--i:' + step() +
+                  '"><img src="' + s.qr + '" alt="QR code, scan to open the site" width="410" height="410"></div>' : "") +
         "</div>";
 
       /* Arm, force the browser to take the armed state, then disarm. The

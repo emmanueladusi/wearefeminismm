@@ -91,6 +91,36 @@
 .xw__cell.is-cursor .xw__num { color: #2f1f1a; }
 .xw__cell.is-solved .xw__in { background: color-mix(in srgb, var(--violet) 16%, var(--paper)); border-color: var(--violet); }
 .xw__in:focus-visible { outline: 2px solid var(--gold-ink); outline-offset: 1px; }
+/* A hinted cell keeps the solved styling but with a dashed border, so a
+   solver (or someone watching over their shoulder) can still tell which
+   letters they placed and which they asked for. */
+.xw__cell.is-hinted .xw__in { border-style: dashed; }
+
+/* ---------- the hint bar ---------- */
+
+.xw__hints {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 560px;
+  margin: 14px 0 0;
+}
+.xw__hintbtn {
+  flex: 0 0 auto;
+  padding: 8px 16px;
+  border: 1px dashed var(--gold-ink);
+  border-radius: var(--r-pill, 999px);
+  background: transparent;
+  color: var(--gold-ink);
+  font-family: inherit;
+  font-size: var(--t-small);
+  cursor: pointer;
+}
+.xw__hintbtn:hover { background: color-mix(in srgb, var(--gold) 12%, transparent); }
+.xw__hintbtn:focus-visible { outline: 2px solid var(--gold-ink); outline-offset: 2px; }
+.xw__hintnote { color: var(--ink-dim); font-size: var(--t-small); }
 
 /* Screen-reader-only live line announcing which clue is active, since the
    visual highlight alone carries none of that for a non-visual reader. */
