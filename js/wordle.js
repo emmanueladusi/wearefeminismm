@@ -22,13 +22,13 @@
   var root = document.getElementById("wordle");
   if (!root) return;
 
-  // Bumped v1 -> v2 to reset every visitor's saved progress for the live
-  // crowd guess tomorrow — anyone who already played today's pinned word
-  // gets a blank grid again, the same as a first-time visitor. The old key
-  // is simply abandoned, not cleared: this is a static site with no server
-  // to reach into anyone else's browser, so "refresh it for everyone" can
-  // only ever mean "stop reading the old key," never an actual remote wipe.
-  var KEY = "wf-word.v2";
+  // Bumped again, v2 -> v3: another reset for everyone, same reason and
+  // same mechanism as the v1 -> v2 bump — anyone who's played since gets a
+  // blank grid again. The old keys are simply abandoned, not cleared: this
+  // is a static site with no server to reach into anyone else's browser, so
+  // "refresh it for everyone" can only ever mean "stop reading the old
+  // key," never an actual remote wipe.
+  var KEY = "wf-word.v3";
   var EPOCH = Date.UTC(2026, 7, 7) / 86400000;
 
   var WORDS = (window.WORD_LIST || []).filter(function (e) {
