@@ -65,7 +65,7 @@
   ])
   .concat(deck("process", "learn.html", "#boring-pulse"))
   .concat([
-    { p: "learn.html", t: "#gallery", say: "The gallery opens, cycling through every room", gal: true, cycle: true, prep: enterGallery },
+    { p: "learn.html", t: "#gallery", say: "The gallery opens · scroll through it, into Waves, to Wave Four", gal: true, walk: true, prep: enterGallery },
     { p: "learn.html", t: "#gallery", say: "Scholars · Dr. Munroe's profile expands", gal: true, url: "room=scholars", prep: goScholars },
     { p: "play.html", t: "#theword", say: "Learning gets tested · the daily word", prep: openWord },
     { p: "community.html", t: "#directory", say: "Organizations girls can actually reach", prep: spotlightOrg },
@@ -146,7 +146,7 @@
 
   // Fades the video out and stops it — called on every beat that is not
   // this one (see land()), the same unconditional-cleanup shape as
-  // stopGalleryCycle(), so stepping away either direction always leaves it
+  // stopGalleryWalk(), so stepping away either direction always leaves it
   // silent and reset for the next arrival.
   function hideVideoOverlay() {
     if (!videoOverlay) return;
@@ -198,64 +198,84 @@
       if (btn) btn.click();
     } else if (typeof window.setChapter === "function") {
       // Already open means we arrived BACKWARD from the scholars room. Put
-      // the gallery back on its opening room before the cycle takes over.
+      // the gallery back on its directory reel before the walkthrough runs,
+      // or it starts from wherever the gallery happened to be left.
       window.setChapter("directory");
     }
-    startGalleryCycle();
+    runGalleryWalkthrough();
     return 200;
   }
 
-  // The rooms this beat cycles through on its own — every real room except
-  // scholars, which stays reserved for the next beat's own deliberate
-  // reveal (her card, then the auto-expand). Order follows CHAPTERS' own
-  // numbering (Gallery.html), the same order the directory lists them in.
-  var GALLERY_CYCLE = ["directory", "lenses", "w1", "w2", "w3", "w4"];
-  var galleryCycleTimer = null;
+  /* A scripted walkthrough that drives the gallery's OWN input handlers —
+     real wheel events and a real Enter keydown dispatched at #reel — rather
+     than reaching into its internals (setChapter, activateReelItem, etc.)
+     directly. He asked to see it "like a normal person would," scrolling
+     back and forth through the real transitions the gallery was built with,
+     not a jump between disconnected states. Dispatching the actual events
+     the site already listens for is what guarantees that: every animation
+     Gallery.html's own wireReelInput()/openCollection() choreograph plays
+     exactly as it would for a real visitor, because it IS that same code
+     path, not a re-implementation of it.
 
-  // How long each room-to-room change in the cycle spends fading, each way.
-  // Deliberately real motion, not a snap: he asked specifically for this —
-  // the gallery's own transitions are content he built and wants seen, not
-  // skipped past just because the cycle is unattended. Dr. Munroe's own
-  // arrival (goScholars, below) is a different, deliberate beat and stays a
-  // plain cut on purpose; this crossfade is only for the auto-cycle.
-  var CYCLE_FADE = 260;
+     The route: scroll through the three top-level covers forward then back
+     (so every reel-to-reel transition is seen going both directions), land
+     back on Waves, press Enter to open that collection (the full portal
+     transition), scroll down through its four covers, then press Enter on
+     Wave Four to open the room itself. */
+  var galleryWalkGen = 0;
 
-  function startGalleryCycle() {
-    stopGalleryCycle();
-    if (typeof window.setChapter !== "function") return;
-    var i = 0;
-    galleryCycleTimer = setInterval(function () {
-      var tick = galleryCycleTimer;
-      i = (i + 1) % GALLERY_CYCLE.length;
-      var oldRoom = document.querySelector("#stage .room");
-
-      function change() {
-        // A tick's fade-out can still be in flight after the interval that
-        // scheduled it was cleared or replaced (stepping to the next beat,
-        // or leaving and re-entering this one fast) — without this guard a
-        // stale tick would call setChapter() on whatever beat came after.
-        if (galleryCycleTimer !== tick) return;
-        window.setChapter(GALLERY_CYCLE[i]);
-        var newRoom = document.querySelector("#stage .room");
-        if (newRoom && newRoom.animate) {
-          newRoom.animate([{ opacity: 0 }, { opacity: 1 }], { duration: CYCLE_FADE, easing: "ease-out" });
-        }
-      }
-
-      if (oldRoom && oldRoom.animate) {
-        var out = oldRoom.animate([{ opacity: 1 }, { opacity: 0 }], { duration: CYCLE_FADE, easing: "ease-in" });
-        out.finished.then(change).catch(change);
-      } else {
-        change();
-      }
-    }, 2500);
+  function stopGalleryWalk() {
+    galleryWalkGen++; // invalidates every step still scheduled below
   }
 
-  // Called on every beat that is not this one, so the cycle never keeps
-  // running into the scholars beat (same page, no reload to reset it) or
-  // any beat after it.
-  function stopGalleryCycle() {
-    if (galleryCycleTimer) { clearInterval(galleryCycleTimer); galleryCycleTimer = null; }
+  function galleryWheel(dy) {
+    var reel = document.getElementById("reel");
+    if (reel) reel.dispatchEvent(new WheelEvent("wheel", { deltaY: dy, bubbles: true, cancelable: true }));
+  }
+  function galleryEnter() {
+    var reel = document.getElementById("reel");
+    if (reel) reel.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true }));
+  }
+
+  function runGalleryWalkthrough() {
+    stopGalleryWalk();
+    var myGen = galleryWalkGen;
+
+    // [delay before this step runs, the step itself]. Delays are spaced
+    // wider than the reel's own transition durations (roughly 500-1050ms
+    // for these moves) so no step is ever dispatched onto a reel Gallery.html
+    // still has marked REEL.busy, which would just be dropped.
+    //
+    // The reel opens already focused on Waves (the middle of the three
+    // covers, whatever S.deckPos last left it on), so the first five moves
+    // read as forward/back/back/forward/forward from there rather than a
+    // clean lenses->waves->scholars sweep — what matters is that all three
+    // covers are visited in both directions before landing back on Waves,
+    // which the sequence below does regardless of the exact starting index.
+    var SCRIPT = [
+      [900,  function () { galleryWheel(120); }],   // forward
+      [900,  function () { galleryWheel(120); }],   // forward again
+      [900,  function () { galleryWheel(-120); }],  // back
+      [900,  function () { galleryWheel(-120); }],  // back again
+      [900,  function () { galleryWheel(120); }],   // forward, settle on Waves
+      [700,  galleryEnter],                          // open the Waves collection
+      [1300, function () { galleryWheel(120); }],   // (portal settled) wave 1 -> 2
+      [900,  function () { galleryWheel(120); }],   // wave 2 -> 3
+      [900,  function () { galleryWheel(120); }],   // wave 3 -> 4
+      [900,  galleryEnter]                           // open Wave Four's room
+    ];
+
+    var t = 0;
+    SCRIPT.forEach(function (step) {
+      t += step[0];
+      setTimeout(function () {
+        // Presenter moved on (or back into this beat again) before this
+        // step fired — stopGalleryWalk() bumped the generation, so a step
+        // from a walkthrough nobody is looking at anymore never runs.
+        if (galleryWalkGen !== myGen) return;
+        step[1]();
+      }, t);
+    });
   }
 
   // Moves to the scholars room, Dr. Munroe's card (gold ring, "Featured"
@@ -358,11 +378,11 @@
     var b = BEATS[i];
     var wait = 0;
 
-    // The auto-cycle only belongs to its own beat. Cleared unconditionally
+    // The walkthrough only belongs to its own beat. Cleared unconditionally
     // here rather than only on exit, since the scholars beat right after it
-    // stays on the same page (no reload to reset a running interval) and a
-    // room changing itself under her card would fight the auto-expand.
-    if (!b.cycle) stopGalleryCycle();
+    // stays on the same page (no reload to reset scheduled steps) and a
+    // late wheel/Enter dispatch firing there would fight the auto-expand.
+    if (!b.walk) stopGalleryWalk();
 
     // Same shape for the video: unconditional, so it can never keep playing
     // (silently, off-screen but still audible) into a later beat.

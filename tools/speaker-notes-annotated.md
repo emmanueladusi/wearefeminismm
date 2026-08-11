@@ -173,7 +173,7 @@ there, tackled my finding on the presurvey.
 
 **(pause)**
 
-**\*SLIDE CHANGE\*** → **the gallery opens. No visible reveal animation — it's simply there, and it cycles through every room on its own (directory, lenses, all four waves, ~2 seconds each) for as long as you stay on this beat. This is the payoff, give it a second**
+**\*SLIDE CHANGE\*** → **the gallery opens. No visible reveal animation — it's simply there. It then drives itself through the gallery like a real visitor would: scrolls back and forth through the three top-level collections, opens Waves, scrolls down through all four waves in order, and opens Wave Four's own room — about 9 seconds start to finish. This is the payoff, let it run**
 
 Within my art gallery, I addressed my second presurvey finding. It is informative,
 featuring a part that talks about the different types of feminism, the different
@@ -343,19 +343,22 @@ on your ask. Presenter-only, set by a `spotlight` flag on that one entry in
 highlighted instead; it's a
 one-line change.
 
-**12. The gallery-opens beat cycles through every room on its own, and now
-each change actually crossfades.** Directory, lenses, and all four waves,
-about 2 seconds each, looping for as long as you stay on that beat —
-scholars is deliberately left out, since that's the next beat's own reveal
-and cycling into it here would fight the auto-expand. You flagged that the
-first version cut between rooms instantly, losing the transitions you spent
-real time building — fair, that wasn't the same thing as skipping the
-one-time opening reveal, which is still gone on purpose. Every room change
-in the cycle now fades the old room out and the new one in (260ms each way)
-before moving on. Dr. Munroe's own arrival stays a plain, instant cut —
-that's still deliberate, not an oversight. Stops the instant you press next
-or back; picking the beat back up (either direction) always restarts the
-cycle fresh from the directory.
+**12. The gallery-opens beat now actually drives itself through the gallery
+the way a visitor would, real scroll and Enter, not a jump.** Two earlier
+passes on this beat (a fade-crossfade between disconnected rooms, before
+that a plain instant cut) both still SKIPPED between states rather than
+navigating through them — not what you were asking for either time. This
+version dispatches genuine wheel and Enter-key events at the gallery's own
+reel, the same events a real scroll and keypress produce, so every
+transition Gallery.html itself choreographs (the reel's own scroll
+animation, the full portal-opening sequence into a collection) plays for
+real: scrolls back and forth through the three top-level collections
+(Lenses, Waves, Scholars), lands on Waves and opens it, scrolls down through
+all four waves in order, then opens Wave Four's own room. About 9 seconds
+start to finish. Scholars stays out of it — that's the next beat's own
+deliberate reveal. Stops instantly the moment you press next or back, and
+restarts fresh from the top every time you land on this beat, either
+direction.
 
 **13. Your presentation video is now its own beat, first in line** — before
 "here's a look," not after. Full-screen, crossfades in over whatever was on
