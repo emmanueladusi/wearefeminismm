@@ -164,7 +164,7 @@ there, tackled my finding on the presurvey.
 
 **(pause)**
 
-**\*SLIDE CHANGE\*** → **the gallery opens. No visible reveal animation — it's simply there. This is the payoff, give it a second**
+**\*SLIDE CHANGE\*** → **the gallery opens. No visible reveal animation — it's simply there, and it cycles through every room on its own (directory, lenses, all four waves, ~2 seconds each) for as long as you stay on this beat. This is the payoff, give it a second**
 
 Within my art gallery, I addressed my second presurvey finding. It is informative,
 featuring a part that talks about the different types of feminism, the different
@@ -327,6 +327,13 @@ and lifts above its neighbours on the Community beat — a presenter-only
 effect, set by a `spotlight` flag on that one entry in `js/directory.js`. Say
 the word if you want a different organization highlighted instead; it's a
 one-line change.
+
+**12. The gallery-opens beat cycles through every room on its own.** Directory,
+lenses, and all four waves, about 2 seconds each, looping for as long as you
+stay on that beat — scholars is deliberately left out, since that's the next
+beat's own reveal and cycling into it here would fight the auto-expand.
+Stops the instant you press next or back; picking the beat back up (either
+direction) always restarts the cycle fresh from the directory.
 
 ## If you lose your place
 

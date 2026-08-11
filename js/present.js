@@ -64,7 +64,7 @@
   ])
   .concat(deck("process", "learn.html", "#boring-pulse"))
   .concat([
-    { p: "learn.html", t: "#gallery", say: "The gallery opens · the payoff", gal: true, prep: enterGallery },
+    { p: "learn.html", t: "#gallery", say: "The gallery opens, cycling through every room", gal: true, cycle: true, prep: enterGallery },
     { p: "learn.html", t: "#gallery", say: "Scholars · Dr. Munroe's profile expands", gal: true, url: "room=scholars", prep: goScholars },
     { p: "play.html", t: "#theword", say: "Learning gets tested · the daily word", prep: openWord },
     { p: "community.html", t: "#directory", say: "Organizations girls can actually reach", prep: spotlightOrg },
@@ -145,13 +145,37 @@
     if (!isGalleryOpen()) {
       var btn = document.getElementById("enterBtn");
       if (btn) btn.click();
-      return 200;
+    } else if (typeof window.setChapter === "function") {
+      // Already open means we arrived BACKWARD from the scholars room. Put
+      // the gallery back on its opening room before the cycle takes over.
+      window.setChapter("directory");
     }
-    // Already open means we arrived BACKWARD from the scholars room. Put the
-    // gallery back on its opening room, or he introduces the gallery over a
-    // room the talk has not reached yet.
-    if (typeof window.setChapter === "function") window.setChapter("directory");
-    return 100;
+    startGalleryCycle();
+    return 200;
+  }
+
+  // The rooms this beat cycles through on its own — every real room except
+  // scholars, which stays reserved for the next beat's own deliberate
+  // reveal (her card, then the auto-expand). Order follows CHAPTERS' own
+  // numbering (Gallery.html), the same order the directory lists them in.
+  var GALLERY_CYCLE = ["directory", "lenses", "w1", "w2", "w3", "w4"];
+  var galleryCycleTimer = null;
+
+  function startGalleryCycle() {
+    stopGalleryCycle();
+    if (typeof window.setChapter !== "function") return;
+    var i = 0;
+    galleryCycleTimer = setInterval(function () {
+      i = (i + 1) % GALLERY_CYCLE.length;
+      window.setChapter(GALLERY_CYCLE[i]);
+    }, 2200);
+  }
+
+  // Called on every beat that is not this one, so the cycle never keeps
+  // running into the scholars beat (same page, no reload to reset it) or
+  // any beat after it.
+  function stopGalleryCycle() {
+    if (galleryCycleTimer) { clearInterval(galleryCycleTimer); galleryCycleTimer = null; }
   }
 
   // Moves to the scholars room, Dr. Munroe's card (gold ring, "Featured"
@@ -242,6 +266,12 @@
   function land(i) {
     var b = BEATS[i];
     var wait = 0;
+
+    // The auto-cycle only belongs to its own beat. Cleared unconditionally
+    // here rather than only on exit, since the scholars beat right after it
+    // stays on the same page (no reload to reset a running interval) and a
+    // room changing itself under her card would fight the auto-expand.
+    if (!b.cycle) stopGalleryCycle();
 
     // The research slides cover the viewport, so they follow the same rule the
     // gallery does: any beat that is not a slide beat has to put them away
