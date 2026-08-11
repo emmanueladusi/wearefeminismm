@@ -322,10 +322,13 @@ On the scholars beat, her card is also clicked automatically, opening the
 same expanded profile panel a visitor gets from clicking her portrait
 themselves.
 
-**11. One organization spotlights.** Black Women's Institute for Health grows
-and lifts above its neighbours on the Community beat — a presenter-only
-effect, set by a `spotlight` flag on that one entry in `js/directory.js`. Say
-the word if you want a different organization highlighted instead; it's a
+**11. One organization spotlights, sized to actually read at a glance.** Black
+Women's Institute for Health grows to 1.35× and lifts above its neighbours,
+centred in the frame rather than just scrolled to the top of the section —
+the first pass (1.14×) was too subtle to call "clear," so this landed bigger
+on your ask. Presenter-only, set by a `spotlight` flag on that one entry in
+`js/directory.js`. Say the word if you want a different organization
+highlighted instead; it's a
 one-line change.
 
 **12. The gallery-opens beat cycles through every room on its own.** Directory,

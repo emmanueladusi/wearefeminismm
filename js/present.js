@@ -207,16 +207,27 @@
     return 0;
   }
 
-  /* One tile on the org wall — Black Women's Institute for Health, marked
-     with a `data-spotlight` attribute in the HTML rather than matched by
-     name here, so swapping which org gets highlighted is a one-line edit in
-     community.html, not a text-match to keep in sync. Every arrival at this
-     beat is a fresh page load (the adjacent beats are on different pages),
-     so there is no stray state to clear on the way out. */
+  /* One tile on the org wall — Black Women's Institute for Health, flagged
+     with `spotlight: true` on its entry in js/directory.js's ORGS array
+     (the wall is JS-rendered from that data, never static HTML, so the flag
+     has to live there and directory.js's card() emits `data-spotlight` when
+     it's set). Swapping which org gets highlighted is a one-line edit there.
+     Every arrival at this beat is a fresh page load (the adjacent beats are
+     on different pages), so there is no stray state to clear on the way out.
+
+     Centres the tile itself, not just the section: at 1.35x it needs real
+     room to read clearly, and the generic scrollTo(b.t) this beat would
+     otherwise fall through to only brings the section's TOP into view,
+     which could leave an expanded tile lower in the grid clipped. */
   function spotlightOrg() {
     var tile = document.querySelector(".orgtile[data-spotlight]");
-    if (tile) tile.classList.add("is-spotlit");
-    return 0;
+    if (!tile) return 0;
+    tile.classList.add("is-spotlit");
+    var r = tile.getBoundingClientRect();
+    var targetY = Math.max(0, window.scrollY + r.top - (innerHeight - r.height) / 2);
+    if (window.__lenis) window.__lenis.scrollTo(targetY, { offset: 0 });
+    else window.scrollTo({ top: targetY, behavior: "smooth" });
+    return -1;
   }
 
   function enterWall() {
