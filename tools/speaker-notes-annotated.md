@@ -173,7 +173,7 @@ there, tackled my finding on the presurvey.
 
 **(pause)**
 
-**\*SLIDE CHANGE\*** → **the gallery opens. No visible reveal animation — it's simply there. It then drives itself through the gallery like a real visitor would: scrolls back and forth through the three top-level collections, opens Waves, scrolls down through all four waves in order, and opens Wave Four's own room — about 9 seconds start to finish. This is the payoff, let it run**
+**\*SLIDE CHANGE\*** → **the gallery opens. No visible reveal animation — it's simply there. It then drives itself through the gallery like a real visitor would: scrolls back and forth through the three top-level collections, opens Waves, scrolls down one to Wave Two, opens that room, then scrolls through its own pieces — about 9 seconds start to finish. This is the payoff, let it run**
 
 Within my art gallery, I addressed my second presurvey finding. It is informative,
 featuring a part that talks about the different types of feminism, the different
@@ -344,21 +344,26 @@ highlighted instead; it's a
 one-line change.
 
 **12. The gallery-opens beat now actually drives itself through the gallery
-the way a visitor would, real scroll and Enter, not a jump.** Two earlier
-passes on this beat (a fade-crossfade between disconnected rooms, before
-that a plain instant cut) both still SKIPPED between states rather than
-navigating through them — not what you were asking for either time. This
-version dispatches genuine wheel and Enter-key events at the gallery's own
-reel, the same events a real scroll and keypress produce, so every
-transition Gallery.html itself choreographs (the reel's own scroll
-animation, the full portal-opening sequence into a collection) plays for
+the way a visitor would, real scroll and Enter, not a jump — and ends inside
+Wave Two, scrolled through, instead of Wave Four.** Two earlier passes on
+this beat (a fade-crossfade between disconnected rooms, before that a plain
+instant cut) both still SKIPPED between states rather than navigating
+through them. This version dispatches genuine wheel and Enter-key events —
+the same events a real scroll and keypress produce — first at the gallery's
+reel, then, once a room is actually open, at the gallery itself (a different
+handler moves the camera through a room's own pieces than the one that
+steps the reel). So every transition Gallery.html choreographs plays for
 real: scrolls back and forth through the three top-level collections
-(Lenses, Waves, Scholars), lands on Waves and opens it, scrolls down through
-all four waves in order, then opens Wave Four's own room. About 9 seconds
-start to finish. Scholars stays out of it — that's the next beat's own
-deliberate reveal. Stops instantly the moment you press next or back, and
-restarts fresh from the top every time you land on this beat, either
-direction.
+(Lenses, Waves, Scholars), lands on Waves and opens it, scrolls down one to
+Wave Two, opens that room, then scrolls a few pieces into it. About 9
+seconds start to finish. Scholars stays out of it — that's the next beat's
+own deliberate reveal. Stops instantly the moment you press next or back,
+and restarts fresh from the top every time you land on this beat, either
+direction. **One thing worth knowing:** if you happen to press next at the
+exact wrong instant — right as it's opening Wave Two — the scholars beat
+right after can show the wrong room for about a second before it corrects
+itself. It does correct itself; if you ever see that flash, just keep
+going.
 
 **13. Your presentation video is now its own beat, first in line** — before
 "here's a look," not after. Full-screen, crossfades in over whatever was on

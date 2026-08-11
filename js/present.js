@@ -65,7 +65,7 @@
   ])
   .concat(deck("process", "learn.html", "#boring-pulse"))
   .concat([
-    { p: "learn.html", t: "#gallery", say: "The gallery opens · scroll through it, into Waves, to Wave Four", gal: true, walk: true, prep: enterGallery },
+    { p: "learn.html", t: "#gallery", say: "The gallery opens · scroll through it, into Waves, through Wave Two", gal: true, walk: true, prep: enterGallery },
     { p: "learn.html", t: "#gallery", say: "Scholars · Dr. Munroe's profile expands", gal: true, url: "room=scholars", prep: goScholars },
     { p: "play.html", t: "#theword", say: "Learning gets tested · the daily word", prep: openWord },
     { p: "community.html", t: "#directory", say: "Organizations girls can actually reach", prep: spotlightOrg },
@@ -207,12 +207,12 @@
   }
 
   /* A scripted walkthrough that drives the gallery's OWN input handlers —
-     real wheel events and a real Enter keydown dispatched at #reel — rather
-     than reaching into its internals (setChapter, activateReelItem, etc.)
-     directly. He asked to see it "like a normal person would," scrolling
-     back and forth through the real transitions the gallery was built with,
-     not a jump between disconnected states. Dispatching the actual events
-     the site already listens for is what guarantees that: every animation
+     real wheel events and real Enter keydowns — rather than reaching into
+     its internals (setChapter, activateReelItem, etc.) directly. He asked
+     to see it "like a normal person would," scrolling back and forth
+     through the real transitions the gallery was built with, not a jump
+     between disconnected states. Dispatching the actual events the site
+     already listens for is what guarantees that: every animation
      Gallery.html's own wireReelInput()/openCollection() choreograph plays
      exactly as it would for a real visitor, because it IS that same code
      path, not a re-implementation of it.
@@ -220,21 +220,32 @@
      The route: scroll through the three top-level covers forward then back
      (so every reel-to-reel transition is seen going both directions), land
      back on Waves, press Enter to open that collection (the full portal
-     transition), scroll down through its four covers, then press Enter on
-     Wave Four to open the room itself. */
+     transition), scroll down ONE cover to Wave Two, press Enter to open its
+     room, then scroll THROUGH that room's own pieces — a different wheel
+     handler once inside a chapter (Gallery.html's #gallery listener, not
+     #reel's), since a chapter room moves a camera along its pieces rather
+     than stepping a reel. */
   var galleryWalkGen = 0;
 
   function stopGalleryWalk() {
     galleryWalkGen++; // invalidates every step still scheduled below
   }
 
-  function galleryWheel(dy) {
+  function galleryReelWheel(dy) {
     var reel = document.getElementById("reel");
     if (reel) reel.dispatchEvent(new WheelEvent("wheel", { deltaY: dy, bubbles: true, cancelable: true }));
   }
   function galleryEnter() {
     var reel = document.getElementById("reel");
     if (reel) reel.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true }));
+  }
+  // Once a chapter room (not the reel) is open, #gallery's own wheel
+  // handler moves S.cam.tz instead — for an orbit/field/feed room (Wave
+  // Two is 'orbit') that's rate 0.0016 per px of deltaY against a 1-unit
+  // step, so ~650 crosses one piece per dispatch.
+  function galleryRoomWheel(dy) {
+    var g = document.getElementById("gallery");
+    if (g) g.dispatchEvent(new WheelEvent("wheel", { deltaY: dy, bubbles: true, cancelable: true }));
   }
 
   function runGalleryWalkthrough() {
@@ -253,16 +264,18 @@
     // covers are visited in both directions before landing back on Waves,
     // which the sequence below does regardless of the exact starting index.
     var SCRIPT = [
-      [900,  function () { galleryWheel(120); }],   // forward
-      [900,  function () { galleryWheel(120); }],   // forward again
-      [900,  function () { galleryWheel(-120); }],  // back
-      [900,  function () { galleryWheel(-120); }],  // back again
-      [900,  function () { galleryWheel(120); }],   // forward, settle on Waves
-      [700,  galleryEnter],                          // open the Waves collection
-      [1300, function () { galleryWheel(120); }],   // (portal settled) wave 1 -> 2
-      [900,  function () { galleryWheel(120); }],   // wave 2 -> 3
-      [900,  function () { galleryWheel(120); }],   // wave 3 -> 4
-      [900,  galleryEnter]                           // open Wave Four's room
+      [900,  function () { galleryReelWheel(120); }],   // forward
+      [900,  function () { galleryReelWheel(120); }],   // forward again
+      [900,  function () { galleryReelWheel(-120); }],  // back
+      [900,  function () { galleryReelWheel(-120); }],  // back again
+      [900,  function () { galleryReelWheel(120); }],   // forward, settle on Waves
+      [700,  galleryEnter],                              // open the Waves collection
+      [1300, function () { galleryReelWheel(120); }],   // (portal settled) wave 1 -> 2
+      [900,  galleryEnter],                              // open Wave Two's own room
+      [1300, function () { galleryRoomWheel(650); }],   // (room settled) piece 1 -> 2
+      [800,  function () { galleryRoomWheel(650); }],   // piece 2 -> 3
+      [800,  function () { galleryRoomWheel(650); }],   // piece 3 -> 4
+      [800,  function () { galleryRoomWheel(650); }]    // piece 4 -> 5
     ];
 
     var t = 0;
@@ -287,6 +300,29 @@
       window.openGallery("scholars");
       var card = document.querySelector('.piece--scholar[data-pid="s3"]');
       if (card) card.click();
+
+      // Landing here can race a gallery transition the WALKTHROUGH beat
+      // (enterGallery, above) already triggered before the presenter moved
+      // on — its Enter/wheel dispatches kick off Gallery.html's own portal
+      // animation, which finishes on an internal setTimeout chain nothing
+      // here can reach in to cancel. galleryWalkGen only stops steps still
+      // scheduled in present.js; it does nothing for an async chain that
+      // was already running inside Gallery.html at interrupt time, so that
+      // chain can still complete afterward and overwrite the room this
+      // beat just set. Self-heal: if the room has drifted off scholars
+      // shortly after landing here, put it back.
+      var thisBeat = idx;
+      setTimeout(function () {
+        if (idx !== thisBeat) return;
+        var room = document.querySelector("#stage .room");
+        if (room && room.dataset.type !== "scholars") {
+          window.openGallery("scholars");
+          var detail = document.getElementById("detail");
+          var card2 = document.querySelector('.piece--scholar[data-pid="s3"]');
+          if (card2 && (!detail || !detail.classList.contains("open"))) card2.click();
+        }
+      }, 1200);
+
       return 200;
     }
     // No global? Fall back to the gallery's own ?room= deep link, which does
