@@ -10,14 +10,17 @@ is set to. Nothing to toggle — just open the link.
 directly against the running code, not counted by hand — if this number and
 the slide deck ever disagree, trust the deck.)
 
-A new beat now sits right after "here's a look": your presentation video,
-full-screen, fading in and out. The piece of the month lands at the top of
-the section first, then moves on its own toward the photo after a few
-seconds. The gallery still opens on its own beat, one press before
-Dr. Munroe — no visible reveal animation either way, and her profile expands
-on its own once you reach her. One org on the Community wall (Black Women's
-Institute for Health) grows and lifts when that beat lands. See
-**Changes made** for the full list.
+Your presentation video is now the very first thing after the wordmark
+builds, full-screen, fading in and out — "here's a look" comes right after
+it. The piece of the month lands at the top of the section first, then
+moves on its own toward the photo after a few seconds. The gallery still
+opens on its own beat, one press before Dr. Munroe, and now the rooms it
+cycles through on its own actually crossfade into each other rather than
+cutting — Munroe's own arrival stays an instant cut, on purpose. The Word is
+pinned to **FEMINISM**, not the site's own name, and takes a short guess now
+instead of rejecting it — you're asking the room to guess it live tomorrow.
+One org on the Community wall (Black Women's Institute for Health) grows and
+lifts when that beat lands. See **Changes made** for the full list.
 
 ---
 
@@ -92,16 +95,16 @@ When considering what product to create in action research, I wanted to create
 something that someone could look at once, and be blown away, and as per usual,
 I delivered.
 
-**\*SLIDE CHANGE\*** → **slides drop. The site appears and the wordmark builds itself**
+**\*SLIDE CHANGE\*** → **slides drop. The site appears, the wordmark starts to build, and the presentation video fades in over it, full-screen. Plays with its own sound — let it run, don't talk over it. Fades back out to the site the instant you press next**
+
+**(pause — this one plays on its own, let it run its course before you press on)**
+
+**\*SLIDE CHANGE\*** → **the wordmark replays fresh, so "here's a look" has something to land on**
 
 However, it is only a bunch of words if I do not back up my big talk, here's a
 look.
 
 **(pause — let the wordmark finish before you speak over it)**
-
-**\*SLIDE CHANGE\*** → **full-screen, fading in: the presentation video. Plays with its own sound — let it run, don't talk over it. Fades back out to the site the instant you press next**
-
-**(pause — this one plays on its own, let it run its course before you press on)**
 
 When you first open the site, the animation hits you, this was meant to
 show that we are building a community.
@@ -188,8 +191,10 @@ are right in front of you so you cannot miss it.
 My website doesn't ignore that learning needs to be tested, it features games
 including a feminism themed wordle and a crossword!
 
-> Today's word is pinned to **WEAREFEMINISMM** — see note 5. If you type it out
-> live, that is what will appear on screen, on purpose.
+> Today's word is pinned to **FEMINISM** — see note 5. This is the one you're
+> asking the room to guess tomorrow; a guess shorter than the target now
+> submits instead of getting rejected, since nobody in the crowd has a reason
+> to type exactly the right length on a word they don't know yet.
 
 **\*SLIDE CHANGE\*** → **the Community page, the organizations wall**
 
@@ -284,9 +289,10 @@ tour stop right now.
 "The wearefeminismm community started from me." It now reads "The wearefeminismm
 community is the *change* I wanted to see," to match the line in your script.
 
-**5. Wordle is pinned to WEAREFEMINISMM**, not the normal daily rotation — carried
-over from the last pass, unchanged here. **To revert:** `js/wordle.js`,
-`FORCE_WORD` near the top, set it to `null`. Tell me when.
+**5. Wordle is pinned to FEMINISM**, not the normal daily rotation — was
+WEAREFEMINISMM, swapped for something a stranger can actually guess cold
+tomorrow. **To revert:** `js/wordle.js`, `FORCE_WORD` near the top, set it to
+`null`. Tell me when.
 
 **6. The pod-leader thank-you moved to the very end**, after "with two m's," with
 their actual names now in it — your script puts it there, not before "I am. You
@@ -337,21 +343,29 @@ on your ask. Presenter-only, set by a `spotlight` flag on that one entry in
 highlighted instead; it's a
 one-line change.
 
-**12. The gallery-opens beat cycles through every room on its own.** Directory,
-lenses, and all four waves, about 2 seconds each, looping for as long as you
-stay on that beat — scholars is deliberately left out, since that's the next
-beat's own reveal and cycling into it here would fight the auto-expand.
-Stops the instant you press next or back; picking the beat back up (either
-direction) always restarts the cycle fresh from the directory.
+**12. The gallery-opens beat cycles through every room on its own, and now
+each change actually crossfades.** Directory, lenses, and all four waves,
+about 2 seconds each, looping for as long as you stay on that beat —
+scholars is deliberately left out, since that's the next beat's own reveal
+and cycling into it here would fight the auto-expand. You flagged that the
+first version cut between rooms instantly, losing the transitions you spent
+real time building — fair, that wasn't the same thing as skipping the
+one-time opening reveal, which is still gone on purpose. Every room change
+in the cycle now fades the old room out and the new one in (260ms each way)
+before moving on. Dr. Munroe's own arrival stays a plain, instant cut —
+that's still deliberate, not an oversight. Stops the instant you press next
+or back; picking the beat back up (either direction) always restarts the
+cycle fresh from the directory.
 
-**13. Your presentation video is now its own beat**, right where you asked:
-after "here's a look," before "when you first open the site." Full-screen,
-crossfades in over whatever was on screen and crossfades back out the same
-way leaving it — no hard cut in or out. It plays with its own sound; the
-autoplay only works because pressing the key that reaches this beat is
-itself the "go ahead and play audio" permission browsers require, so as
-long as you arrive here by pressing next (the normal way), it should just
-play. This is what brought the count to 28.
+**13. Your presentation video is now its own beat, first in line** — before
+"here's a look," not after. Full-screen, crossfades in over whatever was on
+screen and crossfades back out the same way leaving it — no hard cut in or
+out. It plays with its own sound; the autoplay only works because pressing
+the key that reaches this beat is itself the "go ahead and play audio"
+permission browsers require, so as long as you arrive here by pressing next
+(the normal way), it should just play. The wordmark replay that used to open
+this stretch now comes right after the video instead, so "here's a look"
+still has a fresh build to land on. This is what brought the count to 28.
 
 **14. The Asante slide carries both photos now, side by side.** The second
 one — the many-profiles collage — needed the same thing the first one did: I
@@ -361,6 +375,16 @@ watermark — clean this time), it went in alongside the first photo rather
 than replacing it. `.sl__photo` only ever supported one image per slide, so
 this is new: a `.sl__photos` wrapper lays two side by side, each keeping its
 own true aspect ratio so neither crops.
+
+**15. The Word: pinned to FEMINISM, and a short guess now goes through.**
+Previously pinned to WEAREFEMINISMM (14 letters, effectively unguessable
+cold) — swapped for the actual word this whole talk is about, one a room of
+strangers can plausibly land on. It rejected anything shorter than the
+target outright before; now only a truly empty submission is blocked, and a
+short guess marks whatever it actually typed, leaving the rest of that row
+blank instead of inventing "not in the word" marks for letters nobody typed.
+Also reset for everyone, including you: the saved-progress key changed, so
+anyone who already played today's word (under the old pin) starts clean.
 
 ## If you lose your place
 

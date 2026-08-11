@@ -52,8 +52,8 @@
   ]
   .concat(deck("opening", "index.html", "#brandmark"))
   .concat([
-    { p: "index.html", t: "#brandmark", say: "Here's a look · replay the reveal", prep: replayHero },
     { p: "index.html", t: "#brandmark", say: "The presentation video", video: true, prep: showVideo },
+    { p: "index.html", t: "#brandmark", say: "Here's a look · replay the reveal", prep: replayHero },
     { p: "index.html", t: "#popculture", say: "Piece of the month", prep: centerPiece },
     { p: "index.html", t: "#about", say: "About me, and why it's last" },
     // js/learnHero.js plays itself on load, unprompted, so no prep step: the
@@ -212,14 +212,43 @@
   var GALLERY_CYCLE = ["directory", "lenses", "w1", "w2", "w3", "w4"];
   var galleryCycleTimer = null;
 
+  // How long each room-to-room change in the cycle spends fading, each way.
+  // Deliberately real motion, not a snap: he asked specifically for this —
+  // the gallery's own transitions are content he built and wants seen, not
+  // skipped past just because the cycle is unattended. Dr. Munroe's own
+  // arrival (goScholars, below) is a different, deliberate beat and stays a
+  // plain cut on purpose; this crossfade is only for the auto-cycle.
+  var CYCLE_FADE = 260;
+
   function startGalleryCycle() {
     stopGalleryCycle();
     if (typeof window.setChapter !== "function") return;
     var i = 0;
     galleryCycleTimer = setInterval(function () {
+      var tick = galleryCycleTimer;
       i = (i + 1) % GALLERY_CYCLE.length;
-      window.setChapter(GALLERY_CYCLE[i]);
-    }, 2200);
+      var oldRoom = document.querySelector("#stage .room");
+
+      function change() {
+        // A tick's fade-out can still be in flight after the interval that
+        // scheduled it was cleared or replaced (stepping to the next beat,
+        // or leaving and re-entering this one fast) — without this guard a
+        // stale tick would call setChapter() on whatever beat came after.
+        if (galleryCycleTimer !== tick) return;
+        window.setChapter(GALLERY_CYCLE[i]);
+        var newRoom = document.querySelector("#stage .room");
+        if (newRoom && newRoom.animate) {
+          newRoom.animate([{ opacity: 0 }, { opacity: 1 }], { duration: CYCLE_FADE, easing: "ease-out" });
+        }
+      }
+
+      if (oldRoom && oldRoom.animate) {
+        var out = oldRoom.animate([{ opacity: 1 }, { opacity: 0 }], { duration: CYCLE_FADE, easing: "ease-in" });
+        out.finished.then(change).catch(change);
+      } else {
+        change();
+      }
+    }, 2500);
   }
 
   // Called on every beat that is not this one, so the cycle never keeps

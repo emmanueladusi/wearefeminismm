@@ -22,7 +22,13 @@
   var root = document.getElementById("wordle");
   if (!root) return;
 
-  var KEY = "wf-word.v1";
+  // Bumped v1 -> v2 to reset every visitor's saved progress for the live
+  // crowd guess tomorrow — anyone who already played today's pinned word
+  // gets a blank grid again, the same as a first-time visitor. The old key
+  // is simply abandoned, not cleared: this is a static site with no server
+  // to reach into anyone else's browser, so "refresh it for everyone" can
+  // only ever mean "stop reading the old key," never an actual remote wipe.
+  var KEY = "wf-word.v2";
   var EPOCH = Date.UTC(2026, 7, 7) / 86400000;
 
   var WORDS = (window.WORD_LIST || []).filter(function (e) {
@@ -76,13 +82,15 @@
   }
 
   /* ---------- presentation-day override -----------------------------------
-     Pinned by hand for the live talk: every visitor gets WEAREFEMINISMM
-     instead of whatever the normal rotation would deal, regardless of the
-     real date. Deliberately bypasses WORDS and its 4-8 letter filter (line
-     29) rather than being added to the pool, since this is a one-off, not a
-     real day's word that should ever come up again in the rotation.
+     Pinned by hand for the live talk: every visitor gets FEMINISM instead of
+     whatever the normal rotation would deal, regardless of the real date.
+     Deliberately bypasses WORDS and its 4-8 letter filter (line 29) rather
+     than being added to the pool, since this is a one-off tied to tomorrow's
+     crowd guess, not a real day's word that should come up again in the
+     rotation. (Was WEAREFEMINISMM — swapped for something a stranger in the
+     room actually stands a chance of guessing.)
      SET TO null TO GO BACK TO NORMAL. That is the only edit this needs. */
-  var FORCE_WORD = { w: "WEAREFEMINISMM", m: "The name of this site. Two m's, on purpose." };
+  var FORCE_WORD = { w: "FEMINISM", m: "Belief in the political, economic, and social equality of the sexes." };
 
   var day = dayIndex();
   var TARGET = FORCE_WORD ? FORCE_WORD.w : wordFor(day).w;
@@ -105,13 +113,20 @@
   // Two passes, and it has to be two: a single pass marks the second L in
   // SPELL yellow when the answer holds only one L. Exact hits are claimed
   // first, then near-misses draw from whatever letters are actually left.
+  //
+  // guess can be SHORTER than LEN — the pinned word is 14 letters and a
+  // stranger guessing it live has no reason to type exactly 14 characters.
+  // The first pass still runs the full target width so leftover letters are
+  // counted correctly either way; the second pass only marks positions the
+  // guess actually reached, leaving the rest of res undefined rather than
+  // inventing an "off" mark for a letter nobody typed.
   function mark(guess) {
     var res = new Array(LEN), left = {}, i, ch;
     for (i = 0; i < LEN; i++) {
-      if (guess[i] === TARGET[i]) res[i] = "hit";
+      if (i < guess.length && guess[i] === TARGET[i]) res[i] = "hit";
       else { ch = TARGET[i]; left[ch] = (left[ch] || 0) + 1; }
     }
-    for (i = 0; i < LEN; i++) {
+    for (i = 0; i < guess.length; i++) {
       if (res[i]) continue;
       ch = guess[i];
       if (left[ch] > 0) { res[i] = "near"; left[ch]--; }
@@ -183,7 +198,7 @@
       var res = g ? mark(g) : null;
       for (var c = 0; c < LEN; c++) {
         var t = el("div", "wd__t");
-        if (g) {
+        if (g && c < g.length) {
           t.textContent = g[c];
           t.classList.add("is-" + res[c]);
           t.setAttribute("aria-label", g[c] + ", " + LABEL[res[c]]);
@@ -204,8 +219,9 @@
     var rank = { off: 0, near: 1, hit: 2 };
     guesses.forEach(function (g) {
       var res = mark(g);
-      for (var i = 0; i < LEN; i++) {
+      for (var i = 0; i < g.length; i++) {
         var c = g[i];
+        if (!res[i]) continue;
         if (best[c] === undefined || rank[res[i]] > rank[best[c]]) best[c] = res[i];
       }
     });
@@ -254,16 +270,19 @@
   }
 
   function submit() {
-    if (current.length < LEN) {
-      // No dictionary is shipped, so a guess is never rejected for not being
-      // "a word". A 4-to-8 letter dictionary is 580KB, it would refuse plenty
-      // of real words anyway, and being told your valid word is invalid is far
-      // more irritating than being allowed to waste your own turn.
-      say("Needs " + LEN + " letters.");
+    if (current.length === 0) {
+      say("Type a guess.");
       var row = gridEl.children[guesses.length];
       if (row) { row.classList.remove("is-nudge"); void row.offsetWidth; row.classList.add("is-nudge"); }
       return;
     }
+    // No dictionary is shipped, so a guess is never rejected for not being
+    // "a word", AND a guess shorter than LEN is let straight through rather
+    // than blocked. For the pinned word specifically this matters: it is
+    // guessed cold, live, by a room of strangers with no reason to type
+    // exactly LEN letters — mark() and drawGrid() both already handle a
+    // short guess by leaving the untyped tail blank instead of inventing an
+    // "off" mark for a letter nobody typed.
     guesses.push(current);
     var won = current === TARGET;
     current = "";
