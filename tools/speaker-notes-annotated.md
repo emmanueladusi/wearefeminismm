@@ -6,16 +6,16 @@ is set to. Nothing to toggle — just open the link.
 
 **→** or **Space** or clicker forward = next · **←** = back · **P** = peek at where you are · **Esc** = exit
 
-**26 presses.** Beat 0 is where you start, before you press anything. (Verified
+**27 presses.** Beat 0 is where you start, before you press anything. (Verified
 directly against the running code, not counted by hand — if this number and
 the slide deck ever disagree, trust the deck.)
 
-The piece of the month now lands a little higher and keeps scrolling on its
-own toward the prose. The Asante slide now carries the gallery's own
-artwork, so the gallery beat right after it skips its opening reveal
-entirely and lands straight on Dr. Munroe, her profile already expanding on
-its own. One org on the Community wall (Black Women's Institute for Health)
-grows and lifts when that beat lands. See **Changes made** for the full list.
+The piece of the month now lands at the top of the section first, then moves
+on its own toward the photo after a few seconds. The gallery still opens on
+its own beat, one press before Dr. Munroe — no visible reveal animation
+either way, and her profile expands on its own once you reach her. One org
+on the Community wall (Black Women's Institute for Health) grows and lifts
+when that beat lands. See **Changes made** for the full list.
 
 ---
 
@@ -100,14 +100,15 @@ look.
 When you first open the site, the animation hits you, this was meant to
 show that we are building a community.
 
-**\*SLIDE CHANGE\*** → *scrolls to the piece of the month, the Maya Angelou photograph*
+**\*SLIDE CHANGE\*** → **scrolls to the top of the piece-of-month section — the eyebrow, "This month's piece," the lead line. After about 2 seconds it keeps moving on its own, down toward the Maya Angelou photograph**
 
 As you scroll down, there is a piece of the month. In this, every month, it will
 cycle through a Black Feminist literature, artwork, or creative piece.
 
 > The photo takes a second to assemble itself out of ink as it arrives — that is
-> deliberate, not a loading glitch. Give it that second before you start talking
-> over it, same as the wordmark above.
+> deliberate, not a loading glitch. By the time the auto-scroll settles on it,
+> give it that extra second before you start talking over it, same as the
+> wordmark above.
 
 There is also a spot right here for you to make a submission, and be featured on
 the website!
@@ -163,12 +164,16 @@ there, tackled my finding on the presurvey.
 
 **(pause)**
 
-**\*SLIDE CHANGE\*** → **straight to Dr. Munroe — no opening reveal first. The gallery appears already on her card (gold ring, "Featured" tag), and her profile opens on its own, the same panel a visitor gets from clicking her portrait**
+**\*SLIDE CHANGE\*** → **the gallery opens. No visible reveal animation — it's simply there. This is the payoff, give it a second**
 
 Within my art gallery, I addressed my second presurvey finding. It is informative,
 featuring a part that talks about the different types of feminism, the different
 waves, and providing resources from scholars if people are interested in learning
-more, with our very own Dr. Munroe being featured in it. Not only does my art gallery
+more,
+
+**\*SLIDE CHANGE\*** → **the scholars room. Dr. Munroe's card carries a gold ring and a "Featured" tag, and her profile opens on its own — the same panel a visitor gets from clicking her portrait**
+
+with our very own Dr. Munroe being featured in it. Not only does my art gallery
 make feminism interactive and engaging to learn about, there are resources that
 are right in front of you so you cannot miss it.
 
@@ -293,26 +298,29 @@ Learn-page-hero beat, right where your script puts a slide change before the
 82-people stat — instead of sitting with the prototypes paragraph like the last
 draft had it.
 
-**9. The piece of the month lands higher, then keeps going on its own.** It
-used to centre the photo dead-centre and stop. Now it settles higher — about
-30% down instead of 50% — and after a moment keeps scrolling on its own down
-toward the quote and note, so you don't have to press again just to bring the
-rest of the piece into view. The submission line ("Submit your entry here")
-sits on this same beat, right where your script puts it.
+**9. The piece of the month lands at the top of the section, then moves on
+its own toward the photo.** Landing straight on the centred photo skipped
+past the title and lead line, so now the beat opens on the section's natural
+top — eyebrow, "This month's piece," the lead paragraph — and after about 2
+seconds moves on its own down to the photo, settling about 30% down rather
+than true centre so there's room below it once it resolves out of ink. The
+submission line ("Submit your entry here") sits on this same beat, right
+where your script puts it.
 
-**10. The Asante slide carries the gallery's own artwork, the gallery skips
-its opening reveal, and Dr. Munroe's profile expands on its own.** The photo
-you wanted on that slide turned out to already be a site asset —
+**10. The Asante slide carries the gallery's own artwork; the gallery still
+opens on its own beat; Dr. Munroe's profile expands on its own.** The photo
+you wanted on the Asante slide turned out to already be a site asset —
 `img/art/learn-hero.jpg`, the same collage that opens the Learn page, rights
-already held. No file needed. Two more rounds on the beat right after it:
-first, no separate "gallery opens" beat — pressing next off Asante opens the
-gallery directly onto Dr. Munroe. Then you said you didn't want the gallery
-to visibly open at all before showing her — the ~900ms portal-grow reveal is
-now skipped whenever presenting (`Gallery.html`'s `openGallery()` checks for
-`?present` in the URL), so the gallery is simply already there, on her card.
-Last, her card is clicked automatically, opening the same expanded profile
-panel a visitor gets from clicking her portrait — you don't have to click it
-yourself mid-talk. This is what brought the count to 26.
+already held. No file needed. The gallery beat right after it went through a
+few rounds: first merged with the scholars beat into one, then split back
+into two on your call — you didn't want that beat removed. What's changed
+from the very first pass is that neither gallery beat shows a reveal
+animation anymore: the ~900ms portal-grow effect is skipped entirely while
+presenting (`Gallery.html`'s `openGallery()` checks for `?present` in the
+URL), so both beats simply show the room, already there, no growing circle.
+On the scholars beat, her card is also clicked automatically, opening the
+same expanded profile panel a visitor gets from clicking her portrait
+themselves.
 
 **11. One organization spotlights.** Black Women's Institute for Health grows
 and lifts above its neighbours on the Community beat — a presenter-only

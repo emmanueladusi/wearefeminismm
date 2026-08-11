@@ -64,7 +64,8 @@
   ])
   .concat(deck("process", "learn.html", "#boring-pulse"))
   .concat([
-    { p: "learn.html", t: "#gallery", say: "The gallery opens, straight to Dr. Munroe", gal: true, url: "room=scholars", prep: goScholars },
+    { p: "learn.html", t: "#gallery", say: "The gallery opens · the payoff", gal: true, prep: enterGallery },
+    { p: "learn.html", t: "#gallery", say: "Scholars · Dr. Munroe's profile expands", gal: true, url: "room=scholars", prep: goScholars },
     { p: "play.html", t: "#theword", say: "Learning gets tested · the daily word", prep: openWord },
     { p: "community.html", t: "#directory", say: "Organizations girls can actually reach", prep: spotlightOrg },
     { p: "wall.html", t: "#wallf", say: "Your own wall, moderated", prep: enterWall }
@@ -105,57 +106,58 @@
     if (window.__heroReplay) window.__heroReplay();
   }
 
-  /* js/inkpiece.js resolves the Maya Angelou photo out of dithered ink
-     PURELY off scroll position: its own progress function reads 1.0 only
-     once the tile's centre reaches the middle of the viewport, and the
-     ordinary scrollTo() every other beat uses aligns a section's TOP to the
-     viewport's top instead. That mismatch meant this beat could land with
-     the photo still mid-dither, exactly what he flagged.
-
-     The fix does not touch inkpiece.js at all: it scrolls to the position
-     that makes inkpiece's OWN math read "resolved", so the same file that
-     already reveals the picture on a normal visitor's scroll reveals it here
-     too, at rest instead of caught mid-transition.
+  /* Lands at the section's natural top first — eyebrow, title and lead read
+     in order, the way any other beat's plain scrollTo() would leave it —
+     THEN moves on its own toward the photo, rather than jumping straight to
+     the photo on arrival. That second half is the part inkpiece.js cares
+     about: its dither-reveal resolves purely off how CENTRED the tile is in
+     the viewport, and lands here at 32% down rather than true centre so
+     there is room below it once it resolves.
 
      Returns -1, the same sentinel hardNav() uses for "this prep already did
      the navigating" — here it means "this prep already did the scrolling",
      so land() must not also run its own generic scrollTo(b.t) afterward. */
   function centerPiece() {
-    var host = document.querySelector(".piece__photo[data-ink]");
-    if (!host) return 0;
-    var r = host.getBoundingClientRect();
-    // Higher than true centre (32% down rather than 50%), so there is room
-    // left below the photo for the page to keep moving into on its own.
-    var targetY = Math.max(0, window.scrollY + r.top - (innerHeight - r.height) * 0.32);
-    if (window.__lenis) window.__lenis.scrollTo(targetY, { offset: 0 });
-    else window.scrollTo({ top: targetY, behavior: "smooth" });
+    scrollTo("#popculture");
 
-    // The page then keeps scrolling on its own toward the piece's prose,
-    // rather than sitting still until the next press — give the photo a
-    // moment to resolve out of ink first. Guarded against a beat change in
-    // the meantime: if he has already pressed on by the time this fires,
-    // `idx` has moved past the value it was called for, and pulling the
-    // page back down here would fight whatever beat he is actually on.
     var thisBeat = idx;
     setTimeout(function () {
+      // Guarded against a beat change in the meantime: if he has already
+      // pressed on by the time this fires, `idx` has moved past the value
+      // it was called for, and pulling the page down here would fight
+      // whatever beat he is actually on.
       if (idx !== thisBeat) return;
-      var prose = document.querySelector(".piece__prose");
-      if (!prose) return;
-      if (window.__lenis) window.__lenis.scrollTo(prose, { offset: 0 });
-      else prose.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 1800);
+      var host = document.querySelector(".piece__photo[data-ink]");
+      if (!host) return;
+      var r = host.getBoundingClientRect();
+      var targetY = Math.max(0, window.scrollY + r.top - (innerHeight - r.height) * 0.32);
+      if (window.__lenis) window.__lenis.scrollTo(targetY, { offset: 0 });
+      else window.scrollTo({ top: targetY, behavior: "smooth" });
+    }, 2200);
 
     return -1;
   }
 
-  // Opens the gallery straight into the scholars room, Dr. Munroe's card
-  // (gold ring, "Featured" tag) visible as the room resolves, then clicks
-  // her card itself to open her expanded profile — the same #detail panel a
-  // visitor gets from clicking her portrait (Gallery.html's wireOpen/
-  // detailScholar). No separate "gallery opens" beat before this one, and no
-  // portal-grow reveal either: Gallery.html's openGallery() skips its own
-  // ~900ms animation whenever ?present is in the URL, since the Asante slide
-  // already introduced the gallery with its own artwork.
+  function enterGallery() {
+    // No portal-grow reveal to wait out: Gallery.html's openGallery() skips
+    // that ~900ms animation entirely whenever ?present is in the URL, so
+    // the gallery is simply already there once this click resolves.
+    if (!isGalleryOpen()) {
+      var btn = document.getElementById("enterBtn");
+      if (btn) btn.click();
+      return 200;
+    }
+    // Already open means we arrived BACKWARD from the scholars room. Put the
+    // gallery back on its opening room, or he introduces the gallery over a
+    // room the talk has not reached yet.
+    if (typeof window.setChapter === "function") window.setChapter("directory");
+    return 100;
+  }
+
+  // Moves to the scholars room, Dr. Munroe's card (gold ring, "Featured"
+  // tag) visible as it resolves, then clicks her card itself to open her
+  // expanded profile — the same #detail panel a visitor gets from clicking
+  // her portrait (Gallery.html's wireOpen/detailScholar).
   function goScholars() {
     if (typeof window.openGallery === "function") {
       window.openGallery("scholars");
