@@ -22,14 +22,12 @@
   var root = document.getElementById("wordle");
   if (!root) return;
 
-  // Bumped again, v3 -> v4: the target word itself changed (FEMINISM ->
-  // FEMINISMM), so any saved guesses from the old word would be scored
-  // against letters that are no longer the answer. Same reset mechanism as
-  // the v1 -> v2 and v2 -> v3 bumps — the old keys are simply abandoned,
+  // Bumped again, v4 -> v5: another plain reset for everyone. Same
+  // mechanism as every bump before it — the old keys are simply abandoned,
   // not cleared: this is a static site with no server to reach into anyone
   // else's browser, so a reset can only ever mean "stop reading the old
   // key," never an actual remote wipe.
-  var KEY = "wf-word.v4";
+  var KEY = "wf-word.v5";
   var EPOCH = Date.UTC(2026, 7, 7) / 86400000;
 
   var WORDS = (window.WORD_LIST || []).filter(function (e) {
