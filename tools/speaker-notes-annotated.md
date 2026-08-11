@@ -386,6 +386,15 @@ blank instead of inventing "not in the word" marks for letters nobody typed.
 Also reset for everyone, including you: the saved-progress key changed, so
 anyone who already played today's word (under the old pin) starts clean.
 
+**16. The presentation video is swapped for a new file** — same slot, same
+crossfade in and out, just longer (38s, was 28s). Nothing else about that
+beat changed. The poster frame was regenerated from the new file so there's
+no mismatched flash before it starts.
+
+**17. The TDSB and Centre of Excellence logos are bigger** on every slide —
+up from a 42px cap to 68px, about 60% larger, still tucked in the corner
+above the thread and clear of it.
+
 ## If you lose your place
 
 Press **P**. A small card appears at the bottom left with the beat number, what you

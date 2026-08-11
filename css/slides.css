@@ -103,7 +103,7 @@ body.sl-up { overflow: hidden; }
   right: var(--pad);
   bottom: clamp(14px, 2vw, 22px);
   z-index: 2;
-  height: clamp(30px, 3.6vw, 42px);
+  height: clamp(48px, 5.6vw, 68px);
   width: auto;
   opacity: 0.92;
   pointer-events: none;
@@ -112,7 +112,7 @@ body.sl-up { overflow: hidden; }
   /* The foot band gets crowded on a narrow window; a presentation is a
      projector layout first, so this is the one place that is allowed to
      just get smaller rather than earning a whole stacked mobile treatment. */
-  .sl__partners { height: 22px; bottom: 10px; right: 12px; }
+  .sl__partners { height: 34px; bottom: 10px; right: 12px; }
 }
 
 /* ---------- the decoration layer ---------- */
