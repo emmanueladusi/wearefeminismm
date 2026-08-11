@@ -503,6 +503,33 @@ body.sl-up { overflow: hidden; }
    than running to the glass. Smaller and inset from the edge, closer to the
    centre of the frame, for the same reason — a floating card needs air, a
    bleed does not. */
+/* Two photos instead of one, on the Asante slide only: a wrapper takes over
+   the positioning .sl__photo used to hold on its own (right inset,
+   vertical centring), laying its children out in a row, and each
+   .sl__photo inside it drops back to position:static so the flex layout
+   places it rather than the single-photo absolute rule. Specificity (two
+   classes) is what makes this override win without !important. */
+.sl__photos {
+  position: absolute;
+  right: clamp(48px, 9vw, 130px);
+  top: 0;
+  bottom: 0;
+  margin-block: auto;
+  height: var(--photo-h, min(28vh, 260px));
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 0;
+}
+.sl__photos .sl__photo {
+  position: static;
+  right: auto;
+  top: auto;
+  bottom: auto;
+  margin-block: 0;
+  height: 100%;
+}
+
 .sl__photo {
   position: absolute;
   right: clamp(64px, 11vw, 150px);
@@ -570,7 +597,7 @@ body.sl-up { overflow: hidden; }
    projector layout; a shrunken portrait above a headline is worse than no
    portrait, and putting the text on top of it would put type over a face. */
 @media (max-width: 820px) {
-  .sl__photo { display: none; }
+  .sl__photo, .sl__photos { display: none; }
   .sl[data-lay="portrait"] .sl__body { justify-self: center; max-width: 100%; }
 }
 

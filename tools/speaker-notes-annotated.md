@@ -159,7 +159,7 @@ said just use art pieces, and then right there, it clicked.
 
 **(pause)**
 
-**\*SLIDE CHANGE\*** → *Art locates African people as subjects, not objects.* (Asante, 1980) **— the gallery's own artwork now sits on this slide, the collage of two figures reaching across a sunflower, the same image that opens the Learn page**
+**\*SLIDE CHANGE\*** → *Art locates African people as subjects, not objects.* (Asante, 1980) **— two pieces now sit side by side on this slide: the collage of two figures reaching across a sunflower (the same image that opens the Learn page), and the many-profiles collage you sent**
 
 I came to the conclusion that at that very moment there was no better way for me
 to teach people about feminism than through using an Afrocentric method: An Art
@@ -352,6 +352,15 @@ autoplay only works because pressing the key that reaches this beat is
 itself the "go ahead and play audio" permission browsers require, so as
 long as you arrive here by pressing next (the normal way), it should just
 play. This is what brought the count to 28.
+
+**14. The Asante slide carries both photos now, side by side.** The second
+one — the many-profiles collage — needed the same thing the first one did: I
+could see it in chat but couldn't pull it onto disk, and asked where you'd
+saved it. Once I had the file (`non copy right.jpeg`, checked for a
+watermark — clean this time), it went in alongside the first photo rather
+than replacing it. `.sl__photo` only ever supported one image per slide, so
+this is new: a `.sl__photos` wrapper lays two side by side, each keeping its
+own true aspect ratio so neither crops.
 
 ## If you lose your place
 

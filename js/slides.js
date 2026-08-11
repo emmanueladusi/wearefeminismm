@@ -169,8 +169,10 @@
       long: true,
       img: "img/art/learn-hero.jpg",
       imgRatio: "750 / 500",
-      imgHeight: "min(34vh, 320px)",
-      say: "Asante, the Afrocentric method — the gallery's own artwork" }
+      img2: "img/art/many-voices.jpg",
+      imgRatio2: "1732 / 1155",
+      imgHeight: "min(28vh, 260px)",
+      say: "Asante, the Afrocentric method — the gallery's own artwork, in two pieces" }
   ];
 
   /* CLOSING — the whole ending. Next steps, the reflection, the feedback and
@@ -517,23 +519,47 @@
          Armed and released the same way the words are, with its own class and
          a reflow rather than a timer, so the resting state is the visible one:
          if the transition never runs, the photo is simply there. */
-      var oldPhoto = root.querySelector(".sl__photo");
+      var oldPhoto = root.querySelector(".sl__photo, .sl__photos");
       if (oldPhoto) oldPhoto.remove();
-      if (s.img) {
+
+      /* One source per image, deliberately no srcset. Photos are
+         display:none below 820px, so there is no small-screen case to
+         serve a smaller file to, and the responsive version actively
+         hurt: the browser chose the narrow candidate and upscaled a
+         372px image into a 605px box, visibly soft on a projector. */
+      function mkPhoto(src, ratio) {
         var fig = document.createElement("div");
         fig.className = "sl__photo";
+        if (ratio) fig.style.setProperty("--photo-ratio", ratio);
+        fig.innerHTML = '<img src="' + src + '" alt="" decoding="async">';
+        return fig;
+      }
+
+      if (s.img && s.img2) {
+        // Two photos, side by side (the Asante slide: the gallery's own
+        // artwork beside the many-faces collage) — a wrapper takes over
+        // the positioning a single .sl__photo holds on its own, and
+        // --photo-h lives on the WRAPPER, not either photo, since it sets
+        // the shared row height both sides by their own ratio.
+        var wrap = document.createElement("div");
+        wrap.className = "sl__photos";
+        if (s.imgHeight) wrap.style.setProperty("--photo-h", s.imgHeight);
+        wrap.appendChild(mkPhoto(s.img, s.imgRatio));
+        wrap.appendChild(mkPhoto(s.img2, s.imgRatio2));
+        root.appendChild(wrap);
+        wrap.querySelectorAll(".sl__photo").forEach(function (fig) {
+          fig.classList.add("is-armed");
+        });
+        void wrap.offsetWidth;
+        wrap.querySelectorAll(".sl__photo").forEach(function (fig) {
+          fig.classList.remove("is-armed");
+        });
+      } else if (s.img) {
         // Ratio is per-slide: Emmanuel's own portrait is 933/1400, but a
-        // slide can carry a landscape piece instead (the gallery's own
-        // artwork, on the Asante slide). CSS falls back to the portrait
-        // ratio when a slide sets none.
-        if (s.imgRatio) fig.style.setProperty("--photo-ratio", s.imgRatio);
+        // slide can carry a landscape piece instead. CSS falls back to the
+        // portrait ratio when a slide sets none.
+        var fig = mkPhoto(s.img, s.imgRatio);
         if (s.imgHeight) fig.style.setProperty("--photo-h", s.imgHeight);
-        /* One source, deliberately no srcset. The photo is display:none below
-           820px, so there is no small-screen case to serve a smaller file to,
-           and the responsive version actively hurt: the browser chose the
-           narrow candidate and upscaled a 372px image into a 605px box, which
-           is visibly soft on a projector. One 144KB file, always crisp. */
-        fig.innerHTML = '<img src="' + s.img + '" alt="" decoding="async">';
         root.appendChild(fig);
         fig.classList.add("is-armed");
         void fig.offsetWidth;
