@@ -22,13 +22,14 @@
   var root = document.getElementById("wordle");
   if (!root) return;
 
-  // Bumped again, v2 -> v3: another reset for everyone, same reason and
-  // same mechanism as the v1 -> v2 bump — anyone who's played since gets a
-  // blank grid again. The old keys are simply abandoned, not cleared: this
-  // is a static site with no server to reach into anyone else's browser, so
-  // "refresh it for everyone" can only ever mean "stop reading the old
+  // Bumped again, v3 -> v4: the target word itself changed (FEMINISM ->
+  // FEMINISMM), so any saved guesses from the old word would be scored
+  // against letters that are no longer the answer. Same reset mechanism as
+  // the v1 -> v2 and v2 -> v3 bumps — the old keys are simply abandoned,
+  // not cleared: this is a static site with no server to reach into anyone
+  // else's browser, so a reset can only ever mean "stop reading the old
   // key," never an actual remote wipe.
-  var KEY = "wf-word.v3";
+  var KEY = "wf-word.v4";
   var EPOCH = Date.UTC(2026, 7, 7) / 86400000;
 
   var WORDS = (window.WORD_LIST || []).filter(function (e) {
@@ -82,15 +83,15 @@
   }
 
   /* ---------- presentation-day override -----------------------------------
-     Pinned by hand for the live talk: every visitor gets FEMINISM instead of
-     whatever the normal rotation would deal, regardless of the real date.
-     Deliberately bypasses WORDS and its 4-8 letter filter (line 29) rather
-     than being added to the pool, since this is a one-off tied to tomorrow's
-     crowd guess, not a real day's word that should come up again in the
-     rotation. (Was WEAREFEMINISMM — swapped for something a stranger in the
-     room actually stands a chance of guessing.)
+     Pinned by hand for the live talk: every visitor gets FEMINISMM (two m's,
+     matching the site's own name and its whole "wearefeminismm" motif)
+     instead of whatever the normal rotation would deal, regardless of the
+     real date. Deliberately bypasses WORDS and its 4-8 letter filter (line
+     29) rather than being added to the pool, since this is a one-off tied to
+     tomorrow's crowd guess, not a real day's word that should come up again
+     in the rotation. (Was FEMINISM, before that WEAREFEMINISMM.)
      SET TO null TO GO BACK TO NORMAL. That is the only edit this needs. */
-  var FORCE_WORD = { w: "FEMINISM", m: "Belief in the political, economic, and social equality of the sexes." };
+  var FORCE_WORD = { w: "FEMINISMM", m: "Belief in the political, economic, and social equality of the sexes — spelled here with the site's own two m's." };
 
   var day = dayIndex();
   var TARGET = FORCE_WORD ? FORCE_WORD.w : wordFor(day).w;
