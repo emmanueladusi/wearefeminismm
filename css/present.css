@@ -46,3 +46,32 @@
 @media (prefers-reduced-motion: reduce) {
   .pm-peek { transition: none; }
 }
+
+/* ================================================================
+   The presentation-video beat. A full-viewport crossfade: whatever the
+   site was showing fades under a solid black ground as the video fades
+   in on top of it, and the same in reverse leaving it — never a hard cut
+   either way. z-index sits above the research slides (8500) so it can
+   cover them too if this beat is ever moved, but under the peek card
+   (9000) so P still works on top of it. Built once and reused, the same
+   pattern as js/slides.js's overlay. */
+.pm-video {
+  position: fixed;
+  inset: 0;
+  z-index: 8700;
+  display: grid;
+  place-items: center;
+  background: #0b0705;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.75s ease;
+}
+.pm-video.is-on { opacity: 1; pointer-events: auto; }
+.pm-video video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pm-video { transition: none; }
+}

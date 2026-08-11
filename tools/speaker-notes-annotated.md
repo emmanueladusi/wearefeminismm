@@ -6,16 +6,18 @@ is set to. Nothing to toggle — just open the link.
 
 **→** or **Space** or clicker forward = next · **←** = back · **P** = peek at where you are · **Esc** = exit
 
-**27 presses.** Beat 0 is where you start, before you press anything. (Verified
+**28 presses.** Beat 0 is where you start, before you press anything. (Verified
 directly against the running code, not counted by hand — if this number and
 the slide deck ever disagree, trust the deck.)
 
-The piece of the month now lands at the top of the section first, then moves
-on its own toward the photo after a few seconds. The gallery still opens on
-its own beat, one press before Dr. Munroe — no visible reveal animation
-either way, and her profile expands on its own once you reach her. One org
-on the Community wall (Black Women's Institute for Health) grows and lifts
-when that beat lands. See **Changes made** for the full list.
+A new beat now sits right after "here's a look": your presentation video,
+full-screen, fading in and out. The piece of the month lands at the top of
+the section first, then moves on its own toward the photo after a few
+seconds. The gallery still opens on its own beat, one press before
+Dr. Munroe — no visible reveal animation either way, and her profile expands
+on its own once you reach her. One org on the Community wall (Black Women's
+Institute for Health) grows and lifts when that beat lands. See
+**Changes made** for the full list.
 
 ---
 
@@ -96,6 +98,10 @@ However, it is only a bunch of words if I do not back up my big talk, here's a
 look.
 
 **(pause — let the wordmark finish before you speak over it)**
+
+**\*SLIDE CHANGE\*** → **full-screen, fading in: the presentation video. Plays with its own sound — let it run, don't talk over it. Fades back out to the site the instant you press next**
+
+**(pause — this one plays on its own, let it run its course before you press on)**
 
 When you first open the site, the animation hits you, this was meant to
 show that we are building a community.
@@ -337,6 +343,15 @@ stay on that beat — scholars is deliberately left out, since that's the next
 beat's own reveal and cycling into it here would fight the auto-expand.
 Stops the instant you press next or back; picking the beat back up (either
 direction) always restarts the cycle fresh from the directory.
+
+**13. Your presentation video is now its own beat**, right where you asked:
+after "here's a look," before "when you first open the site." Full-screen,
+crossfades in over whatever was on screen and crossfades back out the same
+way leaving it — no hard cut in or out. It plays with its own sound; the
+autoplay only works because pressing the key that reaches this beat is
+itself the "go ahead and play audio" permission browsers require, so as
+long as you arrive here by pressing next (the normal way), it should just
+play. This is what brought the count to 28.
 
 ## If you lose your place
 

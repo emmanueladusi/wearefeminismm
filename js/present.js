@@ -53,6 +53,7 @@
   .concat(deck("opening", "index.html", "#brandmark"))
   .concat([
     { p: "index.html", t: "#brandmark", say: "Here's a look · replay the reveal", prep: replayHero },
+    { p: "index.html", t: "#brandmark", say: "The presentation video", video: true, prep: showVideo },
     { p: "index.html", t: "#popculture", say: "Piece of the month", prep: centerPiece },
     { p: "index.html", t: "#about", say: "About me, and why it's last" },
     // js/learnHero.js plays itself on load, unprompted, so no prep step: the
@@ -104,6 +105,56 @@
 
   function replayHero() {
     if (window.__heroReplay) window.__heroReplay();
+  }
+
+  /* The presentation-video beat: a full-viewport crossfade in, over the
+     video, crossfade back out — never a hard cut either way. Built once
+     and reused, same pattern as js/slides.js's overlay.
+
+     Returns -1 (this prep already handled everything the beat needs; land()
+     must not also run its own scrollTo, which would be pointless anyway
+     under an opaque full-screen layer). */
+  var videoOverlay = null, videoEl = null;
+
+  function buildVideoOverlay() {
+    videoOverlay = document.createElement("div");
+    videoOverlay.className = "pm-video";
+    videoOverlay.setAttribute("aria-hidden", "true");
+    videoEl = document.createElement("video");
+    videoEl.src = "video/presentation-video.mp4";
+    videoEl.poster = "video/presentation-video-poster.jpg";
+    videoEl.playsInline = true;
+    videoEl.preload = "auto";
+    videoOverlay.appendChild(videoEl);
+    document.body.appendChild(videoOverlay);
+  }
+
+  function showVideo() {
+    if (!videoOverlay) buildVideoOverlay();
+    videoEl.currentTime = 0;
+    videoOverlay.classList.add("is-on");
+    // Play is called synchronously inside the keydown handler that reached
+    // this beat, which is what lets Chrome/Safari allow audio to autoplay
+    // at all. A rejected promise here (e.g. a cold ?present&beat= load with
+    // no real keypress behind it) is swallowed rather than thrown: the
+    // poster frame still shows, and a normal advance-by-keypress arrival
+    // works either way.
+    var p = videoEl.play();
+    if (p && p.catch) p.catch(function () {});
+    return -1;
+  }
+
+  // Fades the video out and stops it — called on every beat that is not
+  // this one (see land()), the same unconditional-cleanup shape as
+  // stopGalleryCycle(), so stepping away either direction always leaves it
+  // silent and reset for the next arrival.
+  function hideVideoOverlay() {
+    if (!videoOverlay) return;
+    videoOverlay.classList.remove("is-on");
+    var el = videoEl;
+    setTimeout(function () {
+      if (el) { el.pause(); el.currentTime = 0; }
+    }, 800);
   }
 
   /* Lands at the section's natural top first — eyebrow, title and lead read
@@ -283,6 +334,10 @@
     // stays on the same page (no reload to reset a running interval) and a
     // room changing itself under her card would fight the auto-expand.
     if (!b.cycle) stopGalleryCycle();
+
+    // Same shape for the video: unconditional, so it can never keep playing
+    // (silently, off-screen but still audible) into a later beat.
+    if (!b.video) hideVideoOverlay();
 
     // The research slides cover the viewport, so they follow the same rule the
     // gallery does: any beat that is not a slide beat has to put them away
