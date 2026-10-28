@@ -66,7 +66,6 @@
   .concat(deck("process", "learn.html", "#boring-pulse"))
   .concat([
     { p: "learn.html", t: "#gallery", say: "The gallery opens · scroll through it, into Waves, through Wave Two", gal: true, walk: true, prep: enterGallery },
-    { p: "learn.html", t: "#gallery", say: "Scholars · Dr. Munroe's profile expands", gal: true, url: "room=scholars", prep: goScholars },
     { p: "play.html", t: "#theword", say: "Learning gets tested · the daily word", prep: openWord },
     { p: "community.html", t: "#directory", say: "Organizations girls can actually reach", prep: spotlightOrg },
     { p: "wall.html", t: "#wallf", say: "Your own wall, moderated", prep: enterWall }
@@ -197,7 +196,7 @@
       var btn = document.getElementById("enterBtn");
       if (btn) btn.click();
     } else if (typeof window.setChapter === "function") {
-      // Already open means we arrived BACKWARD from the scholars room. Put
+      // Already open means we landed here again without a page load. Put
       // the gallery back on its directory reel before the walkthrough runs,
       // or it starts from wherever the gallery happened to be left.
       window.setChapter("directory");
@@ -291,46 +290,6 @@
     });
   }
 
-  // Moves to the scholars room, Dr. Munroe's card (gold ring, "Featured"
-  // tag) visible as it resolves, then clicks her card itself to open her
-  // expanded profile — the same #detail panel a visitor gets from clicking
-  // her portrait (Gallery.html's wireOpen/detailScholar).
-  function goScholars() {
-    if (typeof window.openGallery === "function") {
-      window.openGallery("scholars");
-      var card = document.querySelector('.piece--scholar[data-pid="s3"]');
-      if (card) card.click();
-
-      // Landing here can race a gallery transition the WALKTHROUGH beat
-      // (enterGallery, above) already triggered before the presenter moved
-      // on — its Enter/wheel dispatches kick off Gallery.html's own portal
-      // animation, which finishes on an internal setTimeout chain nothing
-      // here can reach in to cancel. galleryWalkGen only stops steps still
-      // scheduled in present.js; it does nothing for an async chain that
-      // was already running inside Gallery.html at interrupt time, so that
-      // chain can still complete afterward and overwrite the room this
-      // beat just set. Self-heal: if the room has drifted off scholars
-      // shortly after landing here, put it back.
-      var thisBeat = idx;
-      setTimeout(function () {
-        if (idx !== thisBeat) return;
-        var room = document.querySelector("#stage .room");
-        if (room && room.dataset.type !== "scholars") {
-          window.openGallery("scholars");
-          var detail = document.getElementById("detail");
-          var card2 = document.querySelector('.piece--scholar[data-pid="s3"]');
-          if (card2 && (!detail || !detail.classList.contains("open"))) card2.click();
-        }
-      }, 1200);
-
-      return 200;
-    }
-    // No global? Fall back to the gallery's own ?room= deep link, which does
-    // exactly this on load and is a documented, already-tested path.
-    if (!isGalleryOpen()) return hardNav("learn.html", idx, "room=scholars");
-    return 0;
-  }
-
   function isGalleryOpen() {
     var g = document.getElementById("gallery");
     return !!(g && g.classList.contains("open"));
@@ -415,9 +374,8 @@
     var wait = 0;
 
     // The walkthrough only belongs to its own beat. Cleared unconditionally
-    // here rather than only on exit, since the scholars beat right after it
-    // stays on the same page (no reload to reset scheduled steps) and a
-    // late wheel/Enter dispatch firing there would fight the auto-expand.
+    // here rather than only on exit, so a late wheel/Enter dispatch can never
+    // fire into whatever beat comes next, even one on the same page.
     if (!b.walk) stopGalleryWalk();
 
     // Same shape for the video: unconditional, so it can never keep playing
